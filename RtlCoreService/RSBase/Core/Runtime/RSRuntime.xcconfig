@@ -1,0 +1,8 @@
+//
+//  RSRuntime.xcconfig
+//  RSKit
+//
+//  Created by RetVal on 12/27/12.
+//  Copyright (c) 2012 RetVal. All rights reserved.
+//
+RSKitVersionNumberCurrent = 812;
