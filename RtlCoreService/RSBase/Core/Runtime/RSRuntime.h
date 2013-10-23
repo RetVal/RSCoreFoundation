@@ -348,7 +348,7 @@ typedef RS_ENUM(RSIndex, RSSystemVersion) {
 #endif
 
 #ifdef __RSRuntimeShowErrorMessage
-#define HALTWithError(exception, error) do { RSExceptionCreateAndRaise(RSAllocatorSystemDefault, exception ?: RSGenericException, RSSTR(#error), nil);} while (0)
+#define HALTWithError(exception, error) do { RSExceptionCreateAndRaise(RSAllocatorSystemDefault, exception ?: RSGenericException, RSSTR(#error), nil); __HALT();} while (0)
 #else
 #define HALTWithError(exception, error) __HALT()
 #endif

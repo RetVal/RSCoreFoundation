@@ -81,7 +81,7 @@ static BOOL __RSArchiverRegisterCallbacks(const RSArchiverCallBacks *callbacks)
             result = YES;
         }
         else
-            __RSCLog(RSLogLevelWarning, "Archiver type confilct");
+            __RSCLog(RSLogLevelWarning, "Archiver type conflict");
         RSSpinLockUnlock(&_RSArchiverCallbacksLock);
         RSRelease(isa);
         return result;
@@ -437,7 +437,6 @@ static void __RSArchiverInitialize_Plist();
 static void __RSArchiverInitialize_Queue();
 static void __RSArchiverInitialize_Set();
 static void __RSArchiverInitialize_String();
-static void __RSArchiverInitialize_Timer();
 static void __RSArchiverInitialize_Timezone();
 static void __RSArchiverInitialize_UUID();
 
@@ -461,7 +460,6 @@ RSPrivate void __RSArchiverInitialize()
     __RSArchiverInitialize_Queue();
     __RSArchiverInitialize_Set();
     __RSArchiverInitialize_String();
-    __RSArchiverInitialize_Timer();
     __RSArchiverInitialize_Timezone();
     __RSArchiverInitialize_UUID();
 }
@@ -556,7 +554,7 @@ RSExport BOOL RSArchiverEncodeObjectForKey(RSArchiverRef archiver, RSStringRef k
 RSExport RSStringRef RSArchiverGetCurrentKey(RSArchiverRef archiver)
 {
     __RSGenericValidInstance(archiver, _RSArchiverTypeID);
-    return archiver->_name;
+    return __RSArchiverGetCurrentKey(archiver);
 }
 
 RSExport RSTypeRef RSUnarchiverDecodeObjectForKey(RSUnarchiverRef unarchiver, RSStringRef key)
@@ -620,6 +618,7 @@ static RSDataRef __RSArchiverKeyedEncodedCopyDataPtr(RSArchiverRef archiver)
 
 static BOOL __RSUnarchiverRestoreContext(RSUnarchiverRef unarchiver, RSDataRef data)
 {
+    BOOL result = NO;
     bzero(&unarchiver->_context, sizeof(struct __RSArchiverContext));
     RSDictionaryRef dict = RSDictionaryCreateWithData(RSAllocatorSystemDefault, data);
     RSTypeRef encoded = RSDictionaryGetValue(dict, __RSArchiverContextEncoded);
@@ -633,12 +632,14 @@ static BOOL __RSUnarchiverRestoreContext(RSUnarchiverRef unarchiver, RSDataRef d
         RSDataRef decoded = __RSUnarchiverKeyedCopyDecodeRoutine(encoded);
         RSRelease(encoded);
         unarchiver->_context._archiveData = (RSMutableDictionaryRef)RSDictionaryCreateWithData(RSAllocatorSystemDefault, decoded);
+        result = YES;
     }
     else
     {
         unarchiver->_context._archiveData = (RSMutableDictionaryRef)RSRetain(contextData);
+        result = YES;
     }
-    return NO;
+    return result;
 }
 
 RSExport RSDataRef RSArchiverCopyData(RSArchiverRef archiver)
@@ -1158,21 +1159,6 @@ static void __RSArchiverInitialize_String()
     __RSArchiverRegisterCallbacks(__RSArchiverMakeCallBack(&cb, 7, __RSStringSerializeCallBack, __RSStringDeserializeCallBack));
 }
 
-static RSDataRef __RSTimerSerializeCallBack(RSArchiverRef archiver, RSTypeRef object)
-{
-    RSTimerRef timer = (RSTimerRef)object;
-    
-    return nil;
-}
-
-//static RSTypeRef __RS DeserializeCallBack(RSUnarchiverRef unarchiver, RSDataRef data)
-
-static void __RSArchiverInitialize_Timer()
-{
-    RSArchiverCallBacks cb = {0};
-    __RSArchiverRegisterCallbacks(&cb);
-}
-
 static RSDataRef __RSTimeZoneSerializeCallBack(RSArchiverRef archiver, RSTypeRef object)
 {
     RSTimeZoneRef tz = (RSTimeZoneRef)object;
@@ -1217,7 +1203,7 @@ static void __RSArchiverInitialize_UUID()
 #pragma mark RSArchiver test routine
 RSExport void __RSArchiverTestMain()
 {
-    return;
+//    return;
     RSArchiverRef archiverEX = RSArchiverCreate(RSAllocatorSystemDefault);
     RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
     RSArrayAddObject(array, RSTimeZoneCopySystem());

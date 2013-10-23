@@ -65,7 +65,7 @@ static void __RSFileManagerContentContextUpdatePrefix(__RSFileManagerContentsCon
         RSIndex cnt = 0;
         if (likely(context->dirStack) && (cnt = RSArrayGetCount(context->dirStack)))
         {
-            BOOL prefix, suffix;
+            BOOL prefix = NO, suffix = NO;
             RSTypeRef objInArray = RSArrayObjectAtIndex(context->dirStack, 0);
             fullObj = RSMutableCopy(RSAllocatorSystemDefault, objInArray);
             

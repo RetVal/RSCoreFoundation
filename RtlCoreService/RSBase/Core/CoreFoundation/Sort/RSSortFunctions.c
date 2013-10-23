@@ -70,17 +70,13 @@
 static RSIndex __RSQSortCore(void** list, RSIndex left, RSIndex right, RSIndex elementSize, RSComparisonOrder order, RSComparatorFunction comparator, void *context)
 {
     void* pivot = nil;
-//    pivot = list[left];
-    pivot = list[(left + right) / 2];
-    list[(left + right) / 2] = list[left];
-    RSComparisonResult compares[2];
+    pivot = list[left];
+//    pivot = list[(left + right) / 2];
+//    list[(left + right) / 2] = list[left];
+    RSComparisonResult compares[2] = {RSCompareGreaterThan};
     compares[0] = RSCompareGreaterThan;
     compares[1] = RSCompareGreaterThan;
-    if (order == RSOrderedAscending)
-        compares[1] = RSCompareLessThan;
-    else
-        compares[0] = RSCompareLessThan;
-    
+    compares[order == RSOrderedAscending ? 1 : 0] = RSCompareLessThan;
     while (left < right)
     {
         while ((compares[0] == comparator(list[right], pivot, context)) && (left < right))
@@ -599,44 +595,47 @@ void __RSMinHeapInsert(RSIndex a[], RSIndex n, RSIndex nNum)
     __RSMinHeapFixup(a, n);
 }
 
-void __RSMinHeapFixdown(RSIndex a[], RSIndex i, RSIndex n)
+void __RSMinHeapFixdown(RSIndex **a, RSIndex i, RSIndex n)
 {
     RSIndex j, temp;
     
-    temp = a[i];
+    temp = (*a)[i];
     j = 2 * i + 1;  // j = left child
     while (j < n)
     {
-        if (j + 1 < n && a[j + 1] < a[j])   // compare the left and right child and get the min one.
+        if (j + 1 < n && (*a)[j + 1] < (*a)[j])   // compare the left and right child and get the min one.
             j++;
         
-        if (a[j] >= temp)                   // if the child gather than father, it is right.
+        if ((*a)[j] >= temp)                   // if the child gather than father, it is right.
             break;
         
-        a[i] = a[j];                        // swap the parent node with the min child node.
+        (*a)[i] = (*a)[j];                        // swap the parent node with the min child node.
         i = j;                              // now i is the parent node.
         j = 2 * i + 1;                      // get the current child node.
     }
-    a[i] = temp;                            // restore the a[i] from temp.
+    (*a)[i] = temp;                            // restore the a[i] from temp.
 }
 //在最小堆中删除数
-void __RSMinHeapDeleteNumber(RSIndex a[], RSIndex n)
+void __RSMinHeapDeleteNumber(RSIndex **a, RSIndex n)
 {
-    __RSSwapIndex(&a[0], &a[n - 1]);
+    __RSSwapIndex(&(*a)[0], &(*a)[n - 1]);
     __RSMinHeapFixdown(a, 0, n - 1);
 }
 
-void __RSMinHeapSortToDescendArray(RSIndex a[], RSIndex n)  //heap sort to descend array
-{
-    for (RSIndex i = n - 1; i >= 1; i--)
-    {
-        __RSSwapIndex(&a[i], &a[0]);
-        __RSMinHeapFixdown(a, 0, i);
-    }
-}
 
-void __RSMakeMinHeap(RSIndex a[], RSIndex n)
+void __RSMakeMinHeap(RSIndex **a, RSIndex n)
 {
     for (RSIndex i = n / 2 - 1; i >= 0; i--)
         __RSMinHeapFixdown(a, i, n);
 }
+
+void __RSMinHeapSortToDescendArray(RSIndex a[], RSIndex n)  //heap sort to descend array
+{
+    __RSMakeMinHeap(&a, n);
+    for (RSIndex i = n - 1; i >= 1; i--)
+    {
+        __RSSwapIndex(&a[i], &a[0]);
+        __RSMinHeapFixdown(&a, 0, i);
+    }
+}
+

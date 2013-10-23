@@ -453,6 +453,7 @@ RSExport RSNumberType RSNumberGetType(RSNumberRef aNumber)
 }
 static void    __RSNumberSetType(RSNumberRef aNumber, RSNumberType aType)
 {
+    if (nil == aNumber) HALTWithError(RSMallocException, "the RSNumber is nil");
     switch (aType) {
         case RSNumberNil: return;
         case RSNumberBoolean: return __RSNumberMarkBoolean(aNumber);
@@ -520,13 +521,20 @@ static  RSNumberRef __RSNumberCreateInstance(RSAllocatorRef allocator, RSNumberT
     RSNumberRef aNumber = nil;
     aNumber = __RSRuntimeCreateInstance(RSAllocatorSystemDefault, __RSNumberTypeID, sizeof(struct __RSNumber) - sizeof(struct __RSRuntimeBase));
     //aNumber = RSAllocatorAllocate(RSAllocatorSystemDefault, sizeof(struct __RSNumber));
-    if(aNumber) __RSNumberMarkStrongMemory(aNumber);
-    else aNumber = (RSNumberRef)0;
-    __RSNumberSetType(aNumber, theType);
-    RSNumberSetValue(aNumber, theType, value);
-//    ((struct __RSNumber*)aNumber)->_base._rsinfo._customRef = 0;
-    __RSNumberMarkStrongMemory(aNumber);
-//    ((struct __RSNumber*)aNumber)->_base._rsinfo._objId = (RSBitU32)RSNumberGetTypeID();
+    if(aNumber)
+    {
+        __RSNumberMarkStrongMemory(aNumber);
+        __RSNumberSetType(aNumber, theType);
+        RSNumberSetValue(aNumber, theType, value);
+        //    ((struct __RSNumber*)aNumber)->_base._rsinfo._customRef = 0;
+        __RSNumberMarkStrongMemory(aNumber);
+        //    ((struct __RSNumber*)aNumber)->_base._rsinfo._objId = (RSBitU32)RSNumberGetTypeID();
+    }
+    else
+    {
+        aNumber = (RSNumberRef)0;
+        HALTWithError(RSMallocException, "Malloc RSNumber failed");
+    }
     return aNumber;
 }
 
@@ -1063,6 +1071,19 @@ RSExport RSComparisonResult RSNumberCompare(RSNumberRef aNumber, RSNumberRef oth
     __RSGenericValidInstance(aNumber, __RSNumberTypeID);
     __RSGenericValidInstance(other, __RSNumberTypeID);
     RSNumberType numberType = RSNumberGetType(aNumber);
+    if (RS_IS_TAGGED_INT(aNumber) && RS_IS_TAGGED_INT(other))
+    {
+        int64_t value1 = 0, value2 = 0;
+        BOOL f1 = RSNumberGetValue(aNumber, &value1);
+        BOOL f2 = RSNumberGetValue(other, &value2);
+        if (f1 && f2)
+        {
+            if (value1 > value2) return RSCompareGreaterThan;
+            if (value1 < value2) return RSCompareLessThan;
+            return RSCompareEqualTo;
+        }
+    }
+    
     if (numberType == RSNumberGetType(other))
     {
         struct __RSBaseNumber pay1 = aNumber->_number;

@@ -6,7 +6,6 @@
 //  Copyright (c) 2012 RetVal. All rights reserved.
 //
 
-#include <stdio.h>
 #include <RSCoreFoundation/RSBinaryPropertyList.h>
 #include <RSCoreFoundation/RSPropertyList.h>
 #include <RSCoreFoundation/RSRuntime.h>
@@ -3045,7 +3044,7 @@ END:
 }
 
 
-static RSTypeRef __RSPropertyListCore0(RSDataRef plistData, RSIndex* offset,__RSPropertyListParseContext* context)
+static RSTypeRef __RSPropertyListCore0 (RSDataRef plistData, RSIndex* offset,__RSPropertyListParseContext* context)
 {
     RSMutableDictionaryRef _plist = nil;
     
@@ -3281,7 +3280,7 @@ static RSTypeRef __RSPropertyListCore0(RSDataRef plistData, RSIndex* offset,__RS
                             RSRelease(_k);RSRelease(_v);
                             previousTagIsKEYIX = NO;
                         }
-                        if (_id != KEY_IX) {
+                        if (preTagIDRef && _id != KEY_IX) {
                             previousTagIsKEYIX = NO;
                         }
                     }

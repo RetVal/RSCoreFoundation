@@ -1,12 +1,12 @@
 //
 //  RSURL.c
-//  RSKit
+//  RSCoreFoundation
 //
 //  Created by RetVal on 12/16/12.
 //  Copyright (c) 2012 RetVal. All rights reserved.
 //
 
-#include <stdio.h>
+#include <RSCoreFoundation/RSString+extension.h>
 #include <RSCoreFoundation/RSURL.h>
 //#include <RSKit/RSPriv.h>
 //#include <RSKit/RSCharacterSetPriv.h>
@@ -45,31 +45,14 @@ static BOOL _RSURLHasFileURLScheme(RSURLRef url, BOOL *hasScheme);
 BOOL _RSURLIsFileReferenceURL(RSURLRef url);
 #endif
 
-// PUBLIC
-typedef RS_ENUM(RSIndex, RSURLComponentType) {
-	RSURLComponentScheme = 1,
-	RSURLComponentNetLocation = 2,
-	RSURLComponentPath = 3,
-	RSURLComponentResourceSpecifier = 4,
-    
-	RSURLComponentUser = 5,
-	RSURLComponentPassword = 6,
-	RSURLComponentUserInfo = 7,
-	RSURLComponentHost = 8,
-	RSURLComponentPort = 9,
-	RSURLComponentParameterString = 10,
-	RSURLComponentQuery = 11,
-	RSURLComponentFragment = 12
-};
-
 // END PUBLIC
 
 // INTERNAL
-typedef RS_ENUM(RSIndex, RSURLComponentDecomposition) {
+typedef enum RSURLComponentDecomposition {
 	RSURLComponentDecompositionNonHierarchical,
 	RSURLComponentDecompositionRFC1808, /* use this for RFC 1738 decompositions as well */
 	RSURLComponentDecompositionRFC2396
-};
+}RSURLComponentDecomposition;
 
 typedef struct {
 	RSStringRef scheme;
@@ -92,7 +75,7 @@ typedef struct {
 typedef struct {
 	RSStringRef scheme;
     
-	/* if the registered name form of the net location is used, userinfo is NULL, port is RSNotFound, and host is the entire registered name. */
+	/* if the registered name form of the net location is used, userinfo is nil, port is RSNotFound, and host is the entire registered name. */
 	RSStringRef userinfo;
 	RSStringRef host;
 	RSIndex port;
@@ -123,7 +106,7 @@ enum {
     RSURLWriteUnsupportedSchemeError = 518,		   // Write error (unsupported URL scheme)
     RSURLWriteOutOfSpaceError = 640,                      // Write error (out of storage space)
     RSURLWriteVolumeReadOnlyError = 642,		   // Write error (readonly volume)
-} RS_AVAILABLE(0_3);
+};
 // END INTERNAL
 
 
@@ -215,7 +198,7 @@ static const RSBitU8 fileURLPrefixWithAuthority[] = FILE_PREFIX_WITH_AUTHORITY;
 //	either a sanitized string or a reserved pointer for URLHandle.
 struct _RSURLAdditionalData {
     void *_reserved; // Reserved for URLHandle's use.
-    RSStringRef _sanitizedString; // The fully compliant RFC string.  This is only non-NULL if ORIGINAL_AND_URL_STRINGS_MATCH is NO.
+    RSStringRef _sanitizedString; // The fully compliant RFC string.  This is only non-nil if ORIGINAL_AND_URL_STRINGS_MATCH is NO.
     RSBitU32 _additionalDataFlags; // these flags only apply to things we need to keep state for in _RSURLAdditionalData (like the XXXX_DIFFERS flags)
 };
 
@@ -223,7 +206,7 @@ struct __RSURL {
     RSRuntimeBase _rsBase;
     RSBitU32 _flags;
     RSStringEncoding _encoding; // The encoding to use when asked to remove percent escapes
-    RSStringRef _string; // Never NULL
+    RSStringRef _string; // Never nil
     RSURLRef _base;
     RSRange *_ranges;
     struct _RSURLAdditionalData* _extra;
@@ -237,7 +220,7 @@ RSInline void* _getReserved ( const struct __RSURL* url )
         return ( url->_extra->_reserved );
     }
     else {
-        return ( NULL );
+        return ( nil );
     }
 }
 
@@ -247,7 +230,7 @@ RSInline RSStringRef _getSanitizedString(const struct __RSURL* url)
         return ( url->_extra->_sanitizedString );
     }
     else {
-        return ( NULL );
+        return ( nil );
     }
 }
 
@@ -267,7 +250,7 @@ RSInline void* _getResourceInfo ( const struct __RSURL* url )
         return url->_resourceInfo;
     }
     else {
-        return NULL;
+        return nil;
     }
 }
 
@@ -294,7 +277,7 @@ RSInline void _setReserved ( struct __RSURL* url, void* reserved )
 {
     if ( url )
     {
-        // Don't allocate extra space if we're just going to be storing NULL
+        // Don't allocate extra space if we're just going to be storing nil
         if ( !url->_extra && reserved )
             _RSURLAllocateExtraDataspace( url );
         
@@ -307,7 +290,7 @@ RSInline void _setSanitizedString( struct __RSURL* url, RSMutableStringRef sanit
 {
     if ( url )
     {
-        // Don't allocate extra space if we're just going to be storing NULL
+        // Don't allocate extra space if we're just going to be storing nil
         if ( !url->_extra && sanitizedString ) {
             _RSURLAllocateExtraDataspace( url );
         }
@@ -341,7 +324,7 @@ RSInline void _setResourceInfo ( struct __RSURL* url, void* resourceInfo )
 {
     // Must be atomic
     // Never a GC object
-    if ( url && OSAtomicCompareAndSwapPtrBarrier( NULL, resourceInfo, &url->_resourceInfo )) {
+    if ( url && OSAtomicCompareAndSwapPtrBarrier( nil, resourceInfo, &url->_resourceInfo )) {
         RSRetain( resourceInfo );
     }
 }
@@ -353,7 +336,7 @@ RSInline RSBitU32 _getSchemeTypeFromFlags(RSBitU32 flags)
 
 RSInline void _setSchemeTypeInFlags(RSBitU32 *flags, RSBitU32 schemeType)
 {
-    //RSAssert2((schemeType >= kHasUncommonScheme) &&  (schemeType < kMaxScheme), __RSLogAssertion, "%s(): Received bad schemeType %d", __PRETTY_FUNCTION__, schemeType);
+    RSAssert2((schemeType >= kHasUncommonScheme) &&  (schemeType < kMaxScheme), __RSLogAssertion, "%s(): Received bad schemeType %d", __PRETTY_FUNCTION__, schemeType);
     *flags = (*flags & ~SCHEME_TYPE_MASK) + (schemeType << SCHEME_SHIFT);
 }
 
@@ -605,7 +588,7 @@ RSInline BOOL _translateBytes(UniChar ch1, UniChar ch2, uint8_t *result) {
 }
 
 RSInline BOOL _haveTestedOriginalString(RSURLRef url) {
-    return ((url->_flags & ORIGINAL_AND_URL_STRINGS_MATCH) != 0) || (_getSanitizedString(url) != NULL);
+    return ((url->_flags & ORIGINAL_AND_URL_STRINGS_MATCH) != 0) || (_getSanitizedString(url) != nil);
 }
 #include "RSPrivate/CString/RSString/RSFoundationEncoding.h"
 /*
@@ -640,7 +623,7 @@ static RSStringRef CreateStringFromFileSystemRepresentationByAddingPercentEscape
         bufStartPtr = (RSBitU8 *)malloc(numBytes * 3);
     }
     
-    if ( bufStartPtr != NULL ) {
+    if ( bufStartPtr != nil ) {
         bufBytePtr = bufStartPtr;
         for ( idx = 0; (idx < numBytes) && (*bytePtr != 0); ++idx ) {
             switch ( *bytePtr ) {
@@ -686,7 +669,7 @@ static RSStringRef CreateStringFromFileSystemRepresentationByAddingPercentEscape
         if ( idx == numBytes )
         {
             // create the result
-            result = RSStringCreateWithBytes(alloc, bufStartPtr, (RSIndex)(bufBytePtr-bufStartPtr), RSStringEncodingUTF8);
+            result = RSStringCreateWithBytes(alloc, bufStartPtr, (RSIndex)(bufBytePtr-bufStartPtr), RSStringEncodingUTF8, NO);
         }
         else
         {
@@ -696,12 +679,12 @@ static RSStringRef CreateStringFromFileSystemRepresentationByAddingPercentEscape
             }
             if ( idx == numBytes ) {
                 // create the result
-                result = RSStringCreateWithBytes(alloc, bufStartPtr, (RSIndex)(bufBytePtr-bufStartPtr), RSStringEncodingUTF8);
+                result = RSStringCreateWithBytes(alloc, bufStartPtr, (RSIndex)(bufBytePtr-bufStartPtr), RSStringEncodingUTF8, NO);
             }
             else
             {
                 // the remaining bytes were not all nul
-                result = NULL;
+                result = nil;
             }
         }
         
@@ -711,16 +694,16 @@ static RSStringRef CreateStringFromFileSystemRepresentationByAddingPercentEscape
         }
     }
     else {
-        result = NULL;
+        result = nil;
     }
     return ( result );
 }
 
-// Returns NULL if str cannot be converted for whatever reason, str if str contains no characters in need of escaping, or a newly-created string with the appropriate % escape codes in place.  Caller must always release the returned string.
+// Returns nil if str cannot be converted for whatever reason, str if str contains no characters in need of escaping, or a newly-created string with the appropriate % escape codes in place.  Caller must always release the returned string.
 RSInline RSStringRef _replacePathIllegalCharacters(RSStringRef str, RSAllocatorRef alloc, BOOL preserveSlashes) {
-    RSStringRef result = NULL;
+    RSStringRef result = nil;
     RSCBuffer buffer = nil;
-    if ( (buffer = RSStringCopyCString(str)) )
+    if ( (buffer = RSStringCopyUTF8String(str)) )
     {
         result = CreateStringFromFileSystemRepresentationByAddingPercentEscapes(RSAllocatorDefault, (const RSBitU8 *)buffer, strlen(buffer), !preserveSlashes);
         RSAllocatorDeallocate(RSAllocatorDefault, buffer);
@@ -739,7 +722,7 @@ static BOOL _hackToConvertSurrogates(UniChar highChar, UniChar lowChar, RSMutabl
     uint8_t *currByte;
     surrogate[0] = highChar;
     surrogate[1] = lowChar;
-    if (RSStringEncodingUnicodeToBytes(RSStringEncodingUTF8, 0, surrogate, 2, NULL, bytes, 6, &len) != RSStringEncodingConversionSuccess) {
+    if (RSStringEncodingUnicodeToBytes(RSStringEncodingUTF8, 0, surrogate, 2, nil, bytes, 6, &len) != RSStringEncodingConversionSuccess) {
         return NO;
     }
     for (currByte = bytes; currByte < bytes + len; currByte ++) {
@@ -758,8 +741,8 @@ static BOOL _appendPercentEscapesForCharacter(UniChar ch, RSStringEncoding encod
     uint8_t bytes[6]; // 6 bytes is the maximum a single character could require in UTF8 (most common case); other encodings could require more
     uint8_t *bytePtr = bytes, *currByte;
     RSIndex byteLength;
-    RSAllocatorRef alloc = NULL;
-    if (RSStringEncodingUnicodeToBytes(encoding, 0, &ch, 1, NULL, bytePtr, 6, &byteLength) != RSStringEncodingConversionSuccess) {
+    RSAllocatorRef alloc = nil;
+    if (RSStringEncodingUnicodeToBytes(encoding, 0, &ch, 1, nil, bytePtr, 6, &byteLength) != RSStringEncodingConversionSuccess) {
         byteLength = RSStringEncodingByteLengthForCharacters(encoding, 0, &ch, 1);
         if (byteLength <= 6) {
             // The encoding cannot accomodate the character
@@ -767,7 +750,7 @@ static BOOL _appendPercentEscapesForCharacter(UniChar ch, RSStringEncoding encod
         }
         alloc = RSGetAllocator(str);
         bytePtr = (uint8_t *)RSAllocatorAllocate(alloc, byteLength);
-        if (!bytePtr || RSStringEncodingUnicodeToBytes(encoding, 0, &ch, 1, NULL, bytePtr, byteLength, &byteLength) != RSStringEncodingConversionSuccess) {
+        if (!bytePtr || RSStringEncodingUnicodeToBytes(encoding, 0, &ch, 1, nil, bytePtr, byteLength, &byteLength) != RSStringEncodingConversionSuccess) {
             if (bytePtr) RSAllocatorDeallocate(alloc, bytePtr);
             return NO;
         }
@@ -787,25 +770,25 @@ static BOOL _appendPercentEscapesForCharacter(UniChar ch, RSStringEncoding encod
     return YES;
 }
 
-// Uses UTF-8 to translate all percent escape sequences; returns NULL if it encounters a format failure.  May return the original string.
-RSStringRef  RSURLCreateStringByReplacingPercentEscapes(RSAllocatorRef alloc, RSStringRef  originalString, RSStringRef  charactersToLeaveEscaped) {
-    RSMutableStringRef newStr = NULL;
+// Uses UTF-8 to translate all percent escape sequences; returns nil if it encounters a format failure.  May return the original string.
+RSExport RSStringRef  RSURLCreateStringByReplacingPercentEscapes(RSAllocatorRef alloc, RSStringRef  originalString, RSStringRef  charactersToLeaveEscaped) {
+    RSMutableStringRef newStr = nil;
     RSIndex length;
     RSIndex mark = 0;
     RSRange percentRange, searchRange;
-    RSStringRef escapedStr = NULL;
-    RSMutableStringRef strForEscapedChar = NULL;
+    RSStringRef escapedStr = nil;
+    RSMutableStringRef strForEscapedChar = nil;
     UniChar escapedChar;
-    BOOL escapeAll = (charactersToLeaveEscaped && RSStringGetByteLength(charactersToLeaveEscaped) == 0);
+    BOOL escapeAll = (charactersToLeaveEscaped && RSStringGetLength(charactersToLeaveEscaped) == 0);
     BOOL failed = NO;
     
-    if (!originalString) return NULL;
+    if (!originalString) return nil;
     
-    if (charactersToLeaveEscaped == NULL) {
+    if (charactersToLeaveEscaped == nil) {
         return (RSStringRef)RSStringCreateCopy(alloc, originalString);
     }
     
-    length = RSStringGetByteLength(originalString);
+    length = RSStringGetLength(originalString);
     searchRange = RSMakeRange(0, length);
     
     while (!failed && RSStringFindWithOptions(originalString, RSSTR("%"), searchRange, 0, &percentRange)) {
@@ -813,7 +796,7 @@ RSStringRef  RSURLCreateStringByReplacingPercentEscapes(RSAllocatorRef alloc, RS
         uint8_t numBytesExpected;
         UniChar ch1, ch2;
         
-        escapedStr = NULL;
+        escapedStr = nil;
         // Make sure we have at least 2 more characters
         if (length - percentRange.location < 3) { failed = YES; break; }
         
@@ -850,10 +833,10 @@ RSStringRef  RSURLCreateStringByReplacingPercentEscapes(RSAllocatorRef alloc, RS
             }
             
             // !!! We should do the low-level bit-twiddling ourselves; this is expensive!  REW, 6/10/99
-            escapedStr = RSStringCreateWithBytes(alloc, bytes, numBytesExpected, RSStringEncodingUTF8);
+            escapedStr = RSStringCreateWithBytes(alloc, bytes, numBytesExpected, RSStringEncodingUTF8, NO);
             if (!escapedStr) {
                 failed = YES;
-            } else if (RSStringGetByteLength(escapedStr) == 0 && numBytesExpected == 3 && bytes[0] == 0xef && bytes[1] == 0xbb && bytes[2] == 0xbf) {
+            } else if (RSStringGetLength(escapedStr) == 0 && numBytesExpected == 3 && bytes[0] == 0xef && bytes[1] == 0xbb && bytes[2] == 0xbf) {
                 // Somehow, the UCS-2 BOM got translated in to a UTF8 string
                 escapedChar = 0xfeff;
                 if (!strForEscapedChar) {
@@ -875,7 +858,7 @@ RSStringRef  RSURLCreateStringByReplacingPercentEscapes(RSAllocatorRef alloc, RS
             if (RSStringFind(charactersToLeaveEscaped, escapedStr, RSStringGetRange(charactersToLeaveEscaped), &result) && result.location != RSNotFound) {
                 if (escapedStr) {
                     RSRelease(escapedStr);
-                    escapedStr = NULL;
+                    escapedStr = nil;
                 }
                 continue;
             }
@@ -894,7 +877,7 @@ RSStringRef  RSURLCreateStringByReplacingPercentEscapes(RSAllocatorRef alloc, RS
         RSStringAppendString(newStr, escapedStr);
         if (escapedStr) {
             RSRelease(escapedStr);
-            escapedStr = NULL;
+            escapedStr = nil;
         }
         mark = searchRange.location;// We need mark to be the index of the first character beyond the escape sequence
     }
@@ -903,7 +886,7 @@ RSStringRef  RSURLCreateStringByReplacingPercentEscapes(RSAllocatorRef alloc, RS
     if (strForEscapedChar) RSRelease(strForEscapedChar);
     if (failed) {
         if (newStr) RSRelease(newStr);
-        return NULL;
+        return nil;
     } else if (newStr) {
         if (mark < length) {
             // Need to cat on the remainder of the string
@@ -917,29 +900,29 @@ RSStringRef  RSURLCreateStringByReplacingPercentEscapes(RSAllocatorRef alloc, RS
     }
 }
 
-RS_EXPORT
-RSStringRef RSURLCreateStringByReplacingPercentEscapesUsingEncoding(RSAllocatorRef alloc, RSStringRef  originalString, RSStringRef  charactersToLeaveEscaped, RSStringEncoding enc) {
+
+RSExport RSStringRef RSURLCreateStringByReplacingPercentEscapesUsingEncoding(RSAllocatorRef alloc, RSStringRef  originalString, RSStringRef  charactersToLeaveEscaped, RSStringEncoding enc) {
     if (enc == RSStringEncodingUTF8) {
         return RSURLCreateStringByReplacingPercentEscapes(alloc, originalString, charactersToLeaveEscaped);
     } else {
-        RSMutableStringRef newStr = NULL;
-        RSMutableStringRef escapedStr = NULL;
+        RSMutableStringRef newStr = nil;
+        RSMutableStringRef escapedStr = nil;
         RSIndex length;
         RSIndex mark = 0;
         RSRange percentRange, searchRange;
-        BOOL escapeAll = (charactersToLeaveEscaped && RSStringGetByteLength(charactersToLeaveEscaped) == 0);
+        BOOL escapeAll = (charactersToLeaveEscaped && RSStringGetLength(charactersToLeaveEscaped) == 0);
         BOOL failed = NO;
         uint8_t byteBuffer[8];
         uint8_t *bytes = byteBuffer;
         int capacityOfBytes = 8;
         
-        if (!originalString) return NULL;
+        if (!originalString) return nil;
         
-        if (charactersToLeaveEscaped == NULL) {
+        if (charactersToLeaveEscaped == nil) {
             return (RSStringRef)RSStringCreateCopy(alloc, originalString);
         }
         
-        length = RSStringGetByteLength(originalString);
+        length = RSStringGetLength(originalString);
         searchRange = RSMakeRange(0, length);
         
         while (!failed && RSStringFindWithOptions(originalString, RSSTR("%"), searchRange, 0, &percentRange)) {
@@ -977,7 +960,7 @@ RSStringRef RSURLCreateStringByReplacingPercentEscapesUsingEncoding(RSAllocatorR
             searchRange.length = length - searchRange.location;
             
             if (failed) break;
-            convertedString = RSStringCreateWithBytes(alloc, bytes, numBytesUsed, enc);
+            convertedString = RSStringCreateWithBytes(alloc, bytes, numBytesUsed, enc, NO);
             if (!convertedString) {
                 failed = YES;
                 break;
@@ -996,7 +979,7 @@ RSStringRef RSURLCreateStringByReplacingPercentEscapesUsingEncoding(RSAllocatorR
             if (escapeAll) {
                 RSStringAppendString(newStr, convertedString);
             } else {
-                RSIndex i, c = RSStringGetByteLength(convertedString);
+                RSIndex i, c = RSStringGetLength(convertedString);
                 if (!escapedStr) {
                     escapedStr = RSStringCreateMutableWithExternalCharactersNoCopy(alloc, &ch1, 1, 1, RSAllocatorDefault);
                 }
@@ -1019,7 +1002,7 @@ RSStringRef RSURLCreateStringByReplacingPercentEscapesUsingEncoding(RSAllocatorR
         if (bytes != byteBuffer) RSAllocatorDeallocate(alloc, bytes);
         if (failed) {
             if (newStr) RSRelease(newStr);
-            return NULL;
+            return nil;
         } else if (newStr) {
             if (mark < length) {
                 // Need to cat on the remainder of the string
@@ -1042,12 +1025,12 @@ RSInline BOOL RSCharacterSetIsSurrogateLowCharacter(UniChar character) {
 }
 
 static RSStringRef _addPercentEscapesToString(RSAllocatorRef allocator, RSStringRef originalString, BOOL (*shouldReplaceChar)(UniChar, void*), RSIndex (*handlePercentChar)(RSIndex, RSStringRef, RSStringRef *, void *), RSStringEncoding encoding, void *context) {
-    RSMutableStringRef newString = NULL;
+    RSMutableStringRef newString = nil;
     RSIndex idx, length;
     RSStringInlineBuffer buf;
     
-    if (!originalString) return NULL;
-    length = RSStringGetByteLength(originalString);
+    if (!originalString) return nil;
+    length = RSStringGetLength(originalString);
     if (length == 0) return (RSStringRef)RSStringCreateCopy(allocator, originalString);
     RSStringInitInlineBuffer(originalString, &buf, RSMakeRange(0, length));
     
@@ -1074,7 +1057,7 @@ static RSStringRef _addPercentEscapesToString(RSAllocatorRef allocator, RSString
                 }
             }
         } else if (ch == '%' && handlePercentChar) {
-            RSStringRef replacementString = NULL;
+            RSStringRef replacementString = nil;
             RSIndex newIndex = handlePercentChar(idx, originalString, &replacementString, context);
             if (newIndex < 0) {
                 break;
@@ -1107,7 +1090,7 @@ static RSStringRef _addPercentEscapesToString(RSAllocatorRef allocator, RSString
     if (idx < length) {
         // Ran in to an encoding failure
         if (newString) RSRelease(newString);
-        return NULL;
+        return nil;
     } else if (newString) {
         return newString;
     } else {
@@ -1117,7 +1100,7 @@ static RSStringRef _addPercentEscapesToString(RSAllocatorRef allocator, RSString
 
 
 static BOOL _stringContainsCharacter(RSStringRef string, UniChar ch) {
-    RSIndex i, c = RSStringGetByteLength(string);
+    RSIndex i, c = RSStringGetLength(string);
     RSStringInlineBuffer buf;
     RSStringInitInlineBuffer(string, &buf, RSMakeRange(0, c));
     for (i = 0; i < c; i ++)
@@ -1140,11 +1123,11 @@ static BOOL _shouldPercentReplaceChar(UniChar ch, void *context) {
     return shouldReplace;
 }
 
-RS_EXPORT RSStringRef RSURLCreateStringByAddingPercentEscapes(RSAllocatorRef allocator, RSStringRef originalString, RSStringRef charactersToLeaveUnescaped, RSStringRef legalURLCharactersToBeEscaped, RSStringEncoding encoding) {
+RSExport RSStringRef RSURLCreateStringByAddingPercentEscapes(RSAllocatorRef allocator, RSStringRef originalString, RSStringRef charactersToLeaveUnescaped, RSStringRef legalURLCharactersToBeEscaped, RSStringEncoding encoding) {
     RSStringRef strings[2];
     strings[0] = charactersToLeaveUnescaped;
     strings[1] = legalURLCharactersToBeEscaped;
-    return _addPercentEscapesToString(allocator, originalString, _shouldPercentReplaceChar, NULL, encoding, strings);
+    return _addPercentEscapesToString(allocator, originalString, _shouldPercentReplaceChar, nil, encoding, strings);
 }
 
 static BOOL __RSURLEqual(RSTypeRef  rs1, RSTypeRef  rs2) {
@@ -1202,7 +1185,7 @@ static RSStringRef  __RSURLCopyFormattingDescription(RSTypeRef  rs, RSDictionary
         return url->_string;
     } else {
         // Do not dereference url->_base; it may be an ObjC object
-        return RSStringCreateWithFormat(RSGetAllocator(url), NULL, RSSTR("%R -- %R"), url->_string, url->_base);
+        return RSStringCreateWithFormat(RSGetAllocator(url), nil, RSSTR("%R -- %R"), url->_string, url->_base);
     }
 }
 
@@ -1224,7 +1207,7 @@ static RSStringRef __RSURLCopyDescription(RSTypeRef rs) {
 #if DEBUG_URL_MEMORY_USAGE
 
 extern __attribute((used)) void __RSURLDumpMemRecord(void) {
-    RSStringRef str = RSStringCreateWithFormat(RSAllocatorSystemDefault, NULL, RSSTR("%d URLs created; %d destroyed\n%d file URLs created; %d urls had 'extra' data allocated, %d had base urls, %d were not UTF8 encoded\n"), numURLs, numDealloced, numFileURLsCreated, numExtraDataAllocated, numURLsWithBaseURL, numNonUTF8EncodedURLs );
+    RSStringRef str = RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("%d URLs created; %d destroyed\n%d file URLs created; %d urls had 'extra' data allocated, %d had base urls, %d were not UTF8 encoded\n"), numURLs, numDealloced, numFileURLsCreated, numExtraDataAllocated, numURLsWithBaseURL, numNonUTF8EncodedURLs );
     RSShow(str);
     RSRelease(str);
 }
@@ -1243,7 +1226,7 @@ static void __RSURLDeallocate(RSTypeRef  rs) {
     if (url->_ranges) RSAllocatorDeallocate(alloc, url->_ranges);
     RSStringRef sanitizedString = _getSanitizedString(url);
     if (sanitizedString) RSRelease(sanitizedString);
-    if ( url->_extra != NULL ) RSAllocatorDeallocate( alloc, url->_extra );
+    if ( url->_extra != nil ) RSAllocatorDeallocate( alloc, url->_extra );
     if (_getResourceInfo(url)) RSRelease(_getResourceInfo(url));
 }
 
@@ -1252,14 +1235,14 @@ static RSTypeID __RSURLTypeID = _RSRuntimeNotATypeID;
 static const RSRuntimeClass __RSURLClass = {
     0,                                  // version
     "RSURL",                            // className
-    NULL,                               // init
-    NULL,                               // copy
+    nil,                               // init
+    nil,                               // copy
     __RSURLDeallocate,                  // finalize
     __RSURLEqual,                       // equal
     __RSURLHash,                        // hash
     __RSURLCopyDescription,             // copyDebugDesc
-    NULL,                               // reclaim
-    NULL,                               // refcount
+    nil,                               // reclaim
+    nil,                               // refcount
 };
 
 // When __CONSTANT_RSSTRINGS__ is not defined, we have separate macros for static and exported constant strings, but
@@ -1272,12 +1255,12 @@ RS_CONST_STRING_DECL(RSURLDataScheme, "data")
 RS_CONST_STRING_DECL(RSURLFTPScheme, "ftp")
 RS_CONST_STRING_DECL(RSURLLocalhost, "localhost")
 #else
-CONST_STRING_DECL(RSURLHTTPScheme, "http")
-CONST_STRING_DECL(RSURLHTTPSScheme, "https")
-CONST_STRING_DECL(RSURLFileScheme, "file")
-CONST_STRING_DECL(RSURLDataScheme, "data")
-CONST_STRING_DECL(RSURLFTPScheme, "ftp")
-CONST_STRING_DECL(RSURLLocalhost, "localhost")
+RS_CONST_STRING_DECL(RSURLHTTPScheme, "http")
+RS_CONST_STRING_DECL(RSURLHTTPSScheme, "https")
+RS_CONST_STRING_DECL(RSURLFileScheme, "file")
+RS_CONST_STRING_DECL(RSURLDataScheme, "data")
+RS_CONST_STRING_DECL(RSURLFTPScheme, "ftp")
+RS_CONST_STRING_DECL(RSURLLocalhost, "localhost")
 #endif
 __private_extern__ void __RSURLInitialize(void) {
     __RSURLTypeID = __RSRuntimeRegisterClass(&__RSURLClass);
@@ -1290,7 +1273,7 @@ RSInline RSURLRef _RSURLFromNSURL(RSURLRef url) {
     return url;
 }
 
-RSTypeID RSURLGetTypeID() {
+RSExport RSTypeID RSURLGetTypeID() {
     return __RSURLTypeID;
 }
 
@@ -1324,21 +1307,21 @@ static void constructBuffers(RSAllocatorRef alloc, RSStringRef string, BOOL useE
     RSIndex length;
     RSRange rg;
     
-    *cstring = RSStringGetCStringPtr(string);
+    *cstring = RSStringGetCStringPtr(string, RSStringEncodingASCII);
     if (*cstring) {
-        *ustring = NULL;
+        *ustring = nil;
         *useCString = YES;
         *freeCharacters = NO;
         return;
     }
-    *ustring = (UniChar *)RSStringGetCStringPtr(string);
+    *ustring = (UniChar *)RSStringGetCStringPtr(string, RSStringEncodingUnicode);
     if (*ustring) {
         *useCString = NO;
         *freeCharacters = NO;
         return;
     }
     
-    length = RSStringGetByteLength(string);
+    length = RSStringGetLength(string);
     rg = RSMakeRange(0, length);
     RSStringRef convertedString = RSStringCreateConvert(string, RSStringEncodingISOLatin1);
     if (convertedString)
@@ -1370,12 +1353,12 @@ static void _parseComponents(RSAllocatorRef alloc, RSStringRef string, RSURLRef 
     BOOL useEightBitStringEncoding = (flags & USES_EIGHTBITSTRINGENCODING) != 0;
     BOOL useCString, freeCharacters, isCompliant;
     uint8_t numRanges = 0;
-    const char *cstring = NULL;
-    const UniChar *ustring = NULL;
+    const char *cstring = nil;
+    const UniChar *ustring = nil;
     RSIndex stackBufferSize = 4096;
     STACK_BUFFER_DECL(RSBitU8, stackBuffer, stackBufferSize);
     
-    string_length = RSStringGetByteLength(string);
+    string_length = RSStringGetLength(string);
     constructBuffers(alloc, string, useEightBitStringEncoding, stackBuffer, stackBufferSize, &cstring, &ustring, &useCString, &freeCharacters);
     
     // Algorithm is as described in RFC 1808
@@ -1445,7 +1428,7 @@ static void _parseComponents(RSAllocatorRef alloc, RSStringRef string, RSURLRef 
         // Clear the fragment flag if it's been set
         if (flags & HAS_FRAGMENT) {
             flags &= (~HAS_FRAGMENT);
-            string_length = RSStringGetByteLength(string);
+            string_length = RSStringGetLength(string);
         }
         (*theFlags) = flags;
         (*range) = (RSRange *)RSAllocatorAllocate(alloc, sizeof(RSRange));
@@ -1607,7 +1590,7 @@ static void _parseComponents(RSAllocatorRef alloc, RSStringRef string, RSURLRef 
                 isDir = NO;
             }
         } else {
-            isDir = (baseURL != NULL) ? RSURLHasDirectoryPath(baseURL) : NO;
+            isDir = (baseURL != nil) ? RSURLHasDirectoryPath(baseURL) : NO;
         }
         if (isDir) {
             flags |= IS_DIRECTORY;
@@ -1656,7 +1639,7 @@ static BOOL scanCharacters(RSAllocatorRef alloc, RSMutableStringRef *escapedStri
                 *escapedString = RSStringCreateMutable(alloc, 0);
             }
             if (useCString) {
-                RSStringRef tempString = RSStringCreateWithBytes(alloc, (uint8_t *)&(cstring[*mark]), idx - *mark, RSStringEncodingISOLatin1);
+                RSStringRef tempString = RSStringCreateWithBytes(alloc, (uint8_t *)&(cstring[*mark]), idx - *mark, RSStringEncodingISOLatin1, NO);
                 RSStringAppendString(*escapedString, tempString);
                 RSRelease(tempString);
             } else {
@@ -1671,15 +1654,15 @@ static BOOL scanCharacters(RSAllocatorRef alloc, RSMutableStringRef *escapedStri
 
 static void computeSanitizedString(RSURLRef url) {
     RSAllocatorRef alloc = RSGetAllocator(url);
-    RSIndex string_length = RSStringGetByteLength(url->_string);
+    RSIndex string_length = RSStringGetLength(url->_string);
     BOOL useCString, freeCharacters;
-    const char *cstring = NULL;
-    const UniChar *ustring = NULL;
+    const char *cstring = nil;
+    const UniChar *ustring = nil;
     RSIndex base; // where to scan from
     RSIndex mark; // first character not-yet copied to sanitized string
     RSIndex stackBufferSize = 4096;
     STACK_BUFFER_DECL(RSBitU8, stackBuffer, stackBufferSize);
-    RSMutableStringRef sanitizedString = NULL;
+    RSMutableStringRef sanitizedString = nil;
     RSBitU32 additionalDataFlags = 0;
     BOOL useEightBitStringEncoding = (url->_flags & USES_EIGHTBITSTRINGENCODING) != 0;
     
@@ -1713,7 +1696,7 @@ static void computeSanitizedString(RSURLRef url) {
     }
     if (sanitizedString && mark != string_length) {
         if (useCString) {
-            RSStringRef tempString = RSStringCreateWithBytes(alloc, (uint8_t *)&(cstring[mark]), string_length - mark, RSStringEncodingISOLatin1);
+            RSStringRef tempString = RSStringCreateWithBytes(alloc, (uint8_t *)&(cstring[mark]), string_length - mark, RSStringEncodingISOLatin1, NO);
             RSStringAppendString(sanitizedString, tempString);
             RSRelease(tempString);
         } else {
@@ -1732,21 +1715,21 @@ static void computeSanitizedString(RSURLRef url) {
 
 static RSStringRef correctedComponent(RSStringRef comp, RSBitU32 compFlag, RSStringEncoding enc) {
     RSAllocatorRef alloc = RSGetAllocator(comp);
-    RSIndex string_length = RSStringGetByteLength(comp);
+    RSIndex string_length = RSStringGetLength(comp);
     BOOL useCString, freeCharacters;
-    const char *cstring = NULL;
-    const UniChar *ustring = NULL;
+    const char *cstring = nil;
+    const UniChar *ustring = nil;
     RSIndex mark = 0; // first character not-yet copied to sanitized string
-    RSMutableStringRef result = NULL;
+    RSMutableStringRef result = nil;
     RSIndex stackBufferSize = 1024;
     STACK_BUFFER_DECL(RSBitU8, stackBuffer, stackBufferSize);
     
     constructBuffers(alloc, comp, NO, stackBuffer, stackBufferSize, &cstring, &ustring, &useCString, &freeCharacters);
-    scanCharacters(alloc, &result, NULL, cstring, ustring, useCString, 0, string_length, &mark, compFlag, enc);
+    scanCharacters(alloc, &result, nil, cstring, ustring, useCString, 0, string_length, &mark, compFlag, enc);
     if (result) {
         if (mark < string_length) {
             if (useCString) {
-                RSStringRef tempString = RSStringCreateWithBytes(alloc, (uint8_t *)&(cstring[mark]), string_length - mark, RSStringEncodingISOLatin1);
+                RSStringRef tempString = RSStringCreateWithBytes(alloc, (uint8_t *)&(cstring[mark]), string_length - mark, RSStringEncodingISOLatin1, NO);
                 RSStringAppendString(result, tempString);
                 RSRelease(tempString);
             } else {
@@ -1765,7 +1748,7 @@ static RSStringRef correctedComponent(RSStringRef comp, RSBitU32 compFlag, RSStr
 }
 
 #undef STRING_CHAR
-RS_EXPORT RSURLRef _RSURLAlloc(RSAllocatorRef allocator) {
+RSExport RSURLRef _RSURLAlloc(RSAllocatorRef allocator) {
     struct __RSURL *url;
 #if DEBUG_URL_MEMORY_USAGE
     numURLs ++;
@@ -1774,22 +1757,22 @@ RS_EXPORT RSURLRef _RSURLAlloc(RSAllocatorRef allocator) {
     if (url) {
         url->_flags = 0;
         url->_encoding = RSStringEncodingUTF8;
-        url->_string = NULL;
-        url->_base = NULL;
-        url->_ranges = NULL;
-        url->_extra = NULL;
-        url->_resourceInfo = NULL;
+        url->_string = nil;
+        url->_base = nil;
+        url->_ranges = nil;
+        url->_extra = nil;
+        url->_resourceInfo = nil;
     }
     return url;
 }
 
-// It is the caller's responsibility to guarantee that if URLString is absolute, base is NULL.  This is necessary to avoid duplicate processing for file system URLs, which had to decide whether to compute the cwd for the base; we don't want to duplicate that work.  This ALSO means it's the caller's responsibility to set the IS_ABSOLUTE bit, since we may have a degenerate URL whose string is relative, but lacks a base.
+// It is the caller's responsibility to guarantee that if URLString is absolute, base is nil.  This is necessary to avoid duplicate processing for file system URLs, which had to decide whether to compute the cwd for the base; we don't want to duplicate that work.  This ALSO means it's the caller's responsibility to set the IS_ABSOLUTE bit, since we may have a degenerate URL whose string is relative, but lacks a base.
 static void _RSURLInit(struct __RSURL *url, RSStringRef URLString, RSURLPathStyle fsType, RSURLRef base) {
-    //RSAssert2((fsType == FULL_URL_REPRESENTATION) || (fsType == RSURLPOSIXPathStyle) || (fsType == RSURLWindowsPathStyle) || (fsType == RSURLHFSPathStyle), __RSLogAssertion, "%s(): Received bad fsType %d", __PRETTY_FUNCTION__, fsType);
+    RSAssert2((fsType == FULL_URL_REPRESENTATION) || (fsType == RSURLPOSIXPathStyle) || (fsType == RSURLWindowsPathStyle) || (fsType == RSURLHFSPathStyle), __RSLogAssertion, "%s(): Received bad fsType %d", __PRETTY_FUNCTION__, fsType);
     
     // Coming in, the url has its allocator flag properly set, and its base initialized, and nothing else.
     url->_string = RSStringCreateCopy(RSGetAllocator(url), URLString);
-    url->_base = base ? RSURLCopyAbsoluteURL(base) : NULL;
+    url->_base = base ? RSURLCopyAbsoluteURL(base) : nil;
     
 #if DEBUG_URL_MEMORY_USAGE
     if ( (fsType == RSURLPOSIXPathStyle) || (fsType == RSURLHFSPathStyle) || (fsType == RSURLWindowsPathStyle) ) {
@@ -1810,9 +1793,9 @@ static void _RSURLInit(struct __RSURL *url, RSStringRef URLString, RSURLPathStyl
 
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI || DEPLOYMENT_TARGET_LINUX
 RS_EXPORT void _RSURLInitFSPath(RSURLRef url, RSStringRef path) {
-    RSIndex len = RSStringGetByteLength(path);
+    RSIndex len = RSStringGetLength(path);
     if (len && RSStringGetCharacterAtIndex(path, 0) == '/') {
-        _RSURLInit((struct __RSURL *)url, path, RSURLPOSIXPathStyle, NULL);
+        _RSURLInit((struct __RSURL *)url, path, RSURLPOSIXPathStyle, nil);
         ((struct __RSURL *)url)->_flags |= IS_ABSOLUTE;
     } else {
         RSURLRef cwdURL = _RSURLCreateCurrentDirectoryURL(RSGetAllocator(url));
@@ -1836,12 +1819,12 @@ RS_EXPORT void _RSURLInitFSPath(RSURLRef url, RSStringRef path) {
         ((struct __RSURL *)url)->_flags |= IS_DIRECTORY;
     isDrive = isDrive && (secondChar == ':' || secondChar == '|');
     if (isDrive || (firstChar == '\\' && secondChar == '\\')) {
-        _RSURLInit((struct __RSURL *)url, path, RSURLWindowsPathStyle, NULL);
+        _RSURLInit((struct __RSURL *)url, path, RSURLWindowsPathStyle, nil);
         ((struct __RSURL *)url)->_flags |= IS_ABSOLUTE;
     } else if (firstChar == '/') {
         if (!len || '/' == RSStringGetCharacterAtIndex(path, len - 1))
             ((struct __RSURL *)url)->_flags |= IS_DIRECTORY;
-        _RSURLInit((struct __RSURL *)url, path, RSURLPOSIXPathStyle, NULL);
+        _RSURLInit((struct __RSURL *)url, path, RSURLPOSIXPathStyle, nil);
         ((struct __RSURL *)url)->_flags |= IS_ABSOLUTE;
     } else {
         RSURLRef cwdURL = _RSURLCreateCurrentDirectoryURL(RSGetAllocator(url));
@@ -1853,17 +1836,17 @@ RS_EXPORT void _RSURLInitFSPath(RSURLRef url, RSStringRef path) {
 #endif
 
 // Exported for Foundation's use
-RS_EXPORT BOOL _RSStringIsLegalURLString(RSStringRef string) {
+RSExport BOOL _RSStringIsLegalURLString(RSStringRef string) {
     // Check each character to make sure it is a legal URL char.  The valid characters are 'A'-'Z', 'a' - 'z', '0' - '9', plus the characters in "-_.!~*'()", and the set of reserved characters (these characters have special meanings in the URL syntax), which are ";/?:@&=+$,".  In addition, percent escape sequences '%' hex-digit hex-digit are permitted.
     // Plus the hash character '#' which denotes the beginning of a fragment, and can appear exactly once in the entire URL string. -- REW, 12/13/2000
     RSStringInlineBuffer stringBuffer;
     RSIndex idx = 0, length;
     BOOL sawHash = NO;
     if (!string) {
-        //RSAssert(NO, __RSLogAssertion, "Cannot create an RSURL from a NULL string");
+        RSAssert(NO, __RSLogAssertion, "Cannot create an RSURL from a nil string");
         return NO;
     }
-    length = RSStringGetByteLength(string);
+    length = RSStringGetLength(string);
     RSStringInitInlineBuffer(string, &stringBuffer, RSMakeRange(0, length));
     while (idx < length) {
         UniChar ch = RSStringGetCharacterFromInlineBuffer(&stringBuffer, idx);
@@ -1873,7 +1856,7 @@ RS_EXPORT BOOL _RSStringIsLegalURLString(RSStringRef string) {
 		if ( ch == '%' ) {
 			if ( idx + 2 > length )
 			{
-				////RSAssert1(NO, __RSLogAssertion, "Detected illegal percent escape sequence at character %d when trying to create a RSURL", idx-1);
+                RSAssert1(NO, __RSLogAssertion, "Detected illegal percent escape sequence at character %d when trying to create a RSURL", idx-1);
 				idx = -1;  // To guarantee index < length, and our failure case is triggered
 				break;
 			}
@@ -1881,14 +1864,14 @@ RS_EXPORT BOOL _RSStringIsLegalURLString(RSStringRef string) {
 			ch = RSStringGetCharacterFromInlineBuffer(&stringBuffer, idx);
 			idx ++;
 			if (! isHexDigit(ch) ) {
-				////RSAssert1(NO, __RSLogAssertion, "Detected illegal percent escape sequence at character %d when trying to create a RSURL", idx-2);
+                RSAssert1(NO, __RSLogAssertion, "Detected illegal percent escape sequence at character %d when trying to create a RSURL", idx-2);
 				idx = -1;
 				break;
 			}
 			ch = RSStringGetCharacterFromInlineBuffer(&stringBuffer, idx);
 			idx ++;
 			if (! isHexDigit(ch) ) {
-				////RSAssert1(NO, __RSLogAssertion, "Detected illegal percent escape sequence at character %d when trying to create a RSURL", idx-3);
+                RSAssert1(NO, __RSLogAssertion, "Detected illegal percent escape sequence at character %d when trying to create a RSURL", idx-3);
 				idx = -1;
 				break;
 			}
@@ -1916,7 +1899,7 @@ RS_EXPORT BOOL _RSStringIsLegalURLString(RSStringRef string) {
     return YES;
 }
 
-RS_EXPORT void _RSURLInitWithString(RSURLRef myURL, RSStringRef string, RSURLRef baseURL) {
+RSExport void _RSURLInitWithString(RSURLRef myURL, RSStringRef string, RSURLRef baseURL) {
     struct __RSURL *url = (struct __RSURL *)myURL; // Supress annoying compile warnings
     BOOL isAbsolute = NO;
     RSRange colon = {RSNotFound};
@@ -1931,7 +1914,7 @@ RS_EXPORT void _RSURLInitWithString(RSURLRef myURL, RSStringRef string, RSURLRef
             }
         }
     }
-    _RSURLInit(url, string, FULL_URL_REPRESENTATION, isAbsolute ? NULL : baseURL);
+    _RSURLInit(url, string, FULL_URL_REPRESENTATION, isAbsolute ? nil : baseURL);
     if (isAbsolute) {
         url->_flags |= IS_ABSOLUTE;
     }
@@ -1949,14 +1932,14 @@ struct __RSURLEncodingTranslationParameters {
 } ;
 
 // encoding will be used both to interpret the bytes of URLBytes, and to interpret any percent-escapes within the bytes.
-RSURLRef RSURLCreateWithBytes(RSAllocatorRef allocator, const uint8_t *URLBytes, RSIndex length, RSStringEncoding encoding, RSURLRef baseURL) {
+RSExport RSURLRef RSURLCreateWithBytes(RSAllocatorRef allocator, const uint8_t *URLBytes, RSIndex length, RSStringEncoding encoding, RSURLRef baseURL) {
     RSStringRef  urlString;
     BOOL useEightBitStringEncoding = ( __RSStringEncodingIsSupersetOfASCII(encoding) && __RSBytesInASCII(URLBytes, length) );
-    urlString = RSStringCreateWithBytes(allocator, URLBytes, length, useEightBitStringEncoding ? RSStringEncodingUTF8 : encoding);
+    urlString = RSStringCreateWithBytes(allocator, URLBytes, length, useEightBitStringEncoding ? RSStringEncodingUTF8 : encoding, NO);
     RSURLRef  result;
-    if (!urlString || RSStringGetByteLength(urlString) == 0) {
+    if (!urlString || RSStringGetLength(urlString) == 0) {
         if (urlString) RSRelease(urlString);
-        return NULL;
+        return nil;
     }
     result = _RSURLAlloc(allocator);
     if (result) {
@@ -1975,8 +1958,8 @@ RSURLRef RSURLCreateWithBytes(RSAllocatorRef allocator, const uint8_t *URLBytes,
     return result;
 }
 #include <RSCoreFoundation/RSData.h>
-RSDataRef RSURLCreateData(RSAllocatorRef allocator, RSURLRef  url, RSStringEncoding encoding, BOOL escapeWhitespace) {
-    RSDataRef result = NULL;
+RSExport RSDataRef RSURLCreateData(RSAllocatorRef allocator, RSURLRef  url, RSStringEncoding encoding, BOOL escapeWhitespace) {
+    RSDataRef result = nil;
     if ( url ) {
         RSStringRef myStr = RSURLGetString(url);
         if ( myStr ) {
@@ -1987,10 +1970,10 @@ RSDataRef RSURLCreateData(RSAllocatorRef allocator, RSURLRef  url, RSStringEncod
 }
 
 // Any escape sequences in URLString will be interpreted via UTF-8.
-RSURLRef RSURLCreateWithString(RSAllocatorRef allocator, RSStringRef  URLString, RSURLRef  baseURL) {
+RSExport RSURLRef RSURLCreateWithString(RSAllocatorRef allocator, RSStringRef  URLString, RSURLRef  baseURL) {
     RSURLRef url;
-    if (!URLString || RSStringGetByteLength(URLString) == 0) return NULL;
-    if (!_RSStringIsLegalURLString(URLString)) return NULL;
+    if (!URLString || RSStringGetLength(URLString) == 0) return nil;
+    if (!_RSStringIsLegalURLString(URLString)) return nil;
     url = _RSURLAlloc(allocator);
     if (url) {
         _RSURLInitWithString(url, URLString, baseURL);
@@ -2000,7 +1983,7 @@ RSURLRef RSURLCreateWithString(RSAllocatorRef allocator, RSStringRef  URLString,
 
 static RSURLRef _RSURLCreateWithArbitraryString(RSAllocatorRef allocator, RSStringRef URLString, RSURLRef baseURL) {
     RSURLRef url;
-    if (!URLString || RSStringGetByteLength(URLString) == 0) return NULL;
+    if (!URLString || RSStringGetLength(URLString) == 0) return nil;
     url = _RSURLAlloc(allocator);
     if (url) {
         _RSURLInitWithString(url, URLString, baseURL);
@@ -2008,14 +1991,14 @@ static RSURLRef _RSURLCreateWithArbitraryString(RSAllocatorRef allocator, RSStri
     return url;
 }
 
-RSURLRef RSURLCreateAbsoluteURLWithBytes(RSAllocatorRef alloc, const RSBitU8 *relativeURLBytes, RSIndex length, RSStringEncoding encoding, RSURLRef baseURL, BOOL useCompatibilityMode) {
-    RSURLRef result = NULL;
+RSExport RSURLRef RSURLCreateAbsoluteURLWithBytes(RSAllocatorRef alloc, const RSBitU8 *relativeURLBytes, RSIndex length, RSStringEncoding encoding, RSURLRef baseURL, BOOL useCompatibilityMode) {
+    RSURLRef result = nil;
     
     // if not useCompatibilityMode, use RSURLCreateWithBytes and then RSURLCopyAbsoluteURL if there's a baseURL
     if ( !useCompatibilityMode ) {
         RSURLRef url = RSURLCreateWithBytes(alloc, relativeURLBytes, length, encoding, baseURL);
-        if ( url != NULL ) {
-            if ( baseURL != NULL ) {
+        if ( url != nil ) {
+            if ( baseURL != nil ) {
                 result = RSURLCopyAbsoluteURL(url);
                 RSRelease(url);
             } else {
@@ -2025,15 +2008,15 @@ RSURLRef RSURLCreateAbsoluteURLWithBytes(RSAllocatorRef alloc, const RSBitU8 *re
     } else {
         RSBitU32 absFlags = 0;
         RSRange *absRanges;
-        RSStringRef absString = NULL;
+        RSStringRef absString = nil;
         BOOL absStringIsMutable = NO;
         RSURLRef absURL;
         RSStringRef relativeString;
         BOOL useEightBitStringEncoding;
         
         useEightBitStringEncoding = ( __RSStringEncodingIsSupersetOfASCII(encoding) && __RSBytesInASCII(relativeURLBytes, length) );
-        relativeString = RSStringCreateWithBytes(alloc, relativeURLBytes, length, useEightBitStringEncoding ? RSStringEncodingUTF8 : encoding);
-        if ( relativeString != NULL ) {
+        relativeString = RSStringCreateWithBytes(alloc, relativeURLBytes, length, useEightBitStringEncoding ? RSStringEncodingUTF8 : encoding, NO);
+        if ( relativeString != nil ) {
             if (!baseURL) {
                 if ( useEightBitStringEncoding ) {
                     absFlags |= USES_EIGHTBITSTRINGENCODING;
@@ -2049,20 +2032,20 @@ RSURLRef RSURLCreateAbsoluteURLWithBytes(RSAllocatorRef alloc, const RSBitU8 *re
                     } else {
                         baseString = baseURL->_string;
                     }
-                    absString = RSStringCreateMutable(alloc, RSStringGetByteLength(baseString) + RSStringGetByteLength(relativeString));
+                    absString = RSStringCreateMutable(alloc, RSStringGetLength(baseString) + RSStringGetLength(relativeString));
                     RSStringAppendString((RSMutableStringRef)absString, baseString);
                     RSStringAppendString((RSMutableStringRef)absString, relativeString);
                     absStringIsMutable = YES;
                 } else {
                     RSBitU32 relFlags = 0;
                     RSRange *relRanges;
-                    RSStringRef relString = NULL;
+                    RSStringRef relString = nil;
                     _parseComponents(alloc, relativeString, baseURL, &relFlags, &relRanges);
                     if (relFlags & HAS_SCHEME) {
                         RSStringRef baseScheme = RSURLCopyScheme(baseURL);
                         RSRange relSchemeRange = _rangeForComponent(relFlags, relRanges, HAS_SCHEME);
-                        if (baseScheme && RSStringGetByteLength(baseScheme) == relSchemeRange.length && RSStringHasPrefix(relativeString, baseScheme)) {
-                            relString = RSStringCreateWithSubstring(alloc, relativeString, RSMakeRange(relSchemeRange.length+1, RSStringGetByteLength(relativeString) - relSchemeRange.length - 1));
+                        if (baseScheme && RSStringGetLength(baseScheme) == relSchemeRange.length && RSStringHasPrefix(relativeString, baseScheme)) {
+                            relString = RSStringCreateWithSubstring(alloc, relativeString, RSMakeRange(relSchemeRange.length+1, RSStringGetLength(relativeString) - relSchemeRange.length - 1));
                             RSAllocatorDeallocate(alloc, relRanges);
                             relFlags = 0;
                             _parseComponents(alloc, relString, baseURL, &relFlags, &relRanges);
@@ -2091,7 +2074,7 @@ RSURLRef RSURLCreateAbsoluteURLWithBytes(RSAllocatorRef alloc, const RSBitU8 *re
                             } else {
                                 baseString = baseURL->_string;
                             }
-                            _parseComponents(alloc, baseString, NULL, &baseFlags, &baseRanges);
+                            _parseComponents(alloc, baseString, nil, &baseFlags, &baseRanges);
                             absString = resolveAbsoluteURLString(alloc, relString, relFlags, relRanges, baseString, baseFlags, baseRanges);
                             RSAllocatorDeallocate(alloc, baseRanges);
                         }
@@ -2104,7 +2087,7 @@ RSURLRef RSURLCreateAbsoluteURLWithBytes(RSAllocatorRef alloc, const RSBitU8 *re
             }
         }
         if ( absString ) {
-            _parseComponents(alloc, absString, NULL, &absFlags, &absRanges);
+            _parseComponents(alloc, absString, nil, &absFlags, &absRanges);
             if (absFlags & HAS_PATH) {
                 RSRange pathRg = _rangeForComponent(absFlags, absRanges, HAS_PATH);
                 // This is expensive, but it allows us to reuse _resolvedPath.  It should be cleaned up to get this allocation removed at some point. - REW
@@ -2113,9 +2096,9 @@ RSURLRef RSURLCreateAbsoluteURLWithBytes(RSAllocatorRef alloc, const RSBitU8 *re
                 RSStringGetCharacters(absString, pathRg, buf);
                 buf[pathRg.length] = '\0';
                 newPath = _resolvedPath(buf, buf + pathRg.length, '/', YES, NO, alloc);
-                if (RSStringGetByteLength(newPath) != pathRg.length) {
+                if (RSStringGetLength(newPath) != pathRg.length) {
                     if (!absStringIsMutable) {
-                        RSStringRef tmp = RSStringCreateMutableCopy(alloc, RSStringGetByteLength(absString), absString);
+                        RSStringRef tmp = RSStringCreateMutableCopy(alloc, RSStringGetLength(absString), absString);
                         RSRelease(absString);
                         absString = tmp;
                     }
@@ -2125,7 +2108,7 @@ RSURLRef RSURLCreateAbsoluteURLWithBytes(RSAllocatorRef alloc, const RSBitU8 *re
                 // Do not deallocate buf; newPath took ownership of it.
             }
             RSAllocatorDeallocate(alloc, absRanges);
-            absURL = _RSURLCreateWithArbitraryString(alloc, absString, NULL);
+            absURL = _RSURLCreateWithArbitraryString(alloc, absString, nil);
             RSRelease(absString);
             if (absURL) {
                 ((struct __RSURL *)absURL)->_encoding = encoding;
@@ -2208,12 +2191,12 @@ static RSStringRef _resolvedPath(UniChar *pathStr, UniChar *end, UniChar pathDel
     if (stripTrailingDelimiter && end > pathStr && end-1 != pathStr && *(end-1) == pathDelimiter) {
         end --;
     }
-    return RSStringCreateWithCharactersWithNoCopy(alloc, pathStr, end - pathStr);
+    return RSStringCreateWithCharactersNoCopy(alloc, pathStr, end - pathStr, alloc);
 }
 
 static RSMutableStringRef resolveAbsoluteURLString(RSAllocatorRef alloc, RSStringRef relString, RSBitU32 relFlags, RSRange *relRanges, RSStringRef baseString, RSBitU32 baseFlags, RSRange *baseRanges) {
     RSMutableStringRef newString = RSStringCreateMutable(alloc, 0);
-    RSIndex bufLen = RSStringGetByteLength(baseString) + RSStringGetByteLength(relString); // Overkill, but guarantees we never allocate again
+    RSIndex bufLen = RSStringGetLength(baseString) + RSStringGetLength(relString); // Overkill, but guarantees we never allocate again
     UniChar *buf = (UniChar *)RSAllocatorAllocate(alloc, bufLen * sizeof(UniChar));
     RSRange rg;
     
@@ -2221,13 +2204,13 @@ static RSMutableStringRef resolveAbsoluteURLString(RSAllocatorRef alloc, RSStrin
     if (rg.location != RSNotFound) {
         RSStringGetCharacters(baseString, rg, buf);
         RSStringAppendCharacters(newString, buf, rg.length);
-        RSStringAppendCString(newString, ":");
+        RSStringAppendCString(newString, ":", RSStringEncodingASCII);
     }
     
     if (relFlags & NET_LOCATION_MASK) {
         RSStringAppendString(newString, relString);
     } else {
-        RSStringAppendCString(newString, "//");
+        RSStringAppendCString(newString, "//", RSStringEncodingASCII);
         rg = _netLocationRange(baseFlags, baseRanges);
         if (rg.location != RSNotFound) {
             RSStringGetCharacters(baseString, rg, buf);
@@ -2279,13 +2262,13 @@ static RSMutableStringRef resolveAbsoluteURLString(RSAllocatorRef alloc, RSStrin
             // if the relative URL does not begin with a slash and
             // the base does not end with a slash, add a slash
             if ((basePathRg.location == RSNotFound || basePathRg.length == 0) && RSStringGetCharacterAtIndex(newPath, 0) != '/') {
-                RSStringAppendCString(newString, "/");
+                RSStringAppendCString(newString, "/", RSStringEncodingASCII);
             }
             
             RSStringAppendString(newString, newPath);
             RSRelease(newPath);
             rg.location = relPathRg.location + relPathRg.length;
-            rg.length = RSStringGetByteLength(relString);
+            rg.length = RSStringGetLength(relString);
             if (rg.length > rg.location) {
                 rg.length -= rg.location;
                 RSStringGetCharacters(relString, rg, buf);
@@ -2303,7 +2286,7 @@ static RSMutableStringRef resolveAbsoluteURLString(RSAllocatorRef alloc, RSStrin
                 RSBitU32 rsrRSlag = _firstResourceSpecifierFlag(baseFlags);
                 if (rsrRSlag) {
                     rg.location = _rangeForComponent(baseFlags, baseRanges, rsrRSlag).location;
-                    rg.length = RSStringGetByteLength(baseString) - rg.location;
+                    rg.length = RSStringGetLength(baseString) - rg.location;
                     rg.location --; // To pick up the separator
                     rg.length ++;
                     RSStringGetCharacters(baseString, rg, buf);
@@ -2312,26 +2295,26 @@ static RSMutableStringRef resolveAbsoluteURLString(RSAllocatorRef alloc, RSStrin
             } else if (relFlags & HAS_PARAMETERS) {
                 rg = _rangeForComponent(relFlags, relRanges, HAS_PARAMETERS);
                 rg.location --; // To get the semicolon that starts the parameters
-                rg.length = RSStringGetByteLength(relString) - rg.location;
+                rg.length = RSStringGetLength(relString) - rg.location;
                 RSStringGetCharacters(relString, rg, buf);
                 RSStringAppendCharacters(newString, buf, rg.length);
             } else {
                 // Sigh; we have to resolve these against one another
                 rg = _rangeForComponent(baseFlags, baseRanges, HAS_PARAMETERS);
                 if (rg.location != RSNotFound) {
-                    RSStringAppendCString(newString, ";");
+                    RSStringAppendCString(newString, ";", RSStringEncodingASCII);
                     RSStringGetCharacters(baseString, rg, buf);
                     RSStringAppendCharacters(newString, buf, rg.length);
                 }
                 rg = _rangeForComponent(relFlags, relRanges, HAS_QUERY);
                 if (rg.location != RSNotFound) {
-                    RSStringAppendCString(newString, "?");
+                    RSStringAppendCString(newString, "?", RSStringEncodingASCII);
                     RSStringGetCharacters(relString, rg, buf);
                     RSStringAppendCharacters(newString, buf, rg.length);
                 } else {
                     rg = _rangeForComponent(baseFlags, baseRanges, HAS_QUERY);
                     if (rg.location != RSNotFound) {
-                        RSStringAppendCString(newString, "?");
+                        RSStringAppendCString(newString, "?", RSStringEncodingASCII);
                         RSStringGetCharacters(baseString, rg, buf);
                         RSStringAppendCharacters(newString, buf, rg.length);
                     }
@@ -2339,7 +2322,7 @@ static RSMutableStringRef resolveAbsoluteURLString(RSAllocatorRef alloc, RSStrin
                 // Only the relative portion of the URL can supply the fragment; otherwise, what would be in the relativeURL?
                 rg = _rangeForComponent(relFlags, relRanges, HAS_FRAGMENT);
                 if (rg.location != RSNotFound) {
-                    RSStringAppendCString(newString, "#");
+                    RSStringAppendCString(newString, "#", RSStringEncodingASCII);
                     RSStringGetCharacters(relString, rg, buf);
                     RSStringAppendCharacters(newString, buf, rg.length);
                 }
@@ -2350,7 +2333,7 @@ static RSMutableStringRef resolveAbsoluteURLString(RSAllocatorRef alloc, RSStrin
     return newString;
 }
 
-RSURLRef RSURLCopyAbsoluteURL(RSURLRef  relativeURL) {
+RSExport RSURLRef RSURLCopyAbsoluteURL(RSURLRef  relativeURL) {
     RSURLRef  anURL, base;
     RSAllocatorRef alloc = RSGetAllocator(relativeURL);
     RSStringRef baseString, newString;
@@ -2358,7 +2341,7 @@ RSURLRef RSURLCopyAbsoluteURL(RSURLRef  relativeURL) {
     RSRange *baseRanges;
     BOOL baseIsObjC;
     
-    //RSAssert1(relativeURL != NULL, __RSLogAssertion, "%s(): Cannot create an absolute URL from a NULL relative URL", __PRETTY_FUNCTION__);
+    RSAssert1(relativeURL != nil, __RSLogAssertion, "%s(): Cannot create an absolute URL from a nil relative URL", __PRETTY_FUNCTION__);
     //    if (RS_IS_OBJC(__RSURLTypeID, relativeURL)) {
     //        anURL = (RSURLRef) RS_OBJC_CALLV((NSURL *)relativeURL, absoluteURL);
     //        if (anURL) RSRetain(anURL);
@@ -2380,15 +2363,15 @@ RSURLRef RSURLCopyAbsoluteURL(RSURLRef  relativeURL) {
     } else {
         baseString = RSURLGetString(base);
         baseFlags = 0;
-        baseRanges = NULL;
-        _parseComponents(alloc, baseString, NULL, &baseFlags, &baseRanges);
+        baseRanges = nil;
+        _parseComponents(alloc, baseString, nil, &baseFlags, &baseRanges);
     }
     
     newString = resolveAbsoluteURLString(alloc, relativeURL->_string, relativeURL->_flags, relativeURL->_ranges, baseString, baseFlags, baseRanges);
     if (baseIsObjC) {
         RSAllocatorDeallocate(alloc, baseRanges);
     }
-    anURL = _RSURLCreateWithArbitraryString(alloc, newString, NULL);
+    anURL = _RSURLCreateWithArbitraryString(alloc, newString, nil);
     RSRelease(newString);
     ((struct __RSURL *)anURL)->_encoding = relativeURL->_encoding;
 #if DEBUG_URL_MEMORY_USAGE
@@ -2407,12 +2390,12 @@ RSStringEncoding _RSURLGetEncoding(RSURLRef url) {
     return url->_encoding;
 }
 
-BOOL RSURLCanBeDecomposed(RSURLRef  anURL) {
+RSExport BOOL RSURLCanBeDecomposed(RSURLRef  anURL) {
     anURL = _RSURLFromNSURL(anURL);
     return ((anURL->_flags & IS_DECOMPOSABLE) != 0);
 }
 
-RSStringRef  RSURLGetString(RSURLRef  url) {
+RSExport RSStringRef  RSURLGetString(RSURLRef  url) {
     RS_OBJC_FUNCDISPATCHV(__RSURLTypeID, RSStringRef, (NSURL *)url, relativeString);
     if (!_haveTestedOriginalString(url)) {
         computeSanitizedString(url);
@@ -2424,27 +2407,27 @@ RSStringRef  RSURLGetString(RSURLRef  url) {
     }
 }
 
-//RSIndex RSURLGetBytes(RSURLRef url, RSBitU8 *buffer, RSIndex bufferLength) {
-//    RSIndex length, charsConverted, usedLength;
-//    RSStringRef string;
-//    RSStringEncoding enc;
-//    if (RS_IS_OBJC(__RSURLTypeID, url)) {
-//        string = RSURLGetString(url);
-//        enc = RSStringEncodingUTF8;
-//    } else {
-//        string = url->_string;
-//        enc = url->_encoding;
-//    }
-//    length = RSStringGetByteLength(string);
-//    charsConverted = RSStringGetBytes(string, RSMakeRange(0, length), enc, 0, NO, buffer, bufferLength, &usedLength);
-//    if (charsConverted != length) {
-//        return -1;
-//    } else {
-//        return usedLength;
-//    }
-//}
+RSExport RSIndex RSURLGetBytes(RSURLRef url, RSBitU8 *buffer, RSIndex bufferLength) {
+    RSIndex length, charsConverted, usedLength;
+    RSStringRef string;
+    RSStringEncoding enc;
+    if (RS_IS_OBJC(__RSURLTypeID, url)) {
+        string = RSURLGetString(url);
+        enc = RSStringEncodingUTF8;
+    } else {
+        string = url->_string;
+        enc = url->_encoding;
+    }
+    length = RSStringGetLength(string);
+    charsConverted = RSStringGetBytes(string, RSMakeRange(0, length), enc, 0, NO, buffer, bufferLength, &usedLength);
+    if (charsConverted != length) {
+        return -1;
+    } else {
+        return usedLength;
+    }
+}
 
-RSURLRef  RSURLGetBaseURL(RSURLRef  anURL) {
+RSExport RSURLRef  RSURLGetBaseURL(RSURLRef  anURL) {
     RS_OBJC_FUNCDISPATCHV(__RSURLTypeID, RSURLRef, (NSURL *)anURL, baseURL);
     return anURL->_base;
 }
@@ -2472,7 +2455,7 @@ static RSStringRef _retainedComponentString(RSURLRef url, RSBitU32 compFlag, BOO
     }
     rg = _rangeForComponent(url->_flags, url->_ranges, compFlag);
     if (rg.location == RSNotFound) {
-        comp = NULL;
+        comp = nil;
     }
     else {
         if ( compFlag & HAS_SCHEME ) {
@@ -2531,13 +2514,14 @@ static RSStringRef _retainedComponentString(RSURLRef url, RSBitU32 compFlag, BOO
     return comp;
 }
 
-RSStringRef  RSURLCopyScheme(RSURLRef  anURL) {
+RSExport RSStringRef  RSURLCopyScheme(RSURLRef  anURL) {
     RSStringRef scheme;
     if (RS_IS_OBJC(__RSURLTypeID, anURL)) {
         //        scheme = (RSStringRef) RS_OBJC_CALLV((NSURL *)anURL, scheme);
         //        if ( scheme ) {
         //            RSRetain(scheme);
         //        }
+        return nil;
     }
     else {
         switch ( _getSchemeTypeFromFlags(anURL->_flags) ) {
@@ -2567,7 +2551,7 @@ RSStringRef  RSURLCopyScheme(RSURLRef  anURL) {
                     if (anURL->_base) {
                         scheme = RSURLCopyScheme(anURL->_base);
                     } else {
-                        scheme = NULL;
+                        scheme = nil;
                     }
                 }
                 break;
@@ -2598,7 +2582,7 @@ static RSRange _netLocationRange(RSBitU32 flags, RSRange *ranges) {
     return netRg;
 }
 
-RSStringRef RSURLCopyNetLocation(RSURLRef  anURL) {
+RSExport RSStringRef RSURLCopyNetLocation(RSURLRef  anURL) {
     anURL = _RSURLFromNSURL(anURL);
     if (anURL->_flags & NET_LOCATION_MASK) {
         // We provide the net location
@@ -2611,7 +2595,7 @@ RSStringRef RSURLCopyNetLocation(RSURLRef  anURL) {
             // Only thing that can come before the net location is the scheme.  It's impossible for the scheme to contain percent escapes.  Therefore, we can use the location of netRg in _sanatizedString, just not the length.
             RSRange netLocEnd;
             RSStringRef sanitizedString = _getSanitizedString(anURL);
-            netRg.length = RSStringGetByteLength(sanitizedString) - netRg.location;
+            netRg.length = RSStringGetLength(sanitizedString) - netRg.location;
             if (RSStringFindWithOptions(sanitizedString, RSSTR("/"), netRg, 0, &netLocEnd)) {
                 netRg.length = netLocEnd.location - netRg.location;
             }
@@ -2623,31 +2607,31 @@ RSStringRef RSURLCopyNetLocation(RSURLRef  anURL) {
     } else if (anURL->_base) {
         return RSURLCopyNetLocation(anURL->_base);
     } else {
-        return NULL;
+        return nil;
     }
 }
 
 // NOTE - if you want an absolute path, you must first get the absolute URL.  If you want a file system path, use the file system methods above.
-RSStringRef  RSURLCopyPath(RSURLRef  anURL) {
+RSExport RSStringRef  RSURLCopyPath(RSURLRef  anURL) {
     anURL = _RSURLFromNSURL(anURL);
     return _retainedComponentString(anURL, HAS_PATH, NO, NO);
 }
 
-/* NULL if RSURLCanBeDecomposed(anURL) is NO; also does not resolve the URL against its base.  See also RSCreateAbsoluteURL().  Note that, strictly speaking, any leading '/' is not considered part of the URL's path, although its presence or absence determines whether the path is absolute.  RSURLCopyPath()'s return value includes any leading slash (giving the path the normal POSIX appearance); RSURLCopyStrictPath()'s return value omits any leading slash, and uses isAbsolute to report whether the URL's path is absolute.
+/* nil if RSURLCanBeDecomposed(anURL) is NO; also does not resolve the URL against its base.  See also RSCreateAbsoluteURL().  Note that, strictly speaking, any leading '/' is not considered part of the URL's path, although its presence or absence determines whether the path is absolute.  RSURLCopyPath()'s return value includes any leading slash (giving the path the normal POSIX appearance); RSURLCopyStrictPath()'s return value omits any leading slash, and uses isAbsolute to report whether the URL's path is absolute.
  
  RSURLCopyFileSystemPath() returns the URL's path as a file system path for the given path style.  All percent escape sequences are replaced.  The URL is not resolved against its base before computing the path.
  */
-RSStringRef RSURLCopyStrictPath(RSURLRef anURL, BOOL *isAbsolute) {
+RSExport RSStringRef RSURLCopyStrictPath(RSURLRef anURL, BOOL *isAbsolute) {
     RSStringRef path = RSURLCopyPath(anURL);
-    if (!path || RSStringGetByteLength(path) == 0) {
+    if (!path || RSStringGetLength(path) == 0) {
         if (path) RSRelease(path);
         if (isAbsolute) *isAbsolute = NO;
-        return NULL;
+        return nil;
     }
     if (RSStringGetCharacterAtIndex(path, 0) == '/') {
         RSStringRef tmp;
         if (isAbsolute) *isAbsolute = YES;
-        tmp = RSStringCreateWithSubstring(RSGetAllocator(path), path, RSMakeRange(1, RSStringGetByteLength(path)-1));
+        tmp = RSStringCreateWithSubstring(RSGetAllocator(path), path, RSMakeRange(1, RSStringGetLength(path)-1));
         RSRelease(path);
         path = tmp;
     } else {
@@ -2656,7 +2640,7 @@ RSStringRef RSURLCopyStrictPath(RSURLRef anURL, BOOL *isAbsolute) {
     return path;
 }
 
-BOOL RSURLHasDirectoryPath(RSURLRef  anURL) {
+RSExport BOOL RSURLHasDirectoryPath(RSURLRef  anURL) {
     __RSGenericValidInstance(anURL, __RSURLTypeID);
     if (!anURL->_base || (anURL->_flags & (HAS_PATH | NET_LOCATION_MASK))) {
         return ((anURL->_flags & IS_DIRECTORY) != 0);
@@ -2678,7 +2662,7 @@ static RSBitU32 _firstResourceSpecifierFlag(RSBitU32 flags) {
     return firstRsrcSpeRSlag;
 }
 
-RSStringRef  RSURLCopyResourceSpecifier(RSURLRef  anURL) {
+RSExport RSStringRef  RSURLCopyResourceSpecifier(RSURLRef  anURL) {
     anURL = _RSURLFromNSURL(anURL);
     __RSGenericValidInstance(anURL, __RSURLTypeID);
     if (!(anURL->_flags & IS_DECOMPOSABLE)) {
@@ -2692,9 +2676,9 @@ RSStringRef  RSURLCopyResourceSpecifier(RSURLRef  anURL) {
         
         if (sanitizedString) {
             // It is impossible to have a percent escape in the scheme (if there were one, we would have considered the URL a relativeURL with a  colon in the path instead), so this range computation is always safe.
-            return RSStringCreateWithSubstring(RSGetAllocator(anURL), sanitizedString, RSMakeRange(base, RSStringGetByteLength(sanitizedString)-base));
+            return RSStringCreateWithSubstring(RSGetAllocator(anURL), sanitizedString, RSMakeRange(base, RSStringGetLength(sanitizedString)-base));
         } else {
-            return RSStringCreateWithSubstring(RSGetAllocator(anURL), anURL->_string, RSMakeRange(base, RSStringGetByteLength(anURL->_string)-base));
+            return RSStringCreateWithSubstring(RSGetAllocator(anURL), anURL->_string, RSMakeRange(base, RSStringGetLength(anURL->_string)-base));
         }
     } else {
         RSBitU32 firstRsrcSpeRSlag = _firstResourceSpecifierFlag(anURL->_flags);
@@ -2731,28 +2715,28 @@ RSStringRef  RSURLCopyResourceSpecifier(RSURLRef  anURL) {
             if (canUseOriginalString) {
                 RSRange rg = _rangeForComponent(anURL->_flags, anURL->_ranges, firstRsrcSpeRSlag);
                 rg.location --; // Include the character that demarcates the component
-                rg.length = RSStringGetByteLength(anURL->_string) - rg.location;
+                rg.length = RSStringGetLength(anURL->_string) - rg.location;
                 return RSStringCreateWithSubstring(alloc, anURL->_string, rg);
             } else if (canUseSanitizedString) {
                 RSRange rg = _rangeForComponent(anURL->_flags, anURL->_ranges, firstRsrcSpeRSlag);
                 rg.location --; // Include the character that demarcates the component
-                rg.length = RSStringGetByteLength(sanitizedString) - rg.location;
+                rg.length = RSStringGetLength(sanitizedString) - rg.location;
                 return RSStringCreateWithSubstring(alloc, sanitizedString, rg);
             } else {
                 // Must compute the correct string to return; just reparse....
                 RSBitU32 sanFlags = 0;
-                RSRange *sanRanges = NULL;
+                RSRange *sanRanges = nil;
                 RSRange rg;
                 _parseComponents(alloc, sanitizedString, anURL->_base, &sanFlags, &sanRanges);
                 rg = _rangeForComponent(sanFlags, sanRanges, firstRsrcSpeRSlag);
                 RSAllocatorDeallocate(alloc, sanRanges);
                 rg.location --; // Include the character that demarcates the component
-                rg.length = RSStringGetByteLength(sanitizedString) - rg.location;
+                rg.length = RSStringGetLength(sanitizedString) - rg.location;
                 return RSStringCreateWithSubstring(RSGetAllocator(anURL), sanitizedString, rg);
             }
         } else {
             // The resource specifier cannot possibly come from the base.
-            return NULL;
+            return nil;
         }
     }
 }
@@ -2762,7 +2746,7 @@ RSStringRef  RSURLCopyResourceSpecifier(RSURLRef  anURL) {
 /*************************************/
 
 // For the next four methods, it is important to realize that, if a URL supplies any part of the net location (host, user, port, or password), it must supply all of the net location (i.e. none of it comes from its base URL).  Also, it is impossible for a URL to be relative, supply none of the net location, and still have its (empty) net location take precedence over its base URL (because there's nothing that precedes the net location except the scheme, and if the URL supplied the scheme, it would be absolute, and there would be no base).
-RSStringRef  RSURLCopyHostName(RSURLRef  anURL) {
+RSExport RSStringRef  RSURLCopyHostName(RSURLRef  anURL) {
     RSStringRef tmp;
     if (RS_IS_OBJC(__RSURLTypeID, anURL)) {
         //        tmp = (RSStringRef) RS_OBJC_CALLV((NSURL *)anURL, host);
@@ -2775,7 +2759,7 @@ RSStringRef  RSURLCopyHostName(RSURLRef  anURL) {
         if (anURL->_flags & IS_IPV6_ENCODED) {
             // Have to strip off the brackets to get the YES hostname.
             // Assume that to be legal the first and last characters are brackets!
-            RSStringRef	strippedHost = RSStringCreateWithSubstring(RSGetAllocator(anURL), tmp, RSMakeRange(1, RSStringGetByteLength(tmp) - 2));
+            RSStringRef	strippedHost = RSStringCreateWithSubstring(RSGetAllocator(anURL), tmp, RSMakeRange(1, RSStringGetLength(tmp) - 2));
             RSRelease(tmp);
             tmp = strippedHost;
         }
@@ -2783,10 +2767,11 @@ RSStringRef  RSURLCopyHostName(RSURLRef  anURL) {
     } else if (anURL->_base && !(anURL->_flags & NET_LOCATION_MASK) && !(anURL->_flags & HAS_SCHEME)) {
         return RSURLCopyHostName(anURL->_base);
     } else {
-        return NULL;
+        return nil;
     }
 }
 
+extern BOOL __RSStringScanInteger(RSStringInlineBuffer *buf, RSTypeRef locale, SInt32 *indexPtr, BOOL doLonglong, void *result);
 // Return -1 to indicate no port is specified
 SInt32 RSURLGetPortNumber(RSURLRef  anURL) {
     RSStringRef port;
@@ -2799,11 +2784,11 @@ SInt32 RSURLGetPortNumber(RSURLRef  anURL) {
     __RSGenericValidInstance(anURL, __RSURLTypeID);
     port = _retainedComponentString(anURL, HAS_PORT, YES, NO);
     if (port) {
-        RSBitU32 portNum, idx, length = (RSBitU32)RSStringGetByteLength(port);
+        RSBitU32 portNum, idx, length = (RSBitU32)RSStringGetLength(port);
         RSStringInlineBuffer buf;
         RSStringInitInlineBuffer(port, &buf, RSMakeRange(0, length));
         idx = 0;
-        if (!__RSStringScanInteger(&buf, NULL, (SInt32)&idx, NO, &portNum) || (idx != length)) {
+        if (!__RSStringScanInteger(&buf, nil, (SInt32)&idx, NO, &portNum) || (idx != length)) {
             portNum = -1;
         }
         RSRelease(port);
@@ -2815,7 +2800,7 @@ SInt32 RSURLGetPortNumber(RSURLRef  anURL) {
     }
 }
 
-RSStringRef  RSURLCopyUserName(RSURLRef  anURL) {
+RSExport RSStringRef  RSURLCopyUserName(RSURLRef  anURL) {
     RSStringRef user;
     if (RS_IS_OBJC(__RSURLTypeID, anURL)) {
         //        user = (RSStringRef) RS_OBJC_CALLV((NSURL *)anURL, user);
@@ -2829,11 +2814,11 @@ RSStringRef  RSURLCopyUserName(RSURLRef  anURL) {
     } else if (anURL->_base && !(anURL->_flags & NET_LOCATION_MASK) && !(anURL->_flags & HAS_SCHEME)) {
         return RSURLCopyUserName(anURL->_base);
     } else {
-        return NULL;
+        return nil;
     }
 }
 
-RSStringRef  RSURLCopyPassword(RSURLRef  anURL) {
+RSExport RSStringRef  RSURLCopyPassword(RSURLRef  anURL) {
     RSStringRef passwd;
     if (RS_IS_OBJC(__RSURLTypeID, anURL)) {
         //        passwd = (RSStringRef) RS_OBJC_CALLV((NSURL *)anURL, password);
@@ -2847,7 +2832,7 @@ RSStringRef  RSURLCopyPassword(RSURLRef  anURL) {
     } else if (anURL->_base && !(anURL->_flags & NET_LOCATION_MASK) && !(anURL->_flags & HAS_SCHEME)) {
         return RSURLCopyPassword(anURL->_base);
     } else {
-        return NULL;
+        return nil;
     }
 }
 
@@ -2863,15 +2848,15 @@ static RSStringRef  _unescapedParameterString(RSURLRef  anURL) {
     __RSGenericValidInstance(anURL, __RSURLTypeID);
     str = _retainedComponentString(anURL, HAS_PARAMETERS, NO, NO);
     if (str) return str;
-    if (!(anURL->_flags & IS_DECOMPOSABLE)) return NULL;
+    if (!(anURL->_flags & IS_DECOMPOSABLE)) return nil;
     if (!anURL->_base || (anURL->_flags & (NET_LOCATION_MASK | HAS_PATH | HAS_SCHEME))) {
-        return NULL;
+        return nil;
         // Parameter string definitely coming from the relative portion of the URL
     }
     return _unescapedParameterString( anURL->_base);
 }
 
-RSStringRef  RSURLCopyParameterString(RSURLRef  anURL, RSStringRef charactersToLeaveEscaped) {
+RSExport RSStringRef  RSURLCopyParameterString(RSURLRef  anURL, RSStringRef charactersToLeaveEscaped) {
     RSStringRef  param = _unescapedParameterString(anURL);
     if (param) {
         RSStringRef result;
@@ -2883,7 +2868,7 @@ RSStringRef  RSURLCopyParameterString(RSURLRef  anURL, RSStringRef charactersToL
         RSRelease(param);
         return result;
     }
-    return NULL;
+    return nil;
 }
 
 static RSStringRef  _unescapedQueryString(RSURLRef  anURL) {
@@ -2896,14 +2881,14 @@ static RSStringRef  _unescapedQueryString(RSURLRef  anURL) {
     __RSGenericValidInstance(anURL, __RSURLTypeID);
     str = _retainedComponentString(anURL, HAS_QUERY, NO, NO);
     if (str) return str;
-    if (!(anURL->_flags & IS_DECOMPOSABLE)) return NULL;
+    if (!(anURL->_flags & IS_DECOMPOSABLE)) return nil;
     if (!anURL->_base || (anURL->_flags & (HAS_SCHEME | NET_LOCATION_MASK | HAS_PATH | HAS_PARAMETERS))) {
-        return NULL;
+        return nil;
     }
     return _unescapedQueryString(anURL->_base);
 }
 
-RSStringRef  RSURLCopyQueryString(RSURLRef  anURL, RSStringRef  charactersToLeaveEscaped) {
+RSExport RSStringRef  RSURLCopyQueryString(RSURLRef  anURL, RSStringRef  charactersToLeaveEscaped) {
     RSStringRef  query = _unescapedQueryString(anURL);
     if (query) {
         RSStringRef tmp;
@@ -2915,7 +2900,7 @@ RSStringRef  RSURLCopyQueryString(RSURLRef  anURL, RSStringRef  charactersToLeav
         RSRelease(query);
         return tmp;
     }
-    return NULL;
+    return nil;
 }
 
 // Fragments are NEVER taken from a base URL
@@ -2931,7 +2916,7 @@ static RSStringRef  _unescapedFragment(RSURLRef  anURL) {
     return str;
 }
 
-RSStringRef  RSURLCopyFragment(RSURLRef  anURL, RSStringRef  charactersToLeaveEscaped) {
+RSExport RSStringRef  RSURLCopyFragment(RSURLRef  anURL, RSStringRef  charactersToLeaveEscaped) {
     RSStringRef  fragment = _unescapedFragment(anURL);
     if (fragment) {
         RSStringRef tmp;
@@ -2943,7 +2928,7 @@ RSStringRef  RSURLCopyFragment(RSURLRef  anURL, RSStringRef  charactersToLeaveEs
         RSRelease(fragment);
         return tmp;
     }
-    return NULL;
+    return nil;
 }
 
 static RSIndex insertionLocationForMask(RSURLRef url, RSOptionFlags mask) {
@@ -3073,7 +3058,7 @@ static RSRange _getCharRangeInNonDecomposableURL(RSURLRef url, RSURLComponentTyp
         return schemeRg;
     } else if (component == RSURLComponentResourceSpecifier) {
         RSRange schemeRg = _rangeForComponent(url->_flags, url->_ranges, HAS_SCHEME);
-        RSIndex stringLength = RSStringGetByteLength(url->_string);
+        RSIndex stringLength = RSStringGetLength(url->_string);
         if (schemeRg.length + 1 == stringLength) {
             rangeIncludingSeparators->location = schemeRg.length + 1;
             rangeIncludingSeparators->length = 0;
@@ -3091,15 +3076,10 @@ static RSRange _getCharRangeInNonDecomposableURL(RSURLRef url, RSURLComponentTyp
     
 }
 
-RSIndex RSStringGetBytes(RSStringRef string, RSRange range, RSStringEncoding encoding, RSBitU8 lossbytes, BOOL isExternalRepresentation, uint8_t *buffer, RSIndex maxBufLen, RSIndex *usedBufLen)
-{
-    return 0;
-}
-
-RSRange RSURLGetByteRangeForComponent(RSURLRef url, RSURLComponentType component, RSRange *rangeIncludingSeparators) {
+RSExport RSRange RSURLGetByteRangeForComponent(RSURLRef url, RSURLComponentType component, RSRange *rangeIncludingSeparators) {
     RSRange charRange, charRangeWithSeparators;
     RSRange byteRange;
-    //RSAssert2(component > 0 && component < 13, __RSLogAssertion, "%s(): passed invalid component %d", __PRETTY_FUNCTION__, component);
+    RSAssert2(component > 0 && component < 13, __RSLogAssertion, "%s(): passed invalid component %d", __PRETTY_FUNCTION__, component);
     url = _RSURLFromNSURL(url);
     
     if (!(url->_flags & IS_DECOMPOSABLE)) {
@@ -3116,11 +3096,11 @@ RSRange RSURLGetByteRangeForComponent(RSURLRef url, RSURLComponentType component
         }
         return RSMakeRange(RSNotFound, 0);
     } else if (rangeIncludingSeparators) {
-        RSStringGetBytes(url->_string, RSMakeRange(0, charRangeWithSeparators.location), url->_encoding, 0, NO, NULL, 0, &(rangeIncludingSeparators->location));
+        RSStringGetBytes(url->_string, RSMakeRange(0, charRangeWithSeparators.location), url->_encoding, 0, NO, nil, 0, &(rangeIncludingSeparators->location));
         
         if (charRange.location == RSNotFound) {
             byteRange = charRange;
-            RSStringGetBytes(url->_string, charRangeWithSeparators, url->_encoding, 0, NO, NULL, 0, &(rangeIncludingSeparators->length));
+            RSStringGetBytes(url->_string, charRangeWithSeparators, url->_encoding, 0, NO, nil, 0, &(rangeIncludingSeparators->length));
         } else {
             RSIndex maxCharRange = charRange.location + charRange.length;
             RSIndex maxCharRangeWithSeparators = charRangeWithSeparators.location + charRangeWithSeparators.length;
@@ -3129,10 +3109,10 @@ RSRange RSURLGetByteRangeForComponent(RSURLRef url, RSURLComponentType component
                 byteRange.location = rangeIncludingSeparators->location;
             } else {
                 RSIndex numBytes;
-                RSStringGetBytes(url->_string, RSMakeRange(charRangeWithSeparators.location, charRange.location - charRangeWithSeparators.location), url->_encoding, 0, NO, NULL, 0, &numBytes);
+                RSStringGetBytes(url->_string, RSMakeRange(charRangeWithSeparators.location, charRange.location - charRangeWithSeparators.location), url->_encoding, 0, NO, nil, 0, &numBytes);
                 byteRange.location = charRangeWithSeparators.location + numBytes;
             }
-            RSStringGetBytes(url->_string, charRange, url->_encoding, 0, NO, NULL, 0, &(byteRange.length));
+            RSStringGetBytes(url->_string, charRange, url->_encoding, 0, NO, nil, 0, &(byteRange.length));
             if (maxCharRangeWithSeparators == maxCharRange) {
                 rangeIncludingSeparators->length = byteRange.location + byteRange.length - rangeIncludingSeparators->location;
             } else {
@@ -3140,15 +3120,15 @@ RSRange RSURLGetByteRangeForComponent(RSURLRef url, RSURLComponentType component
                 RSRange rg;
                 rg.location = maxCharRange;
                 rg.length = maxCharRangeWithSeparators - rg.location;
-                RSStringGetBytes(url->_string, rg, url->_encoding, 0, NO, NULL, 0, &numBytes);
+                RSStringGetBytes(url->_string, rg, url->_encoding, 0, NO, nil, 0, &numBytes);
                 rangeIncludingSeparators->length = byteRange.location + byteRange.length + numBytes - rangeIncludingSeparators->location;
             }
         }
     } else if (charRange.location == RSNotFound) {
         byteRange = charRange;
     } else {
-        RSStringGetBytes(url->_string, RSMakeRange(0, charRange.location), url->_encoding, 0, NO, NULL, 0, &(byteRange.location));
-        RSStringGetBytes(url->_string, charRange, url->_encoding, 0, NO, NULL, 0, &(byteRange.length));
+        RSStringGetBytes(url->_string, RSMakeRange(0, charRange.location), url->_encoding, 0, NO, nil, 0, &(byteRange.location));
+        RSStringGetBytes(url->_string, charRange, url->_encoding, 0, NO, nil, 0, &(byteRange.length));
     }
     return byteRange;
 }
@@ -3156,8 +3136,8 @@ RSRange RSURLGetByteRangeForComponent(RSURLRef url, RSURLComponentType component
 /* Component support */
 
 static BOOL decomposeToNonHierarchical(RSURLRef url, RSURLComponentsNonHierarchical *components) {
-    if ( RSURLGetBaseURL(url) != NULL)  {
-        components->scheme = NULL;
+    if ( RSURLGetBaseURL(url) != nil)  {
+        components->scheme = nil;
     } else {
         components->scheme = RSURLCopyScheme(url);
     }
@@ -3169,27 +3149,27 @@ static RSURLRef composeFromNonHierarchical(RSAllocatorRef alloc, const RSURLComp
     RSStringRef str;
     if (components->scheme) {
         UniChar ch = ':';
-        str = RSStringCreateMutableCopy(alloc, RSStringGetByteLength(components->scheme) + 1 + (components->schemeSpecific ? RSStringGetByteLength(components->schemeSpecific): 0), components->scheme);
+        str = RSStringCreateMutableCopy(alloc, RSStringGetLength(components->scheme) + 1 + (components->schemeSpecific ? RSStringGetLength(components->schemeSpecific): 0), components->scheme);
         RSStringAppendCharacters((RSMutableStringRef)str, &ch, 1);
         if (components->schemeSpecific) RSStringAppendString((RSMutableStringRef)str, components->schemeSpecific);
     } else if (components->schemeSpecific) {
         str = components->schemeSpecific;
         RSRetain(str);
     } else {
-        str = NULL;
+        str = nil;
     }
     if (str) {
-        RSURLRef url = RSURLCreateWithString(alloc, str, NULL);
+        RSURLRef url = RSURLCreateWithString(alloc, str, nil);
         RSRelease(str);
         return url;
     } else {
-        return NULL;
+        return nil;
     }
 }
 
 static BOOL decomposeToRFC1808(RSURLRef url, RSURLComponentsRFC1808 *components) {
     RSAllocatorRef alloc = RSGetAllocator(url);
-    static RSStringRef emptyStr = NULL;
+    static RSStringRef emptyStr = nil;
     if (!emptyStr) {
         emptyStr = RSSTR("");
     }
@@ -3203,12 +3183,12 @@ static BOOL decomposeToRFC1808(RSURLRef url, RSURLComponentsRFC1808 *components)
         components->pathComponents = RSStringCreateArrayBySeparatingStrings(alloc, path, RSSTR("/"));
         RSRelease(path);
     } else {
-        components->pathComponents = NULL;
+        components->pathComponents = nil;
     }
     components->baseURL = RSURLGetBaseURL(url);
     if (components->baseURL)  {
         RSRetain(components->baseURL);
-        components->scheme = NULL;
+        components->scheme = nil;
     } else {
         components->scheme = _retainedComponentString(url, HAS_SCHEME, YES, NO);
     }
@@ -3232,7 +3212,7 @@ static RSURLRef composeFromRFC1808(RSAllocatorRef alloc, const RSURLComponentsRF
     RSURLRef url;
     BOOL hadPrePathComponent = NO;
     if (comp->scheme) {
-        base = NULL;
+        base = nil;
         RSStringAppendString(urlString, comp->scheme);
         RSStringAppendString(urlString, RSSTR("://"));
         hadPrePathComponent = YES;
@@ -3257,7 +3237,7 @@ static RSURLRef composeFromRFC1808(RSAllocatorRef alloc, const RSURLComponentsRF
         hadPrePathComponent = YES;
     }
     
-    if (hadPrePathComponent && (comp->pathComponents == NULL || RSArrayGetCount( comp->pathComponents ) == 0 || RSStringGetByteLength((RSStringRef)RSArrayObjectAtIndex(comp->pathComponents, 0)) != 0)) {
+    if (hadPrePathComponent && (comp->pathComponents == nil || RSArrayGetCount( comp->pathComponents ) == 0 || RSStringGetLength((RSStringRef)RSArrayObjectAtIndex(comp->pathComponents, 0)) != 0)) {
         RSStringAppendString(urlString, RSSTR("/"));
     }
     if (comp->pathComponents) {
@@ -3299,7 +3279,7 @@ static BOOL decomposeToRFC2396(RSURLRef url, RSURLComponentsRFC2396 *comp) {
             comp->userinfo = oldComp.user;
         }
     } else {
-        comp->userinfo = NULL;
+        comp->userinfo = nil;
     }
     comp->host = oldComp.host;
     comp->port = oldComp.port;
@@ -3326,7 +3306,7 @@ static RSURLRef composeFromRFC2396(RSAllocatorRef alloc, const RSURLComponentsRF
     RSURLRef url;
     BOOL hadPrePathComponent = NO;
     if (comp->scheme) {
-        base = NULL;
+        base = nil;
         RSStringAppendString(urlString, comp->scheme);
         RSStringAppendString(urlString, RSSTR("://"));
         hadPrePathComponent = YES;
@@ -3343,7 +3323,7 @@ static RSURLRef composeFromRFC2396(RSAllocatorRef alloc, const RSURLComponentsRF
         }
         hadPrePathComponent = YES;
     }
-    if (hadPrePathComponent && (comp->pathComponents == NULL || RSStringGetByteLength((RSStringRef)RSArrayObjectAtIndex(comp->pathComponents, 0)) != 0)) {
+    if (hadPrePathComponent && (comp->pathComponents == nil || RSStringGetLength((RSStringRef)RSArrayObjectAtIndex(comp->pathComponents, 0)) != 0)) {
         RSStringAppendString(urlString, RSSTR("/"));
     }
     if (comp->pathComponents) {
@@ -3367,8 +3347,7 @@ static RSURLRef composeFromRFC2396(RSAllocatorRef alloc, const RSURLComponentsRF
 #undef RSURLCopyComponents
 #undef RSURLCreateFromComponents
 
-RS_EXPORT
-BOOL _RSURLCopyComponents(RSURLRef url, RSURLComponentDecomposition decompositionType, void *components) {
+RSExport BOOL _RSURLCopyComponents(RSURLRef url, RSURLComponentDecomposition decompositionType, void *components) {
     url = _RSURLFromNSURL(url);
     switch (decompositionType) {
         case RSURLComponentDecompositionNonHierarchical:
@@ -3382,8 +3361,7 @@ BOOL _RSURLCopyComponents(RSURLRef url, RSURLComponentDecomposition decompositio
     }
 }
 
-RS_EXPORT
-RSURLRef _RSURLCreateFromComponents(RSAllocatorRef alloc, RSURLComponentDecomposition decompositionType, const void *components) {
+RSExport RSURLRef _RSURLCreateFromComponents(RSAllocatorRef alloc, RSURLComponentDecomposition decompositionType, const void *components) {
     switch (decompositionType) {
         case RSURLComponentDecompositionNonHierarchical:
             return composeFromNonHierarchical(alloc, (const RSURLComponentsNonHierarchical *)components);
@@ -3392,23 +3370,23 @@ RSURLRef _RSURLCreateFromComponents(RSAllocatorRef alloc, RSURLComponentDecompos
         case RSURLComponentDecompositionRFC2396:
             return composeFromRFC2396(alloc, (const RSURLComponentsRFC2396 *)components);
         default:
-            return NULL;
+            return nil;
     }
 }
 
-RS_EXPORT void *__RSURLReservedPtr(RSURLRef  url) {
+RSExport void *__RSURLReservedPtr(RSURLRef  url) {
     return _getReserved(url);
 }
 
-RS_EXPORT void __RSURLSetReservedPtr(RSURLRef  url, void *ptr) {
+RSExport void __RSURLSetReservedPtr(RSURLRef  url, void *ptr) {
     _setReserved ( (struct __RSURL*) url, ptr );
 }
 
-RS_EXPORT void *__RSURLResourceInfoPtr(RSURLRef url) {
+RSExport void *__RSURLResourceInfoPtr(RSURLRef url) {
     return _getResourceInfo(url);
 }
 
-RS_EXPORT void __RSURLSetResourceInfoPtr(RSURLRef url, void *ptr) {
+RSExport void __RSURLSetResourceInfoPtr(RSURLRef url, void *ptr) {
     _setResourceInfo ( (struct __RSURL*) url, ptr );
 }
 
@@ -3417,7 +3395,7 @@ RS_EXPORT void __RSURLSetResourceInfoPtr(RSURLRef url, void *ptr) {
 /* HFSPath<->URLPath functions at the bottom of the file */
 static RSArrayRef WindowsPathToURLComponents(RSStringRef path, RSAllocatorRef alloc, BOOL isDir) {
     RSArrayRef tmp;
-    RSMutableArrayRef urlComponents = NULL;
+    RSMutableArrayRef urlComponents = nil;
     RSIndex i=0;
     
     tmp = RSStringCreateArrayBySeparatingStrings(alloc, path, RSSTR("\\"));
@@ -3425,7 +3403,7 @@ static RSArrayRef WindowsPathToURLComponents(RSStringRef path, RSAllocatorRef al
     RSRelease(tmp);
     
     RSStringRef str = (RSStringRef)RSArrayObjectAtIndex(urlComponents, 0);
-    if (RSStringGetByteLength(str) == 2 && RSStringGetCharacterAtIndex(str, 1) == ':') {
+    if (RSStringGetLength(str) == 2 && RSStringGetCharacterAtIndex(str, 1) == ':') {
         RSArrayInsertObjectAtIndex(urlComponents, 0, RSSTR("")); // So we get a leading '/' below
         i = 2; // Skip over the drive letter and the empty string we just inserted
     }
@@ -3436,7 +3414,7 @@ static RSArrayRef WindowsPathToURLComponents(RSStringRef path, RSAllocatorRef al
         if (!urlComp) {
             // Couldn't decode fileComp
             RSRelease(urlComponents);
-            return NULL;
+            return nil;
         }
         if (urlComp != fileComp) {
             RSArraySetObjectAtIndex(urlComponents, i, urlComp);
@@ -3445,7 +3423,7 @@ static RSArrayRef WindowsPathToURLComponents(RSStringRef path, RSAllocatorRef al
     }
     
     if (isDir) {
-        if (RSStringGetByteLength((RSStringRef)RSArrayObjectAtIndex(urlComponents, RSArrayGetCount(urlComponents) - 1)) != 0)
+        if (RSStringGetLength((RSStringRef)RSArrayObjectAtIndex(urlComponents, RSArrayGetCount(urlComponents) - 1)) != 0)
             RSArrayAddObject(urlComponents, RSSTR(""));
     }
     return urlComponents;
@@ -3455,7 +3433,7 @@ static RSStringRef WindowsPathToURLPath(RSStringRef path, RSAllocatorRef alloc, 
     RSArrayRef urlComponents;
     RSStringRef str;
     
-    if (RSStringGetByteLength(path) == 0) return RSStringCreateWithCString(alloc, "", RSStringEncodingASCII);
+    if (RSStringGetLength(path) == 0) return RSStringCreateWithCString(alloc, "", RSStringEncodingASCII);
     urlComponents = WindowsPathToURLComponents(path, alloc, isDir);
     if (!urlComponents) return RSStringCreateWithCString(alloc, "", RSStringEncodingASCII);
     
@@ -3467,7 +3445,7 @@ static RSStringRef WindowsPathToURLPath(RSStringRef path, RSAllocatorRef alloc, 
 
 static RSStringRef POSIXPathToURLPath(RSStringRef path, RSAllocatorRef alloc, BOOL isDirectory) {
     RSStringRef pathString = _replacePathIllegalCharacters(path, alloc, YES);
-    if (isDirectory && RSStringGetCharacterAtIndex(path, RSStringGetByteLength(path)-1) != '/') {
+    if (isDirectory && RSStringGetCharacterAtIndex(path, RSStringGetLength(path)-1) != '/') {
         RSStringRef tmp = RSStringCreateWithFormat(alloc, RSSTR("%R/"), pathString);
         RSRelease(pathString);
         pathString = tmp;
@@ -3479,7 +3457,7 @@ static RSStringRef URLPathToPOSIXPath(RSStringRef path, RSAllocatorRef allocator
     // This is the easiest case; just remove the percent escape codes and we're done
     RSStringRef result = RSURLCreateStringByReplacingPercentEscapesUsingEncoding(allocator, path, RSSTR(""), encoding);
     if (result) {
-        RSIndex length = RSStringGetByteLength(result);
+        RSIndex length = RSStringGetLength(result);
         if (length > 1 && RSStringGetCharacterAtIndex(result, length-1) == '/') {
             RSStringRef tmp = RSStringCreateWithSubstring(allocator, result, RSMakeRange(0, length-1));
             RSRelease(result);
@@ -3496,7 +3474,7 @@ static BOOL CanonicalFileURLStringToFileSystemRepresentation(RSStringRef str, RS
     if ( inBuffer && inBufferLen ) {
         STACK_BUFFER_DECL(RSBitU8, stackEscapedBuf, PATH_MAX * 3);    // worst case size is every unicode code point could be a 3-byte UTF8 sequence
         RSBitU8 *escapedBuf;
-        RSIndex strLength = RSStringGetByteLength(str) - (sizeof(fileURLPrefixWithAuthority) - 1);
+        RSIndex strLength = RSStringGetLength(str) - (sizeof(fileURLPrefixWithAuthority) - 1);
         if ( strLength != 0 ) {
             RSIndex maxBufLength = strLength * 3;
             RSIndex usedBufLen;
@@ -3508,7 +3486,7 @@ static BOOL CanonicalFileURLStringToFileSystemRepresentation(RSStringRef str, RS
                 // worst case size is every unicode code point could be a 3-byte UTF8 sequence
                 escapedBuf = (RSBitU8 *)malloc(maxBufLength);
             }
-            if ( escapedBuf != NULL ) {
+            if ( escapedBuf != nil ) {
                 charsConverted = RSStringGetBytes(str, RSMakeRange(sizeof(fileURLPrefixWithAuthority) - 1, strLength), RSStringEncodingUTF8, 0, NO, escapedBuf, maxBufLength, &usedBufLen);
                 if ( charsConverted ) {
                     static const RSBitU8 hexvalues[] = {
@@ -3641,23 +3619,23 @@ static RSStringRef URLPathToWindowsPath(RSStringRef path, RSAllocatorRef allocat
     
     
     RSRelease(tmp);
-    if (RSStringGetByteLength((RSStringRef)RSArrayObjectAtIndex(components,count-1)) == 0) {
+    if (RSStringGetLength((RSStringRef)RSArrayObjectAtIndex(components,count-1)) == 0) {
         RSArrayRemoveObjectAtIndex(components, count-1);
         count --;
     }
     
-    if (count > 1 && RSStringGetByteLength((RSStringRef)RSArrayObjectAtIndex(components, 0)) == 0) {
+    if (count > 1 && RSStringGetLength((RSStringRef)RSArrayObjectAtIndex(components, 0)) == 0) {
         // Absolute path; we need to check for a drive letter in the second component, and if so, remove the first component
         RSStringRef firstComponent = RSURLCreateStringByReplacingPercentEscapesUsingEncoding(allocator, (RSStringRef)RSArrayObjectAtIndex(components, 1), RSSTR(""), encoding);
         UniChar ch;
         
         {
             if (firstComponent) {
-                if (RSStringGetByteLength(firstComponent) == 2 && ((ch = RSStringGetCharacterAtIndex(firstComponent, 1)) == '|' || ch == ':')) {
+                if (RSStringGetLength(firstComponent) == 2 && ((ch = RSStringGetCharacterAtIndex(firstComponent, 1)) == '|' || ch == ':')) {
                     // Drive letter
                     RSArrayRemoveObjectAtIndex(components, 0);
                     if (ch == '|') {
-                        RSStringRef driveStr = RSStringCreateWithFormat(allocator, NULL, RSSTR("%c:"), RSStringGetCharacterAtIndex(firstComponent, 0));
+                        RSStringRef driveStr = RSStringCreateWithFormat(allocator, nil, RSSTR("%c:"), RSStringGetCharacterAtIndex(firstComponent, 0));
                         RSArraySetObjectAtIndex(components, 0, driveStr);
                         RSRelease(driveStr);
                     }
@@ -3702,7 +3680,7 @@ static RSStringRef URLPathToWindowsPath(RSStringRef path, RSAllocatorRef allocat
 
 // converts url from a file system path representation to a standard representation
 static void _convertToURLRepresentation(struct __RSURL *url, RSBitU32 fsType) {
-    RSStringRef path = NULL;
+    RSStringRef path = nil;
     BOOL isDir = ((url->_flags & IS_DIRECTORY) != 0);
     BOOL isFileReferencePath = NO;
     RSAllocatorRef alloc = RSGetAllocator(url);
@@ -3720,7 +3698,7 @@ static void _convertToURLRepresentation(struct __RSURL *url, RSBitU32 fsType) {
             path = WindowsPathToURLPath(url->_string, alloc, isDir);
             break;
     }
-    //RSAssert2(path != NULL, __RSLogAssertion, "%s(): Encountered malformed file system URL %R", __PRETTY_FUNCTION__, url);
+    RSAssert2(path != nil, __RSLogAssertion, "%s(): Encountered malformed file system URL %R", __PRETTY_FUNCTION__, url);
     if ( path )
     {
         if (!url->_base) {
@@ -3735,13 +3713,13 @@ static void _convertToURLRepresentation(struct __RSURL *url, RSBitU32 fsType) {
             if (isFileReferencePath) {
                 url->_ranges = (RSRange *)RSAllocatorAllocate(alloc, sizeof(RSRange) * 2);
                 url->_ranges[0] = RSMakeRange(0, 4); // scheme "file"
-                url->_ranges[1] = RSMakeRange(7, RSStringGetByteLength(path)); // path
+                url->_ranges[1] = RSMakeRange(7, RSStringGetLength(path)); // path
             }
             else {
                 url->_ranges = (RSRange *)RSAllocatorAllocate(alloc, sizeof(RSRange) * 3);
                 url->_ranges[0] = RSMakeRange(0, 4); // scheme "file"
                 url->_ranges[1] = RSMakeRange(7, 9); // host "localhost"
-                url->_ranges[2] = RSMakeRange(16, RSStringGetByteLength(path)); // path
+                url->_ranges[2] = RSMakeRange(16, RSStringGetLength(path)); // path
             }
             RSRelease(path);
         } else {
@@ -3750,15 +3728,15 @@ static void _convertToURLRepresentation(struct __RSURL *url, RSBitU32 fsType) {
             url->_string = RSStringCreateCopy(alloc, path);
             RSRelease(path);
             url->_ranges = (RSRange *)RSAllocatorAllocate(alloc, sizeof(RSRange));
-            *(url->_ranges) = RSMakeRange(0, RSStringGetByteLength(url->_string));
+            *(url->_ranges) = RSMakeRange(0, RSStringGetLength(url->_string));
         }
     }
 }
 
 // Caller must release the returned string
 static RSStringRef _resolveFileSystemPaths(RSStringRef relativePath, RSStringRef basePath, BOOL baseIsDir, RSURLPathStyle fsType, RSAllocatorRef alloc) {
-    RSIndex baseLen = RSStringGetByteLength(basePath);
-    RSIndex relLen = RSStringGetByteLength(relativePath);
+    RSIndex baseLen = RSStringGetLength(basePath);
+    RSIndex relLen = RSStringGetLength(relativePath);
     UniChar pathDelimiter = '/';
     UniChar *buf = (UniChar *)RSAllocatorAllocate(alloc, sizeof(UniChar)*(relLen + baseLen + 2));
     RSStringGetCharacters(basePath, RSMakeRange(0, baseLen), buf);
@@ -3783,8 +3761,8 @@ static RSStringRef _resolveFileSystemPaths(RSStringRef relativePath, RSStringRef
     return _resolvedPath(buf, buf + baseLen + relLen, pathDelimiter, NO, YES, alloc);
 }
 
-RSURLRef _RSURLCreateCurrentDirectoryURL(RSAllocatorRef allocator) {
-    RSURLRef url = NULL;
+RSExport RSURLRef _RSURLCreateCurrentDirectoryURL(RSAllocatorRef allocator) {
+    RSURLRef url = nil;
     uint8_t buf[RSMaxPathSize + 1];
     if (_RSGetCurrentDirectory((char *)buf, RSMaxPathLength)) {
         url = RSURLCreateFromFileSystemRepresentation(allocator, buf, strlen((char *)buf), YES);
@@ -3792,16 +3770,16 @@ RSURLRef _RSURLCreateCurrentDirectoryURL(RSAllocatorRef allocator) {
     return url;
 }
 
-RSURLRef RSURLCreateWithFileSystemPath(RSAllocatorRef allocator, RSStringRef filePath, RSURLPathStyle fsType, BOOL isDirectory) {
+RSExport RSURLRef RSURLCreateWithFileSystemPath(RSAllocatorRef allocator, RSStringRef filePath, RSURLPathStyle fsType, BOOL isDirectory) {
     BOOL isAbsolute = YES;
     RSIndex len;
     RSURLRef baseURL, result;
     
-    //RSAssert2(fsType == RSURLPOSIXPathStyle || fsType == RSURLHFSPathStyle || fsType == RSURLWindowsPathStyle, __RSLogAssertion, "%s(): encountered unknown path style %d", __PRETTY_FUNCTION__, fsType);
+    RSAssert2(fsType == RSURLPOSIXPathStyle || fsType == RSURLHFSPathStyle || fsType == RSURLWindowsPathStyle, __RSLogAssertion, "%s(): encountered unknown path style %d", __PRETTY_FUNCTION__, fsType);
     
-    //RSAssert1(filePath != NULL, __RSLogAssertion, "%s(): NULL filePath argument not permitted", __PRETTY_FUNCTION__);
+    RSAssert1(filePath != nil, __RSLogAssertion, "%s(): nil filePath argument not permitted", __PRETTY_FUNCTION__);
     
-	len = RSStringGetByteLength(filePath);
+	len = RSStringGetLength(filePath);
 	
     switch(fsType) {
         case RSURLPOSIXPathStyle:
@@ -3819,7 +3797,7 @@ RSURLRef RSURLCreateWithFileSystemPath(RSAllocatorRef allocator, RSStringRef fil
             break;
     }
     if (isAbsolute) {
-        baseURL = NULL;
+        baseURL = nil;
     } else {
         baseURL = _RSURLCreateCurrentDirectoryURL(allocator);
     }
@@ -3828,16 +3806,16 @@ RSURLRef RSURLCreateWithFileSystemPath(RSAllocatorRef allocator, RSStringRef fil
     return result;
 }
 
-RS_EXPORT RSURLRef RSURLCreateWithFileSystemPathRelativeToBase(RSAllocatorRef allocator, RSStringRef filePath, RSURLPathStyle fsType, BOOL isDirectory, RSURLRef baseURL) {
+RSExport RSURLRef RSURLCreateWithFileSystemPathRelativeToBase(RSAllocatorRef allocator, RSStringRef filePath, RSURLPathStyle fsType, BOOL isDirectory, RSURLRef baseURL) {
     RSURLRef url;
     BOOL isAbsolute = YES, releaseFilePath = NO, releaseBaseURL = NO;
     UniChar pathDelim = '\0';
     RSIndex len;
     
-    //RSAssert1(filePath != NULL, __RSLogAssertion, "%s(): NULL path string not permitted", __PRETTY_FUNCTION__);
-    //RSAssert2(fsType == RSURLPOSIXPathStyle || fsType == RSURLHFSPathStyle || fsType == RSURLWindowsPathStyle, __RSLogAssertion, "%s(): encountered unknown path style %d", __PRETTY_FUNCTION__, fsType);
+    RSAssert1(filePath != nil, __RSLogAssertion, "%s(): nil path string not permitted", __PRETTY_FUNCTION__);
+    RSAssert2(fsType == RSURLPOSIXPathStyle || fsType == RSURLHFSPathStyle || fsType == RSURLWindowsPathStyle, __RSLogAssertion, "%s(): encountered unknown path style %d", __PRETTY_FUNCTION__, fsType);
     
-	len = RSStringGetByteLength(filePath);
+	len = RSStringGetLength(filePath);
     
     switch(fsType) {
         case RSURLPOSIXPathStyle:
@@ -3855,12 +3833,12 @@ RS_EXPORT RSURLRef RSURLCreateWithFileSystemPathRelativeToBase(RSAllocatorRef al
             pathDelim = '\\';
             break;
         case RSURLHFSPathStyle:
-		{	RSRange	fullStrRange = RSMakeRange( 0, RSStringGetByteLength( filePath ) );
+		{	RSRange	fullStrRange = RSMakeRange( 0, RSStringGetLength( filePath ) );
             
             isAbsolute = (len > 0 && RSStringGetCharacterAtIndex(filePath, 0) != ':');
             pathDelim = ':';
 			
-			if ( filePath && RSStringFindWithOptions( filePath, RSSTR("::"), fullStrRange, 0, NULL ) ) {
+			if ( filePath && RSStringFindWithOptions( filePath, RSSTR("::"), fullStrRange, 0, nil ) ) {
 				UniChar *	chars = (UniChar *) malloc( fullStrRange.length * sizeof( UniChar ) );
 				RSIndex index, writeIndex, firstColonOffset = -1;
                 
@@ -3892,7 +3870,7 @@ RS_EXPORT RSURLRef RSURLCreateWithFileSystemPathRelativeToBase(RSAllocatorRef al
 					RSRelease( filePath );
                 filePath = RSStringCreateWithCharacters(allocator, chars, writeIndex);
 				// reset len because a canonical HFS path can be a different length than the original RSString
-				len = RSStringGetByteLength(filePath);
+				len = RSStringGetLength(filePath);
 				releaseFilePath = YES;
 				
 				free( chars );
@@ -3902,9 +3880,9 @@ RS_EXPORT RSURLRef RSURLCreateWithFileSystemPathRelativeToBase(RSAllocatorRef al
 		}
     }
     if (isAbsolute) {
-        baseURL = NULL;
+        baseURL = nil;
     }
-    else if ( baseURL == NULL ) {
+    else if ( baseURL == nil ) {
         baseURL = _RSURLCreateCurrentDirectoryURL(allocator);
         releaseBaseURL = YES;
     }
@@ -3929,10 +3907,10 @@ RS_EXPORT RSURLRef RSURLCreateWithFileSystemPathRelativeToBase(RSAllocatorRef al
             releaseFilePath = YES;
         }
     }
-    if (!filePath || RSStringGetByteLength(filePath) == 0) {
+    if (!filePath || RSStringGetLength(filePath) == 0) {
         if (releaseFilePath && filePath) RSRelease(filePath);
         if (releaseBaseURL && baseURL) RSRelease(baseURL);
-        return NULL;
+        return nil;
     }
     url = _RSURLAlloc(allocator);
     _RSURLInit((struct __RSURL *)url, filePath, fsType, baseURL);
@@ -3945,7 +3923,7 @@ RS_EXPORT RSURLRef RSURLCreateWithFileSystemPathRelativeToBase(RSAllocatorRef al
         RSStringInlineBuffer buf;
         BOOL sawSlash = NO;
         BOOL mustPrependDotSlash = NO;
-        RSIndex idx, length = RSStringGetByteLength(url->_string);
+        RSIndex idx, length = RSStringGetLength(url->_string);
         RSStringInitInlineBuffer(url->_string, &buf, RSMakeRange(0, length));
         for (idx = 0; idx < length; idx ++) {
             UniChar ch = RSStringGetCharacterFromInlineBuffer(&buf, idx);
@@ -3975,12 +3953,12 @@ RS_EXPORT RSURLRef RSURLCreateWithFileSystemPathRelativeToBase(RSAllocatorRef al
 
 static BOOL _pathHasFileIDPrefix( RSStringRef path )
 {
-    // path is not NULL, path has prefix "/.file/" and has at least one character following the prefix.
+    // path is not nil, path has prefix "/.file/" and has at least one character following the prefix.
 #ifdef __CONSTANT_STRINGS__
     static const
 #endif
     RSStringRef fileIDPrefix = RSSTR( "/" FILE_ID_PREFIX "/" );
-    return path && RSStringHasPrefix( path, fileIDPrefix ) && RSStringGetByteLength( path ) > RSStringGetByteLength( fileIDPrefix );
+    return path && RSStringHasPrefix( path, fileIDPrefix ) && RSStringGetLength( path ) > RSStringGetLength( fileIDPrefix );
 }
 
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED
@@ -3988,12 +3966,12 @@ static BOOL _pathHasFileIDOnly( RSStringRef path )
 {
     // Is file ID rooted and contains no additonal path segments
     RSRange slashRange;
-    return _pathHasFileIDPrefix( path ) && ( !RSStringFindWithOptions( path, RSSTR("/"), RSMakeRange( sizeof(FILE_ID_PREFIX) + 1, RSStringGetByteLength( path ) - sizeof(FILE_ID_PREFIX) - 1), 0, &slashRange ) || slashRange.location == RSStringGetByteLength( path ) - 1 );
+    return _pathHasFileIDPrefix( path ) && ( !RSStringFindWithOptions( path, RSSTR("/"), RSMakeRange( sizeof(FILE_ID_PREFIX) + 1, RSStringGetLength( path ) - sizeof(FILE_ID_PREFIX) - 1), 0, &slashRange ) || slashRange.location == RSStringGetLength( path ) - 1 );
 }
 #endif
 
-RS_EXPORT RSStringRef RSURLCopyFileSystemPath(RSURLRef anURL, RSURLPathStyle pathStyle) {
-    //RSAssert2(pathStyle == RSURLPOSIXPathStyle || pathStyle == RSURLHFSPathStyle || pathStyle == RSURLWindowsPathStyle, __RSLogAssertion, "%s(): Encountered unknown path style %d", __PRETTY_FUNCTION__, pathStyle);
+RSExport RSStringRef RSURLCopyFileSystemPath(RSURLRef anURL, RSURLPathStyle pathStyle) {
+    RSAssert2(pathStyle == RSURLPOSIXPathStyle || pathStyle == RSURLHFSPathStyle || pathStyle == RSURLWindowsPathStyle, __RSLogAssertion, "%s(): Encountered unknown path style %d", __PRETTY_FUNCTION__, pathStyle);
     
     RSStringRef result;
     
@@ -4003,10 +3981,10 @@ RS_EXPORT RSStringRef RSURLCopyFileSystemPath(RSURLRef anURL, RSURLPathStyle pat
 
 
 // There is no matching ObjC method for this functionality; because this function sits on top of the RSURL primitives, it's o.k. not to check for the need to dispatch an ObjC method instead, but this means care must be taken that this function never call anything that will result in dereferencing anURL without first checking for an ObjC dispatch.  -- REW, 10/29/98
-RSStringRef RSURLCreateStringWithFileSystemPath(RSAllocatorRef allocator, RSURLRef anURL, RSURLPathStyle fsType, BOOL resolveAgainstBase) {
-    RSURLRef base = resolveAgainstBase ? RSURLGetBaseURL(anURL) : NULL;
-    RSStringRef basePath = base ? RSURLCreateStringWithFileSystemPath(allocator, base, fsType, NO) : NULL;
-    RSStringRef relPath = NULL;
+RSExport RSStringRef RSURLCreateStringWithFileSystemPath(RSAllocatorRef allocator, RSURLRef anURL, RSURLPathStyle fsType, BOOL resolveAgainstBase) {
+    RSURLRef base = resolveAgainstBase ? RSURLGetBaseURL(anURL) : nil;
+    RSStringRef basePath = base ? RSURLCreateStringWithFileSystemPath(allocator, base, fsType, NO) : nil;
+    RSStringRef relPath = nil;
     
     if (!RS_IS_OBJC(__RSURLTypeID, anURL)) {
         // We can grope the ivars
@@ -4017,7 +3995,7 @@ RSStringRef RSURLCreateStringWithFileSystemPath(RSAllocatorRef allocator, RSURLR
         }
     }
     
-    if (relPath == NULL) {
+    if (relPath == nil) {
         RSStringRef urlPath = RSURLCopyPath(anURL);
         RSStringEncoding enc = anURL->_encoding;
         if (urlPath) {
@@ -4026,14 +4004,14 @@ RSStringRef RSURLCreateStringWithFileSystemPath(RSAllocatorRef allocator, RSURLR
                     relPath = URLPathToPOSIXPath(urlPath, allocator, enc);
                     break;
                 case RSURLHFSPathStyle:
-                    relPath = NULL;
+                    relPath = nil;
                     break;
                 case RSURLWindowsPathStyle:
                     relPath = URLPathToWindowsPath(urlPath, allocator, enc);
                     break;
                 default:
                     break;
-                    //RSAssert2(YES, __RSLogAssertion, "%s(): Received unknown path type %d", __PRETTY_FUNCTION__, fsType);
+                RSAssert2(YES, __RSLogAssertion, "%s(): Received unknown path type %d", __PRETTY_FUNCTION__, fsType);
             }
             RSRelease(urlPath);
         }
@@ -4043,8 +4021,8 @@ RSStringRef RSURLCreateStringWithFileSystemPath(RSAllocatorRef allocator, RSURLR
     //	and do a linked-on-or-later check so we don't break third parties.
     //	See <rdar://problem/4003028> Converting volume name from POSIX to HFS form fails and
     //	<rdar://problem/4018895> RS needs to back out 4003028 for icky details.
-    if ( relPath && RSURLHasDirectoryPath(anURL) && RSStringGetByteLength(relPath) > 1 && RSStringGetCharacterAtIndex(relPath, RSStringGetByteLength(relPath)-1) == '/') {
-        RSStringRef tmp = RSStringCreateWithSubstring(allocator, relPath, RSMakeRange(0, RSStringGetByteLength(relPath)-1));
+    if ( relPath && RSURLHasDirectoryPath(anURL) && RSStringGetLength(relPath) > 1 && RSStringGetCharacterAtIndex(relPath, RSStringGetLength(relPath)-1) == '/') {
+        RSStringRef tmp = RSStringCreateWithSubstring(allocator, relPath, RSMakeRange(0, RSStringGetLength(relPath)-1));
         RSRelease(relPath);
         relPath = tmp;
     }
@@ -4068,11 +4046,11 @@ RSStringRef RSURLCreateStringWithFileSystemPath(RSAllocatorRef allocator, RSURLR
     }
     else {
         // we have nothing to return
-        return NULL;
+        return nil;
     }
 }
 
-BOOL RSURLGetFileSystemRepresentation(RSURLRef url, BOOL resolveAgainstBase, uint8_t *buffer, RSIndex bufLen) {
+RSExport BOOL RSURLGetFileSystemRepresentation(RSURLRef url, BOOL resolveAgainstBase, uint8_t *buffer, RSIndex bufLen) {
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_LINUX || DEPLOYMENT_TARGET_WINDOWS
     RSAllocatorRef alloc = RSGetAllocator(url);
     RSStringRef path;
@@ -4080,7 +4058,7 @@ BOOL RSURLGetFileSystemRepresentation(RSURLRef url, BOOL resolveAgainstBase, uin
     if (!url) return NO;
 #endif
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_LINUX
-    if ( !resolveAgainstBase || (RSURLGetBaseURL(url) == NULL) ) {
+    if ( !resolveAgainstBase || (RSURLGetBaseURL(url) == nil) ) {
         if (!RS_IS_OBJC(__RSURLTypeID, url)) {
             // We can grope the ivars
             if ( url->_flags & IS_CANONICAL_FILE_URL ) {
@@ -4143,11 +4121,11 @@ static RSStringRef _createPathFromFileSystemRepresentation(RSAllocatorRef alloca
             STACK_BUFFER_DECL(uint8_t, tempBuf, bufLen + 1);
             memcpy(tempBuf, buffer, bufLen);
             tempBuf[bufLen] = pathDelim;
-            path = RSStringCreateWithBytes(allocator, tempBuf, bufLen + 1, RSStringFileSystemEncoding());
+            path = RSStringCreateWithBytes(allocator, tempBuf, bufLen + 1, RSStringFileSystemEncoding(), NO);
         }
         else {
             // already had pathDelim at end of buffer or bufLen is really large
-            path = RSStringCreateWithBytes(allocator, buffer, bufLen, RSStringFileSystemEncoding());
+            path = RSStringCreateWithBytes(allocator, buffer, bufLen, RSStringFileSystemEncoding(), NO);
         }
     }
     else {
@@ -4155,7 +4133,7 @@ static RSStringRef _createPathFromFileSystemRepresentation(RSAllocatorRef alloca
         while ( (bufLen > 1) && (buffer[bufLen-1] == pathDelim) ) {
             --bufLen;
         }
-        path = RSStringCreateWithBytes(allocator, buffer, bufLen, RSStringFileSystemEncoding());
+        path = RSStringCreateWithBytes(allocator, buffer, bufLen, RSStringFileSystemEncoding(), NO);
     }
     return path;
 }
@@ -4192,7 +4170,7 @@ static RSStringRef CreatePOSIXFileURLStringFromPOSIXAbsolutePath(RSAllocatorRef 
         bufStartPtr = (RSBitU8 *)malloc((numBytes * 3) + sizeof(fileURLPrefixWithAuthority));
     }
     
-    if ( bufStartPtr != NULL ) {
+    if ( bufStartPtr != nil ) {
         // start with the fileURLPrefixWithAuthority
         strcpy((char *)bufStartPtr, (char *)fileURLPrefixWithAuthority);
         bufBytePtr = bufStartPtr + sizeof(fileURLPrefixWithAuthority) - 1;
@@ -4246,7 +4224,7 @@ static RSStringRef CreatePOSIXFileURLStringFromPOSIXAbsolutePath(RSAllocatorRef 
             }
             
             // create the result
-            result = RSStringCreateWithBytes(alloc, bufStartPtr, (RSIndex)(bufBytePtr-bufStartPtr), RSStringEncodingUTF8);
+            result = RSStringCreateWithBytes(alloc, bufStartPtr, (RSIndex)(bufBytePtr-bufStartPtr), RSStringEncodingUTF8, NO);
         }
         else {
             // no, but it's OK if the remaining bytes are all nul (embedded nul bytes are not allowed)
@@ -4256,11 +4234,11 @@ static RSStringRef CreatePOSIXFileURLStringFromPOSIXAbsolutePath(RSAllocatorRef 
             }
             if ( idx == numBytes ) {
                 // create the result
-                result = RSStringCreateWithBytes(alloc, bufStartPtr, (RSIndex)(bufBytePtr-bufStartPtr), RSStringEncodingUTF8);
+                result = RSStringCreateWithBytes(alloc, bufStartPtr, (RSIndex)(bufBytePtr-bufStartPtr), RSStringEncodingUTF8, NO);
             }
             else {
                 // the remaining bytes were not all nul
-                result = NULL;
+                result = nil;
             }
         }
         // free the buffer if we malloc'd it
@@ -4269,7 +4247,7 @@ static RSStringRef CreatePOSIXFileURLStringFromPOSIXAbsolutePath(RSAllocatorRef 
         }
     }
     else {
-        result = NULL;
+        result = nil;
     }
     
     if ( addedPercentEncoding ) {
@@ -4279,8 +4257,8 @@ static RSStringRef CreatePOSIXFileURLStringFromPOSIXAbsolutePath(RSAllocatorRef 
     return ( result );
 }
 
-RSURLRef RSURLCreateFromFileSystemRepresentation(RSAllocatorRef allocator, const uint8_t *buffer, RSIndex bufLen, BOOL isDirectory) {
-    RSURLRef newURL = NULL;
+RSExport RSURLRef RSURLCreateFromFileSystemRepresentation(RSAllocatorRef allocator, const uint8_t *buffer, RSIndex bufLen, BOOL isDirectory) {
+    RSURLRef newURL = nil;
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI || DEPLOYMENT_TARGET_LINUX
     if ( bufLen && (*buffer == '/') ) {
         BOOL addedPercentEncoding;
@@ -4291,7 +4269,7 @@ RSURLRef RSURLCreateFromFileSystemRepresentation(RSAllocatorRef allocator, const
             if ( newURL ) {
                 ((struct __RSURL *)newURL)->_flags |= USES_EIGHTBITSTRINGENCODING;
                 // we know urlStr has a scheme and is absolute
-                _RSURLInit((struct __RSURL *)newURL, urlStr, FULL_URL_REPRESENTATION, NULL);
+                _RSURLInit((struct __RSURL *)newURL, urlStr, FULL_URL_REPRESENTATION, nil);
                 ((struct __RSURL *)newURL)->_flags |= (IS_ABSOLUTE | IS_CANONICAL_FILE_URL);
                 if ( !addedPercentEncoding ) {
                     ((struct __RSURL *)newURL)->_flags |= POSIX_AND_URL_PATHS_MATCH;
@@ -4300,7 +4278,7 @@ RSURLRef RSURLCreateFromFileSystemRepresentation(RSAllocatorRef allocator, const
             RSRelease(urlStr);
         }
         else {
-            newURL = NULL;
+            newURL = nil;
         }
     }
     else {
@@ -4310,7 +4288,7 @@ RSURLRef RSURLCreateFromFileSystemRepresentation(RSAllocatorRef allocator, const
             RSRelease(path);
         }
         else {
-            newURL = NULL;
+            newURL = nil;
         }
     }
 #elif DEPLOYMENT_TARGET_WINDOWS
@@ -4320,16 +4298,16 @@ RSURLRef RSURLCreateFromFileSystemRepresentation(RSAllocatorRef allocator, const
         RSRelease(path);
     }
     else {
-        newURL = NULL;
+        newURL = nil;
     }
 #endif
     return newURL;
 }
 
-RS_EXPORT RSURLRef RSURLCreateFromFileSystemRepresentationRelativeToBase(RSAllocatorRef allocator, const uint8_t *buffer, RSIndex bufLen, BOOL isDirectory, RSURLRef baseURL) {
+RSExport RSURLRef RSURLCreateFromFileSystemRepresentationRelativeToBase(RSAllocatorRef allocator, const uint8_t *buffer, RSIndex bufLen, BOOL isDirectory, RSURLRef baseURL) {
     RSStringRef path = _createPathFromFileSystemRepresentation(allocator, buffer, bufLen, isDirectory);
-    RSURLRef newURL = NULL;
-    if (!path) return NULL;
+    RSURLRef newURL = nil;
+    if (!path) return nil;
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_LINUX
     newURL = RSURLCreateWithFileSystemPathRelativeToBase(allocator, path, RSURLPOSIXPathStyle, isDirectory, baseURL);
 #elif DEPLOYMENT_TARGET_WINDOWS
@@ -4370,15 +4348,15 @@ static RSRange _rangeOfLastPathComponent(RSURLRef url) {
     return componentRg;
 }
 
-RSStringRef RSURLCopyLastPathComponent(RSURLRef url) {
+RSExport RSStringRef RSURLCopyLastPathComponent(RSURLRef url) {
     RSStringRef result;
     
     if (RS_IS_OBJC(__RSURLTypeID, url)) {
         RSStringRef path = RSURLCreateStringWithFileSystemPath(RSGetAllocator(url), url, RSURLPOSIXPathStyle, NO);
         RSIndex length;
         RSRange rg, compRg;
-        if (!path) return NULL;
-        rg = RSMakeRange(0, RSStringGetByteLength(path));
+        if (!path) return nil;
+        rg = RSMakeRange(0, RSStringGetLength(path));
         if ( rg.length == 0 ) return path;
         length = rg.length; // Remember this for comparison later
         if (RSStringGetCharacterAtIndex(path, rg.length - 1) == '/' ) {
@@ -4405,13 +4383,13 @@ RSStringRef RSURLCopyLastPathComponent(RSURLRef url) {
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED
         if ( _RSURLIsFileReferenceURL(url) ) {
             // use a file path URL or fail
-            RSURLRef filePathURL = RSURLCreateFilePathURL(RSGetAllocator(url), url, NULL);
+            RSURLRef filePathURL = RSURLCreateFilePathURL(RSGetAllocator(url), url, nil);
             if ( filePathURL ) {
                 filePathURLCreated = YES;
                 url = filePathURL;
             }
             else {
-                return NULL;
+                return nil;
             }
         }
 #endif
@@ -4448,9 +4426,9 @@ RSStringRef RSURLCopyLastPathComponent(RSURLRef url) {
     return result;
 }
 
-RSStringRef RSURLCopyPathExtension(RSURLRef url) {
+RSExport RSStringRef RSURLCopyPathExtension(RSURLRef url) {
     RSStringRef lastPathComp = RSURLCopyLastPathComponent(url);
-    RSStringRef ext = NULL;
+    RSStringRef ext = nil;
     
     if (lastPathComp)
     {
@@ -4458,7 +4436,7 @@ RSStringRef RSURLCopyPathExtension(RSURLRef url) {
         BOOL result = RSStringFindWithOptions(lastPathComp, RSSTR("."), RSStringGetRange(lastPathComp), RSCompareBackwards, &rg);
         if (result && rg.location != RSNotFound) {
             rg.location ++;
-            rg.length = RSStringGetByteLength(lastPathComp) - rg.location;
+            rg.length = RSStringGetLength(lastPathComp) - rg.location;
             if (rg.length > 0) {
                 ext = RSStringCreateWithSubstring(RSGetAllocator(url), lastPathComp, rg);
             } else {
@@ -4470,17 +4448,17 @@ RSStringRef RSURLCopyPathExtension(RSURLRef url) {
     return ext;
 }
 
-RSURLRef RSURLCreateCopyAppendingPathComponent(RSAllocatorRef allocator, RSURLRef url, RSStringRef pathComponent, BOOL isDirectory) {
+RSExport RSURLRef RSURLCreateCopyAppendingPathComponent(RSAllocatorRef allocator, RSURLRef url, RSStringRef pathComponent, BOOL isDirectory) {
     RSURLRef result;
     url = _RSURLFromNSURL(url);
     __RSGenericValidInstance(url, __RSURLTypeID);
-    //RSAssert1(pathComponent != NULL, __RSLogAssertion, "%s(): Cannot be called with a NULL component to append", __PRETTY_FUNCTION__);
+    RSAssert1(pathComponent != nil, __RSLogAssertion, "%s(): Cannot be called with a nil component to append", __PRETTY_FUNCTION__);
     
     BOOL filePathURLCreated = NO;
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED
     if ( _RSURLIsFileReferenceURL(url) ) {
         // use a file path URL if possible (only because this is appending a path component)
-        RSURLRef filePathURL = RSURLCreateFilePathURL(allocator, url, NULL);
+        RSURLRef filePathURL = RSURLCreateFilePathURL(allocator, url, nil);
         if ( filePathURL ) {
             filePathURLCreated = YES;
             url = filePathURL;
@@ -4492,11 +4470,11 @@ RSURLRef RSURLCreateCopyAppendingPathComponent(RSAllocatorRef allocator, RSURLRe
     RSStringRef newComp;
     RSRange pathRg;
     if (!(url->_flags & HAS_PATH)) {
-        result = NULL;
+        result = nil;
     }
     else {
         newString = RSStringCreateMutableCopy(allocator, 0, url->_string);
-        newComp = RSURLCreateStringByAddingPercentEscapes(allocator, pathComponent, NULL, RSSTR(";?"), url->_encoding);
+        newComp = RSURLCreateStringByAddingPercentEscapes(allocator, pathComponent, nil, RSSTR(";?"), url->_encoding);
         pathRg = _rangeForComponent(url->_flags, url->_ranges, HAS_PATH);
         if ( (!pathRg.length || RSStringGetCharacterAtIndex(url->_string, pathRg.location + pathRg.length - 1) != '/') && (RSStringGetCharacterAtIndex(newComp, 0) != '/') ) {
             RSStringInsert(newString, pathRg.location + pathRg.length, RSSTR("/"));
@@ -4504,7 +4482,7 @@ RSURLRef RSURLCreateCopyAppendingPathComponent(RSAllocatorRef allocator, RSURLRe
         }
         RSStringInsert(newString, pathRg.location + pathRg.length, newComp);
         if (isDirectory) {
-            RSStringInsert(newString, pathRg.location + pathRg.length + RSStringGetByteLength(newComp), RSSTR("/"));
+            RSStringInsert(newString, pathRg.location + pathRg.length + RSStringGetLength(newComp), RSSTR("/"));
         }
         RSRelease(newComp);
         result = _RSURLCreateWithArbitraryString(allocator, newString, url->_base);
@@ -4516,27 +4494,27 @@ RSURLRef RSURLCreateCopyAppendingPathComponent(RSAllocatorRef allocator, RSURLRe
     return result;
 }
 
-RSURLRef RSURLCreateCopyDeletingLastPathComponent(RSAllocatorRef allocator, RSURLRef url) {
+RSExport RSURLRef RSURLCreateCopyDeletingLastPathComponent(RSAllocatorRef allocator, RSURLRef url) {
     RSURLRef result;
     RSMutableStringRef newString;
     RSRange lastCompRg, pathRg;
     BOOL appendDotDot = NO;
     
     url = _RSURLFromNSURL(url);
-    //RSAssert1(url != NULL, __RSLogAssertion, "%s(): NULL argument not allowed", __PRETTY_FUNCTION__);
+    RSAssert1(url != nil, __RSLogAssertion, "%s(): nil argument not allowed", __PRETTY_FUNCTION__);
     __RSGenericValidInstance(url, __RSURLTypeID);
     
     BOOL filePathURLCreated = NO;
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED
     if ( _RSURLIsFileReferenceURL(url) ) {
         // use a file path URL or fail
-        RSURLRef filePathURL = RSURLCreateFilePathURL(allocator, url, NULL);
+        RSURLRef filePathURL = RSURLCreateFilePathURL(allocator, url, nil);
         if ( filePathURL ) {
             filePathURLCreated = YES;
             url = filePathURL;
         }
         else {
-            return NULL;
+            return nil;
         }
     }
 #endif
@@ -4545,7 +4523,7 @@ RSURLRef RSURLCreateCopyDeletingLastPathComponent(RSAllocatorRef allocator, RSUR
         if ( filePathURLCreated ) {
             RSRelease(url);
         }
-        return NULL;
+        return nil;
     }
     pathRg = _rangeForComponent(url->_flags, url->_ranges, HAS_PATH);
     lastCompRg = _rangeOfLastPathComponent(url);
@@ -4593,12 +4571,12 @@ RSURLRef RSURLCreateCopyDeletingLastPathComponent(RSAllocatorRef allocator, RSUR
     return result;
 }
 
-RSURLRef RSURLCreateCopyAppendingPathExtension(RSAllocatorRef allocator, RSURLRef url, RSStringRef extension) {
+RSExport RSURLRef RSURLCreateCopyAppendingPathExtension(RSAllocatorRef allocator, RSURLRef url, RSStringRef extension) {
     RSMutableStringRef newString;
     RSURLRef result;
     RSRange rg;
     
-    //RSAssert1(url != NULL && extension != NULL, __RSLogAssertion, "%s(): NULL argument not allowed", __PRETTY_FUNCTION__);
+    RSAssert1(url != nil && extension != nil, __RSLogAssertion, "%s(): nil argument not allowed", __PRETTY_FUNCTION__);
     url = _RSURLFromNSURL(url);
     __RSGenericValidInstance(url, __RSURLTypeID);
     __RSGenericValidInstance(extension, RSStringGetTypeID());
@@ -4607,13 +4585,13 @@ RSURLRef RSURLCreateCopyAppendingPathExtension(RSAllocatorRef allocator, RSURLRe
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED
     if ( _RSURLIsFileReferenceURL(url) ) {
         // use a file path URL or fail
-        RSURLRef filePathURL = RSURLCreateFilePathURL(allocator, url, NULL);
+        RSURLRef filePathURL = RSURLCreateFilePathURL(allocator, url, nil);
         if ( filePathURL ) {
             filePathURLCreated = YES;
             url = filePathURL;
         }
         else {
-            return NULL;
+            return nil;
         }
     }
 #endif
@@ -4623,12 +4601,12 @@ RSURLRef RSURLCreateCopyAppendingPathExtension(RSAllocatorRef allocator, RSURLRe
         if ( filePathURLCreated ) {
             RSRelease(url);
         }
-        return NULL; // No path
+        return nil; // No path
     }
     
     newString = RSStringCreateMutableCopy(allocator, 0, url->_string);
     RSStringInsert(newString, rg.location + rg.length, RSSTR("."));
-    RSStringRef newExt = RSURLCreateStringByAddingPercentEscapes(allocator, extension, NULL, RSSTR(";?/"), url->_encoding);
+    RSStringRef newExt = RSURLCreateStringByAddingPercentEscapes(allocator, extension, nil, RSSTR(";?/"), url->_encoding);
     RSStringInsert(newString, rg.location + rg.length + 1, newExt);
     RSRelease(newExt);
     result =  _RSURLCreateWithArbitraryString(allocator, newString, url->_base);
@@ -4639,11 +4617,11 @@ RSURLRef RSURLCreateCopyAppendingPathExtension(RSAllocatorRef allocator, RSURLRe
     return result;
 }
 
-RSURLRef RSURLCreateCopyDeletingPathExtension(RSAllocatorRef allocator, RSURLRef url) {
+RSExport RSURLRef RSURLCreateCopyDeletingPathExtension(RSAllocatorRef allocator, RSURLRef url) {
     RSRange rg, dotRg;
     RSURLRef result;
     
-    //RSAssert1(url != NULL, __RSLogAssertion, "%s(): NULL argument not allowed", __PRETTY_FUNCTION__);
+    RSAssert1(url != nil, __RSLogAssertion, "%s(): nil argument not allowed", __PRETTY_FUNCTION__);
     url = _RSURLFromNSURL(url);
     __RSGenericValidInstance(url, __RSURLTypeID);
     
@@ -4651,20 +4629,20 @@ RSURLRef RSURLCreateCopyDeletingPathExtension(RSAllocatorRef allocator, RSURLRef
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED
     if ( _RSURLIsFileReferenceURL(url) ) {
         // use a file path URL or fail
-        RSURLRef filePathURL = RSURLCreateFilePathURL(allocator, url, NULL);
+        RSURLRef filePathURL = RSURLCreateFilePathURL(allocator, url, nil);
         if ( filePathURL ) {
             filePathURLCreated = YES;
             url = filePathURL;
         }
         else {
-            return NULL;
+            return nil;
         }
     }
 #endif
     
     rg = _rangeOfLastPathComponent(url);
     if (rg.location < 0) {
-        result = NULL;
+        result = nil;
     } else if (rg.length && RSStringFindWithOptions(url->_string, RSSTR("."), rg, RSCompareBackwards, &dotRg)) {
         RSMutableStringRef newString = RSStringCreateMutableCopy(allocator, 0, url->_string);
         dotRg.length = rg.location + rg.length - dotRg.location;
@@ -4699,7 +4677,7 @@ static RSArrayRef HFSPathToURLComponents(RSStringRef path, RSAllocatorRef alloc,
         // volume name, and we need to find the mount point.  Bleah. If we
         // don't find a mount point, we're going to have to lie, and make something up.
         RSStringRef firstComp = (RSStringRef)RSArrayObjectAtIndex(newComponents, 0);
-        if (RSStringGetByteLength(firstComp) == 1 && RSStringGetCharacterAtIndex(firstComp, 0) == '/') {
+        if (RSStringGetLength(firstComp) == 1 && RSStringGetCharacterAtIndex(firstComp, 0) == '/') {
             // "/" is the "magic" path for a UFS root directory
             RSArrayRemoveObjectAtIndex(newComponents, 0);
             RSArrayInsertObjectAtIndex(newComponents, 0, RSSTR(""));
@@ -4718,10 +4696,10 @@ static RSArrayRef HFSPathToURLComponents(RSStringRef path, RSAllocatorRef alloc,
     cnt = (RSBitU32)RSArrayGetCount(newComponents);
     for (i = 0; i < cnt; i ++) {
         RSStringRef comp = (RSStringRef)RSArrayObjectAtIndex(newComponents, i);
-        RSStringRef newComp = NULL;
+        RSStringRef newComp = nil;
         RSRange searchRg, slashRg;
         searchRg.location = 0;
-        searchRg.length = RSStringGetByteLength(comp);
+        searchRg.length = RSStringGetLength(comp);
         while (RSStringFindWithOptions(comp, RSSTR("/"), searchRg, 0, &slashRg)) {
             if (!newComp) {
                 newComp = RSStringCreateMutableCopy(alloc, searchRg.location + searchRg.length, comp);
@@ -4735,7 +4713,7 @@ static RSArrayRef HFSPathToURLComponents(RSStringRef path, RSAllocatorRef alloc,
             RSRelease(newComp);
         }
     }
-    if (isDir && RSStringGetByteLength((RSStringRef)RSArrayObjectAtIndex(newComponents, cnt-1)) != 0) {
+    if (isDir && RSStringGetLength((RSStringRef)RSArrayObjectAtIndex(newComponents, cnt-1)) != 0) {
         RSArrayAddObject(newComponents, RSSTR(""));
     }
     return newComponents;
@@ -4744,7 +4722,7 @@ static RSArrayRef HFSPathToURLComponents(RSStringRef path, RSAllocatorRef alloc,
 typedef RSStringRef (*StringTransformation)(RSAllocatorRef, RSStringRef, RSIndex);
 static RSArrayRef copyStringArrayWithTransformation(RSArrayRef array, StringTransformation transformation) {
     RSAllocatorRef alloc = RSGetAllocator(array);
-    RSMutableArrayRef mArray = NULL;
+    RSMutableArrayRef mArray = nil;
     RSIndex i, c = RSArrayGetCount(array);
     for (i = 0; i < c; i ++) {
         RSStringRef origComp = (RSStringRef)RSArrayObjectAtIndex(array, i);
@@ -4762,7 +4740,7 @@ static RSArrayRef copyStringArrayWithTransformation(RSArrayRef array, StringTran
     }
     if (i != c) {
         if (mArray) RSRelease(mArray);
-        return NULL;
+        return nil;
     } else if (mArray) {
         return mArray;
     } else {
@@ -4772,19 +4750,19 @@ static RSArrayRef copyStringArrayWithTransformation(RSArrayRef array, StringTran
 }
 
 static RSStringRef escapePathComponent(RSAllocatorRef alloc, RSStringRef origComponent, RSIndex componentIndex) {
-    return RSURLCreateStringByAddingPercentEscapes(alloc, origComponent, NULL, RSSTR(";?/"), RSStringEncodingUTF8);
+    return RSURLCreateStringByAddingPercentEscapes(alloc, origComponent, nil, RSSTR(";?/"), RSStringEncodingUTF8);
 }
 
 static RSStringRef HFSPathToURLPath(RSStringRef path, RSAllocatorRef alloc, BOOL isDir) {
     RSArrayRef components = HFSPathToURLComponents(path, alloc, isDir);
-    RSArrayRef newComponents = components ? copyStringArrayWithTransformation(components, escapePathComponent) : NULL;
+    RSArrayRef newComponents = components ? copyStringArrayWithTransformation(components, escapePathComponent) : nil;
     RSIndex cnt;
     RSStringRef result;
     if (components) RSRelease(components);
-    if (!newComponents) return NULL;
+    if (!newComponents) return nil;
     
     cnt = RSArrayGetCount(newComponents);
-    if (cnt == 1 && RSStringGetByteLength((RSStringRef)RSArrayObjectAtIndex(newComponents, 0)) == 0) {
+    if (cnt == 1 && RSStringGetLength((RSStringRef)RSArrayObjectAtIndex(newComponents, 0)) == 0) {
         result = (RSStringRef)RSRetain(RSSTR("/"));
     } else {
         result = RSStringCreateByCombiningStrings(alloc, newComponents, RSSTR("/"));
@@ -4796,7 +4774,7 @@ static RSStringRef HFSPathToURLPath(RSStringRef path, RSAllocatorRef alloc, BOOL
 
 
 
-// keys and vals must have space for at least 4 key/value pairs.  No argument can be NULL.
+// keys and vals must have space for at least 4 key/value pairs.  No argument can be nil.
 // Caller must release values, but not keys
 static void __RSURLCopyPropertyListKeysAndValues(RSURLRef url, RSTypeRef *keys, RSTypeRef *vals, RSIndex *count) {
     RSAllocatorRef alloc = RSGetAllocator(url);
@@ -4813,20 +4791,20 @@ static void __RSURLCopyPropertyListKeysAndValues(RSURLRef url, RSTypeRef *keys, 
         SInt32 urlType = FULL_URL_REPRESENTATION;
         vals[0] = RSNumberCreate(alloc, RSNumberUnsignedInteger, &urlType);
         if (url->_flags & IS_DIRECTORY) {
-            if (RSStringGetCharacterAtIndex(url->_string, RSStringGetByteLength(url->_string) - 1) == '/') {
+            if (RSStringGetCharacterAtIndex(url->_string, RSStringGetLength(url->_string) - 1) == '/') {
                 vals[1] = RSRetain(url->_string);
             } else {
                 vals[1] = RSStringCreateWithFormat(alloc, RSSTR("%R%c"), url->_string, '/');
             }
         } else {
-            if (RSStringGetCharacterAtIndex(url->_string, RSStringGetByteLength(url->_string) - 1) != '/') {
+            if (RSStringGetCharacterAtIndex(url->_string, RSStringGetLength(url->_string) - 1) != '/') {
                 vals[1] = RSRetain(url->_string);
             } else {
-                vals[1] = RSStringCreateWithSubstring(alloc, url->_string, RSMakeRange(0, RSStringGetByteLength(url->_string) - 1));
+                vals[1] = RSStringCreateWithSubstring(alloc, url->_string, RSMakeRange(0, RSStringGetLength(url->_string) - 1));
             }
         }
     }
-    if (base != NULL) {
+    if (base != nil) {
         if (RS_IS_OBJC(__RSURLTypeID, base)) {
             SInt32 urlType = FULL_URL_REPRESENTATION;
             vals[2] = RSNumberCreate(alloc, RSNumberUnsignedInteger, &urlType);
@@ -4835,16 +4813,16 @@ static void __RSURLCopyPropertyListKeysAndValues(RSURLRef url, RSTypeRef *keys, 
             SInt32 urlType = FULL_URL_REPRESENTATION;
             vals[2] = RSNumberCreate(alloc, RSNumberUnsignedInteger, &urlType);
             if (base->_flags & IS_DIRECTORY) {
-                if (RSStringGetCharacterAtIndex(base->_string, RSStringGetByteLength(base->_string) - 1) == '/') {
+                if (RSStringGetCharacterAtIndex(base->_string, RSStringGetLength(base->_string) - 1) == '/') {
                     vals[3] = RSRetain(base->_string);
                 } else {
                     vals[3] = RSStringCreateWithFormat(alloc, RSSTR("%R%c"), base->_string, '/');
                 }
             } else {
-                if (RSStringGetCharacterAtIndex(base->_string, RSStringGetByteLength(base->_string) - 1) != '/') {
+                if (RSStringGetCharacterAtIndex(base->_string, RSStringGetLength(base->_string) - 1) != '/') {
                     vals[3] = RSRetain(base->_string);
                 } else {
-                    vals[3] = RSStringCreateWithSubstring(alloc, base->_string, RSMakeRange(0, RSStringGetByteLength(base->_string) - 1));
+                    vals[3] = RSStringCreateWithSubstring(alloc, base->_string, RSMakeRange(0, RSStringGetLength(base->_string) - 1));
                 }
             }
         }
@@ -4871,41 +4849,41 @@ RSURLRef _RSURLCreateFromPropertyListRepresentation(RSAllocatorRef alloc, RSProp
     RSStringRef baseString, string;
     RSNumberRef baseTypeNum, urlTypeNum;
     SInt32 baseType, urlType;
-    RSURLRef baseURL = NULL, url;
+    RSURLRef baseURL = nil, url;
     RSDictionaryRef dict = (RSDictionaryRef)pListRepresentation;
     
     // Start by getting all the pieces and verifying they're of the correct type.
     if (RSGetTypeID(pListRepresentation) != RSDictionaryGetTypeID()) {
-        return NULL;
+        return nil;
     }
     string = (RSStringRef)RSDictionaryGetValue(dict, RSSTR("_RSURLString"));
     if (!string || RSGetTypeID(string) != RSStringGetTypeID()) {
-        return NULL;
+        return nil;
     }
     urlTypeNum = (RSNumberRef)RSDictionaryGetValue(dict, RSSTR("_RSURLStringType"));
     if (!urlTypeNum || RSGetTypeID(urlTypeNum) != RSNumberGetTypeID() || !RSNumberGetValue(urlTypeNum, &urlType) || (urlType != FULL_URL_REPRESENTATION && urlType != RSURLPOSIXPathStyle && urlType != RSURLHFSPathStyle && urlType != RSURLWindowsPathStyle)) {
-        return NULL;
+        return nil;
     }
     baseString = (RSStringRef)RSDictionaryGetValue(dict, RSSTR("_RSURLBaseURLString"));
     if (baseString) {
         if (RSGetTypeID(baseString) != RSStringGetTypeID()) {
-            return NULL;
+            return nil;
         }
         baseTypeNum = (RSNumberRef)RSDictionaryGetValue(dict, RSSTR("_RSURLBaseStringType"));
         if (!baseTypeNum || RSGetTypeID(baseTypeNum) != RSNumberGetTypeID() || !RSNumberGetValue(baseTypeNum, &baseType) ||
             (baseType != FULL_URL_REPRESENTATION && baseType != RSURLPOSIXPathStyle && baseType != RSURLHFSPathStyle && baseType != RSURLWindowsPathStyle)) {
-            return NULL;
+            return nil;
         }
         if (baseType == FULL_URL_REPRESENTATION) {
-            baseURL = _RSURLCreateWithArbitraryString(alloc, baseString, NULL);
+            baseURL = _RSURLCreateWithArbitraryString(alloc, baseString, nil);
         } else {
-            baseURL = RSURLCreateWithFileSystemPathRelativeToBase(alloc, baseString, (RSURLPathStyle)baseType, RSStringGetCharacterAtIndex(baseString, RSStringGetByteLength(baseString)-1) == '/', NULL);
+            baseURL = RSURLCreateWithFileSystemPathRelativeToBase(alloc, baseString, (RSURLPathStyle)baseType, RSStringGetCharacterAtIndex(baseString, RSStringGetLength(baseString)-1) == '/', nil);
         }
     }
     if (urlType == FULL_URL_REPRESENTATION) {
         url = _RSURLCreateWithArbitraryString(alloc, string, baseURL);
     } else {
-        url = RSURLCreateWithFileSystemPathRelativeToBase(alloc, string, (RSURLPathStyle)urlType, RSStringGetCharacterAtIndex(string, RSStringGetByteLength(string)-1) == '/', baseURL);
+        url = RSURLCreateWithFileSystemPathRelativeToBase(alloc, string, (RSURLPathStyle)urlType, RSStringGetCharacterAtIndex(string, RSStringGetLength(string)-1) == '/', baseURL);
     }
     if (baseURL) RSRelease(baseURL);
     return url;
@@ -4973,22 +4951,22 @@ static BOOL _RSURLHasFileURLScheme(RSURLRef url, BOOL *hasScheme)
 
 BOOL _RSURLIsFileURL(RSURLRef url)
 {
-    BOOL result = _RSURLHasFileURLScheme(url, NULL);
+    BOOL result = _RSURLHasFileURLScheme(url, nil);
     return ( result );
 }
 
-RSURLRef RSURLCreateFilePathURL(RSAllocatorRef alloc, RSURLRef url, RSErrorRef *error)
+RSExport RSURLRef RSURLCreateFilePathURL(RSAllocatorRef alloc, RSURLRef url, RSErrorRef *error)
 {
-    RSURLRef result = NULL;
+    RSURLRef result = nil;
     BOOL hasScheme;
     if (!_RSURLHasFileURLScheme(url, &hasScheme)) {
         if ( !hasScheme ) {
-            RSLog(RSLogLevelWarning, RSSTR("RSURLCreateFilePathURL failed because it was passed this URL which has no scheme: %R"), url);
+            RSLog(RSSTR("RSURLCreateFilePathURL failed because it was passed this URL which has no scheme: %R"), url);
         }
         if ( error ) {
-            *error = RSErrorCreate( RSAllocatorDefault, RSErrorDomainRSCoreFoundation, RSURLReadUnsupportedSchemeError, NULL );
+            *error = RSErrorCreate( RSAllocatorDefault, RSErrorDomainRSCoreFoundation, RSURLReadUnsupportedSchemeError, nil );
         }
-        result = NULL;
+        result = nil;
     } else {
         // File URL. Form of the path is unknown. Make a new URL.
         RSStringRef newURLString;
@@ -5009,17 +4987,17 @@ RSURLRef RSURLCreateFilePathURL(RSAllocatorRef alloc, RSURLRef url, RSErrorRef *
         }
         if ( fsPath ) {
             RSStringRef urlPath = _replacePathIllegalCharacters( fsPath, alloc, YES );
-            newURLString = RSStringCreateWithFormat( alloc, RSSTR("file://%R%R%R%R"), (netLoc ? netLoc : RSSTR("")), urlPath, ((RSStringCompare(urlPath, RSSTR("/")) != RSCompareEqualTo) ? (RSURLHasDirectoryPath( url ) ? RSSTR("/") : RSSTR("")) : RSSTR("")), (rSpec ? rSpec : RSSTR("")));
-            result = RSURLCreateWithString( alloc, newURLString, NULL );
+            newURLString = RSStringCreateWithFormat( alloc, RSSTR("file://%R%R%R%R"), (netLoc ? netLoc : RSSTR("")), urlPath, ((RSStringCompare(urlPath, RSSTR("/"), nil) != RSCompareEqualTo) ? (RSURLHasDirectoryPath( url ) ? RSSTR("/") : RSSTR("")) : RSSTR("")), (rSpec ? rSpec : RSSTR("")));
+            result = RSURLCreateWithString( alloc, newURLString, nil );
             RSRelease( newURLString );
             RSRelease( urlPath );
             RSRelease( fsPath );
         } else {
             if ( error ) {
                 // Would be better here to get an underlying error back from RSURLCreateStringWithFileSystemPath
-                *error = RSErrorCreate( RSAllocatorDefault, RSErrorDomainRSCoreFoundation, RSURLNoSuchResourceError, NULL );
+                *error = RSErrorCreate( RSAllocatorDefault, RSErrorDomainRSCoreFoundation, RSURLNoSuchResourceError, nil );
             }
-            result = NULL;
+            result = nil;
         }
         if ( netLoc ) {
             RSRelease( netLoc );
@@ -5034,5 +5012,5 @@ RSURLRef RSURLCreateFilePathURL(RSAllocatorRef alloc, RSURLRef url, RSErrorRef *
 #endif
 
 
-RSURLRef RSURLCreateFileReferenceURL(RSAllocatorRef alloc, RSURLRef url, RSErrorRef *error) { return NULL; }
+RSURLRef RSURLCreateFileReferenceURL(RSAllocatorRef alloc, RSURLRef url, RSErrorRef *error) { return nil; }
 

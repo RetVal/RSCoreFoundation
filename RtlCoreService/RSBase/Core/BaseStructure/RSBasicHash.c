@@ -1041,24 +1041,24 @@ static void __RSBasicHashRehash(RSBasicHashRef ht, RSIndex newItemCount) {
     
     if (0 < new_num_buckets) {
         new_values = (RSBasicHashValue *)__RSBasicHashAllocateMemory(ht, new_num_buckets, sizeof(RSBasicHashValue), RSBasicHashHasStrongValues(ht), __RSBasicHashHasCompactableValues(ht));
-        if (!new_values) HALTWithError(RSInvalidArgumentException, "new value is nil");
+        if (!new_values) HALTWithError(RSMallocException, "new value is nil");
         ////__SetLastAllocationEventName(new_values, "RSBasicHash (value-store)");
         memset(new_values, 0, new_num_buckets * sizeof(RSBasicHashValue));
         if (ht->bits.keys_offset) {
             new_keys = (RSBasicHashValue *)__RSBasicHashAllocateMemory(ht, new_num_buckets, sizeof(RSBasicHashValue), RSBasicHashHasStrongKeys(ht), __RSBasicHashHasCompactableKeys(ht));
-            if (!new_keys) HALTWithError(RSInvalidArgumentException, "new keys is nil");
+            if (!new_keys) HALTWithError(RSMallocException, "new keys is nil");
             ////__SetLastAllocationEventName(new_keys, "RSBasicHash (key-store)");
             memset(new_keys, 0, new_num_buckets * sizeof(RSBasicHashValue));
         }
         if (ht->bits.counts_offset) {
             new_counts = (uintptr_t *)__RSBasicHashAllocateMemory(ht, new_num_buckets, (1 << ht->bits.counts_width), NO, NO);
-            if (!new_counts) HALTWithError(RSInvalidArgumentException, "mew counts is 0");
+            if (!new_counts) HALTWithError(RSMallocException, "mew counts is 0");
             ////__SetLastAllocationEventName(new_counts, "RSBasicHash (count-store)");
             memset(new_counts, 0, new_num_buckets * (1 << ht->bits.counts_width));
         }
         if (__RSBasicHashHasHashCache(ht)) {
             new_hashes = (uintptr_t *)__RSBasicHashAllocateMemory(ht, new_num_buckets, sizeof(uintptr_t), NO, NO);
-            if (!new_hashes) HALTWithError(RSInvalidArgumentException, "new hash cache is nil");
+            if (!new_hashes) HALTWithError(RSMallocException, "new hash cache is nil");
             ////__SetLastAllocationEventName(new_hashes, "RSBasicHash (hash-store)");
             memset(new_hashes, 0, new_num_buckets * sizeof(uintptr_t));
         }
@@ -1093,7 +1093,7 @@ static void __RSBasicHashRehash(RSBasicHashRef ht, RSIndex newItemCount) {
                 if (__RSBasicHashSubABZero == stack_value) stack_value = 0UL;
                 if (__RSBasicHashSubABOne == stack_value) stack_value = ~0UL;
                 uintptr_t stack_key = stack_value;
-                if (ht->bits.keys_offset) {
+                if (ht->bits.keys_offset && old_keys) {
                     stack_key = old_keys[idx].neutral;
                     if (__RSBasicHashSubABZero == stack_key) stack_key = 0UL;
                     if (__RSBasicHashSubABOne == stack_key) stack_key = ~0UL;

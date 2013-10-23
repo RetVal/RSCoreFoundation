@@ -805,8 +805,8 @@ static BOOL __RSFromNextStepLatin(uint32_t flags, uint8_t byte, UniChar *charact
 }
 
 static RSIndex __RSToNextStepLatinPrecompose(uint32_t flags, const UniChar *character, RSIndex numChars, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen) {
-    uint8_t byte;
-    RSIndex usedCharLen;
+    uint8_t byte = 0;
+    RSIndex usedCharLen = 0;
     
     if (__RSToNextStepLatin(flags, RSStringEncodingPrecomposeLatinCharacter(character, numChars, &usedCharLen), &byte) && byte && (usedCharLen > 1)) {
         if (maxByteLen) *bytes = byte;

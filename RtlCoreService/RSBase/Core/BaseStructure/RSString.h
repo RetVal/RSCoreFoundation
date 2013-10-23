@@ -86,13 +86,13 @@ RSExport void RSStringAppendString(RSMutableStringRef aString, RSStringRef appen
 RSExport void RSStringAppendStringWithFormat(RSMutableStringRef aString, RSStringRef format,...) RS_AVAILABLE(0_0);
 RSExport void RSStringAppendCString(RSMutableStringRef aString, RSCBuffer cString, RSStringEncoding encoding) RS_AVAILABLE(0_0);
 RSExport void RSStringAppendCharacters(RSMutableStringRef aString, const UniChar* characters, RSIndex numChars) RS_AVAILABLE(0_0);
-//RSExport void RSStringInsert(RSMutableStringRef aString, RSIndex location, RSStringRef insert) RS_AVAILABLE(0_3);
+RSExport void RSStringInsert(RSMutableStringRef aString, RSIndex location, RSStringRef insert) RS_AVAILABLE(0_3);
 //
 //RSExport void RSStringCyclicShift(RSMutableStringRef aString, RSRange range, RSIndex n, BOOL left) RS_AVAILABLE(0_0);
 //RSExport void RSStringReverse(RSMutableStringRef aString, RSRange range, RSIndex n) RS_AVAILABLE(0_0);
 //
 //
-//RSExport RSCBuffer RSStringCopyCString(RSStringRef aString) RS_AVAILABLE(0_0);
+RSExport const char* RSStringCopyUTF8String(RSStringRef str) RS_AVAILABLE(0_0);
 RSExport RSIndex RSStringGetCString(RSStringRef str, char *buffer, RSIndex bufferSize, RSStringEncoding encoding) RS_AVAILABLE(0_0);
 RSExport const char* RSStringGetCStringPtr(RSStringRef str, RSStringEncoding encoding) RS_AVAILABLE(0_0);
 RSExport const UniChar *RSStringGetCharactersPtr(RSStringRef str) RS_AVAILABLE(0_0);

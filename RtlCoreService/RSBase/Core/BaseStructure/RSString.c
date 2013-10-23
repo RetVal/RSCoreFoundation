@@ -2222,7 +2222,7 @@ static void __RSStringChangeSizeMultiple(RSMutableStringRef str, const RSRange *
         
         if (!newIsUnicode)
         {
-            if (useLengthAndNullBytes)
+            if (useLengthAndNullBytes && newContentsBody)
             {
                 newContentsBody[newLength] = 0;	/* Always have null byte, if not unicode */
                 newContents[0] = __RSCanUseLengthByte(newLength) ? (uint8_t)newLength : 0;
@@ -7113,6 +7113,14 @@ RSExport RSDataRef RSStringCreateExternalRepresentation(RSAllocatorRef alloc, RS
         return NULL;
     }
     return RSDataCreateWithNoCopy(alloc, bytes, usedLength, YES, alloc);
+}
+
+RSExport void RSStringInsert(RSMutableStringRef str, RSIndex idx, RSStringRef insertedStr)
+{
+    RS_OBJC_FUNCDISPATCHV(__RSStringTypeID, void, (NSMutableString *)str, insertString:(NSString *)insertedStr atIndex:(NSUInteger)idx);
+    __RSAssertIsStringAndMutable(str);
+    RSAssert3(idx >= 0 && idx <= __RSStrLength(str), __RSLogAssertion, "%s(): string index %d out of bounds (length %d)", __PRETTY_FUNCTION__, idx, __RSStrLength(str));
+    __RSStringReplace(str, RSMakeRange(idx, 0), insertedStr);
 }
 
 RSExport void RSStringDelete(RSMutableStringRef str, RSRange range)

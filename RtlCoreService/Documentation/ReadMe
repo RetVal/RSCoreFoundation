@@ -1,0 +1,22 @@
+********************************************************************************
+* Copyright (C) 2012-2013, RetVal.					       *
+* All Rights Reserved.            	                                       *
+*                                                                              *
+* 9/13/13 - Created by RetVal						       *
+*                                                                              *
+********************************************************************************
+
+*Setup*
+*Mac OS X*
+	1.Open RSCoreFoundation-1332/RSCoreFoundation.xcodeproj
+	2.Make sure USER_HEADER_SEARCH_PATHS is icu/**
+	3.Make sure link to libicucore.dylib
+	4.Make sure Compiler is Apple LLVM 5.0 or above
+	5.Compile by Xcode 5 (Xcode 4 is not test)
+	
+*iOS*
+*Linux*
+*Windows*
+RSCoreFoundation can be built on OS X by Xcode currently.(TUT)
+
+

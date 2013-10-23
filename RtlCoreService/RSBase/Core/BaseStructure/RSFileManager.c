@@ -279,7 +279,7 @@ static RSFileHandleRef __RSFileHandleCreateInstance(RSAllocatorRef allocator, RS
     {
         if (isTempFile)
         {
-            fileName = mktemp("RSCoreFoundationXXXXXX");
+            fileName = mkstemp("RSCoreFoundationXXXXXX");//mktemp();
         }
         else
         {

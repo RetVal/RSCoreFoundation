@@ -262,6 +262,8 @@
 		41813437168B394500B08722 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 41813436168B394500B08722 /* libicucore.dylib */; };
 		418246B016292A6400750E2A /* RSBaseMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 418246AF16292A6400750E2A /* RSBaseMacro.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		418246B316292BFE00750E2A /* RSErrorCode.h in Headers */ = {isa = PBXBuildFile; fileRef = 418246B216292BFE00750E2A /* RSErrorCode.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		418AED421813BED60001694B /* RSURL.c in Sources */ = {isa = PBXBuildFile; fileRef = 418AED401813BED60001694B /* RSURL.c */; };
+		418AED431813BED60001694B /* RSURL.h in Headers */ = {isa = PBXBuildFile; fileRef = 418AED411813BED60001694B /* RSURL.h */; };
 		419C42B0175DB23400C1D41E /* RSDictionary+Extension.c in Sources */ = {isa = PBXBuildFile; fileRef = 419C42AF175DB23300C1D41E /* RSDictionary+Extension.c */; };
 		419C42B2175DB23E00C1D41E /* RSDictionary+Extension.h in Headers */ = {isa = PBXBuildFile; fileRef = 419C42B1175DB23E00C1D41E /* RSDictionary+Extension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		419DF2E61679D53200EF052D /* RSPropertyList.c in Sources */ = {isa = PBXBuildFile; fileRef = 419DF2E51679D53200EF052D /* RSPropertyList.c */; };
@@ -695,6 +697,8 @@
 		41813436168B394500B08722 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
 		418246AF16292A6400750E2A /* RSBaseMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSBaseMacro.h; path = RSBase/RSBaseMacro.h; sourceTree = "<group>"; };
 		418246B216292BFE00750E2A /* RSErrorCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSErrorCode.h; path = RSBase/RSErrorCode.h; sourceTree = "<group>"; };
+		418AED401813BED60001694B /* RSURL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSURL.c; sourceTree = "<group>"; };
+		418AED411813BED60001694B /* RSURL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSURL.h; sourceTree = "<group>"; };
 		419C42AF175DB23300C1D41E /* RSDictionary+Extension.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "RSDictionary+Extension.c"; sourceTree = "<group>"; };
 		419C42B1175DB23E00C1D41E /* RSDictionary+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RSDictionary+Extension.h"; sourceTree = "<group>"; };
 		419DF2E51679D53200EF052D /* RSPropertyList.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSPropertyList.c; sourceTree = "<group>"; };
@@ -1212,6 +1216,8 @@
 		41704FF01647C713005E7FB5 /* BaseStructure */ = {
 			isa = PBXGroup;
 			children = (
+				418AED401813BED60001694B /* RSURL.c */,
+				418AED411813BED60001694B /* RSURL.h */,
 				41704FFD1647C713005E7FB5 /* RSPrivate */,
 				41259DD117E18DEC00FECA33 /* RSArchiver.c */,
 				41259DD217E18DEC00FECA33 /* RSArchiver.h */,
@@ -1705,6 +1711,7 @@
 				4151C1CD17600E6500C9AC40 /* gregocal.h in Headers */,
 				4151C1CE17600E6500C9AC40 /* icudataver.h in Headers */,
 				4151C1CF17600E6500C9AC40 /* icuplug.h in Headers */,
+				418AED431813BED60001694B /* RSURL.h in Headers */,
 				4151C1D017600E6500C9AC40 /* idna.h in Headers */,
 				4151C1D117600E6500C9AC40 /* localpointer.h in Headers */,
 				4151C1D217600E6500C9AC40 /* locdspnm.h in Headers */,
@@ -2020,7 +2027,7 @@
 		};
 		410BA22F16DB7C8300F9632D /* Install */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 8;
 			files = (
 			);
 			inputPaths = (
@@ -2028,7 +2035,7 @@
 			name = Install;
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
 			shellScript = "cd ${TARGET_BUILD_DIR}/\nrm -rf ~/Library/Frameworks/RSCoreFoundation.framework\ncp -a RSCoreFoundation.framework ~/Library/Frameworks/RSCoreFoundation.framework";
 		};
@@ -2089,6 +2096,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				418AED421813BED60001694B /* RSURL.c in Sources */,
 				4159783016DFBD6200726AAA /* RSFileManagerPathSupport.c in Sources */,
 				4170503C1647C713005E7FB5 /* RSAllocator.c in Sources */,
 				41BCD9E117A61647002128F2 /* RSStringEncodingDatabase.c in Sources */,

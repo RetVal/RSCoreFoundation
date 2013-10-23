@@ -73,7 +73,26 @@ static void _jsonAppendUTF8CString(RSMutableDataRef mData, const char *cString)
 
 static void _jsonAppendString(RSMutableDataRef xmlData, RSStringRef append)
 {
-    RSDataAppendBytes(xmlData, (const RSBitU8*)RSStringGetCStringPtr(append, RSStringEncodingUTF8), RSStringGetLength(append));
+    const UniChar *chars;
+    const char *cStr;
+    RSDataRef data;
+    if ((chars = RSStringGetCharactersPtr(append)))
+    {
+        _plistAppendCharacters(xmlData, chars, RSStringGetLength(append));
+    }
+    else if ((cStr = RSStringGetCStringPtr(append, RSStringEncodingASCII)) || (cStr = RSStringGetCStringPtr(append, __RSDefaultEightBitStringEncoding)))
+    {
+        _jsonAppendUTF8CString(xmlData, cStr);
+    }
+    else if ((data = RSStringCreateExternalRepresentation(RSAllocatorSystemDefault, append, RSStringEncodingUTF8, 0)))
+    {
+        RSDataAppendBytes (xmlData, RSDataGetBytesPtr(data), RSDataGetLength(data));
+        RSRelease(data);
+    }
+    else
+    {
+        RSAssert1(YES, __RSLogAssertion, "%s(): Error in plist writing", __PRETTY_FUNCTION__);
+    }
 }
 
 static void _jsonAppendFormat(RSMutableDataRef xmlData, RSStringRef format, ...)
@@ -86,9 +105,39 @@ static void _jsonAppendFormat(RSMutableDataRef xmlData, RSStringRef format, ...)
     RSRelease(append);
 }
 
-static void _jsonAppendCharacters(RSMutableDataRef xmlData, const RSUBlock* characters, RSIndex size)
+static void _jsonAppendCharacters(RSMutableDataRef xmlData, const UniChar* characters, RSIndex length)
 {
-    RSDataAppendBytes(xmlData, characters, size);
+    RSIndex curLoc = 0;
+    
+    do
+    {
+        // Flush out ASCII chars, BUFLEN at a time
+#define BUFLEN 400
+        UInt8 buf[BUFLEN], *bufPtr = buf;
+        RSIndex cnt = 0;
+        while (cnt < length && (cnt - curLoc < BUFLEN) && (characters[cnt] < 128)) *bufPtr++ = (UInt8)(characters[cnt++]);
+        if (cnt > curLoc)
+        {	// Flush any ASCII bytes
+            RSDataAppendBytes(xmlData, buf, cnt - curLoc);
+            curLoc = cnt;
+        }
+    } while (curLoc < length && (characters[curLoc] < 128));	// We will exit out of here when we run out of chars or hit a non-ASCII char
+    
+    if (curLoc < length)
+    {
+        // Now deal with non-ASCII chars
+        RSDataRef data = NULL;
+        RSStringRef str = NULL;
+        if ((str = RSStringCreateWithCharactersNoCopy(RSAllocatorSystemDefault, characters + curLoc, length - curLoc, RSAllocatorNull)))
+        {
+            if ((data = RSStringCreateExternalRepresentation(RSAllocatorSystemDefault, str, RSStringEncodingUTF8, 0))) {
+                RSDataAppendBytes (xmlData, RSDataGetBytesPtr(data), RSDataGetLength(data));
+                RSRelease(data);
+            }
+            RSRelease(str);
+        }
+        RSAssert1(str && data, __RSLogAssertion, "%s(): Error writing plist", __PRETTY_FUNCTION__);
+    }
 }
 
 #if !defined(new_rstype_array)
@@ -133,7 +182,7 @@ static RSMutableStringRef __RSNormalStringFromJSONFormat(RSStringRef jsonString)
 static void _appendIndents(RSIndex numIndents, RSMutableDataRef str)
 {
 #define NUMTABS 4
-    static const RSUBlock tabs[NUMTABS] = {'\t','\t','\t','\t'};
+    static const UniChar tabs[NUMTABS] = {'\t','\t','\t','\t'};
     for (; numIndents > 0; numIndents -= NUMTABS) _jsonAppendCharacters(str, tabs, (numIndents >= NUMTABS) ? NUMTABS : numIndents);
 }
 
