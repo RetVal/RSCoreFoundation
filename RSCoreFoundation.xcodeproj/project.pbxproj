@@ -263,7 +263,7 @@
 		418246B016292A6400750E2A /* RSBaseMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 418246AF16292A6400750E2A /* RSBaseMacro.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		418246B316292BFE00750E2A /* RSErrorCode.h in Headers */ = {isa = PBXBuildFile; fileRef = 418246B216292BFE00750E2A /* RSErrorCode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		418AED421813BED60001694B /* RSURL.c in Sources */ = {isa = PBXBuildFile; fileRef = 418AED401813BED60001694B /* RSURL.c */; };
-		418AED431813BED60001694B /* RSURL.h in Headers */ = {isa = PBXBuildFile; fileRef = 418AED411813BED60001694B /* RSURL.h */; };
+		418AED431813BED60001694B /* RSURL.h in Headers */ = {isa = PBXBuildFile; fileRef = 418AED411813BED60001694B /* RSURL.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		419C42B0175DB23400C1D41E /* RSDictionary+Extension.c in Sources */ = {isa = PBXBuildFile; fileRef = 419C42AF175DB23300C1D41E /* RSDictionary+Extension.c */; };
 		419C42B2175DB23E00C1D41E /* RSDictionary+Extension.h in Headers */ = {isa = PBXBuildFile; fileRef = 419C42B1175DB23E00C1D41E /* RSDictionary+Extension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		419DF2E61679D53200EF052D /* RSPropertyList.c in Sources */ = {isa = PBXBuildFile; fileRef = 419DF2E51679D53200EF052D /* RSPropertyList.c */; };
@@ -1632,6 +1632,7 @@
 				4145F78E168C25B7008AC7F8 /* RSAvailability.h in Headers */,
 				411671D516F5637C00E70FDE /* RSDistributedNotificationCenter.h in Headers */,
 				41EC213316D5F7A100AED1DC /* RSBinaryPropertyList.h in Headers */,
+				418AED431813BED60001694B /* RSURL.h in Headers */,
 				41AE32E416DE3F5B00C3A15E /* RSStringNumberSupport.h in Headers */,
 				41AD12A316ECE9E30032577A /* RSFileHandle.h in Headers */,
 				41FB48FE177AE3CC00571B16 /* RSError+Extension.h in Headers */,
@@ -1711,7 +1712,6 @@
 				4151C1CD17600E6500C9AC40 /* gregocal.h in Headers */,
 				4151C1CE17600E6500C9AC40 /* icudataver.h in Headers */,
 				4151C1CF17600E6500C9AC40 /* icuplug.h in Headers */,
-				418AED431813BED60001694B /* RSURL.h in Headers */,
 				4151C1D017600E6500C9AC40 /* idna.h in Headers */,
 				4151C1D117600E6500C9AC40 /* localpointer.h in Headers */,
 				4151C1D217600E6500C9AC40 /* locdspnm.h in Headers */,

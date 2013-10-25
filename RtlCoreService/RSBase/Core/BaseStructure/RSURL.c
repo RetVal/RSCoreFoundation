@@ -701,12 +701,11 @@ static RSStringRef CreateStringFromFileSystemRepresentationByAddingPercentEscape
 
 // Returns nil if str cannot be converted for whatever reason, str if str contains no characters in need of escaping, or a newly-created string with the appropriate % escape codes in place.  Caller must always release the returned string.
 RSInline RSStringRef _replacePathIllegalCharacters(RSStringRef str, RSAllocatorRef alloc, BOOL preserveSlashes) {
-    RSStringRef result = nil;
-    RSCBuffer buffer = nil;
-    if ( (buffer = RSStringCopyUTF8String(str)) )
+    RSStringRef result = NULL;
+    STACK_BUFFER_DECL(char, buffer, PATH_MAX);
+    if ( RSStringGetCString(str, buffer, PATH_MAX, RSStringEncodingUTF8) )
     {
-        result = CreateStringFromFileSystemRepresentationByAddingPercentEscapes(RSAllocatorDefault, (const RSBitU8 *)buffer, strlen(buffer), !preserveSlashes);
-        RSAllocatorDeallocate(RSAllocatorDefault, buffer);
+        result = CreateStringFromFileSystemRepresentationByAddingPercentEscapes(RSAllocatorSystemDefault, (const RSBitU8 *)buffer, strlen(buffer), !preserveSlashes);
     }
     return result;
 }
@@ -1233,7 +1232,7 @@ static void __RSURLDeallocate(RSTypeRef  rs) {
 static RSTypeID __RSURLTypeID = _RSRuntimeNotATypeID;
 
 static const RSRuntimeClass __RSURLClass = {
-    0,                                  // version
+    _RSRuntimeScannedObject,                                  // version
     "RSURL",                            // className
     nil,                               // init
     nil,                               // copy
@@ -1262,7 +1261,7 @@ RS_CONST_STRING_DECL(RSURLDataScheme, "data")
 RS_CONST_STRING_DECL(RSURLFTPScheme, "ftp")
 RS_CONST_STRING_DECL(RSURLLocalhost, "localhost")
 #endif
-__private_extern__ void __RSURLInitialize(void) {
+RSPrivate void __RSURLInitialize(void) {
     __RSURLTypeID = __RSRuntimeRegisterClass(&__RSURLClass);
     __RSRuntimeSetClassTypeID(&__RSURLClass, __RSURLTypeID);
 }
@@ -1277,7 +1276,7 @@ RSExport RSTypeID RSURLGetTypeID() {
     return __RSURLTypeID;
 }
 
-__private_extern__ void RSShowURL(RSURLRef url) {
+RSPrivate void RSShowURL(RSURLRef url) {
     if (!url) {
         fprintf(stdout, "(null)\n");
         return;
@@ -1304,42 +1303,91 @@ __private_extern__ void RSShowURL(RSURLRef url) {
 /* URL creation and String/Data creation from URLS */
 /***************************************************/
 static void constructBuffers(RSAllocatorRef alloc, RSStringRef string, BOOL useEightBitStringEncoding, RSBitU8 *inBuffer, RSIndex inBufferSize, const char **cstring, const UniChar **ustring, BOOL *useCString, BOOL *freeCharacters) {
+    RSIndex neededLength;
     RSIndex length;
     RSRange rg;
     
-    *cstring = RSStringGetCStringPtr(string, RSStringEncodingASCII);
+    *cstring = RSStringGetCStringPtr(string, (useEightBitStringEncoding ? __RSStringGetEightBitStringEncoding() : RSStringEncodingISOLatin1));
     if (*cstring) {
-        *ustring = nil;
-        *useCString = YES;
-        *freeCharacters = NO;
+        *ustring = NULL;
+        *useCString = true;
+        *freeCharacters = false;
         return;
     }
-    *ustring = (UniChar *)RSStringGetCStringPtr(string, RSStringEncodingUnicode);
+    
+    *ustring = RSStringGetCharactersPtr(string);
     if (*ustring) {
-        *useCString = NO;
-        *freeCharacters = NO;
+        *useCString = false;
+        *freeCharacters = false;
         return;
     }
     
     length = RSStringGetLength(string);
     rg = RSMakeRange(0, length);
-    RSStringRef convertedString = RSStringCreateConvert(string, RSStringEncodingISOLatin1);
-    if (convertedString)
-    {
-        UniChar *buf = (UniChar *)RSAllocatorAllocate(alloc, length * sizeof(UniChar));
-        *freeCharacters = YES;
-        RSStringGetCharacters(convertedString, rg, buf);
-        RSRelease(convertedString);
-        *useCString = NO;
-    }
-    else
-    {
-        char *buf = RSAllocatorAllocate(alloc, length);
-        *freeCharacters = YES;
-        RSStringGetCharacters(string, rg, (UniChar *)buf);
+    RSStringGetBytes(string, rg, RSStringEncodingISOLatin1, 0, false, NULL, INT_MAX, &neededLength);
+    if (neededLength == length) {
+        char *buf;
+        if ( (inBuffer != NULL) && (length <= inBufferSize) ) {
+            buf = (char *)inBuffer;
+            *freeCharacters = false;
+        }
+        else {
+            buf = (char *)RSAllocatorAllocate(alloc, length);
+            *freeCharacters = true;
+        }
+        RSStringGetBytes(string, rg, RSStringEncodingISOLatin1, 0, false, (uint8_t *)buf, length, NULL);
         *cstring = buf;
-        *useCString = YES;
+        *useCString = true;
+    } else {
+        UniChar *buf;
+        if ( (inBuffer != NULL) && ((length * sizeof(UniChar)) <= inBufferSize) ) {
+            buf = (UniChar *)inBuffer;
+            *freeCharacters = false;
+        }
+        else {
+            buf = (UniChar *)RSAllocatorAllocate(alloc, length * sizeof(UniChar));
+            *freeCharacters = true;
+        }
+        RSStringGetCharacters(string, rg, buf);
+        *ustring = buf;
+        *useCString = false;
     }
+//    RSIndex length;
+//    RSRange rg;
+//    
+//    *cstring = RSStringGetCStringPtr(string, (useEightBitStringEncoding ? __RSStringGetEightBitStringEncoding() : RSStringEncodingISOLatin1));
+//    if (*cstring) {
+//        *ustring = nil;
+//        *useCString = YES;
+//        *freeCharacters = NO;
+//        return;
+//    }
+//    *ustring = (UniChar *)RSStringGetCharactersPtr(string);
+//    if (*ustring) {
+//        *useCString = NO;
+//        *freeCharacters = NO;
+//        return;
+//    }
+//    
+//    length = RSStringGetLength(string);
+//    rg = RSMakeRange(0, length);
+//    RSStringRef convertedString = RSStringCreateConvert(string, RSStringEncodingISOLatin1);
+//    if (convertedString)
+//    {
+//        UniChar *buf = (UniChar *)RSAllocatorAllocate(alloc, length * sizeof(UniChar));
+//        *freeCharacters = YES;
+//        RSStringGetCharacters(convertedString, rg, buf);
+//        RSRelease(convertedString);
+//        *useCString = NO;
+//    }
+//    else
+//    {
+//        char *buf = RSAllocatorAllocate(alloc, length);
+//        *freeCharacters = YES;
+//        RSStringGetCharacters(string, rg, (UniChar *)buf);
+//        *cstring = buf;
+//        *useCString = YES;
+//    }
 }
 
 #define STRING_CHAR(x) (useCString ? cstring[(x)] : ustring[(x)])
@@ -1771,7 +1819,7 @@ static void _RSURLInit(struct __RSURL *url, RSStringRef URLString, RSURLPathStyl
     RSAssert2((fsType == FULL_URL_REPRESENTATION) || (fsType == RSURLPOSIXPathStyle) || (fsType == RSURLWindowsPathStyle) || (fsType == RSURLHFSPathStyle), __RSLogAssertion, "%s(): Received bad fsType %d", __PRETTY_FUNCTION__, fsType);
     
     // Coming in, the url has its allocator flag properly set, and its base initialized, and nothing else.
-    url->_string = RSStringCreateCopy(RSGetAllocator(url), URLString);
+    url->_string = RSCopy(RSGetAllocator(url), URLString);
     url->_base = base ? RSURLCopyAbsoluteURL(base) : nil;
     
 #if DEBUG_URL_MEMORY_USAGE
@@ -2396,6 +2444,7 @@ RSExport BOOL RSURLCanBeDecomposed(RSURLRef  anURL) {
 }
 
 RSExport RSStringRef  RSURLGetString(RSURLRef  url) {
+    if (!url) return nil;
     RS_OBJC_FUNCDISPATCHV(__RSURLTypeID, RSStringRef, (NSURL *)url, relativeString);
     if (!_haveTestedOriginalString(url)) {
         computeSanitizedString(url);
@@ -3708,7 +3757,7 @@ static void _convertToURLRepresentation(struct __RSURL *url, RSBitU32 fsType) {
             url->_flags = (url->_flags & (IS_DIRECTORY)) | IS_DECOMPOSABLE | IS_ABSOLUTE | HAS_SCHEME | HAS_PATH | ORIGINAL_AND_URL_STRINGS_MATCH | ( isFileReferencePath ? PATH_HAS_FILE_ID : HAS_HOST );
             _setSchemeTypeInFlags(&url->_flags, kHasFileScheme);
             RSRelease(url->_string);
-            url->_string = RSStringCreateCopy(alloc, str);
+            url->_string = RSCopy(alloc, str);
             RSRelease(str);
             if (isFileReferencePath) {
                 url->_ranges = (RSRange *)RSAllocatorAllocate(alloc, sizeof(RSRange) * 2);
@@ -3725,7 +3774,7 @@ static void _convertToURLRepresentation(struct __RSURL *url, RSBitU32 fsType) {
         } else {
             RSRelease(url->_string);
             url->_flags = (url->_flags & (IS_DIRECTORY)) | IS_DECOMPOSABLE | HAS_PATH | ORIGINAL_AND_URL_STRINGS_MATCH;
-            url->_string = RSStringCreateCopy(alloc, path);
+            url->_string = RSCopy(alloc, path);
             RSRelease(path);
             url->_ranges = (RSRange *)RSAllocatorAllocate(alloc, sizeof(RSRange));
             *(url->_ranges) = RSMakeRange(0, RSStringGetLength(url->_string));

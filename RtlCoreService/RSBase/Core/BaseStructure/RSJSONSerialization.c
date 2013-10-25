@@ -70,6 +70,7 @@ static void _jsonAppendUTF8CString(RSMutableDataRef mData, const char *cString)
 {
     RSDataAppendBytes(mData, (const RSBitU8 *)cString, strlen(cString));
 }
+static void _jsonAppendCharacters(RSMutableDataRef xmlData, const UniChar* characters, RSIndex length);
 
 static void _jsonAppendString(RSMutableDataRef xmlData, RSStringRef append)
 {
@@ -78,7 +79,7 @@ static void _jsonAppendString(RSMutableDataRef xmlData, RSStringRef append)
     RSDataRef data;
     if ((chars = RSStringGetCharactersPtr(append)))
     {
-        _plistAppendCharacters(xmlData, chars, RSStringGetLength(append));
+        _jsonAppendCharacters(xmlData, chars, RSStringGetLength(append));
     }
     else if ((cStr = RSStringGetCStringPtr(append, RSStringEncodingASCII)) || (cStr = RSStringGetCStringPtr(append, __RSDefaultEightBitStringEncoding)))
     {

@@ -14,7 +14,7 @@
 #include <RSCoreFoundation/RSString.h>
 enum {
     RSURLPOSIXPathStyle = 0,
-    RSURLHFSPathStyle, /* The use of kCFURLHFSPathStyle is deprecated. The Carbon File Manager, which uses HFS style paths, is deprecated. HFS style paths are unreliable because they can arbitrarily refer to multiple volumes if those volumes have identical volume names. You should instead use kCFURLPOSIXPathStyle wherever possible. */
+    RSURLHFSPathStyle, /* The use of RSURLHFSPathStyle is deprecated. The Carbon File Manager, which uses HFS style paths, is deprecated. HFS style paths are unreliable because they can arbitrarily refer to multiple volumes if those volumes have identical volume names. You should instead use RSURLPOSIXPathStyle wherever possible. */
     RSURLWindowsPathStyle
 };
 typedef RSIndex RSURLPathStyle;

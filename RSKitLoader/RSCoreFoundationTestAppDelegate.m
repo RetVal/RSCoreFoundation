@@ -68,7 +68,19 @@ RSExport void RSSortIndexes(RSIndex *indexBuffer, RSIndex count, RSOptionFlags o
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    RSDictionaryWriteToFile(NULL, RSFileManagerStandardizingPath(RSSTR("~/Desktop/dict_null.plist")), RSWriteFileAutomatically);
+    RSStringRef path = RSFileManagerStandardizingPath(RSSTR("~/Desktop/dict.plist"));
+    RSShow(path);
+    RSURLRef rsurl = RSURLCreateWithFileSystemPathRelativeToBase(RSAllocatorDefault, path, RSURLPOSIXPathStyle, NO, nil);
+    RSShow(rsurl);
+    RSShow(RSURLGetString(rsurl));
+    
+    RSBitU8 buf[RSBufferSize] = {0};
+    if (RSURLGetFileSystemRepresentation(rsurl, YES, buf, RSBufferSize))
+    {
+        RSShow(RSStringWithCharacters((UniChar *)buf, RSBufferSize));
+    }
+    
+    RSRelease(rsurl);
     return;
     RSNumberRef a[] = { RSNumberWithInt(1),
                         RSNumberWithInt(9),

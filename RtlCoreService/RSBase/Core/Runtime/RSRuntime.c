@@ -852,6 +852,7 @@ extern void __RSDelegateInitialize();
 extern void __RSXMLParserInitialize();
 extern void __RSArchiverInitialize();
 
+extern void __RSURLInitialize();
 #include <RSCoreFoundation/RSNotificationCenter.h>
 RS_PUBLIC_CONST_STRING_DECL(RSCoreFoundationWillDeallocateNotification, "RSCoreFoundationWillDeallocateNotification")
 RS_PUBLIC_CONST_STRING_DECL(RSCoreFoundationDidFinishLoadingNotification, "RSCoreFoundationDidFinishLoadingNotification")
@@ -906,13 +907,17 @@ RSExport __RS_INIT_ROUTINE(RSRuntimePriority) void RSCoreFoundationInitialize()
     __RSTimeZoneInitialize();   //  24  rely on RSString and RSArray (Known time zones information).
     __RSDateInitialize();       //  25  rely on Calendar
     __RSCalendarInitialize();   //  26  rely on RSTimeZone, RSDate, RSString.
-    __RSJSONSerializationInitialize();
+    __RSJSONSerializationInitialize(); // not register class
 //    __RSBaseHeapInitialize();   //  27
     
-    __RSRunLoopInitialize();    //  28  rely on RSDictionary, RSArray, RSString, RSUUID.
-    __RSRunLoopSourceInitialize();//29  do for the RSRunLoop.
+    __RSRunLoopInitialize();    //  27  rely on RSDictionary, RSArray, RSString, RSUUID.
+    __RSRunLoopSourceInitialize();//28  do for the RSRunLoop.
+    __RSURLInitialize();        // 29
+    
     
     __RSSocketInitialize();     //  30  run in the RunLoop by RunLoopSource.
+    
+    
     
     __RSPropertyListInitializeInitStatics();
     __RSBinaryPropertyListInitStatics();
@@ -934,7 +939,6 @@ RSExport __RS_INIT_ROUTINE(RSRuntimePriority) void RSCoreFoundationInitialize()
     
     __RSProtocolInitialize();
     __RSDelegateInitialize();
-    __RSArchiverTestMain();
     RSNotificationCenterPostImmediately(RSNotificationCenterGetDefault(), RSCoreFoundationDidFinishLoadingNotification, nil, nil);
     return;
 }

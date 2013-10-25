@@ -1203,7 +1203,7 @@ static void __RSArchiverInitialize_UUID()
 #pragma mark RSArchiver test routine
 RSExport void __RSArchiverTestMain()
 {
-//    return;
+    return;
     RSArchiverRef archiverEX = RSArchiverCreate(RSAllocatorSystemDefault);
     RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
     RSArrayAddObject(array, RSTimeZoneCopySystem());

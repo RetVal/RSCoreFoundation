@@ -13,7 +13,8 @@
 #include "RSICUConverters.h"
 #include "RSUniChar.h"
 #include "RSFoundationEncoding.h"
-//#include <CoreFoundation/RSPriv.h>
+#include <RSCoreFoundation/RSNotificationCenter.h>
+//#include <RSCoreFoundation/RSPriv.h>
 #include "RSUnicodeDecomposition.h"
 #include "RSStringEncodingConverterExt.h"
 #include "RSStringEncodingConverterPrivate.h"
@@ -350,30 +351,41 @@ static RSIndex __RSToCanonicalUnicodeStandardEightBitWrapper(const void *convert
     BOOL isHFSPlus = (flags & RSStringEncodingUseHFSPlusCanonical ? YES : NO);
     RSIndex theUsedCharLen = 0;
     
-    while ((processedByteLen < numBytes) && (!maxCharLen || (theUsedCharLen < maxCharLen))) {
+    while ((processedByteLen < numBytes) && (!maxCharLen || (theUsedCharLen < maxCharLen)))
+    {
         if (!(usedLen = ((RSStringEncodingCheapEightBitToUnicodeProc)((const _RSEncodingConverter*)converter)->definition->toUnicode)(flags, bytes[processedByteLen], charBuffer))) break;
         
-        for (idx = 0;idx < usedLen;idx++) {
-            if (RSUniCharIsDecomposableCharacter(charBuffer[idx], isHFSPlus)) {
+        for (idx = 0;idx < usedLen;idx++)
+        {
+            if (RSUniCharIsDecomposableCharacter(charBuffer[idx], isHFSPlus))
+            {
                 decompedLen = RSUniCharDecomposeCharacter(charBuffer[idx], decompBuffer, MAX_DECOMPOSED_LENGTH);
                 *usedCharLen = theUsedCharLen;
                 
-                for (decompIndex = 0;decompIndex < decompedLen;decompIndex++) {
-                    if (decompBuffer[decompIndex] > 0xFFFF) { // Non-BMP
+                for (decompIndex = 0;decompIndex < decompedLen;decompIndex++)
+                {
+                    if (decompBuffer[decompIndex] > 0xFFFF)
+                    {
+                        // Non-BMP
                         if (theUsedCharLen + 2 > maxCharLen)  return processedByteLen;
                         theUsedCharLen += 2;
-                        if (maxCharLen) {
+                        if (maxCharLen)
+                        {
                             charBuffer[idx] = charBuffer[idx] - 0x10000;
                             *(characters++) = (charBuffer[idx] >> 10) + 0xD800UL;
                             *(characters++) = (charBuffer[idx] & 0x3FF) + 0xDC00UL;
                         }
-                    } else {
+                    }
+                    else
+                    {
                         if (theUsedCharLen + 1 > maxCharLen)  return processedByteLen;
                         ++theUsedCharLen;
                         *(characters++) = charBuffer[idx];
                     }
                 }
-            } else {
+            }
+            else
+            {
                 if (maxCharLen) *(characters++) = charBuffer[idx];
                 ++theUsedCharLen;
             }
@@ -451,7 +463,8 @@ static RSIndex __RSToCanonicalUnicodeCheapMultiByteWrapper(const void *converter
             *usedCharLen = theUsedCharLen;
             
             for (idx = 0;idx < decomposedLen;idx++) {
-                if (charBuffer[idx] > 0xFFFF) { // Non-BMP
+                if (charBuffer[idx] > 0xFFFF) {
+                    // Non-BMP
                     if (theUsedCharLen + 2 > maxCharLen)  return processedByteLen;
                     theUsedCharLen += 2;
                     if (maxCharLen) {
@@ -577,19 +590,35 @@ RSInline const RSStringEncodingConverter *__RSStringEncodingConverterGetDefiniti
     }
 }
 
-static const _RSEncodingConverter *__RSGetConverter(uint32_t encoding) {
+static RSMutableDictionaryRef mappingTable = NULL;
+static _RSEncodingConverter *mappingTableCommonConverters[3] = {NULL, NULL, NULL}; // UTF8, MacRoman/WinLatin1, and the default encoding*
+static RSSpinLock mappingTableGetConverterLock = RSSpinLockInit;
+
+static void __RSEncodingMappingTableReleaseRoutine(RSNotificationRef notification)
+{
+    RSSpinLockLock(&mappingTableGetConverterLock);
+    if (mappingTable)
+        RSRelease(mappingTable);
+    RSSpinLockUnlock(&mappingTableGetConverterLock);
+}
+
+static void __RSEncodingMappingTableRegister(RSDictionaryRef dict)
+{
+    RSNotificationCenterAddObserver(RSNotificationCenterGetDefault(), RSAutorelease(RSObserverCreate(RSAllocatorSystemDefault, RSCoreFoundationWillDeallocateNotification, __RSEncodingMappingTableReleaseRoutine, nil)));
+}
+
+static const _RSEncodingConverter *__RSGetConverter(uint32_t encoding)
+{
     const _RSEncodingConverter *converter = NULL;
     const _RSEncodingConverter **commonConverterSlot = NULL;
-    static _RSEncodingConverter *commonConverters[3] = {NULL, NULL, NULL}; // UTF8, MacRoman/WinLatin1, and the default encoding*
-    static RSMutableDictionaryRef mappingTable = NULL;
-    static RSSpinLock lock = RSSpinLockInit;
     
-    switch (encoding) {
-        case RSStringEncodingUTF8: commonConverterSlot = (const _RSEncodingConverter **)&(commonConverters[0]); break;
+    switch (encoding)
+    {
+        case RSStringEncodingUTF8: commonConverterSlot = (const _RSEncodingConverter **)&(mappingTableCommonConverters[0]); break;
             
             /* the swith here should avoid possible bootstrap issues in the default: case below when invoked from RSStringGetSystemEncoding() */
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI || DEPLOYMENT_TARGET_LINUX
-        case RSStringEncodingMacRoman: commonConverterSlot = (const _RSEncodingConverter **)&(commonConverters[1]); break;
+        case RSStringEncodingMacRoman: commonConverterSlot = (const _RSEncodingConverter **)&(mappingTableCommonConverters[1]); break;
 #elif DEPLOYMENT_TARGET_WINDOWS
         case RSStringEncodingWindowsLatin1: commonConverterSlot = (const _RSEncodingConverter **)(&(commonConverters[1])); break;
 #else
@@ -597,35 +626,43 @@ static const _RSEncodingConverter *__RSGetConverter(uint32_t encoding) {
         case RSStringEncodingISOLatin1: commonConverterSlot = (const _RSEncodingConverter **)(&(commonConverters[1])); break;
 #endif
             
-        default: if (RSStringGetSystemEncoding() == encoding) commonConverterSlot = (const _RSEncodingConverter **)&(commonConverters[2]); break;
+        default: if (RSStringGetSystemEncoding() == encoding) commonConverterSlot = (const _RSEncodingConverter **)&(mappingTableCommonConverters[2]); break;
     }
     
-    RSSpinLockLock(&lock);
+    RSSpinLockLock(&mappingTableGetConverterLock);
     converter = ((NULL == commonConverterSlot) ? ((NULL == mappingTable) ? NULL : (const _RSEncodingConverter *)RSDictionaryGetValue(mappingTable, (const void *)(uintptr_t)encoding)) : *commonConverterSlot);
-    RSSpinLockUnlock(&lock);
+    RSSpinLockUnlock(&mappingTableGetConverterLock);
     
-    if (NULL == converter) {
+    if (NULL == converter)
+    {
         const RSStringEncodingConverter *definition = __RSStringEncodingConverterGetDefinition(encoding);
         
-        if (NULL != definition) {
-            RSSpinLockLock(&lock);
+        if (NULL != definition)
+        {
+            RSSpinLockLock(&mappingTableGetConverterLock);
             converter = ((NULL == commonConverterSlot) ? ((NULL == mappingTable) ? NULL : (const _RSEncodingConverter *)RSDictionaryGetValue(mappingTable, (const void *)(uintptr_t)encoding)) : *commonConverterSlot);
             
-            if (NULL == converter) {
+            if (NULL == converter)
+            {
                 converter = __RSEncodingConverterFromDefinition(definition, encoding);
                 
-                if (NULL == commonConverterSlot) {
-                    if (NULL == mappingTable) {
+                if (NULL == commonConverterSlot)
+                {
+                    if (NULL == mappingTable)
+                    {
                         mappingTable = RSDictionaryCreateMutable(NULL, 0, NULL);
-                        RSAutorelease(mappingTable);
+//                        RSAutorelease(mappingTable);
+                        __RSEncodingMappingTableRegister(mappingTable);
                     }
                     
                     RSDictionarySetValue(mappingTable, (const void *)(uintptr_t)encoding, converter);
-                } else {
+                }
+                else
+                {
                     *commonConverterSlot = converter;
                 }
             }
-            RSSpinLockUnlock(&lock);
+            RSSpinLockUnlock(&mappingTableGetConverterLock);
         }
     }
     

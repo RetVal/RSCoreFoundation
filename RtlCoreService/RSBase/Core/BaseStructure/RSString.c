@@ -7140,7 +7140,7 @@ RSExport const char* RSStringCopyUTF8String(RSStringRef str)
     {
         if ((utf8 = RSAllocatorAllocate(RSAllocatorSystemDefault, ++maxSize)))
         {
-            usedLength = RSStringGetCString(str, (char *)utf8, maxSize, RSStringEncodingUTF8);
+            usedLength = RSStringGetCString(str, (char *)utf8, maxSize, RSStringEncodingUTF8) + 1; // add end flag
             char *tmp = RSAllocatorAllocate(RSAllocatorSystemDefault, usedLength);
             if (tmp)
             {

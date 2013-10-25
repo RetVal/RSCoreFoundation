@@ -50,6 +50,7 @@
 #include <RSCoreFoundation/RSStringNumberSupport.h>
 #include <RSCoreFoundation/RSTimer.h>
 #include <RSCoreFoundation/RSTimeZone.h>
+#include <RSCoreFoundation/RSURL.h>
 #include <RSCoreFoundation/RSUUID.h>
 #include <RSCoreFoundation/RSXMLParser.h>
 

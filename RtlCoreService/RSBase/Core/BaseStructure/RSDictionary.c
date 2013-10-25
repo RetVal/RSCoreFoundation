@@ -1226,7 +1226,7 @@ RSExport RSHashRef RSDictionaryCreate(RSAllocatorRef allocator, const_any_pointe
 RSExport RSMutableHashRef RSDictionaryCreateMutable(RSAllocatorRef allocator, RSIndex capacity, const RSDictionaryContext *context) {
     RSTypeID typeID = RSDictionaryGetTypeID();
     RSAssert2(0 <= capacity, __RSLogAssertion, "%s(): capacity (%ld) cannot be less than zero", __PRETTY_FUNCTION__, capacity);
-    RSBasicHashRef ht = __RSDictionaryCreateGeneric(allocator, context->keyContext, context->valueContext, RSDictionary);
+    RSBasicHashRef ht = __RSDictionaryCreateGeneric(allocator, context ? context->keyContext : nil, context ? context->valueContext : nil, RSDictionary);
     if (!ht) return NULL;
 //    *(uintptr_t *)ht = __RSISAForTypeID(typeID);
     __RSRuntimeSetInstanceTypeID(ht, typeID);
