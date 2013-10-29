@@ -7196,7 +7196,6 @@ RSExport void RSMutableStringConvert(RSMutableStringRef aString, RSStringEncodin
         RSIndex usedLen = 0;
         if (strLen < len)
             __RSStringChangeSize(aString, RSMakeRange(__RSStrLength(aString), 0), len - strLen, NO);
-//        __RSStringEncodeByteStream(str, 0, len, NO, encoding, NO, (unsigned char*) buffer, bufferSize - 1, &usedLen)
         __RSStringEncodeByteStream(aString, 0, strLen, NO, encoding, NO, (RSUBlock *)__RSStrContents(aString) + __RSStrSkipAnyLengthByte(aString), len - 1, &usedLen);
         __RSStrSetExplicitLength(aString, usedLen);
         __RSStringChangeSize(aString, RSMakeRange(0, __RSStrLength(aString)), usedLen, NO);

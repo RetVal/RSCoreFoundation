@@ -314,3 +314,15 @@ RSExport RSStringRef RSClassNameFromInstance(RSTypeRef id)
 {
     return RSAutorelease(RSStringCreateWithCString(RSAllocatorSystemDefault, __RSRuntimeGetClassNameWithInstance(id), RSStringEncodingUTF8));
 }
+
+#if RS_BLOCKS_AVAILABLE
+void RSSyncUpdateBlock(RSSpinLock lock, void (^block)(void))
+{
+    RSSpinLockLock(&lock);
+    block();
+    if (RSSpinLockTry(&lock))
+        RSSpinLockUnlock(&lock);
+    else
+        __RSCLog(RSLogLevelWarning, "May be case an dead lock, %s can only be used updating your data synchronized", __func__);
+}
+#endif

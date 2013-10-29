@@ -174,6 +174,12 @@ RSInline BOOL RSSpinLockTry(volatile RSSpinLock_t *lock) {
 }
 #endif
 
+
+#if RS_BLOCKS_AVAILABLE
+
+void RSSyncUpdateBlock(RSSpinLock lock, void (^block)(void));
+
+#endif
 #endif
 
 #ifndef M_PI
