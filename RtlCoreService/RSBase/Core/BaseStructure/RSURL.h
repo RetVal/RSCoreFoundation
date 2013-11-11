@@ -95,8 +95,6 @@ RSExport RSRange RSURLGetByteRangeForComponent(RSURLRef url, RSURLComponentType 
 
 RSExport RSURLRef RSURLCreateWithFileSystemPath(RSAllocatorRef allocator, RSStringRef filePath, RSURLPathStyle fsType, BOOL isDirectory) RS_AVAILABLE(0_3);
 
-RSExport RSURLRef RSURLCreateWithFileSystemPathRelativeToBase(RSAllocatorRef allocator, RSStringRef filePath, RSURLPathStyle fsType, BOOL isDirectory, RSURLRef baseURL) RS_AVAILABLE(0_3);
-
 RSExport RSStringRef RSURLCopyFileSystemPath(RSURLRef anURL, RSURLPathStyle pathStyle) RS_AVAILABLE(0_3);
 
 RSExport RSStringRef RSURLCreateStringWithFileSystemPath(RSAllocatorRef allocator, RSURLRef anURL, RSURLPathStyle fsType, BOOL resolveAgainstBase) RS_AVAILABLE(0_3);
@@ -119,5 +117,6 @@ RSExport RSURLRef RSURLCreateCopyAppendingPathExtension(RSAllocatorRef allocator
 
 RSExport RSURLRef RSURLCreateCopyDeletingPathExtension(RSAllocatorRef allocator, RSURLRef url) RS_AVAILABLE(0_3);
 
-RSExport RSURLRef RSURLCreateFilePathURL(RSAllocatorRef alloc, RSURLRef url, RSErrorRef *error) RS_AVAILABLE(0_3);
+RSExport RSURLRef RSURLWithString(RSStringRef URLString);
+RSExport RSURLRef RSURLWithFilePath(RSStringRef filePath, BOOL isDirectory);
 #endif

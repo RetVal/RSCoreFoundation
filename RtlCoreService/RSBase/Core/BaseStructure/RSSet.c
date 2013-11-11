@@ -64,8 +64,8 @@ static RSHashCode __RSSetHash(RSTypeRef obj) {
     return __RSBasicHashHash((RSBasicHashRef)obj);
 }
 
-static RSStringRef __RSSetCopyDescription(RSTypeRef obj) {
-    return __RSBasicHashCopyDescription((RSBasicHashRef)obj);
+static RSStringRef __RSSetDescription(RSTypeRef obj) {
+    return __RSBasicHashDescription((RSBasicHashRef)obj);
 }
 
 static RSTypeRef __RSSetClassCopy(RSAllocatorRef allocator, RSTypeRef rs, BOOL mutableCopy)
@@ -92,7 +92,7 @@ static const RSRuntimeClass __RSSetClass = {
     __RSSetDeallocate,
     __RSSetEqual,
     __RSSetHash,
-    __RSSetCopyDescription,        //
+    __RSSetDescription,        //
     NULL,
     NULL
 };
@@ -108,7 +108,7 @@ RSExport RSTypeID RSSetGetTypeID(void)
     return __RSSetTypeID;
 }
 
-
+#if !defined(RSBasicHashVersion) || (RSBasicHashVersion == 1)
 static uintptr_t __RSSetStandardRetainValue(RSConstBasicHashRef ht, uintptr_t stack_value) {
     if (RSBasicHashGetSpecialBits(ht) & 0x0100) return stack_value;
     return (RSBasicHashHasStrongValues(ht)) ? (uintptr_t)(RSTypeRef)stack_value : (uintptr_t)RSRetain((RSTypeRef)stack_value);
@@ -188,9 +188,9 @@ static void __RSSetStandardFreeCallbacks(RSConstBasicHashRef ht, RSAllocatorRef 
 
 static RSBasicHashCallbacks *__RSSetCopyCallbacks(RSConstBasicHashRef ht, RSAllocatorRef allocator, RSBasicHashCallbacks *cb) {
     RSBasicHashCallbacks *newcb = NULL;
-//    if (RS_IS_COLLECTABLE_ALLOCATOR(allocator)) {
-//        newcb = (RSBasicHashCallbacks *)auto_zone_allocate_object(objc_collectableZone(), sizeof(RSBasicHashCallbacks) + 10 * sizeof(void *), AUTO_MEMORY_UNSCANNED, NO, NO);
-//    } else {
+    //    if (RS_IS_COLLECTABLE_ALLOCATOR(allocator)) {
+    //        newcb = (RSBasicHashCallbacks *)auto_zone_allocate_object(objc_collectableZone(), sizeof(RSBasicHashCallbacks) + 10 * sizeof(void *), AUTO_MEMORY_UNSCANNED, NO, NO);
+    //    } else {
     newcb = RSAllocatorAllocate(allocator, sizeof(RSBasicHashCallbacks) + 10 * sizeof(void *));
     //}
     if (!newcb) return NULL;
@@ -441,7 +441,140 @@ RSPrivate RSHashRef __RSSetCreateTransfer(RSAllocatorRef allocator, const_any_po
     ///if (__RSOASafe) __RSSetLastAllocationEventName(ht, "RSSet (immutable)");
     return (RSHashRef)ht;
 }
+#elif (RSBasicHashVersion == 2)
+static RSBasicHashRef __RSSetCreateInstance(RSAllocatorRef allocator, const RSHashKeyCallBacks *keyCallBacks, const RSHashValueCallBacks *valueCallBacks, BOOL useValueCB) {
+    RSOptionFlags flags = RSBasicHashLinearHashing; // RSBasicHashExponentialHashing
+    flags |= (RSDictionary ? RSBasicHashHasKeys : 0) | (RSBag ? RSBasicHashHasCounts : 0);
+    
+    if (RS_IS_COLLECTABLE_ALLOCATOR(allocator)) { // all this crap is just for figuring out two flags for GC in the way done historically; it probably simplifies down to three lines, but we let the compiler worry about that
+        BOOL set_cb = false;
+        BOOL std_cb = false;
+        const_any_pointer_t (*key_retain)(RSAllocatorRef, const_any_pointer_t) = NULL;
+        void (*key_release)(RSAllocatorRef, const_any_pointer_t) = NULL;
+        const_any_pointer_t (*value_retain)(RSAllocatorRef, const_any_pointer_t) = NULL;
+        void (*value_release)(RSAllocatorRef, const_any_pointer_t) = NULL;
+        
+        if ((NULL == keyCallBacks || 0 == keyCallBacks->version) && (!useValueCB || NULL == valueCallBacks || 0 == valueCallBacks->version)) {
+            BOOL keyRetainNull = NULL == keyCallBacks || NULL == keyCallBacks->retain;
+            BOOL keyReleaseNull = NULL == keyCallBacks || NULL == keyCallBacks->release;
+            BOOL keyEquateNull = NULL == keyCallBacks || NULL == keyCallBacks->equal;
+            BOOL keyHashNull = NULL == keyCallBacks || NULL == keyCallBacks->hash;
+            BOOL keyDescribeNull = NULL == keyCallBacks || NULL == keyCallBacks->copyDescription;
+            
+            BOOL valueRetainNull = (useValueCB && (NULL == valueCallBacks || NULL == valueCallBacks->retain)) || (!useValueCB && keyRetainNull);
+            BOOL valueReleaseNull = (useValueCB && (NULL == valueCallBacks || NULL == valueCallBacks->release)) || (!useValueCB && keyReleaseNull);
+            BOOL valueEquateNull = (useValueCB && (NULL == valueCallBacks || NULL == valueCallBacks->equal)) || (!useValueCB && keyEquateNull);
+            BOOL valueDescribeNull = (useValueCB && (NULL == valueCallBacks || NULL == valueCallBacks->copyDescription)) || (!useValueCB && keyDescribeNull);
+            
+            BOOL keyRetainStd = keyRetainNull || __RSTypeCollectionRetain == keyCallBacks->retain;
+            BOOL keyReleaseStd = keyReleaseNull || __RSTypeCollectionRelease == keyCallBacks->release;
+            BOOL keyEquateStd = keyEquateNull || RSEqual == keyCallBacks->equal;
+            BOOL keyHashStd = keyHashNull || RSHash == keyCallBacks->hash;
+            BOOL keyDescribeStd = keyDescribeNull || RSDescription == keyCallBacks->copyDescription;
+            
+            BOOL valueRetainStd = (useValueCB && (valueRetainNull || __RSTypeCollectionRetain == valueCallBacks->retain)) || (!useValueCB && keyRetainStd);
+            BOOL valueReleaseStd = (useValueCB && (valueReleaseNull || __RSTypeCollectionRelease == valueCallBacks->release)) || (!useValueCB && keyReleaseStd);
+            BOOL valueEquateStd = (useValueCB && (valueEquateNull || RSEqual == valueCallBacks->equal)) || (!useValueCB && keyEquateStd);
+            BOOL valueDescribeStd = (useValueCB && (valueDescribeNull || RSDescription == valueCallBacks->copyDescription)) || (!useValueCB && keyDescribeStd);
+            
+            if (keyRetainStd && keyReleaseStd && keyEquateStd && keyHashStd && keyDescribeStd && valueRetainStd && valueReleaseStd && valueEquateStd && valueDescribeStd) {
+                set_cb = true;
+                if (!(keyRetainNull || keyReleaseNull || keyEquateNull || keyHashNull || keyDescribeNull || valueRetainNull || valueReleaseNull || valueEquateNull || valueDescribeNull)) {
+                    std_cb = true;
+                } else {
+                    // just set these to tickle the GC Strong logic below in a way that mimics past practice
+                    key_retain = keyCallBacks ? keyCallBacks->retain : NULL;
+                    key_release = keyCallBacks ? keyCallBacks->release : NULL;
+                    if (useValueCB) {
+                        value_retain = valueCallBacks ? valueCallBacks->retain : NULL;
+                        value_release = valueCallBacks ? valueCallBacks->release : NULL;
+                    } else {
+                        value_retain = key_retain;
+                        value_release = key_release;
+                    }
+                }
+            }
+        }
+        
+        if (!set_cb) {
+            key_retain = keyCallBacks ? keyCallBacks->retain : NULL;
+            key_release = keyCallBacks ? keyCallBacks->release : NULL;
+            if (useValueCB) {
+                value_retain = valueCallBacks ? valueCallBacks->retain : NULL;
+                value_release = valueCallBacks ? valueCallBacks->release : NULL;
+            } else {
+                value_retain = key_retain;
+                value_release = key_release;
+            }
+        }
+        
+        if (std_cb || value_retain != NULL || value_release != NULL) {
+            flags |= RSBasicHashStrongValues;
+        }
+        if (std_cb || key_retain != NULL || key_release != NULL) {
+            flags |= RSBasicHashStrongKeys;
+        }
+    }
+    
+    
+    RSBasicHashCallbacks callbacks;
+    callbacks.retainKey = keyCallBacks ? (uintptr_t (*)(RSAllocatorRef, uintptr_t))keyCallBacks->retain : NULL;
+    callbacks.releaseKey = keyCallBacks ? (void (*)(RSAllocatorRef, uintptr_t))keyCallBacks->release : NULL;
+    callbacks.equateKeys = keyCallBacks ? (BOOL (*)(uintptr_t, uintptr_t))keyCallBacks->equal : NULL;
+    callbacks.hashKey = keyCallBacks ? (RSHashCode (*)(uintptr_t))keyCallBacks->hash : NULL;
+    callbacks.getIndirectKey = NULL;
+    callbacks.copyKeyDescription = keyCallBacks ? (RSStringRef (*)(uintptr_t))keyCallBacks->copyDescription : NULL;
+    callbacks.retainValue = useValueCB ? (valueCallBacks ? (uintptr_t (*)(RSAllocatorRef, uintptr_t))valueCallBacks->retain : NULL) : (callbacks.retainKey);
+    callbacks.releaseValue = useValueCB ? (valueCallBacks ? (void (*)(RSAllocatorRef, uintptr_t))valueCallBacks->release : NULL) : (callbacks.releaseKey);
+    callbacks.equateValues = useValueCB ? (valueCallBacks ? (BOOL (*)(uintptr_t, uintptr_t))valueCallBacks->equal : NULL) : (callbacks.equateKeys);
+    callbacks.copyValueDescription = useValueCB ? (valueCallBacks ? (RSStringRef (*)(uintptr_t))valueCallBacks->copyDescription : NULL) : (callbacks.copyKeyDescription);
+    
+    RSBasicHashRef ht = RSBasicHashCreate(allocator, flags, &callbacks);
+    return ht;
+}
 
+#if RSDictionary
+RSPrivate RSHashRef __RSSetCreateTransfer(RSAllocatorRef allocator, const_any_pointer_t *klist, const_any_pointer_t *vlist, RSIndex numValues)
+#endif
+#if RSSet || RSBag
+RSPrivate RSHashRef __RSSetCreateTransfer(RSAllocatorRef allocator, const_any_pointer_t *klist, RSIndex numValues)
+
+#endif
+{
+#if RSSet || RSBag
+    const_any_pointer_t *vlist = klist;
+#endif
+    RSTypeID typeID = RSSetGetTypeID();
+    RSAssert2(0 <= numValues, __RSLogAssertion, "%s(): numValues (%ld) cannot be less than zero", __PRETTY_FUNCTION__, numValues);
+    RSOptionFlags flags = RSBasicHashLinearHashing; // RSBasicHashExponentialHashing
+    flags |= (RSDictionary ? RSBasicHashHasKeys : 0) | (RSBag ? RSBasicHashHasCounts : 0);
+    
+    RSBasicHashCallbacks callbacks;
+    callbacks.retainKey = (uintptr_t (*)(RSAllocatorRef, uintptr_t))RSTypeSetKeyCallBacks.retain;
+    callbacks.releaseKey = (void (*)(RSAllocatorRef, uintptr_t))RSTypeSetKeyCallBacks.release;
+    callbacks.equateKeys = (BOOL (*)(uintptr_t, uintptr_t))RSTypeSetKeyCallBacks.equal;
+    callbacks.hashKey = (RSHashCode (*)(uintptr_t))RSTypeSetKeyCallBacks.hash;
+    callbacks.getIndirectKey = NULL;
+    callbacks.copyKeyDescription = (RSStringRef (*)(uintptr_t))RSTypeSetKeyCallBacks.copyDescription;
+    callbacks.retainValue = RSDictionary ? (uintptr_t (*)(RSAllocatorRef, uintptr_t))RSTypeSetValueCallBacks.retain : callbacks.retainKey;
+    callbacks.releaseValue = RSDictionary ? (void (*)(RSAllocatorRef, uintptr_t))RSTypeSetValueCallBacks.release : callbacks.releaseKey;
+    callbacks.equateValues = RSDictionary ? (BOOL (*)(uintptr_t, uintptr_t))RSTypeSetValueCallBacks.equal : callbacks.equateKeys;
+    callbacks.copyValueDescription = RSDictionary ? (RSStringRef (*)(uintptr_t))RSTypeSetValueCallBacks.copyDescription : callbacks.copyKeyDescription;
+    
+    RSBasicHashRef ht = RSBasicHashCreate(allocator, flags, &callbacks);
+    RSBasicHashSuppressRC(ht);
+    if (0 < numValues) RSBasicHashSetCapacity(ht, numValues);
+    for (RSIndex idx = 0; idx < numValues; idx++) {
+        RSBasicHashAddValue(ht, (uintptr_t)klist[idx], (uintptr_t)vlist[idx]);
+    }
+    RSBasicHashUnsuppressRC(ht);
+    RSBasicHashMakeImmutable(ht);
+    __RSRuntimeSetInstanceTypeID(ht, typeID);
+//    if (__RSOASafe) __RSSetLastAllocationEventName(ht, "RSSet (immutable)");
+    return (RSHashRef)ht;
+}
+
+#endif
 #if RSSet || RSBag
 RSHashRef RSSetCreate(RSAllocatorRef allocator, const_any_pointer_t *klist, RSIndex numValues, const RSSetKeyCallBacks *keyCallBacks)
 {
@@ -496,7 +629,7 @@ RSHashRef RSSetCreateCopy(RSAllocatorRef allocator, RSHashRef other)
         {
             vlist = RSAllocatorAllocate(RSAllocatorSystemDefault, numValues * sizeof(const_any_pointer_t));
         }
-
+        
 #if RSSet || RSBag
         const_any_pointer_t *klist = vlist;
         RSSetGetValues(other, vlist);
@@ -575,7 +708,7 @@ RSIndex RSSetGetCount(RSHashRef hc) {
 #if RSSet || RSBag
 RSIndex RSSetGetCountOfValue(RSHashRef hc, const_any_pointer_t key) {
 #endif
-
+    
     __RSGenericValidInstance(hc, __RSSetTypeID);
     return RSBasicHashGetCountOfKey((RSBasicHashRef)hc, (uintptr_t)key);
 }
@@ -595,7 +728,7 @@ const_any_pointer_t RSSetGetValue(RSHashRef hc, const_any_pointer_t key)
 }
 
 BOOL RSSetGetValueIfPresent(RSHashRef hc, const_any_pointer_t key, const_any_pointer_t *value) {
-
+    
     __RSGenericValidInstance(hc, __RSSetTypeID);
     RSBasicHashBucket bkt = RSBasicHashFindBucket((RSBasicHashRef)hc, (uintptr_t)key);
     if (0 < bkt.count)
@@ -622,18 +755,18 @@ void RSSetGetValues(RSHashRef hc, const_any_pointer_t *keybuf) {
 #endif
     __RSGenericValidInstance(hc, __RSSetTypeID);
     if (RSUseCollectableAllocator) {
-    RSOptionFlags flags = RSBasicHashGetFlags((RSBasicHashRef)hc);
-    __block const_any_pointer_t *keys = keybuf;
-    __block const_any_pointer_t *values = valuebuf;
-    RSBasicHashApply((RSBasicHashRef)hc, ^(RSBasicHashBucket bkt) {
-        for (RSIndex cnt = bkt.count; cnt--;) {
-            if (keybuf && (flags & RSBasicHashStrongKeys)) { __RSAssignWithWriteBarrier((void **)keys, (void *)bkt.weak_key); keys++; }
-            if (keybuf && !(flags & RSBasicHashStrongKeys)) { *keys++ = (const_any_pointer_t)bkt.weak_key; }
-            if (valuebuf && (flags & RSBasicHashStrongValues)) { __RSAssignWithWriteBarrier((void **)values, (void *)bkt.weak_value); values++; }
-            if (valuebuf && !(flags & RSBasicHashStrongValues)) { *values++ = (const_any_pointer_t)bkt.weak_value; }
-        }
-        return (BOOL)YES;
-    });
+        RSOptionFlags flags = RSBasicHashGetFlags((RSBasicHashRef)hc);
+        __block const_any_pointer_t *keys = keybuf;
+        __block const_any_pointer_t *values = valuebuf;
+        RSBasicHashApply((RSBasicHashRef)hc, ^(RSBasicHashBucket bkt) {
+            for (RSIndex cnt = bkt.count; cnt--;) {
+                if (keybuf && (flags & RSBasicHashStrongKeys)) { __RSAssignWithWriteBarrier((void **)keys, (void *)bkt.weak_key); keys++; }
+                if (keybuf && !(flags & RSBasicHashStrongKeys)) { *keys++ = (const_any_pointer_t)bkt.weak_key; }
+                if (valuebuf && (flags & RSBasicHashStrongValues)) { __RSAssignWithWriteBarrier((void **)values, (void *)bkt.weak_value); values++; }
+                if (valuebuf && !(flags & RSBasicHashStrongValues)) { *values++ = (const_any_pointer_t)bkt.weak_value; }
+            }
+            return (BOOL)YES;
+        });
     } else {
         RSBasicHashGetElements((RSBasicHashRef)hc, RSSetGetCount(hc), (uintptr_t *)valuebuf, (uintptr_t *)keybuf);
     }
@@ -642,14 +775,14 @@ void RSSetGetValues(RSHashRef hc, const_any_pointer_t *keybuf) {
 void RSSetApplyFunction(RSHashRef hc, RSSetApplierFunction applier, any_pointer_t context)
 {
     FAULT_CALLBACK((void **)&(applier));
-
+    
     __RSGenericValidInstance(hc, __RSSetTypeID);
     RSBasicHashApply((RSBasicHashRef)hc, ^(RSBasicHashBucket bkt) {
-    
-    #if RSSet
+        
+#if RSSet
         INVOKE_CALLBACK2(applier, (const_any_pointer_t)bkt.weak_value, context);
-    #endif
-
+#endif
+        
         return (BOOL)YES;
     });
 }
@@ -778,7 +911,7 @@ void RSSetRemoveAllValues(RSMutableHashRef hc) {
     RSBasicHashRemoveAllValues((RSBasicHashRef)hc);
     RS_OBJC_KVO_DIDCHANGEALL(hc);
 }
-    
+
 #undef RS_OBJC_KVO_WILLCHANGE
 #undef RS_OBJC_KVO_DIDCHANGE
 #undef RS_OBJC_KVO_WILLCHANGEALL

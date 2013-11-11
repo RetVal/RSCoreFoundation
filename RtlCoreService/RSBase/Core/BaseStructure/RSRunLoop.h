@@ -52,8 +52,8 @@ typedef RS_OPTIONS(RSOptionFlags, RSPerformBlockOptionFlags) {
 
 RSExport RSTypeID RSRunLoopGetTypeID() RS_AVAILABLE(0_0);
 
-RSExport RSRunLoopRef RSRunLoopCurrentLoop() RS_AVAILABLE(0_0);   // get the RSRunLoop for the current thread with retain
-RSExport RSRunLoopRef RSRunLoopMainLoop() RS_AVAILABLE(0_0);      // get the RSRunLoop for the main thread with retain
+RSExport RSRunLoopRef RSRunLoopGetCurrent() RS_AVAILABLE(0_0);   // get the RSRunLoop for the current thread with retain
+RSExport RSRunLoopRef RSRunLoopGetMain() RS_AVAILABLE(0_0);      // get the RSRunLoop for the main thread with retain
 
 RSExport RSStringRef RSRunLoopModeName(RSRunLoopRef rl) RS_AVAILABLE(0_0);    // get the name of the RSRunLoop with retain
 
@@ -69,6 +69,7 @@ RSExport void RSPerformBlockOnMainThreadWaitUntilDone(void (^perform)()) RS_AVAI
 RSExport void RSPerformBlockAfterDelay(RSTimeInterval delayTime, void (^perform)()) RS_AVAILABLE(0_3);
 RSExport void RSPerformBlockRepeat(RSIndex performCount, void (^perform)(RSIndex idx)) RS_AVAILABLE(0_3);
 RSExport void RSPerformBlockRepeatWithFlags(RSIndex performCount, RSPerformBlockOptionFlags performFlags, void (^perform)(RSIndex idx)) RS_AVAILABLE(0_3);
+RSExport void RSRunLoopPerformBlockInRunLoop(RSRunLoopRef runloop, void (^perform)(void)) RS_AVAILABLE(0_3);
 #endif
 
 RSExport void RSRunLoopPerformFunctionInRunLoop(RSRunLoopRef runloop, void(*perform)(void* info), void* info, RSStringRef mode) RS_AVAILABLE(0_3);
@@ -90,11 +91,11 @@ RSExport RSTypeID RSRunLoopSourceGetTypeID() RS_AVAILABLE(0_0);
 
 RSExport RSRunLoopSourceRef RSRunLoopSourceCreate(RSAllocatorRef allocator, RSIndex order, RSRunLoopSourceContext* context) RS_AVAILABLE(0_0);
 RSExport BOOL RSRunLoopSourceIsValid(RSRunLoopSourceRef source) RS_AVAILABLE(0_0);
-RSExport void RSRunLoopSourceRemoveFromRunLoop(RSRunLoopSourceRef source, RSStringRef mode) RS_AVAILABLE(0_0);
 
 RSExport RSStringRef const RSRunLoopDefault RS_AVAILABLE(0_0);   // one source one thread mode.
 RSExport RSStringRef const RSRunLoopQueue RS_AVAILABLE(0_1);     // all sources run on one thread.
 RSExport RSStringRef const RSRunLoopMain RS_AVAILABLE(0_1);
-
+RSExport RSStringRef const RSRunLoopDefaultMode RS_AVAILABLE(0_3);
+RSExport RSStringRef const RSRunLoopCommonModes RS_AVAILABLE(0_3);
 RS_EXTERN_C_END
 #endif

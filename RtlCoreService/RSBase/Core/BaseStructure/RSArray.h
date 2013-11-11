@@ -189,5 +189,7 @@ RSExport void RSArrayApplyFunction(RSArrayRef array, RSRange range, RSArrayAppli
 #if RS_BLOCKS_AVAILABLE
 RSExport void RSArrayApplyBlock(RSArrayRef array, RSRange range, void (^block)(const void*value, void *context), void* context) RS_AVAILABLE(0_1);
 #endif
+
+RSExport BOOL RSArrayContainsObject(RSArrayRef array, RSRange range, const void *value) RS_AVAILABLE(0_3);
 RS_EXTERN_C_END
 #endif

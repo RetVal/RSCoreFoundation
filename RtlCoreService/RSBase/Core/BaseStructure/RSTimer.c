@@ -122,7 +122,7 @@ static void __RSTimerDescriptorInit(RSTimerRef timer, RSBitU64 when, RSTimeInter
 static void __RSTimerClassInit(RSTypeRef rs)
 {
     RSTimerRef timer = (RSTimerRef)rs;
-//    timer->_dps_timer = __dps_timer_create(RSRunLoopCurrentLoop());
+//    timer->_dps_timer = __dps_timer_create(RSRunLoopGetCurrent());
     __RSTimerSetDescriptor(timer);
     __RSTimerSetInvalid(timer);
 }
@@ -214,7 +214,7 @@ static RSTimerRef __RSTimerCreateWithTimerDescritorInside(RSTimerRef timer, void
     if (timer == nil) return nil;
     if (!__RSTimerIsDescriptor(timer)) return nil;
     struct __RSTimer *_timer = (struct __RSTimer *)timer;
-    _timer->_dps_timer = __dps_timer_create(timer->_descriptor._absolute_time, timer->_descriptor._timeInterval * __dps_timer_tick_per_second, 0, __RSTimerIsRepeat(timer), RSRunLoopCurrentLoop(), handler);
+    _timer->_dps_timer = __dps_timer_create(timer->_descriptor._absolute_time, timer->_descriptor._timeInterval * __dps_timer_tick_per_second, 0, __RSTimerIsRepeat(timer), RSRunLoopGetCurrent(), handler);
     if (timer->_dps_timer == nil) return nil;
     __dps_timer_set_context(timer->_dps_timer, _timer);
     __RSTimerSetTimer(timer);

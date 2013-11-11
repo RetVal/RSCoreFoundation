@@ -910,9 +910,9 @@ static void __RSSocketHandleWrite(RSSocketRef s, BOOL callBackNow)
     if (callBackNow) __RSSocketDoCallback(s, 0, nil, nil, 0);
     else {
         __RSSocketUnlock(s);
-        if (!__RSSocketIsScheduled(s)) __RSSocketSchedule(s, RSRunLoopCurrentLoop(), RSRunLoopDefault);
+        if (!__RSSocketIsScheduled(s)) __RSSocketSchedule(s, RSRunLoopGetCurrent(), RSRunLoopDefault);
         __RSSocketPerformV0(s, writeAvailable);
-//            __RSSocketCancel(s, RSRunLoopCurrentLoop(), RSRunLoopDefault);
+//            __RSSocketCancel(s, RSRunLoopGetCurrent(), RSRunLoopDefault);
     }
 }
 
@@ -1013,7 +1013,7 @@ static void __RSSocketHandleRead(RSSocketRef s, BOOL causedByTimeout)
         }
 		__RSSocketUnlock(s);
         __RSSocketPerformV0(s, RSSocketAcceptCallBack);
-        if (!__RSSocketIsScheduled(s)) __RSSocketSchedule(s, RSRunLoopCurrentLoop(), RSRunLoopDefault);
+        if (!__RSSocketIsScheduled(s)) __RSSocketSchedule(s, RSRunLoopGetCurrent(), RSRunLoopDefault);
         return;
 	}
 }

@@ -65,6 +65,7 @@ static void __e_pop_exception_handler(_exception_handler_block handler)
 
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
 #define RS_TSD_KEY 206
+//#define RS_TSD_KEY 55
 #endif
 
 // Windows and Linux, not sure how many times the destructor could get called; RS_TSD_MAX_DESTRUCTOR_CALLS could be 1

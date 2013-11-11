@@ -18,6 +18,19 @@
 const RSTimeInterval RSAbsoluteTimeIntervalSince1970 = 978307200.0L;
 const RSTimeInterval RSAbsoluteTimeIntervalSince1904 = 3061152000.0L;
 
+RSPrivate double __RSTSRRate = 0.0;
+static double __RS1_TSRRate = 0.0;
+
+RSPrivate int64_t __RSTimeIntervalToTSR(RSTimeInterval ti) {
+    if ((ti * __RSTSRRate) > INT64_MAX / 2) return (INT64_MAX / 2);
+    return (int64_t)(ti * __RSTSRRate);
+}
+
+RSPrivate RSTimeInterval __RSTSRToTimeInterval(int64_t tsr) {
+    return (RSTimeInterval)((double)tsr * __RS1_TSRRate);
+}
+
+
 struct	__RSTimeBase
 {
 	long	second		: 6	;   //2^6 = 64 , 60

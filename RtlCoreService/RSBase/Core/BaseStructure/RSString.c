@@ -1622,8 +1622,8 @@ RSInline void __RSStrSetContentsDeallocator(RSStringRef str, RSAllocatorRef allo
 }
 
 static RSAllocatorRef *__RSStrContentsAllocatorPtr(RSStringRef str) {
-//    RSAssert(!__RSStrIsInline(str), __RSLogAssertion, "Asking for contents allocator of inline string");
-//    RSAssert(__RSStrIsMutable(str), __RSLogAssertion, "Asking for contents allocator of an immutable string");
+    RSAssert(!__RSStrIsInline(str), __RSLogAssertion, "Asking for contents allocator of inline string");
+    RSAssert(__RSStrIsMutable(str), __RSLogAssertion, "Asking for contents allocator of an immutable string");
     return (RSAllocatorRef *)&(str->_variants._notInlineMutable1._contentsAllocator);
 }
 

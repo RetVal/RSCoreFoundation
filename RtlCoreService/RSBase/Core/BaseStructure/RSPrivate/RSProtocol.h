@@ -23,7 +23,7 @@ typedef struct _RSProtocolItem RSProtocolItem;
 
 struct _RSProtocolContext {
     const char * delegateName;
-    const RSUInteger countOfItems;
+    RSUInteger countOfItems;
     RSProtocolItem items[1];
 };
 typedef struct _RSProtocolContext RSProtocolContext;

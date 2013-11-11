@@ -1450,7 +1450,7 @@ static void __RSFWAddFDToQueue(RSFileWatcherRef fw, RSFileHandle fd, int mode, R
     kevent(fw->_queue, &event, 1, nil, 0, &_to);
 //    RSRunLoopSourceContext context = {};
 //    RSRunLoopSourceRef source = RSRunLoopSourceCreate(RSAllocatorSystemDefault, 0, nil);
-//    RSRunLoopAddSource(RSRunLoopCurrentLoop(), source, RSRunLoopQueue);
+//    RSRunLoopAddSource(RSRunLoopGetCurrent(), source, RSRunLoopQueue);
 //    RSRelease(source);
 }
 

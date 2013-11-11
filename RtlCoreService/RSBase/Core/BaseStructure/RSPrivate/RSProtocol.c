@@ -105,11 +105,13 @@ static __unused BOOL __RSProtocolCacheRemoveProtocol(RSProtocolRef protocol)
     __RSGenericValidInstance(protocol, _RSProtocolTypeID);
     RSStringRef name = RSProtocolGetName(protocol);
     RSSpinLockLock(&__RSProtocolCacheLock);
-    if (!RSDictionaryGetValue(__RSProtocolCache, name))
+    RSTypeRef value = nil;
+    if (!(value = RSDictionaryGetValue(__RSProtocolCache, name)))
     {
         RSSpinLockUnlock(&__RSProtocolCacheLock);
         return NO;
     }
+    __RSRuntimeSetInstanceSpecial(value, NO);
     RSDictionaryRemoveValue(__RSProtocolCache, name);
     RSSpinLockUnlock(&__RSProtocolCacheLock);
     return YES;
@@ -181,7 +183,7 @@ static RSProtocolRef __RSProtocolCreateInstance(RSAllocatorRef allocator, RSStri
     instance->_name = RSRetain(name);
     instance->_table = (RSMutableDictionaryRef)RSRetain(pces);
     if (supers) instance->_superProtocols = RSMutableCopy(allocator, supers);
-    
+    __RSRuntimeSetInstanceSpecial(instance, YES);
     __RSProtocolCacheAddProtocol(instance);
     return instance;
 }

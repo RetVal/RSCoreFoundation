@@ -1,5 +1,8 @@
 //
 // Prefix header for all source files of the 'RSCoreFoundation' target in the 'RSCoreFoundation' project
 //
+
 #include <RSCoreFoundation/RSBase.h>
 #include "RSInternal.h"
+#include "RSBase/Core/BaseStructure/RSPrivate/libcurl/curl_config.h"
+

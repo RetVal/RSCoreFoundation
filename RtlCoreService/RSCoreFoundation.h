@@ -14,6 +14,7 @@
 #include <RSCoreFoundation/RSArchiverRoutine.h>
 #include <RSCoreFoundation/RSArray.h>
 #include <RSCoreFoundation/RSAutoreleasePool.h>
+#include <RSCoreFoundation/RSBag.h>
 #include <RSCoreFoundation/RSBaseHash.h>
 #include <RSCoreFoundation/RSBaseMacro.h>
 #include <RSCoreFoundation/RSBaseType.h>
@@ -51,6 +52,8 @@
 #include <RSCoreFoundation/RSTimer.h>
 #include <RSCoreFoundation/RSTimeZone.h>
 #include <RSCoreFoundation/RSURL.h>
+#include <RSCoreFoundation/RSURLRequest.h>
+#include <RSCoreFoundation/RSURLConnection.h>
 #include <RSCoreFoundation/RSUUID.h>
 #include <RSCoreFoundation/RSXMLParser.h>
 

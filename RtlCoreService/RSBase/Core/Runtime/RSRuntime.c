@@ -328,6 +328,7 @@ RSExport uintptr_t __RSDoExternRefOperation(uintptr_t op, void* obj)
     return 0;
 }
 
+#if !defined(RSBasicHashVersion) || (RSBasicHashVersion == 1)
 static void __RSExternRefNullFreeCallbacks(RSConstBasicHashRef ht, RSAllocatorRef allocator, RSBasicHashCallbacks *cb) {
 }
 
@@ -397,6 +398,10 @@ static RSBasicHashCallbacks *__RSExternRefNullCopyCallbacks(RSConstBasicHashRef 
 {
     return (RSBasicHashCallbacks *)&RSExternRefCallbacks;
 }
+#elif (RSBasicHashVersion == 2)
+static RSBasicHashCallbacks RSExternRefCallbacks = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+
+#endif
 
 RSExport RSTypeRef  __RSRuntimeInstanceRetain(RSTypeRef obj, BOOL try)
 {

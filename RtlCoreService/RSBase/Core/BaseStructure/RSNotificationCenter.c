@@ -421,7 +421,7 @@ static void __RSProcessInNotificationCenterDeallocate(RSNotificationCenterRef nc
     
     if (nc->_queue) RSRelease(nc->_queue);
     nc->_queue = nil;
-    if (nc->_sendSource) RSRunLoopSourceRemoveFromRunLoop(nc->_sendSource, RSRunLoopDefault);
+    if (nc->_sendSource) RSRunLoopRemoveSource(RSRunLoopGetCurrent(), nc->_sendSource, RSRunLoopDefault);
     nc->_sendSource = nil;
 }
 
@@ -709,7 +709,7 @@ static void __RSNotificationCenterPostImmediately(RSNotificationCenterRef notifi
 			//                    mode = runMode;
 			//                }
 			//            }
-            RSRunLoopAddSource(RSRunLoopCurrentLoop(), task, mode);    // current loop.
+            RSRunLoopAddSource(RSRunLoopGetCurrent(), task, mode);    // current loop.
             ____RSNotificationCenterProcessInUnlockObservers(notificationCenter);
             RSRunLoopRun();
             //RSRelease(__runtimeObserver);
@@ -946,7 +946,7 @@ static void __RSDistributedNotificationCenterClassDeallocate(RSTypeRef rs)
     if (nc->_queueForNotification) RSRelease(nc->_queueForNotification);
     nc->_queueForNotification = nil;
     
-    if (nc->_sendSource) RSRunLoopSourceRemoveFromRunLoop(nc->_sendSource, RSRunLoopDefault);
+    if (nc->_sendSource) RSRunLoopRemoveSource(RSRunLoopGetCurrent(), nc->_sendSource, RSRunLoopDefault);
     nc->_sendSource = nil;
 }
 

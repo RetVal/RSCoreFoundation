@@ -11,6 +11,10 @@
 #define RSCoreFoundation_RSBasicHash_h
 RS_EXTERN_C_BEGIN
 
+#ifndef RSBasicHashVersion
+#define RSBasicHashVersion 2
+#endif
+
 struct __RSFastEnumerationStateEquivalent2 {
     unsigned long state;
     //  Arbitrary state information used by the iterator. Typically this is set to 0 at the beginning of the iteration.
@@ -82,6 +86,7 @@ RSInline void RSBasicHashMakeImmutable(RSBasicHashRef ht)
 typedef struct __RSBasicHashCallbacks RSBasicHashCallbacks;
 
 struct __RSBasicHashCallbacks {
+#if !defined(RSBasicHashVersion) || RSBasicHashVersion == 1
     RSBasicHashCallbacks *(*copyCallbacks)(RSConstBasicHashRef ht, RSAllocatorRef allocator, RSBasicHashCallbacks *cb);	// Return new value
     void (*freeCallbacks)(RSConstBasicHashRef ht, RSAllocatorRef allocator, RSBasicHashCallbacks *cb);
     uintptr_t (*retainValue)(RSConstBasicHashRef ht, uintptr_t stack_value);	// Return 2nd arg or new value
@@ -95,19 +100,36 @@ struct __RSBasicHashCallbacks {
     RSStringRef (*copyValueDescription)(RSConstBasicHashRef ht, uintptr_t stack_value);
     RSStringRef (*copyKeyDescription)(RSConstBasicHashRef ht, uintptr_t stack_key);
     uintptr_t context[0]; // variable size; any pointers in here must remain valid as long as the RSBasicHash
+#elif RSBasicHashVersion == 2
+    uintptr_t (*retainValue)(RSAllocatorRef alloc, uintptr_t stack_value);	// Return 2nd arg or new value
+    uintptr_t (*retainKey)(RSAllocatorRef alloc, uintptr_t stack_key);	// Return 2nd arg or new key
+    void (*releaseValue)(RSAllocatorRef alloc, uintptr_t stack_value);
+    void (*releaseKey)(RSAllocatorRef alloc, uintptr_t stack_key);
+    BOOL (*equateValues)(uintptr_t coll_value1, uintptr_t stack_value2); // 1st arg is in-collection value, 2nd arg is probe parameter OR in-collection value for a second collection
+    BOOL (*equateKeys)(uintptr_t coll_key1, uintptr_t stack_key2); // 1st arg is in-collection key, 2nd arg is probe parameter
+    RSHashCode (*hashKey)(uintptr_t stack_key);
+    uintptr_t (*getIndirectKey)(uintptr_t coll_value);	// Return key; 1st arg is in-collection value
+    RSStringRef (*copyValueDescription)(uintptr_t stack_value);
+    RSStringRef (*copyKeyDescription)(uintptr_t stack_key);
+#endif
 };
 BOOL RSBasicHashHasStrongValues(RSConstBasicHashRef ht) RS_AVAILABLE(0_0);
 BOOL RSBasicHashHasStrongKeys(RSConstBasicHashRef ht) RS_AVAILABLE(0_0);
 
+#if !defined(RSBasicHashVersion) || (RSBasicHashVersion == 1)
 uint16_t RSBasicHashGetSpecialBits(RSConstBasicHashRef ht) RS_AVAILABLE(0_0);
 uint16_t RSBasicHashSetSpecialBits(RSBasicHashRef ht, uint16_t bits) RS_AVAILABLE(0_0);
+const RSBasicHashCallbacks *RSBasicHashGetCallbacks(RSConstBasicHashRef ht) RS_AVAILABLE(0_0);
+#elif (RSBasicHashVersion == 2)
+void RSBasicHashSuppressRC(RSBasicHashRef ht) RS_AVAILABLE(0_3);
+void RSBasicHashUnsuppressRC(RSBasicHashRef ht) RS_AVAILABLE(0_3);
+#endif
 
 RSOptionFlags RSBasicHashGetFlags(RSConstBasicHashRef ht) RS_AVAILABLE(0_0);
 RSIndex RSBasicHashGetNumBuckets(RSConstBasicHashRef ht) RS_AVAILABLE(0_0);
 RSIndex RSBasicHashGetCapacity(RSConstBasicHashRef ht) RS_AVAILABLE(0_0);
 void RSBasicHashSetCapacity(RSBasicHashRef ht, RSIndex capacity) RS_AVAILABLE(0_0);
 
-const RSBasicHashCallbacks *RSBasicHashGetCallbacks(RSConstBasicHashRef ht) RS_AVAILABLE(0_0);
 RSIndex RSBasicHashGetCount(RSConstBasicHashRef ht) RS_AVAILABLE(0_0);
 RSBasicHashBucket RSBasicHashGetBucket(RSConstBasicHashRef ht, RSIndex idx) RS_AVAILABLE(0_0);
 RSBasicHashBucket RSBasicHashFindBucket(RSConstBasicHashRef ht, uintptr_t stack_key) RS_AVAILABLE(0_0);
@@ -130,13 +152,13 @@ void RSBasicHashRemoveIntValueAndDec(RSBasicHashRef ht, uintptr_t int_value) RS_
 
 size_t RSBasicHashGetSize(RSConstBasicHashRef ht, BOOL total) RS_AVAILABLE(0_0);
 
-RSStringRef RSBasicHashCopyDescription(RSConstBasicHashRef ht, BOOL detailed, RSStringRef linePrefix, RSStringRef entryLinePrefix, BOOL describeElements) RS_AVAILABLE(0_0);
+RSStringRef RSBasicHashDescription(RSConstBasicHashRef ht, BOOL detailed, RSStringRef linePrefix, RSStringRef entryLinePrefix, BOOL describeElements) RS_AVAILABLE(0_0);
 
 RSTypeID RSBasicHashGetTypeID(void) RS_AVAILABLE(0_0);
 
 extern BOOL __RSBasicHashEqual(RSTypeRef obj1, RSTypeRef obj2) RS_AVAILABLE(0_0);
 extern RSHashCode __RSBasicHashHash(RSTypeRef obj) RS_AVAILABLE(0_0);
-extern RSStringRef __RSBasicHashCopyDescription(RSTypeRef obj) RS_AVAILABLE(0_0);
+extern RSStringRef __RSBasicHashDescription(RSTypeRef obj) RS_AVAILABLE(0_0);
 extern void __RSBasicHashDeallocate(RSTypeRef obj) RS_AVAILABLE(0_0);
 extern unsigned long __RSBasicHashFastEnumeration(RSConstBasicHashRef ht, struct __RSFastEnumerationStateEquivalent2 *state, void *stackbuffer, unsigned long count) RS_AVAILABLE(0_0);
 

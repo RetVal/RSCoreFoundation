@@ -63,11 +63,47 @@ typedef RSComparisonResult (*COMPARATOR)(RSIndex, RSIndex);
 #endif
 
 RSExport void RSSortIndexes(RSIndex *indexBuffer, RSIndex count, RSOptionFlags opts, COMPARATOR cmp, RSComparisonOrder order);
+extern void caller();
+extern void __runtime_vm_pressure_handler(void *context __unused);
+extern void __runtime_malloc_vm_pressure_setup(void);
 
 @implementation RSCoreFoundationTestAppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+//    __runtime_malloc_vm_pressure_setup();
+//    RSAutoreleasePoolRef pool = RSAutoreleasePoolCreate(RSAllocatorDefault);
+//    RSLog(RSSTR("%r"), RSAutorelease(RSStringWithFormat(RSSTR("%s"), "fuck")));
+//    RSAutoreleasePoolDrain(pool);
+    return;
+    caller();
+    uint32_t pages_reclaimed = 0;
+    int pressure = 0;
+    int vm_pressure_monitor(int wait_for_pressure, int nsecs_monitored, uint32_t *pages_reclaimed);
+    pressure = vm_pressure_monitor(0, 100000, &pages_reclaimed);
+    NSLog(@"pressure = %d, reclamied = %d", pressure, pages_reclaimed);
+    NSLog(@"START");
+    @autoreleasepool {
+        for (NSUInteger idx = 0; idx < 10000000; idx++) {
+            [NSString stringWithFormat:@"%ld", idx];
+        }
+    }
+    NSLog(@"END");
+    pressure = vm_pressure_monitor(0, 100000, &pages_reclaimed);
+    NSLog(@"pressure = %d, reclamied = %d", pressure, pages_reclaimed);
+    RSPerformBlockAfterDelay(10.0f, ^{
+        __runtime_vm_pressure_handler(nil);
+        __runtime_vm_pressure_handler(nil);
+        __runtime_vm_pressure_handler(nil);
+        __runtime_vm_pressure_handler(nil);
+        __runtime_vm_pressure_handler(nil);
+        uint32_t pages_reclaimed = 0;
+        int pressure = vm_pressure_monitor(0, 100000, &pages_reclaimed);
+        NSLog(@"pressure = %d, reclamied = %d", pressure, pages_reclaimed);
+    });
+//    __runtime_malloc_vm_pressure_handler(nil);
+    return;
+    return;
     RSStringRef path = RSFileManagerStandardizingPath(RSSTR("~/Desktop/dict.plist"));
     RSShow(path);
     RSURLRef rsurl = RSURLCreateWithFileSystemPathRelativeToBase(RSAllocatorDefault, path, RSURLPOSIXPathStyle, NO, nil);
@@ -123,12 +159,6 @@ RSExport void RSSortIndexes(RSIndex *indexBuffer, RSIndex count, RSOptionFlags o
     RSDataWriteToFile(RSAutorelease(RSArchiverCopyData(archiver)), RSFileManagerStandardizingPath(RSSTR("~/Desktop/RSBundle.archiver.plist")), RSWriteFileAutomatically);
     RSRelease(archiver);
     return;
-    RSShow(RSSTR("START"));
-    for (RSUInteger idx = 0; idx < 1000000; idx++) {
-        RSNumberCreate(RSAllocatorDefault, RSNumberInteger, &idx);
-    }
-    RSShow(RSSTR("END"));
-    return ;
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification

@@ -2407,7 +2407,7 @@ RSExport RSIndex RSArrayGetCountOfObject(RSArrayRef array, RSRange range, const 
     return count;
 }
 
-BOOL RSArrayContainsObject(RSArrayRef array, RSRange range, const void *value)
+RSExport BOOL RSArrayContainsObject(RSArrayRef array, RSRange range, const void *value)
 {
     RSIndex idx;
     __RSGenericValidInstance(array, __RSArrayTypeID);

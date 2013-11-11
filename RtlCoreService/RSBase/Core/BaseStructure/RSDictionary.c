@@ -424,7 +424,7 @@ static void __RSDictionaryAddValue(RSMutableDictionaryRef dictionary, const void
             __RSDictionaryCountIncrenment(dictionary);
         else
         {
-                // the key is already existing, should replace it.
+            // the key is already existing, should replace it.
             rbtree_container_node* find = rbtree_container_replace(rbt, node);
             if (find)
             {
@@ -508,9 +508,9 @@ RSPrivate void __RSDictionaryCleanAllObjects(RSMutableDictionaryRef dictionary)
     {
         tpc = pc;
         //__RSCLog(RSLogLevelDebug, "%s\n",tpc->key);
-            //1 << 3
+        //1 << 3
         RSDeallocateInstance(tpc->value);
-            //RSRelease(tpc->value);
+        //RSRelease(tpc->value);
         pc = rbtree_container_next(pc);
         rbtree_container_erase(rbt, tpc);
 		rbtree_container_node_free(tpc);
@@ -713,7 +713,7 @@ RSExport RSArrayRef RSDictionaryAllKeys(RSDictionaryRef dictionary)
     }
     
     return array;
-
+    
 }
 
 RSExport RSArrayRef RSDictionaryAllValues(RSDictionaryRef dictionary)
@@ -722,7 +722,7 @@ RSExport RSArrayRef RSDictionaryAllValues(RSDictionaryRef dictionary)
     if (dictionary->_context == RSDictionaryNilValueContext) return nil;
     RSIndex cnt = __RSDictionaryCount(dictionary);
     RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorSystemDefault, cnt);
-
+    
     rbtree_container* rbt = __RSDictionaryRoot(dictionary);
     rbtree_container_node* pc = rbtree_container_first(rbt), *tpc = nil;
     while (pc)
@@ -731,7 +731,7 @@ RSExport RSArrayRef RSDictionaryAllValues(RSDictionaryRef dictionary)
         RSArrayAddObject(array, tpc->value);
         pc = rbtree_container_next(pc);
     }
-
+    
     return array;
 }
 
@@ -859,7 +859,7 @@ static RSHashCode __RSDictionaryHash(RSTypeRef rs) {
 }
 
 static RSStringRef __RSDictionaryCopyDescription(RSTypeRef rs) {
-    return RSBasicHashCopyDescription(rs, NO, RSSTR(""), RSSTR("\t"), YES);
+    return RSBasicHashDescription(rs, NO, RSSTR(""), RSSTR("\t"), YES);
 }
 
 static void __RSDictionaryDeallocate(RSTypeRef rs) {
@@ -893,6 +893,7 @@ RSTypeID RSDictionaryGetTypeID(void) {
     return _RSDictionaryTypeID;
 }
 
+#if !defined(RSBasicHashVersion) || (RSBasicHashVersion == 1)
 #define GCRETAIN(A, B) RSTypeSetCallBacks.retain(A, B)
 #define GCRELEASE(A, B) RSTypeSetCallBacks.release(A, B)
 
@@ -1186,7 +1187,7 @@ static RSBasicHashRef __RSDictionaryCreateGeneric(RSAllocatorRef allocator, cons
     return ht;
 }
 
-__private_extern__ RSHashRef __RSDictionaryCreateTransfer(RSAllocatorRef allocator, const_any_pointer_t *klist, const_any_pointer_t *vlist, RSIndex numValues)
+RSPrivate RSHashRef __RSDictionaryCreateTransfer(RSAllocatorRef allocator, const_any_pointer_t *klist, const_any_pointer_t *vlist, RSIndex numValues)
 {
     RSTypeID typeID = RSDictionaryGetTypeID();
     RSAssert2(0 <= numValues, __RSLogAssertion, "%s(): numValues (%ld) cannot be less than zero", __PRETTY_FUNCTION__, numValues);
@@ -1201,12 +1202,144 @@ __private_extern__ RSHashRef __RSDictionaryCreateTransfer(RSAllocatorRef allocat
     }
     RSBasicHashSetSpecialBits(ht, 0x0000);
     RSBasicHashMakeImmutable(ht);
-//    *(uintptr_t *)ht = __RSISAForTypeID(typeID);
+    //    *(uintptr_t *)ht = __RSISAForTypeID(typeID);
     __RSRuntimeSetInstanceTypeID(ht, typeID);
-//    if (__RSOASafe) __RSSetLastAllocationEventName(ht, "RSDictionary (immutable)");
+    //    if (__RSOASafe) __RSSetLastAllocationEventName(ht, "RSDictionary (immutable)");
     return (RSHashRef)ht;
 }
+#elif (RSBasicHashVersion == 2)
+static RSBasicHashRef __RSDictionaryCreateGeneric(RSAllocatorRef allocator, const RSHashKeyCallBacks *keyCallBacks, const RSHashValueCallBacks *valueCallBacks, BOOL useValueCB) {
+    RSOptionFlags flags = RSBasicHashLinearHashing; // RSBasicHashExponentialHashing
+    flags |= (RSDictionary ? RSBasicHashHasKeys : 0) | (RSBag ? RSBasicHashHasCounts : 0);
+    
+    if (RS_IS_COLLECTABLE_ALLOCATOR(allocator)) { // all this crap is just for figuring out two flags for GC in the way done historically; it probably simplifies down to three lines, but we let the compiler worry about that
+        BOOL set_cb = false;
+        BOOL std_cb = false;
+        const_any_pointer_t (*key_retain)(RSAllocatorRef, const_any_pointer_t) = NULL;
+        void (*key_release)(RSAllocatorRef, const_any_pointer_t) = NULL;
+        const_any_pointer_t (*value_retain)(RSAllocatorRef, const_any_pointer_t) = NULL;
+        void (*value_release)(RSAllocatorRef, const_any_pointer_t) = NULL;
+        
+        if ((NULL == keyCallBacks) && (!useValueCB || NULL == valueCallBacks)) {
+            BOOL keyRetainNull = NULL == keyCallBacks || NULL == keyCallBacks->retain;
+            BOOL keyReleaseNull = NULL == keyCallBacks || NULL == keyCallBacks->release;
+            BOOL keyEquateNull = NULL == keyCallBacks || NULL == keyCallBacks->equal;
+            BOOL keyHashNull = NULL == keyCallBacks || NULL == keyCallBacks->hash;
+            BOOL keyDescribeNull = NULL == keyCallBacks || NULL == keyCallBacks->description;
+            
+            BOOL valueRetainNull = (useValueCB && (NULL == valueCallBacks || NULL == valueCallBacks->retain)) || (!useValueCB && keyRetainNull);
+            BOOL valueReleaseNull = (useValueCB && (NULL == valueCallBacks || NULL == valueCallBacks->release)) || (!useValueCB && keyReleaseNull);
+            BOOL valueEquateNull = (useValueCB && (NULL == valueCallBacks || NULL == valueCallBacks->equal)) || (!useValueCB && keyEquateNull);
+            BOOL valueDescribeNull = (useValueCB && (NULL == valueCallBacks || NULL == valueCallBacks->description)) || (!useValueCB && keyDescribeNull);
+            
+            BOOL keyRetainStd = keyRetainNull || __RSTypeCollectionRetain == keyCallBacks->retain;
+            BOOL keyReleaseStd = keyReleaseNull || __RSTypeCollectionRelease == keyCallBacks->release;
+            BOOL keyEquateStd = keyEquateNull || RSEqual == keyCallBacks->equal;
+            BOOL keyHashStd = keyHashNull || RSHash == keyCallBacks->hash;
+            BOOL keyDescribeStd = keyDescribeNull || RSDescription == keyCallBacks->description;
+            
+            BOOL valueRetainStd = (useValueCB && (valueRetainNull || __RSTypeCollectionRetain == valueCallBacks->retain)) || (!useValueCB && keyRetainStd);
+            BOOL valueReleaseStd = (useValueCB && (valueReleaseNull || __RSTypeCollectionRelease == valueCallBacks->release)) || (!useValueCB && keyReleaseStd);
+            BOOL valueEquateStd = (useValueCB && (valueEquateNull || RSEqual == valueCallBacks->equal)) || (!useValueCB && keyEquateStd);
+            BOOL valueDescribeStd = (useValueCB && (valueDescribeNull || RSDescription == valueCallBacks->description)) || (!useValueCB && keyDescribeStd);
+            
+            if (keyRetainStd && keyReleaseStd && keyEquateStd && keyHashStd && keyDescribeStd && valueRetainStd && valueReleaseStd && valueEquateStd && valueDescribeStd) {
+                set_cb = true;
+                if (!(keyRetainNull || keyReleaseNull || keyEquateNull || keyHashNull || keyDescribeNull || valueRetainNull || valueReleaseNull || valueEquateNull || valueDescribeNull)) {
+                    std_cb = true;
+                } else {
+                    // just set these to tickle the GC Strong logic below in a way that mimics past practice
+                    key_retain = keyCallBacks ? keyCallBacks->retain : NULL;
+                    key_release = keyCallBacks ? keyCallBacks->release : NULL;
+                    if (useValueCB) {
+                        value_retain = valueCallBacks ? valueCallBacks->retain : NULL;
+                        value_release = valueCallBacks ? valueCallBacks->release : NULL;
+                    } else {
+                        value_retain = key_retain;
+                        value_release = key_release;
+                    }
+                }
+            }
+        }
+        
+        if (!set_cb) {
+            key_retain = keyCallBacks ? keyCallBacks->retain : NULL;
+            key_release = keyCallBacks ? keyCallBacks->release : NULL;
+            if (useValueCB) {
+                value_retain = valueCallBacks ? valueCallBacks->retain : NULL;
+                value_release = valueCallBacks ? valueCallBacks->release : NULL;
+            } else {
+                value_retain = key_retain;
+                value_release = key_release;
+            }
+        }
+        
+        if (std_cb || value_retain != NULL || value_release != NULL) {
+            flags |= RSBasicHashStrongValues;
+        }
+        if (std_cb || key_retain != NULL || key_release != NULL) {
+            flags |= RSBasicHashStrongKeys;
+        }
+    }
+    
+    
+    RSBasicHashCallbacks callbacks;
+    callbacks.retainKey = keyCallBacks ? (uintptr_t (*)(RSAllocatorRef, uintptr_t))keyCallBacks->retain : NULL;
+    callbacks.releaseKey = keyCallBacks ? (void (*)(RSAllocatorRef, uintptr_t))keyCallBacks->release : NULL;
+    callbacks.equateKeys = keyCallBacks ? (BOOL (*)(uintptr_t, uintptr_t))keyCallBacks->equal : NULL;
+    callbacks.hashKey = keyCallBacks ? (RSHashCode (*)(uintptr_t))keyCallBacks->hash : NULL;
+    callbacks.getIndirectKey = NULL;
+    callbacks.copyKeyDescription = keyCallBacks ? (RSStringRef (*)(uintptr_t))keyCallBacks->description : NULL;
+    callbacks.retainValue = useValueCB ? (valueCallBacks ? (uintptr_t (*)(RSAllocatorRef, uintptr_t))valueCallBacks->retain : NULL) : (callbacks.retainKey);
+    callbacks.releaseValue = useValueCB ? (valueCallBacks ? (void (*)(RSAllocatorRef, uintptr_t))valueCallBacks->release : NULL) : (callbacks.releaseKey);
+    callbacks.equateValues = useValueCB ? (valueCallBacks ? (BOOL (*)(uintptr_t, uintptr_t))valueCallBacks->equal : NULL) : (callbacks.equateKeys);
+    callbacks.copyValueDescription = useValueCB ? (valueCallBacks ? (RSStringRef (*)(uintptr_t))valueCallBacks->description : NULL) : (callbacks.copyKeyDescription);
+    
+    RSBasicHashRef ht = RSBasicHashCreate(allocator, flags, &callbacks);
+    return ht;
+}
 
+#if RSDictionary
+RSPrivate RSHashRef __RSDictionaryCreateTransfer(RSAllocatorRef allocator, const_any_pointer_t *klist, const_any_pointer_t *vlist, RSIndex numValues)
+#endif
+#if RSSet || RSBag
+RSPrivate RSHashRef __RSDictionaryCreateTransfer(RSAllocatorRef allocator, const_any_pointer_t *klist, RSIndex numValues)
+
+#endif
+{
+#if RSSet || RSBag
+    const_any_pointer_t *vlist = klist;
+#endif
+    RSTypeID typeID = RSDictionaryGetTypeID();
+    RSAssert2(0 <= numValues, __RSLogAssertion, "%s(): numValues (%ld) cannot be less than zero", __PRETTY_FUNCTION__, numValues);
+    RSOptionFlags flags = RSBasicHashLinearHashing; // RSBasicHashExponentialHashing
+    flags |= (RSDictionary ? RSBasicHashHasKeys : 0) | (RSBag ? RSBasicHashHasCounts : 0);
+    
+    RSBasicHashCallbacks callbacks;
+    callbacks.retainKey = (uintptr_t (*)(RSAllocatorRef, uintptr_t))RSTypeDictionaryKeyCallBacks.retain;
+    callbacks.releaseKey = (void (*)(RSAllocatorRef, uintptr_t))RSTypeDictionaryKeyCallBacks.release;
+    callbacks.equateKeys = (BOOL (*)(uintptr_t, uintptr_t))RSTypeDictionaryKeyCallBacks.equal;
+    callbacks.hashKey = (RSHashCode (*)(uintptr_t))RSTypeDictionaryKeyCallBacks.hash;
+    callbacks.getIndirectKey = NULL;
+    callbacks.copyKeyDescription = (RSStringRef (*)(uintptr_t))RSTypeDictionaryKeyCallBacks.description;
+    callbacks.retainValue = RSDictionary ? (uintptr_t (*)(RSAllocatorRef, uintptr_t))RSTypeDictionaryValueCallBacks.retain : callbacks.retainKey;
+    callbacks.releaseValue = RSDictionary ? (void (*)(RSAllocatorRef, uintptr_t))RSTypeDictionaryValueCallBacks.release : callbacks.releaseKey;
+    callbacks.equateValues = RSDictionary ? (BOOL (*)(uintptr_t, uintptr_t))RSTypeDictionaryValueCallBacks.equal : callbacks.equateKeys;
+    callbacks.copyValueDescription = RSDictionary ? (RSStringRef (*)(uintptr_t))RSTypeDictionaryValueCallBacks.description : callbacks.copyKeyDescription;
+    
+    RSBasicHashRef ht = RSBasicHashCreate(allocator, flags, &callbacks);
+    RSBasicHashSuppressRC(ht);
+    if (0 < numValues) RSBasicHashSetCapacity(ht, numValues);
+    for (RSIndex idx = 0; idx < numValues; idx++) {
+        RSBasicHashAddValue(ht, (uintptr_t)klist[idx], (uintptr_t)vlist[idx]);
+    }
+    RSBasicHashUnsuppressRC(ht);
+    RSBasicHashMakeImmutable(ht);
+    __RSRuntimeSetInstanceTypeID(ht, typeID);
+    //        if (__RSOASafe) __RSSetLastAllocationEventName(ht, "RSDictionary (immutable)");
+    return (RSHashRef)ht;
+}
+#endif
 RSExport RSHashRef RSDictionaryCreate(RSAllocatorRef allocator, const_any_pointer_t *klist, const_any_pointer_t *vlist, const RSDictionaryContext *context, RSIndex numValues) {
     RSTypeID typeID = RSDictionaryGetTypeID();
     RSAssert2(0 <= numValues, __RSLogAssertion, "%s(): numValues (%ld) cannot be less than zero", __PRETTY_FUNCTION__, numValues);
@@ -1217,9 +1350,9 @@ RSExport RSHashRef RSDictionaryCreate(RSAllocatorRef allocator, const_any_pointe
         RSBasicHashAddValue(ht, (uintptr_t)klist[idx], (uintptr_t)vlist[idx]);
     }
     RSBasicHashMakeImmutable(ht);
-//    *(uintptr_t *)ht = __RSISAForTypeID(typeID);
+    //    *(uintptr_t *)ht = __RSISAForTypeID(typeID);
     __RSRuntimeSetInstanceTypeID(ht, typeID);
-//    if (__RSOASafe) __RSSetLastAllocationEventName(ht, "RSDictionary (immutable)");
+    //    if (__RSOASafe) __RSSetLastAllocationEventName(ht, "RSDictionary (immutable)");
     return (RSHashRef)ht;
 }
 
@@ -1228,9 +1361,9 @@ RSExport RSMutableHashRef RSDictionaryCreateMutable(RSAllocatorRef allocator, RS
     RSAssert2(0 <= capacity, __RSLogAssertion, "%s(): capacity (%ld) cannot be less than zero", __PRETTY_FUNCTION__, capacity);
     RSBasicHashRef ht = __RSDictionaryCreateGeneric(allocator, context ? context->keyContext : nil, context ? context->valueContext : nil, RSDictionary);
     if (!ht) return NULL;
-//    *(uintptr_t *)ht = __RSISAForTypeID(typeID);
+    //    *(uintptr_t *)ht = __RSISAForTypeID(typeID);
     __RSRuntimeSetInstanceTypeID(ht, typeID);
-//    if (__RSOASafe) __RSSetLastAllocationEventName(ht, "RSDictionary (mutable)");
+    //    if (__RSOASafe) __RSSetLastAllocationEventName(ht, "RSDictionary (mutable)");
     return (RSMutableHashRef)ht;
 }
 
@@ -1258,9 +1391,9 @@ RSExport RSHashRef RSDictionaryCreateCopy(RSAllocatorRef allocator, RSHashRef ot
     }
     if (!ht) return NULL;
     RSBasicHashMakeImmutable(ht);
-//    *(uintptr_t *)ht = __RSISAForTypeID(typeID);
+    //    *(uintptr_t *)ht = __RSISAForTypeID(typeID);
     __RSRuntimeSetInstanceTypeID(ht, typeID);
-//    if (__RSOASafe) __RSSetLastAllocationEventName(ht, "RSDictionary (immutable)");
+    //    if (__RSOASafe) __RSSetLastAllocationEventName(ht, "RSDictionary (immutable)");
     return (RSHashRef)ht;
 }
 
@@ -1268,7 +1401,7 @@ RSExport RSMutableHashRef RSDictionaryCreateMutableCopy(RSAllocatorRef allocator
     RSTypeID typeID = RSDictionaryGetTypeID();
     RSAssert1(other, __RSLogAssertion, "%s(): other RSDictionary cannot be NULL", __PRETTY_FUNCTION__);
     __RSGenericValidInstance(other, typeID);
-//    RSAssert2(0 <= capacity, __RSLogAssertion, "%s(): capacity (%ld) cannot be less than zero", __PRETTY_FUNCTION__, capacity);
+    //    RSAssert2(0 <= capacity, __RSLogAssertion, "%s(): capacity (%ld) cannot be less than zero", __PRETTY_FUNCTION__, capacity);
     RSBasicHashRef ht = NULL;
     if (RS_IS_OBJC(typeID, other)) {
         RSIndex numValues = RSDictionaryGetCount(other);
@@ -1287,9 +1420,9 @@ RSExport RSMutableHashRef RSDictionaryCreateMutableCopy(RSAllocatorRef allocator
         ht = RSBasicHashCreateCopy(allocator, (RSBasicHashRef)other);
     }
     if (!ht) return NULL;
-//    *(uintptr_t *)ht = __RSISAForTypeID(typeID);
+    //    *(uintptr_t *)ht = __RSISAForTypeID(typeID);
     __RSRuntimeSetInstanceTypeID(ht, typeID);
-//    if (__RSOASafe) __RSSetLastAllocationEventName(ht, "RSDictionary (mutable)");
+    //    if (__RSOASafe) __RSSetLastAllocationEventName(ht, "RSDictionary (mutable)");
     return (RSMutableHashRef)ht;
 }
 
@@ -1610,20 +1743,20 @@ RSExport RSMutableDictionaryRef RSDictionaryCreateWithObjectsAndOKeys(RSAllocato
 
 RSPrivate void __RSDictionaryCleanAllObjects(RSMutableDictionaryRef dictionary)
 {
-//    rbtree_container* rbt = __RSDictionaryRoot(dictionary);
-//    rbtree_container_node* pc = rbtree_container_first(rbt), *tpc = nil;
-//    //RSIndex refcnt = 0;
-//    while (pc)
-//    {
-//        tpc = pc;
-//        //__RSCLog(RSLogLevelDebug, "%s\n",tpc->key);
-//        //1 << 3
-//        RSDeallocateInstance(tpc->value);
-//        //RSRelease(tpc->value);
-//        pc = rbtree_container_next(pc);
-//        rbtree_container_erase(rbt, tpc);
-//		rbtree_container_node_free(tpc);
-//    }
+    //    rbtree_container* rbt = __RSDictionaryRoot(dictionary);
+    //    rbtree_container_node* pc = rbtree_container_first(rbt), *tpc = nil;
+    //    //RSIndex refcnt = 0;
+    //    while (pc)
+    //    {
+    //        tpc = pc;
+    //        //__RSCLog(RSLogLevelDebug, "%s\n",tpc->key);
+    //        //1 << 3
+    //        RSDeallocateInstance(tpc->value);
+    //        //RSRelease(tpc->value);
+    //        pc = rbtree_container_next(pc);
+    //        rbtree_container_erase(rbt, tpc);
+    //		rbtree_container_node_free(tpc);
+    //    }
     RSDictionaryApply(dictionary, ^(const void *key, const void *value, void *context) {
         __RSRuntimeSetInstanceSpecial(value, NO);
     }, nil);

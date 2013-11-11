@@ -105,3 +105,93 @@ void _RSCloseHandle(RSHandle handle)
 #endif
     return;
 }
+
+static const char *__RSProcessPath = NULL;
+static const char *__RSprogname = NULL;
+
+const char **_RSGetProgname(void) {
+    if (!__RSprogname)
+        _RSProcessPath();		// sets up __RSprogname as a side-effect
+    return &__RSprogname;
+}
+
+const char **_RSGetProcessPath(void) {
+    if (!__RSProcessPath)
+        _RSProcessPath();		// sets up __RSProcessPath as a side-effect
+    return &__RSProcessPath;
+}
+
+#if DEPLOYMENT_TARGET_WINDOWS
+const char *_RSProcessPath(void) {
+    if (__RSProcessPath) return __RSProcessPath;
+    wchar_t buf[RSMaxPathSize] = {0};
+    DWORD rlen = GetModuleFileNameW(NULL, buf, sizeof(buf) / sizeof(buf[0]));
+    if (0 < rlen) {
+        char asciiBuf[RSMaxPathSize] = {0};
+        int res = WideCharToMultiByte(CP_UTF8, 0, buf, rlen, asciiBuf, sizeof(asciiBuf) / sizeof(asciiBuf[0]), NULL, NULL);
+        if (0 < res) {
+            __RSProcessPath = strdup(asciiBuf);
+            __RSprogname = strrchr(__RSProcessPath, PATH_SEP);
+            __RSprogname = (__RSprogname ? __RSprogname + 1 : __RSProcessPath);
+        }
+    }
+    if (!__RSProcessPath) {
+        __RSProcessPath = "";
+        __RSprogname = __RSProcessPath;
+    }
+    return __RSProcessPath;
+}
+#endif
+
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
+const char *_RSProcessPath(void) {
+    if (__RSProcessPath) return __RSProcessPath;
+#if DEPLOYMENT_TARGET_MACOSX
+    if (!issetugid()) {
+        const char *path = (char *)__RSRuntimeGetEnvironment("RSProcessPath");
+        if (path) {
+            __RSProcessPath = strdup(path);
+            __RSprogname = strrchr(__RSProcessPath, PATH_SEP);
+            __RSprogname = (__RSprogname ? __RSprogname + 1 : __RSProcessPath);
+            return __RSProcessPath;
+        }
+    }
+#endif
+    uint32_t size = RSMaxPathSize;
+    char buffer[size];
+    extern int _NSGetExecutablePath(char *, uint32_t);
+    if (0 == _NSGetExecutablePath(buffer, &size)) {
+        __RSProcessPath = strdup(buffer);
+        __RSprogname = strrchr(__RSProcessPath, PATH_SEP);
+        __RSprogname = (__RSprogname ? __RSprogname + 1 : __RSProcessPath);
+    }
+    if (!__RSProcessPath) {
+        __RSProcessPath = "";
+        __RSprogname = __RSProcessPath;
+    }
+    return __RSProcessPath;
+}
+#endif
+
+#if DEPLOYMENT_TARGET_LINUX
+#include <unistd.h>
+
+const char *_RSProcessPath(void) {
+    if (__RSProcessPath) return __RSProcessPath;
+    char buf[RSMaxPathSize + 1];
+    
+    ssize_t res = readlink("/proc/self/exe", buf, RSMaxPathSize);
+    if (res > 0) {
+        // null terminate, readlink does not
+        buf[res] = 0;
+        __RSProcessPath = strdup(buf);
+        __RSprogname = strrchr(__RSProcessPath, PATH_SEP);
+        __RSprogname = (__RSprogname ? __RSprogname + 1 : __RSProcessPath);
+    } else {
+        __RSProcessPath = "";
+        __RSprogname = __RSProcessPath;
+    }
+    return __RSProcessPath;
+}
+#endif
+

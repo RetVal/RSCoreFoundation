@@ -13,6 +13,7 @@
 struct __RSDelegate
 {
     RSRuntimeBase _base;
+//    RSTypeRef _delegate;
     RSStringRef _name;
     RSMutableDictionaryRef _protocols;
 };

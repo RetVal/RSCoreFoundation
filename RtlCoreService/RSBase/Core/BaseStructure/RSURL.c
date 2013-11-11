@@ -5063,3 +5063,12 @@ RSExport RSURLRef RSURLCreateFilePathURL(RSAllocatorRef alloc, RSURLRef url, RSE
 
 RSURLRef RSURLCreateFileReferenceURL(RSAllocatorRef alloc, RSURLRef url, RSErrorRef *error) { return nil; }
 
+RSExport RSURLRef RSURLWithString(RSStringRef URLString)
+{
+    return RSAutorelease(RSURLCreateWithString(RSAllocatorSystemDefault, URLString, nil));
+}
+
+RSExport RSURLRef RSURLWithFilePath(RSStringRef URLString, BOOL isDirectory)
+{
+    return RSAutorelease(RSURLCreateWithFileSystemPath(RSAllocatorSystemDefault, URLString, RSURLPOSIXPathStyle, isDirectory));
+}

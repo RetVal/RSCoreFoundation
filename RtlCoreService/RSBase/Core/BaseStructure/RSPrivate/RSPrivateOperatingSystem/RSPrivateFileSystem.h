@@ -16,4 +16,8 @@ RSHandle __RSLoadLibrary(RSStringRef dir, RSStringRef lib);
 RSHandle _RSLoadLibrary(RSStringRef library);
 void *_RSGetImplementAddress(RSHandle handle, const char* key);
 void _RSCloseHandle(RSHandle handle);
+
+const char *_RSProcessPath(void);
+const char **_RSGetProcessPath(void);
+const char **_RSGetProgname(void);
 #endif
