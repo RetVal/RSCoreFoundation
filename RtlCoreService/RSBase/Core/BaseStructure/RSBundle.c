@@ -2433,12 +2433,12 @@ RSPrivate void __RSBundleGUnlock()
 
 RSPrivate RSBundleRef _RSBundleCopyBundleForPath(RSStringRef path, Boolean alreadyLocked)
 {
-    RSBundleRef result = NULL;
+    RSBundleRef result = nil;
     if (!alreadyLocked) __RSBundleGLock();
     if (__bundleCacheByPath) result = (RSBundleRef)RSDictionaryGetValue(__bundleCacheByPath, path);
     if (result && !result->_path)
     {
-        result = NULL;
+        result = nil;
         RSDictionaryRemoveValue(__bundleCacheByPath, path);
     }
     if (result) RSRetain(result);
@@ -2568,7 +2568,7 @@ END:
 
 RSPrivate RSBundleRef _RSBundlePrimitiveGetBundleWithIdentifierAlreadyLocked(RSStringRef bundleID)
 {
-    RSBundleRef result = NULL, bundle;
+    RSBundleRef result = nil, bundle;
     if (__bundleCacheByIdentifier && bundleID)
     {
         // Note that this array is maintained in descending order by version number
@@ -3182,7 +3182,7 @@ static RSArrayRef _RSBundleDYLDCopyLoadedImagePathsForHint(RSStringRef hint)
     }
     for (i = 0; i < numImages; i++)
     {
-        const char *curName = _dyld_get_image_name(i), *lastComponent = NULL;
+        const char *curName = _dyld_get_image_name(i), *lastComponent = nil;
         if (curName && (!processPath || 0 != strcmp(curName, processPath)) && mhp != (void *)_dyld_get_image_header(i))
             lastComponent = strrchr(curName, '/');
         if (lastComponent)
@@ -3194,13 +3194,13 @@ static RSArrayRef _RSBundleDYLDCopyLoadedImagePathsForHint(RSStringRef hint)
                                             str,
                                             range,
                                             RSCompareAnchored| RSCompareBackwards| RSCompareCaseInsensitive,
-                                            NULL) ||
+                                            nil) ||
                     (altRange.length > 0 &&
                      RSStringFindWithOptions(hint,
                                              str,
                                              altRange,
                                              RSCompareAnchored| RSCompareBackwards| RSCompareCaseInsensitive,
-                                             NULL)))
+                                             nil)))
                 {
                     RSStringRef curStr = RSStringCreateWithCString(RSAllocatorSystemDefault, curName, RSStringEncodingUTF8);
                     if (curStr)
@@ -3227,8 +3227,8 @@ static RSStringRef __RSBundleCopyFrameworkPathForExecutablePath(RSStringRef exec
     UniChar pathBuff[RSMaxPathSize] = {0};
     UniChar nameBuff[RSMaxPathSize] = {0};
     RSIndex length, nameStart, nameLength, savedLength;
-    RSMutableStringRef cheapStr = RSStringCreateMutableWithExternalCharactersNoCopy(RSAllocatorSystemDefault, NULL, 0, 0, NULL);
-    RSStringRef bundleURL = NULL;
+    RSMutableStringRef cheapStr = RSStringCreateMutableWithExternalCharactersNoCopy(RSAllocatorSystemDefault, nil, 0, 0, nil);
+    RSStringRef bundleURL = nil;
     
     length = RSStringGetLength(executablePath);
     if (length > RSMaxPathSize) length = RSMaxPathSize;
@@ -3252,7 +3252,7 @@ static RSStringRef __RSBundleCopyFrameworkPathForExecutablePath(RSStringRef exec
         bundleURL = RSURLCreateWithFileSystemPath(RSAllocatorSystemDefault, cheapStr, PLATFORM_PATH_STYLE, YES);
         if (!_RSBundleCouldBeBundle(bundleURL)) {
             RSRelease(bundleURL);
-            bundleURL = NULL;
+            bundleURL = nil;
         }
     }
     // * (Windows-only) Next check the "Executables" directory parallel to the "PrivateFrameworks" directory case.
@@ -3265,7 +3265,7 @@ static RSStringRef __RSBundleCopyFrameworkPathForExecutablePath(RSStringRef exec
             bundleURL = RSURLCreateWithFileSystemPath(RSAllocatorSystemDefault, cheapStr, PLATFORM_PATH_STYLE, YES);
             if (!_RSBundleCouldBeBundle(bundleURL)) {
                 RSRelease(bundleURL);
-                bundleURL = NULL;
+                bundleURL = nil;
             }
         }
     }
@@ -3302,7 +3302,7 @@ static RSStringRef __RSBundleCopyFrameworkPathForExecutablePath(RSStringRef exec
                     if (!_RSBundleCouldBeBundle(bundleURL))
                     {
                         RSRelease(bundleURL);
-                        bundleURL = NULL;
+                        bundleURL = nil;
                     }
                     break;
                 }
@@ -3315,7 +3315,7 @@ static RSStringRef __RSBundleCopyFrameworkPathForExecutablePath(RSStringRef exec
                 if (!_RSBundleCouldBeBundle(bundleURL))
                 {
                     RSRelease(bundleURL);
-                    bundleURL = NULL;
+                    bundleURL = nil;
                 }
                 break;
             }
@@ -3323,7 +3323,7 @@ static RSStringRef __RSBundleCopyFrameworkPathForExecutablePath(RSStringRef exec
         }
         if (!permissive) RSRelease(name);
     }
-    RSStringSetExternalCharactersNoCopy(cheapStr, NULL, 0, 0);
+    RSStringSetExternalCharactersNoCopy(cheapStr, nil, 0, 0);
     RSRelease(cheapStr);
     
     return bundleURL;
@@ -3435,7 +3435,7 @@ static void _RSBundleEnsureBundlesExistForImagePaths(RSArrayRef imagePaths)
 }
 
 static void _RSBundleEnsureBundlesUpToDateWithHintAlreadyLocked(RSStringRef hint) {
-    RSArrayRef imagePaths = NULL;
+    RSArrayRef imagePaths = nil;
     // Tickle the main bundle into existence
 #if defined(BINARY_SUPPORT_DYLD)
     imagePaths = _RSBundleDYLDCopyLoadedImagePathsForHint(hint);
@@ -3492,8 +3492,8 @@ RSPrivate void _RSBundleDlfcnUnload(RSBundleRef bundle)
         }
         else
         {
-            bundle->_connectionCookie = bundle->_handleCookie = NULL;
-            bundle->_imageCookie = bundle->_moduleCookie = NULL;
+            bundle->_connectionCookie = bundle->_handleCookie = nil;
+            bundle->_imageCookie = bundle->_moduleCookie = nil;
             bundle->_isLoaded = NO;
         }
     }

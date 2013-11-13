@@ -113,7 +113,7 @@ CURLcode Curl_input_ntlm(struct connectdata *conn,
 CURLcode Curl_output_ntlm(struct connectdata *conn,
                           bool proxy)
 {
-  char *base64 = NULL;
+  char *base64 = nil;
   size_t len = 0;
   CURLcode error;
 
@@ -161,10 +161,10 @@ CURLcode Curl_output_ntlm(struct connectdata *conn,
     passwdp = "";
 
 #ifdef USE_WINDOWS_SSPI
-  if(s_hSecDll == NULL) {
+  if(s_hSecDll == nil) {
     /* not thread safe and leaks - use curl_global_init() to avoid */
     CURLcode err = Curl_sspi_global_init();
-    if(s_hSecDll == NULL)
+    if(s_hSecDll == nil)
       return err;
   }
 #endif
@@ -214,7 +214,7 @@ CURLcode Curl_output_ntlm(struct connectdata *conn,
      * don't send a header in future requests */
     if(*allocuserpwd) {
       free(*allocuserpwd);
-      *allocuserpwd = NULL;
+      *allocuserpwd = nil;
     }
     authp->done = TRUE;
     break;

@@ -40,10 +40,10 @@
 typedef PSecurityFunctionTableA (APIENTRY *INITSECURITYINTERFACE_FN_A)(VOID);
 
 /* Handle of security.dll or secur32.dll, depending on Windows version */
-HMODULE s_hSecDll = NULL;
+HMODULE s_hSecDll = nil;
 
 /* Pointer to SSPI dispatch table */
-PSecurityFunctionTableA s_pSecFn = NULL;
+PSecurityFunctionTableA s_pSecFn = nil;
 
 
 /*
@@ -65,7 +65,7 @@ Curl_sspi_global_init(void)
   INITSECURITYINTERFACE_FN_A pInitSecurityInterface;
 
   /* If security interface is not yet initialized try to do this */
-  if(s_hSecDll == NULL) {
+  if(s_hSecDll == nil) {
 
     /* Find out Windows version */
     memset(&osver, 0, sizeof(osver));
@@ -113,8 +113,8 @@ Curl_sspi_global_cleanup(void)
 {
   if(s_hSecDll) {
     FreeLibrary(s_hSecDll);
-    s_hSecDll = NULL;
-    s_pSecFn = NULL;
+    s_hSecDll = nil;
+    s_pSecFn = nil;
   }
 }
 

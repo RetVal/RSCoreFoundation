@@ -48,7 +48,7 @@ static inline struct page * rb_search_page_cache(struct inode * inode,
 		else
 			return page;
 	}
-	return NULL;
+	return nil;
 }
 
 static inline struct page * __rb_insert_page_cache(struct inode * inode,
@@ -56,7 +56,7 @@ static inline struct page * __rb_insert_page_cache(struct inode * inode,
 						   struct rb_node * node)
 {
 	struct rb_node ** p = &inode->i_rb_page_cache.rb_node;
-	struct rb_node * parent = NULL;
+	struct rb_node * parent = nil;
 	struct page * page;
 
 	while (*p)
@@ -74,7 +74,7 @@ static inline struct page * __rb_insert_page_cache(struct inode * inode,
 
 	rb_link_node(node, parent, p);
 
-	return NULL;
+	return nil;
 }
 
 static inline struct page * rb_insert_page_cache(struct inode * inode,
@@ -156,14 +156,14 @@ void rb_set_color(struct rb_node *rb, int color)
 #endif
 /**********************************************************/
 
-#define RB_ROOT	(struct rb_root) { NULL, }
+#define RB_ROOT	(struct rb_root) { nil, }
 #ifdef _C99
 #define	rb_entry(ptr, type, member) container_of(ptr, type, member)
 #else
 #define rb_entry(ptr, type, member)  ((type *)ptr)
 #endif
 
-#define RB_EMPTY_ROOT(root)	((root)->rb_node == NULL)
+#define RB_EMPTY_ROOT(root)	((root)->rb_node == nil)
 #define RB_EMPTY_NODE(node)	(rb_parent(node) == node)
 #define RB_CLEAR_NODE(node)	(rb_set_parent(node, node))
 
@@ -174,8 +174,8 @@ inline
 void rb_init_node(struct rb_node *rb)
 {
 	rb->rb_parent_color = 0;
-	rb->rb_right = NULL;
-	rb->rb_left = NULL;
+	rb->rb_right = nil;
+	rb->rb_left = nil;
 	RB_CLEAR_NODE(rb);
 }
 
@@ -207,7 +207,7 @@ void rb_link_node(struct rb_node * node, struct rb_node * parent,
 				struct rb_node ** rb_link)
 {
 	node->rb_parent_color = (unsigned long )parent;
-	node->rb_left = node->rb_right = NULL;
+	node->rb_left = node->rb_right = nil;
 
 	*rb_link = node;
 }

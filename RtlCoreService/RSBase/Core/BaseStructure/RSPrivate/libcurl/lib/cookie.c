@@ -145,13 +145,13 @@ void Curl_cookie_loadfiles(struct SessionHandle *data)
             list = list->next;
         }
         curl_slist_free_all(data->change.cookielist); /* clean up list */
-        data->change.cookielist = NULL; /* don't do this again! */
+        data->change.cookielist = nil; /* don't do this again! */
         Curl_share_unlock(data, CURL_LOCK_DATA_COOKIE);
     }
 }
 
 /*
- * strstore() makes a strdup() on the 'newstr' and if '*str' is non-NULL
+ * strstore() makes a strdup() on the 'newstr' and if '*str' is non-nil
  * that will be freed before the allocated string is stored there.
  *
  * It is meant to easily replace strdup()
@@ -174,9 +174,9 @@ static void strstore(char **str, const char *newstr)
 
 struct Cookie *
 Curl_cookie_add(struct SessionHandle *data,
-                /* The 'data' pointer here may be NULL at times, and thus
+                /* The 'data' pointer here may be nil at times, and thus
                  must only be used very carefully for things that can deal
-                 with data being NULL. Such as infof() and similar */
+                 with data being nil. Such as infof() and similar */
                 
                 struct CookieInfo *c,
                 bool httpheader, /* TRUE if HTTP header-style line */
@@ -189,8 +189,8 @@ Curl_cookie_add(struct SessionHandle *data,
     struct Cookie *clist;
     char name[MAX_NAME];
     struct Cookie *co;
-    struct Cookie *lastc=NULL;
-    time_t now = time(NULL);
+    struct Cookie *lastc=nil;
+    time_t now = time(nil);
     bool replace_old = FALSE;
     bool badcookie = FALSE; /* cookies are good by default. mmmmm yummy */
     
@@ -201,7 +201,7 @@ Curl_cookie_add(struct SessionHandle *data,
     /* First, alloc and init a new struct for it */
     co = calloc(1, sizeof(struct Cookie));
     if(!co)
-        return NULL; /* bail out if we're this low on memory */
+        return nil; /* bail out if we're this low on memory */
     
     if(httpheader) {
         /* This line was read off a HTTP-header */
@@ -212,7 +212,7 @@ Curl_cookie_add(struct SessionHandle *data,
         what = malloc(MAX_COOKIE_LINE);
         if(!what) {
             free(co);
-            return NULL;
+            return nil;
         }
         
         semiptr=strchr(lineptr, ';'); /* first, find a semicolon */
@@ -365,7 +365,7 @@ Curl_cookie_add(struct SessionHandle *data,
                         break;
                     }
                     co->expires =
-                    strtol((*co->maxage=='\"')?&co->maxage[1]:&co->maxage[0],NULL,10)
+                    strtol((*co->maxage=='\"')?&co->maxage[1]:&co->maxage[0],nil,10)
                     + (long)now;
                 }
                 else if(Curl_raw_equal("expires", name)) {
@@ -404,7 +404,7 @@ Curl_cookie_add(struct SessionHandle *data,
             
             if(!semiptr || !*semiptr) {
                 /* we already know there are no more cookies */
-                semiptr = NULL;
+                semiptr = nil;
                 continue;
             }
             
@@ -459,7 +459,7 @@ Curl_cookie_add(struct SessionHandle *data,
             /* we didn't get a cookie name or a bad one,
              this is an illegal line, bail out */
             freecookie(co);
-            return NULL;
+            return nil;
         }
         
     }
@@ -468,7 +468,7 @@ Curl_cookie_add(struct SessionHandle *data,
          reading the odd netscape cookies-file format here */
         char *ptr;
         char *firstptr;
-        char *tok_buf=NULL;
+        char *tok_buf=nil;
         int fields;
         
         /* IE introduced HTTP-only cookies to prevent XSS attacks. Cookies
@@ -486,7 +486,7 @@ Curl_cookie_add(struct SessionHandle *data,
         if(lineptr[0]=='#') {
             /* don't even try the comments */
             free(co);
-            return NULL;
+            return nil;
         }
         /* strip off the possible end-of-line characters */
         ptr=strchr(lineptr, '\r');
@@ -501,13 +501,13 @@ Curl_cookie_add(struct SessionHandle *data,
         /* Here's a quick check to eliminate normal HTTP-headers from this */
         if(!firstptr || strchr(firstptr, ':')) {
             free(co);
-            return NULL;
+            return nil;
         }
         
         /* Now loop through the fields and init the struct we already have
          allocated */
         for(ptr=firstptr, fields=0; ptr && !badcookie;
-            ptr=strtok_r(NULL, "\t", &tok_buf), fields++) {
+            ptr=strtok_r(nil, "\t", &tok_buf), fields++) {
             switch(fields) {
                 case 0:
                     if(ptr[0]=='.') /* skip preceding dots */
@@ -550,7 +550,7 @@ Curl_cookie_add(struct SessionHandle *data,
                     co->secure = Curl_raw_equal(ptr, "TRUE")?TRUE:FALSE;
                     break;
                 case 4:
-                    co->expires = curlx_strtoofft(ptr, NULL, 10);
+                    co->expires = curlx_strtoofft(ptr, nil, 10);
                     break;
                 case 5:
                     co->name = strdup(ptr);
@@ -579,7 +579,7 @@ Curl_cookie_add(struct SessionHandle *data,
         
         if(badcookie) {
             freecookie(co);
-            return NULL;
+            return nil;
         }
         
     }
@@ -588,7 +588,7 @@ Curl_cookie_add(struct SessionHandle *data,
        c->newsession &&  /* clean session cookies */
        !co->expires) {   /* this is a session cookie since it doesn't expire! */
         freecookie(co);
-        return NULL;
+        return nil;
     }
     
     co->livecookie = c->running;
@@ -636,7 +636,7 @@ Curl_cookie_add(struct SessionHandle *data,
                 
                 /* Free the newcomer and get out of here! */
                 freecookie(co);
-                return NULL;
+                return nil;
             }
             
             if(replace_old) {
@@ -700,7 +700,7 @@ Curl_cookie_add(struct SessionHandle *data,
  * Curl_cookie_init()
  *
  * Inits a cookie struct to read data from a local file. This is always
- * called before any cookies are set. File may be NULL.
+ * called before any cookies are set. File may be nil.
  *
  * If 'newsession' is TRUE, discard all "session cookies" on read from file.
  *
@@ -714,11 +714,11 @@ struct CookieInfo *Curl_cookie_init(struct SessionHandle *data,
     FILE *fp;
     bool fromfile=TRUE;
     
-    if(NULL == inc) {
+    if(nil == inc) {
         /* we didn't get a struct, create one */
         c = calloc(1, sizeof(struct CookieInfo));
         if(!c)
-            return NULL; /* failed to get memory */
+            return nil; /* failed to get memory */
         c->filename = strdup(file?file:"none"); /* copy the name just in case */
     }
     else {
@@ -733,10 +733,10 @@ struct CookieInfo *Curl_cookie_init(struct SessionHandle *data,
     }
     else if(file && !*file) {
         /* points to a "" string */
-        fp = NULL;
+        fp = nil;
     }
     else
-        fp = file?fopen(file, "r"):NULL;
+        fp = file?fopen(file, "r"):nil;
     
     c->newsession = newsession; /* new session? */
     
@@ -759,7 +759,7 @@ struct CookieInfo *Curl_cookie_init(struct SessionHandle *data,
                 while(*lineptr && ISBLANK(*lineptr))
                     lineptr++;
                 
-                Curl_cookie_add(data, c, headerline, lineptr, NULL, NULL);
+                Curl_cookie_add(data, c, headerline, lineptr, nil, nil);
             }
             free(line); /* free the line buffer */
         }
@@ -802,12 +802,12 @@ struct Cookie *Curl_cookie_getlist(struct CookieInfo *c,
 {
     struct Cookie *newco;
     struct Cookie *co;
-    time_t now = time(NULL);
-    struct Cookie *mainco=NULL;
+    time_t now = time(nil);
+    struct Cookie *mainco=nil;
     size_t matches = 0;
     
     if(!c || !c->cookies)
-        return NULL; /* no cookie struct or no cookies in the struct */
+        return nil; /* no cookie struct or no cookies in the struct */
     
     co = c->cookies;
     
@@ -850,14 +850,14 @@ struct Cookie *Curl_cookie_getlist(struct CookieInfo *c,
                     }
                     else {
                     fail:
-                        /* failure, clear up the allocated chain and return NULL */
+                        /* failure, clear up the allocated chain and return nil */
                         while(mainco) {
                             co = mainco->next;
                             free(mainco);
                             mainco = co;
                         }
                         
-                        return NULL;
+                        return nil;
                     }
                 }
             }
@@ -890,7 +890,7 @@ struct Cookie *Curl_cookie_getlist(struct CookieInfo *c,
         mainco = array[0]; /* start here */
         for(i=0; i<matches-1; i++)
             array[i]->next = array[i+1];
-        array[matches-1]->next = NULL; /* terminate the list */
+        array[matches-1]->next = nil; /* terminate the list */
         
         free(array); /* remove the temporary data again */
     }
@@ -909,7 +909,7 @@ void Curl_cookie_clearall(struct CookieInfo *cookies)
 {
     if(cookies) {
         Curl_cookie_freelist(cookies->cookies, TRUE);
-        cookies->cookies = NULL;
+        cookies->cookies = nil;
         cookies->numcookies = 0;
     }
 }
@@ -951,7 +951,7 @@ void Curl_cookie_freelist(struct Cookie *co, bool cookiestoo)
  ****************************************************************************/
 void Curl_cookie_clearsess(struct CookieInfo *cookies)
 {
-    struct Cookie *first, *curr, *next, *prev = NULL;
+    struct Cookie *first, *curr, *next, *prev = nil;
     
     if(!cookies || !cookies->cookies)
         return;
@@ -1049,7 +1049,7 @@ static int cookie_output(struct CookieInfo *c, const char *dumphere)
     FILE *out;
     bool use_stdout=FALSE;
     
-    if((NULL == c) || (0 == c->numcookies))
+    if((nil == c) || (0 == c->numcookies))
     /* If there are no known cookies, we don't write or even create any
      destination file */
         return 0;
@@ -1076,7 +1076,7 @@ static int cookie_output(struct CookieInfo *c, const char *dumphere)
         
         while(co) {
             format_ptr = get_netscape_format(co);
-            if(format_ptr == NULL) {
+            if(format_ptr == nil) {
                 fprintf(out, "#\n# Fatal libcurl error\n");
                 if(!use_stdout)
                     fclose(out);
@@ -1096,14 +1096,14 @@ static int cookie_output(struct CookieInfo *c, const char *dumphere)
 
 struct curl_slist *Curl_cookie_list(struct SessionHandle *data)
 {
-    struct curl_slist *list = NULL;
+    struct curl_slist *list = nil;
     struct curl_slist *beg;
     struct Cookie *c;
     char *line;
     
-    if((data->cookies == NULL) ||
+    if((data->cookies == nil) ||
        (data->cookies->numcookies == 0))
-        return NULL;
+        return nil;
     
     c = data->cookies->cookies;
     
@@ -1112,13 +1112,13 @@ struct curl_slist *Curl_cookie_list(struct SessionHandle *data)
         line = get_netscape_format(c);
         if(!line) {
             curl_slist_free_all(list);
-            return NULL;
+            return nil;
         }
         beg = curl_slist_append(list, line);
         free(line);
         if(!beg) {
             curl_slist_free_all(list);
-            return NULL;
+            return nil;
         }
         list = beg;
         c = c->next;
@@ -1149,7 +1149,7 @@ void Curl_flush_cookies(struct SessionHandle *data, int cleanup)
             /* since nothing is written, we can just free the list of cookie file
              names */
             curl_slist_free_all(data->change.cookielist); /* clean up list */
-            data->change.cookielist = NULL;
+            data->change.cookielist = nil;
         }
         Curl_share_lock(data, CURL_LOCK_DATA_COOKIE, CURL_LOCK_ACCESS_SINGLE);
     }

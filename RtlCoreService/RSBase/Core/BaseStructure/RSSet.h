@@ -67,7 +67,7 @@ RSTypeID RSSetGetTypeID(void) RS_AVAILABLE(0_1);
  Creates a new immutable set with the given values.
  @param allocator The RSAllocator which should be used to allocate
  memory for the set and its storage for values. This
- parameter may be NULL in which case the current default
+ parameter may be nil in which case the current default
  RSAllocator is used. If this reference is not a valid
  RSAllocator, the behavior is undefined.
  @param values A C array of the pointer-sized values to be in the
@@ -87,18 +87,18 @@ RSTypeID RSSetGetTypeID(void) RS_AVAILABLE(0_1);
  for multiple set creations. If the version field of this
  callbacks structure is not one of the defined ones for
  RSSet, the behavior is undefined. The retain field may be
- NULL, in which case the RSSet will do nothing to add a
+ nil, in which case the RSSet will do nothing to add a
  retain to the contained values for the set. The release
- field may be NULL, in which case the RSSet will do nothing
+ field may be nil, in which case the RSSet will do nothing
  to remove the set's retain (if any) on the values when the
- set is destroyed. If the copyDescription field is NULL,
+ set is destroyed. If the copyDescription field is nil,
  the set will create a simple description for the value. If
- the equal field is NULL, the set will use pointer equality
- to test for equality of values. The hash field may be NULL,
+ the equal field is nil, the set will use pointer equality
+ to test for equality of values. The hash field may be nil,
  in which case the RSSet will determine uniqueness by pointer
  equality. This callbacks parameter
- itself may be NULL, which is treated as if a valid structure
- of version 0 with all fields NULL had been passed in.
+ itself may be nil, which is treated as if a valid structure
+ of version 0 with all fields nil had been passed in.
  Otherwise, if any of the fields are not valid pointers to
  functions of the correct type, or this parameter is not a
  valid pointer to a  RSSetCallBacks callbacks structure,
@@ -116,7 +116,7 @@ RSSetRef RSSetCreate(RSAllocatorRef allocator, const void **values, RSIndex numV
  Creates a new immutable set with the values from the given set.
  @param allocator The RSAllocator which should be used to allocate
  memory for the set and its storage for values. This
- parameter may be NULL in which case the current default
+ parameter may be nil in which case the current default
  RSAllocator is used. If this reference is not a valid
  RSAllocator, the behavior is undefined.
  @param theSet The set which is to be copied. The values from the
@@ -137,7 +137,7 @@ RSSetRef RSSetCreateCopy(RSAllocatorRef allocator, RSSetRef theSet) RS_AVAILABLE
  Creates a new empty mutable set.
  @param allocator The RSAllocator which should be used to allocate
  memory for the set and its storage for values. This
- parameter may be NULL in which case the current default
+ parameter may be nil in which case the current default
  RSAllocator is used. If this reference is not a valid
  RSAllocator, the behavior is undefined.
  @param capacity A hint about the number of values that will be held
@@ -154,18 +154,18 @@ RSSetRef RSSetCreateCopy(RSAllocatorRef allocator, RSSetRef theSet) RS_AVAILABLE
  for multiple set creations. If the version field of this
  callbacks structure is not one of the defined ones for
  RSSet, the behavior is undefined. The retain field may be
- NULL, in which case the RSSet will do nothing to add a
+ nil, in which case the RSSet will do nothing to add a
  retain to the contained values for the set. The release
- field may be NULL, in which case the RSSet will do nothing
+ field may be nil, in which case the RSSet will do nothing
  to remove the set's retain (if any) on the values when the
- set is destroyed. If the copyDescription field is NULL,
+ set is destroyed. If the copyDescription field is nil,
  the set will create a simple description for the value. If
- the equal field is NULL, the set will use pointer equality
- to test for equality of values. The hash field may be NULL,
+ the equal field is nil, the set will use pointer equality
+ to test for equality of values. The hash field may be nil,
  in which case the RSSet will determine uniqueness by pointer
  equality. This callbacks parameter
- itself may be NULL, which is treated as if a valid structure
- of version 0 with all fields NULL had been passed in.
+ itself may be nil, which is treated as if a valid structure
+ of version 0 with all fields nil had been passed in.
  Otherwise, if any of the fields are not valid pointers to
  functions of the correct type, or this parameter is not a
  valid pointer to a  RSSetCallBacks callbacks structure,
@@ -183,7 +183,7 @@ RSMutableSetRef RSSetCreateMutable(RSAllocatorRef allocator, RSIndex capacity, c
  Creates a new immutable set with the values from the given set.
  @param allocator The RSAllocator which should be used to allocate
  memory for the set and its storage for values. This
- parameter may be NULL in which case the current default
+ parameter may be nil in which case the current default
  RSAllocator is used. If this reference is not a valid
  RSAllocator, the behavior is undefined.
  @param capacity A hint about the number of values that will be held
@@ -227,7 +227,7 @@ RSIndex RSSetGetCount(RSSetRef theSet) RS_AVAILABLE(0_1);
  valid RSSet, the behavior is undefined.
  @param value The value for which to find matches in the set. The
  equal() callback provided when the set was created is
- used to compare. If the equal() callback was NULL, pointer
+ used to compare. If the equal() callback was nil, pointer
  equality (in C, ==) is used. If value, or any of the values
  in the set, are not understood by the equal() callback,
  the behavior is undefined.
@@ -243,7 +243,7 @@ RSIndex RSSetGetCountOfValue(RSSetRef theSet, const void *value) RS_AVAILABLE(0_
  valid RSSet, the behavior is undefined.
  @param value The value for which to find matches in the set. The
  equal() callback provided when the set was created is
- used to compare. If the equal() callback was NULL, pointer
+ used to compare. If the equal() callback was nil, pointer
  equality (in C, ==) is used. If value, or any of the values
  in the set, are not understood by the equal() callback,
  the behavior is undefined.
@@ -259,7 +259,7 @@ BOOL RSSetContainsValue(RSSetRef theSet, const void *value) RS_AVAILABLE(0_1);
  valid RSSet, the behavior is undefined.
  @param value The value to retrieve. The equal() callback provided when
  the set was created is used to compare. If the equal() callback
- was NULL, pointer equality (in C, ==) is used. If a value, or
+ was nil, pointer equality (in C, ==) is used. If a value, or
  any of the values in the set, are not understood by the equal()
  callback, the behavior is undefined.
  @result The value in the set with the given hash.
@@ -276,13 +276,13 @@ const void *RSSetGetValue(RSSetRef theSet, const void *value) RS_AVAILABLE(0_1);
  @param candidate This value is hashed and compared with values in the
  set to determine which value to retrieve. The equal() callback provided when
  the set was created is used to compare. If the equal() callback
- was NULL, pointer equality (in C, ==) is used. If a value, or
+ was nil, pointer equality (in C, ==) is used. If a value, or
  any of the values in the set, are not understood by the equal()
  callback, the behavior is undefined.
  @param value A pointer to memory which should be filled with the
  pointer-sized value if a matching value is found. If no
  match is found, the contents of the storage pointed to by
- this parameter are undefined. This parameter may be NULL,
+ this parameter are undefined. This parameter may be nil,
  in which case the value from the dictionary is not returned
  (but the return value of this function still indicates
  whether or not the value was present).
@@ -348,7 +348,7 @@ void RSSetAddValue(RSMutableSetRef theSet, const void *value) RS_AVAILABLE(0_1);
  undefined.
  @param value The value to replace in the set. The equal() callback provided when
  the set was created is used to compare. If the equal() callback
- was NULL, pointer equality (in C, ==) is used. If a value, or
+ was nil, pointer equality (in C, ==) is used. If a value, or
  any of the values in the set, are not understood by the equal()
  callback, the behavior is undefined. The value is retained by
  the set using the retain callback provided when the set
@@ -368,7 +368,7 @@ void RSSetReplaceValue(RSMutableSetRef theSet, const void *value) RS_AVAILABLE(0
  undefined.
  @param value The value to set in the RSSet. The equal() callback provided when
  the set was created is used to compare. If the equal() callback
- was NULL, pointer equality (in C, ==) is used. If a value, or
+ was nil, pointer equality (in C, ==) is used. If a value, or
  any of the values in the set, are not understood by the equal()
  callback, the behavior is undefined. The value is retained by
  the set using the retain callback provided when the set
@@ -387,7 +387,7 @@ void RSSetSetValue(RSMutableSetRef theSet, const void *value) RS_AVAILABLE(0_1);
  the behavior is undefined.
  @param value The value to remove. The equal() callback provided when
  the set was created is used to compare. If the equal() callback
- was NULL, pointer equality (in C, ==) is used. If a value, or
+ was nil, pointer equality (in C, ==) is used. If a value, or
  any of the values in the set, are not understood by the equal()
  callback, the behavior is undefined.
  */

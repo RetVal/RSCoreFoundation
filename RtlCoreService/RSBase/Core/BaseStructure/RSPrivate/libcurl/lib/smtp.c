@@ -232,7 +232,7 @@ static int smtp_endofresp(struct pingpong *pp, int *resp)
     return FALSE;       /* Nothing for us. */
 
   if((result = (line[3] == ' ')) != 0)
-    *resp = curlx_sltosi(strtol(line, NULL, 10));
+    *resp = curlx_sltosi(strtol(line, nil, 10));
 
   line += 4;
   len -= 4;
@@ -364,7 +364,7 @@ static CURLcode smtp_auth_plain_data(struct connectdata *conn,
 
   if(2 * ulen + plen + 2 > sizeof plainauth) {
     *outlen = 0;
-    *outptr = NULL;
+    *outptr = nil;
     return CURLE_OUT_OF_MEMORY; /* plainauth too small */
   }
 
@@ -408,8 +408,8 @@ static CURLcode smtp_authenticate(struct connectdata *conn)
 {
   CURLcode result = CURLE_OK;
   struct smtp_conn *smtpc = &conn->proto.smtpc;
-  char *initresp = NULL;
-  const char *mech = NULL;
+  char *initresp = nil;
+  const char *mech = nil;
   size_t len = 0;
   smtpstate state1 = SMTP_STOP;
   smtpstate state2 = SMTP_STOP;
@@ -608,7 +608,7 @@ static CURLcode smtp_state_authplain_resp(struct connectdata *conn,
   CURLcode result = CURLE_OK;
   struct SessionHandle *data = conn->data;
   size_t len = 0;
-  char *plainauth = NULL;
+  char *plainauth = nil;
 
   (void)instate; /* no use for this yet */
 
@@ -641,7 +641,7 @@ static CURLcode smtp_state_authlogin_resp(struct connectdata *conn,
   CURLcode result = CURLE_OK;
   struct SessionHandle *data = conn->data;
   size_t len = 0;
-  char *authuser = NULL;
+  char *authuser = nil;
 
   (void)instate; /* no use for this yet */
 
@@ -675,7 +675,7 @@ static CURLcode smtp_state_authpasswd_resp(struct connectdata *conn,
   struct SessionHandle *data = conn->data;
   size_t plen;
   size_t len = 0;
-  char *authpasswd = NULL;
+  char *authpasswd = nil;
 
   (void)instate; /* no use for this yet */
 
@@ -719,7 +719,7 @@ static CURLcode smtp_state_authcram_resp(struct connectdata *conn,
   unsigned char * chlg;
   size_t chlglen;
   size_t len = 0;
-  char *rplyb64 = NULL;
+  char *rplyb64 = nil;
   HMAC_context *ctxt;
   unsigned char digest[16];
   char reply[MAX_CURL_USER_LENGTH + 32 /* 2 * size of MD5 digest */ + 1];
@@ -735,7 +735,7 @@ static CURLcode smtp_state_authcram_resp(struct connectdata *conn,
   for(chlg64 += 4; *chlg64 == ' ' || *chlg64 == '\t'; chlg64++)
     ;
 
-  chlg = (unsigned char *) NULL;
+  chlg = (unsigned char *) nil;
   chlglen = 0;
 
   if(*chlg64 != '=') {
@@ -804,7 +804,7 @@ static CURLcode smtp_state_auth_ntlm_resp(struct connectdata *conn,
 {
   CURLcode result = CURLE_OK;
   struct SessionHandle *data = conn->data;
-  char *type1msg = NULL;
+  char *type1msg = nil;
   size_t len = 0;
 
   (void)instate; /* no use for this yet */
@@ -837,7 +837,7 @@ static CURLcode smtp_state_auth_ntlm_type2msg_resp(struct connectdata *conn,
 {
   CURLcode result = CURLE_OK;
   struct SessionHandle *data = conn->data;
-  char *type3msg = NULL;
+  char *type3msg = nil;
   size_t len = 0;
 
   (void)instate; /* no use for this yet */
@@ -892,8 +892,8 @@ static CURLcode smtp_state_auth_resp(struct connectdata *conn,
 /* start the DO phase */
 static CURLcode smtp_mail(struct connectdata *conn)
 {
-  char *from = NULL;
-  char *size = NULL;
+  char *from = nil;
+  char *size = nil;
   CURLcode result = CURLE_OK;
   struct SessionHandle *data = conn->data;
 
@@ -1035,7 +1035,7 @@ static CURLcode smtp_state_data_resp(struct connectdata *conn,
   }
 
   /* SMTP upload */
-  Curl_setup_transfer(conn, -1, -1, FALSE, NULL, /* no download */
+  Curl_setup_transfer(conn, -1, -1, FALSE, nil, /* no download */
                       FIRSTSOCKET, smtp->bytecountp);
 
   state(conn, SMTP_STOP);
@@ -1315,7 +1315,7 @@ static CURLcode smtp_connect(struct connectdata *conn,
   }
 
   /* url decode the path and use it as domain with EHLO */
-  result = Curl_urldecode(conn->data, path, 0, &smtpc->domain, NULL, TRUE);
+  result = Curl_urldecode(conn->data, path, 0, &smtpc->domain, nil, TRUE);
   if(result)
     return result;
 
@@ -1531,7 +1531,7 @@ static CURLcode smtp_disconnect(struct connectdata *conn,
 
   /* This won't already be freed in some error cases */
   Curl_safefree(smtpc->domain);
-  smtpc->domain = NULL;
+  smtpc->domain = nil;
 
   return CURLE_OK;
 }
@@ -1546,10 +1546,10 @@ static CURLcode smtp_dophase_done(struct connectdata *conn,
 
   if(smtp->transfer != FTPTRANSFER_BODY)
     /* no data to transfer */
-    Curl_setup_transfer(conn, -1, -1, FALSE, NULL, -1, NULL);
+    Curl_setup_transfer(conn, -1, -1, FALSE, nil, -1, nil);
 
   free(smtpc->domain);
-  smtpc->domain = NULL;
+  smtpc->domain = nil;
 
   return CURLE_OK;
 }
@@ -1657,9 +1657,9 @@ CURLcode Curl_smtp_escape_eob(struct connectdata *conn, ssize_t nread)
   struct smtp_conn *smtpc = &conn->proto.smtpc;
   struct SessionHandle *data = conn->data;
 
-  if(data->state.scratch == NULL)
+  if(data->state.scratch == nil)
     data->state.scratch = malloc(2 * BUFSIZE);
-  if(data->state.scratch == NULL) {
+  if(data->state.scratch == nil) {
     failf (data, "Failed to alloc scratch buffer!");
     return CURLE_OUT_OF_MEMORY;
   }

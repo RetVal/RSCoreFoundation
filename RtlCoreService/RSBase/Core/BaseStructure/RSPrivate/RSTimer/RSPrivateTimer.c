@@ -30,7 +30,7 @@ RSPrivate RSBitU64 __dps_absolute_time()
 RSPrivate RSBitU64 __dps_get_nanoseconds()
 {
 	struct timeval now;
-	int r = gettimeofday(&now, NULL);
+	int r = gettimeofday(&now, nil);
     assert(r);
 	return now.tv_sec * DPS_NSEC_PER_SEC + now.tv_usec * DPS_NSEC_PER_USEC;
 }

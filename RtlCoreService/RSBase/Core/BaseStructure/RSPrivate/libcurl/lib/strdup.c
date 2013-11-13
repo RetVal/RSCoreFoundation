@@ -31,16 +31,16 @@ char *curlx_strdup(const char *str)
   char *newstr;
 
   if(!str)
-    return (char *)NULL;
+    return (char *)nil;
 
   len = strlen(str);
 
   if(len >= ((size_t)-1) / sizeof(char))
-    return (char *)NULL;
+    return (char *)nil;
 
   newstr = malloc((len+1)*sizeof(char));
   if(!newstr)
-    return (char *)NULL;
+    return (char *)nil;
 
   memcpy(newstr,str,(len+1)*sizeof(char));
 

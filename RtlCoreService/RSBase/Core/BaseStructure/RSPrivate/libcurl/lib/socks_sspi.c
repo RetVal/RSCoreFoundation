@@ -169,10 +169,10 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
   SecPkgContext_Sizes sspi_sizes;
   CredHandle cred_handle;
   CtxtHandle sspi_context;
-  PCtxtHandle context_handle = NULL;
+  PCtxtHandle context_handle = nil;
   SecPkgCredentials_Names names;
   TimeStamp expiry;
-  char *service_name=NULL;
+  char *service_name=nil;
   unsigned short us_length;
   ULONG qop;
   unsigned char socksreq[4]; /* room for gssapi exchange header only */
@@ -207,7 +207,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
 
   sspi_recv_token.BufferType = SECBUFFER_TOKEN;
   sspi_recv_token.cbBuffer = 0;
-  sspi_recv_token.pvBuffer = NULL;
+  sspi_recv_token.pvBuffer = nil;
 
   output_desc.cBuffers = 1;
   output_desc.pBuffers = &sspi_send_token;
@@ -215,7 +215,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
 
   sspi_send_token.BufferType = SECBUFFER_TOKEN;
   sspi_send_token.cbBuffer = 0;
-  sspi_send_token.pvBuffer = NULL;
+  sspi_send_token.pvBuffer = nil;
 
   wrap_desc.cBuffers = 3;
   wrap_desc.pBuffers = sspi_w_token;
@@ -225,13 +225,13 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
   cred_handle.dwUpper = 0;
 
   sspi_major_status =
-    s_pSecFn->AcquireCredentialsHandleA( NULL,
+    s_pSecFn->AcquireCredentialsHandleA( nil,
                                          (char *)"Kerberos",
                                          SECPKG_CRED_OUTBOUND,
-                                         NULL,
-                                         NULL,
-                                         NULL,
-                                         NULL,
+                                         nil,
+                                         nil,
+                                         nil,
+                                         nil,
                                          &cred_handle,
                                          &expiry);
 
@@ -239,7 +239,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
                     "AcquireCredentialsHandleA") ) {
     failf(data, "Failed to acquire credentials.");
     free(service_name);
-    service_name=NULL;
+    service_name=nil;
     s_pSecFn->FreeCredentialsHandle(&cred_handle);
     return CURLE_COULDNT_CONNECT;
   }
@@ -267,14 +267,14 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
 
     if(sspi_recv_token.pvBuffer) {
       s_pSecFn->FreeContextBuffer(sspi_recv_token.pvBuffer);
-      sspi_recv_token.pvBuffer = NULL;
+      sspi_recv_token.pvBuffer = nil;
       sspi_recv_token.cbBuffer = 0;
     }
 
     if(check_sspi_err(data,sspi_major_status,sspi_minor_status,
                       "InitializeSecurityContextA") ) {
       free(service_name);
-      service_name=NULL;
+      service_name=nil;
       s_pSecFn->FreeCredentialsHandle(&cred_handle);
       s_pSecFn->DeleteSecurityContext(&sspi_context);
       s_pSecFn->FreeContextBuffer(sspi_recv_token.pvBuffer);
@@ -292,7 +292,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
       if((code != CURLE_OK) || (4 != written)) {
         failf(data, "Failed to send SSPI authentication request.");
         free(service_name);
-        service_name=NULL;
+        service_name=nil;
         s_pSecFn->FreeContextBuffer(sspi_send_token.pvBuffer);
         s_pSecFn->FreeContextBuffer(sspi_recv_token.pvBuffer);
         s_pSecFn->FreeCredentialsHandle(&cred_handle);
@@ -305,7 +305,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
       if((code != CURLE_OK) || (sspi_send_token.cbBuffer != (size_t)written)) {
         failf(data, "Failed to send SSPI authentication token.");
         free(service_name);
-        service_name=NULL;
+        service_name=nil;
         s_pSecFn->FreeContextBuffer(sspi_send_token.pvBuffer);
         s_pSecFn->FreeContextBuffer(sspi_recv_token.pvBuffer);
         s_pSecFn->FreeCredentialsHandle(&cred_handle);
@@ -316,10 +316,10 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
     }
 
     s_pSecFn->FreeContextBuffer(sspi_send_token.pvBuffer);
-    sspi_send_token.pvBuffer = NULL;
+    sspi_send_token.pvBuffer = nil;
     sspi_send_token.cbBuffer = 0;
     s_pSecFn->FreeContextBuffer(sspi_recv_token.pvBuffer);
-    sspi_recv_token.pvBuffer = NULL;
+    sspi_recv_token.pvBuffer = nil;
     sspi_recv_token.cbBuffer = 0;
     if(sspi_major_status != SEC_I_CONTINUE_NEEDED)  break;
 
@@ -337,7 +337,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
     if(result != CURLE_OK || actualread != 4) {
       failf(data, "Failed to receive SSPI authentication response.");
       free(service_name);
-      service_name=NULL;
+      service_name=nil;
       s_pSecFn->FreeCredentialsHandle(&cred_handle);
       s_pSecFn->DeleteSecurityContext(&sspi_context);
       return CURLE_COULDNT_CONNECT;
@@ -348,7 +348,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
       failf(data, "User was rejected by the SOCKS5 server (%d %d).",
             socksreq[0], socksreq[1]);
       free(service_name);
-      service_name=NULL;
+      service_name=nil;
       s_pSecFn->FreeCredentialsHandle(&cred_handle);
       s_pSecFn->DeleteSecurityContext(&sspi_context);
       return CURLE_COULDNT_CONNECT;
@@ -358,7 +358,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
       failf(data, "Invalid SSPI authentication response type (%d %d).",
             socksreq[0], socksreq[1]);
       free(service_name);
-      service_name=NULL;
+      service_name=nil;
       s_pSecFn->FreeCredentialsHandle(&cred_handle);
       s_pSecFn->DeleteSecurityContext(&sspi_context);
       return CURLE_COULDNT_CONNECT;
@@ -372,7 +372,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
 
     if(!sspi_recv_token.pvBuffer) {
       free(service_name);
-      service_name=NULL;
+      service_name=nil;
       s_pSecFn->FreeCredentialsHandle(&cred_handle);
       s_pSecFn->DeleteSecurityContext(&sspi_context);
       return CURLE_OUT_OF_MEMORY;
@@ -383,7 +383,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
     if(result != CURLE_OK || actualread != us_length) {
       failf(data, "Failed to receive SSPI authentication token.");
       free(service_name);
-      service_name=NULL;
+      service_name=nil;
       s_pSecFn->FreeContextBuffer(sspi_recv_token.pvBuffer);
       s_pSecFn->FreeCredentialsHandle(&cred_handle);
       s_pSecFn->DeleteSecurityContext(&sspi_context);
@@ -394,7 +394,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
   }
 
   free(service_name);
-  service_name=NULL;
+  service_name=nil;
 
   /* Everything is good so far, user was authenticated! */
   sspi_major_status =
@@ -537,13 +537,13 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
            sspi_w_token[2].pvBuffer, sspi_w_token[2].cbBuffer);
 
     s_pSecFn->FreeContextBuffer(sspi_w_token[0].pvBuffer);
-    sspi_w_token[0].pvBuffer = NULL;
+    sspi_w_token[0].pvBuffer = nil;
     sspi_w_token[0].cbBuffer = 0;
     s_pSecFn->FreeContextBuffer(sspi_w_token[1].pvBuffer);
-    sspi_w_token[1].pvBuffer = NULL;
+    sspi_w_token[1].pvBuffer = nil;
     sspi_w_token[1].cbBuffer = 0;
     s_pSecFn->FreeContextBuffer(sspi_w_token[2].pvBuffer);
-    sspi_w_token[2].pvBuffer = NULL;
+    sspi_w_token[2].pvBuffer = nil;
     sspi_w_token[2].cbBuffer = 0;
 
     us_length = htons((short)sspi_send_token.cbBuffer);
@@ -627,7 +627,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
     sspi_w_token[0].BufferType = SECBUFFER_STREAM;
     sspi_w_token[1].BufferType = SECBUFFER_DATA;
     sspi_w_token[1].cbBuffer = 0;
-    sspi_w_token[1].pvBuffer = NULL;
+    sspi_w_token[1].pvBuffer = nil;
 
     sspi_major_status = s_pSecFn->DecryptMessage( &sspi_context,
                                                   &wrap_desc,

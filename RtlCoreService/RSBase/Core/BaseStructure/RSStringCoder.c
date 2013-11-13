@@ -105,7 +105,7 @@ BOOL _RSStringGetFileSystemRepresentation(RSStringRef string, uint8_t *buffer, R
     return RSStringGetFileSystemRepresentation(string, (char *)buffer, maxBufLen);
 }
 
-RSPrivate BOOL (*__RSCharToUniCharFunc)(UInt32 flags, uint8_t ch, UniChar *unicodeChar) = NULL;
+RSPrivate BOOL (*__RSCharToUniCharFunc)(UInt32 flags, uint8_t ch, UniChar *unicodeChar) = nil;
 RSPrivate UniChar __RSCharToUniCharTable[256] = {
     0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15,
     16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,

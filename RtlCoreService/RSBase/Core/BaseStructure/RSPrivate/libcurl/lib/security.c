@@ -120,7 +120,7 @@ static const struct Curl_sec_client_mech * const mechs[] = {
 #if defined(HAVE_KRB4)
   &Curl_krb4_client_mech,
 #endif
-  NULL
+  nil
 };
 
 /* Send an FTP command defined by |message| and the optional arguments. The
@@ -215,7 +215,7 @@ static CURLcode read_data(struct connectdata *conn,
 
   len = ntohl(len);
   tmp = realloc(buf->data, len);
-  if(tmp == NULL)
+  if(tmp == nil)
     return CURLE_OUT_OF_MEMORY;
 
   buf->data = tmp;
@@ -280,13 +280,13 @@ static ssize_t sec_recv(struct connectdata *conn, int sockindex,
 }
 
 /* Send |length| bytes from |from| to the |fd| socket taking care of encoding
-   and negociating with the server. |from| can be NULL. */
+   and negociating with the server. |from| can be nil. */
 /* FIXME: We don't check for errors nor report any! */
 static void do_sec_send(struct connectdata *conn, curl_socket_t fd,
                         const char *from, int length)
 {
   int bytes, htonl_bytes; /* 32-bit integers for htonl */
-  char *buffer = NULL;
+  char *buffer = nil;
   char *cmd_buffer;
   size_t cmd_size = 0;
   CURLcode error;
@@ -499,16 +499,16 @@ static CURLcode choose_mech(struct connectdata *conn)
 
   for(mech = mechs; (*mech); ++mech) {
     mech_name = (*mech)->name;
-    /* We have no mechanism with a NULL name but keep this check */
-    DEBUGASSERT(mech_name != NULL);
-    if(mech_name == NULL) {
+    /* We have no mechanism with a nil name but keep this check */
+    DEBUGASSERT(mech_name != nil);
+    if(mech_name == nil) {
       infof(data, "Skipping mechanism with empty name (%p)\n", mech);
       continue;
     }
     tmp_allocation = realloc(conn->app_data, (*mech)->size);
-    if(tmp_allocation == NULL) {
+    if(tmp_allocation == nil) {
       failf(data, "Failed realloc of size %u", (*mech)->size);
-      mech = NULL;
+      mech = nil;
       return CURLE_OUT_OF_MEMORY;
     }
     conn->app_data = tmp_allocation;
@@ -571,7 +571,7 @@ static CURLcode choose_mech(struct connectdata *conn)
     break;
   }
 
-  return mech != NULL ? CURLE_OK : CURLE_FAILED_INIT;
+  return mech != nil ? CURLE_OK : CURLE_FAILED_INIT;
 }
 
 CURLcode
@@ -584,15 +584,15 @@ Curl_sec_login(struct connectdata *conn)
 void
 Curl_sec_end(struct connectdata *conn)
 {
-  if(conn->mech != NULL && conn->mech->end)
+  if(conn->mech != nil && conn->mech->end)
     conn->mech->end(conn->app_data);
   if(conn->app_data) {
     free(conn->app_data);
-    conn->app_data = NULL;
+    conn->app_data = nil;
   }
   if(conn->in_buffer.data) {
     free(conn->in_buffer.data);
-    conn->in_buffer.data = NULL;
+    conn->in_buffer.data = nil;
     conn->in_buffer.size = 0;
     conn->in_buffer.index = 0;
     /* FIXME: Is this really needed? */
@@ -600,7 +600,7 @@ Curl_sec_end(struct connectdata *conn)
   }
   conn->sec_complete = 0;
   conn->data_prot = PROT_CLEAR;
-  conn->mech = NULL;
+  conn->mech = nil;
 }
 
 #endif /* HAVE_KRB4 || HAVE_GSSAPI */

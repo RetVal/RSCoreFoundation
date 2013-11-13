@@ -366,7 +366,7 @@ RS_CONST_STRING_DECL(_RSEmptyString, "");
 //    __RSStringClassEqual,
 //    __RSStringClassHash,
 //    __RSStringClassDescription,
-//    NULL,
+//    nil,
 //    __RSStringClassRefcount,
 //};
 //
@@ -2133,7 +2133,7 @@ static void __RSStringChangeSizeMultiple(RSMutableStringRef str, const RSRange *
         {
             // If we're reallocing anyway (larger or smaller --- larger could happen if desired capacity was changed in the meantime), let's just free it all
             if (curContents) __RSStrDeallocateMutableContents(str, (uint8_t *)curContents);
-            __RSStrSetContentPtr(str, NULL);
+            __RSStrSetContentPtr(str, nil);
             __RSStrSetCapacity(str, 0);
             __RSStrClearCapacityProvidedExternally(str);
             __RSStrClearHasLengthAndNullBytes(str);
@@ -2319,7 +2319,7 @@ static void __RSStringDeallocate(RSTypeRef RS)
 RSExport const char* RSStringGetCStringPtr(RSStringRef str, RSStringEncoding encoding)
 {
     if (encoding != __RSStringGetEightBitStringEncoding() && (RSStringEncodingASCII != __RSStringGetEightBitStringEncoding() || !__RSStringEncodingIsSupersetOfASCII(encoding)))
-        return NULL;
+        return nil;
     // ??? Also check for encoding = SystemEncoding and perhaps bytes are all ASCII?
     
     RS_OBJC_FUNCDISPATCHV(__RSStringTypeID, const char *, (NSString *)str, _fastCStringContents:YES);
@@ -2338,7 +2338,7 @@ RSExport const char* RSStringGetCStringPtr(RSStringRef str, RSStringEncoding enc
             if (__RSStrSkipAnyLengthByte(str) != 0 || !__RSStrIsMutable(str)) {
                 static int counter = 0;
                 printf("RSString %dth unsafe safe string %s\n", ++counter, __RSStrContents(str) + __RSStrSkipAnyLengthByte(str));
-                return NULL;
+                return nil;
             }
         }
 #endif
@@ -2355,7 +2355,7 @@ RSExport const char* RSStringGetCStringPtr(RSStringRef str, RSStringEncoding enc
     }
     else
     {
-        return NULL;
+        return nil;
     }
 }
 
@@ -2369,12 +2369,12 @@ const unsigned char * RSStringGetPascalStringPtr (RSStringRef str, RSStringEncod
         {
             // Requested encoding is equal to the encoding in string || the contents is in ASCII
             const uint8_t *contents = (const uint8_t *)__RSStrContents(str);
-            if (__RSStrHasExplicitLength(str) && (__RSStrLength2(str, contents) != (SInt32)(*contents))) return NULL;	// Invalid length byte
+            if (__RSStrHasExplicitLength(str) && (__RSStrLength2(str, contents) != (SInt32)(*contents))) return nil;	// Invalid length byte
             return (ConstStringPtr)contents;
         }
         // ??? Also check for encoding = SystemEncoding and perhaps bytes are all ASCII?
     }
-    return NULL;
+    return nil;
 }
 
 /* Guts of RSStringGetCharacters(); called from the two functions below. Don't call it from elsewhere.
@@ -2812,15 +2812,15 @@ RSInline void __RSParseFormatSpec(const UniChar *uformat, const uint8_t *cformat
                 spec->type = RSFormatRSType;
                 spec->size = RSFormatSizePointer;  // 4 or 8 depending on LP64
                 
-                if ((NULL != configKeyPointer) && (length > 0))
+                if ((nil != configKeyPointer) && (length > 0))
                 {
                     if (cformat)
                     {
-                        *configKeyPointer = RSStringCreateWithBytes(NULL, cformat + keyIndex, length, __RSStringGetEightBitStringEncoding(), FALSE);
+                        *configKeyPointer = RSStringCreateWithBytes(nil, cformat + keyIndex, length, __RSStringGetEightBitStringEncoding(), FALSE);
                     }
                     else
                     {
-                        *configKeyPointer = RSStringCreateWithCharactersNoCopy(NULL, uformat + keyIndex, length, RSAllocatorNull);
+                        *configKeyPointer = RSStringCreateWithCharactersNoCopy(nil, uformat + keyIndex, length, RSAllocatorNull);
                     }
                 }
                 return;
@@ -2836,15 +2836,15 @@ RSInline void __RSParseFormatSpec(const UniChar *uformat, const uint8_t *cformat
 //                    spec->type = RSFormatRSType;
 //                    spec->size = RSFormatSizePointer;  // 4 or 8 depending on LP64
 //                    
-//                    if ((NULL != configKeyPointer) && (length > 0))
+//                    if ((nil != configKeyPointer) && (length > 0))
 //                    {
 //                        if (cformat)
 //                        {
-//                            *configKeyPointer = RSStringCreateWithBytes(NULL, cformat + keyIndex, length, __RSStringGetEightBitStringEncoding(), FALSE);
+//                            *configKeyPointer = RSStringCreateWithBytes(nil, cformat + keyIndex, length, __RSStringGetEightBitStringEncoding(), FALSE);
 //                        }
 //                        else
 //                        {
-//                            *configKeyPointer = RSStringCreateWithCharactersNoCopy(NULL, uformat + keyIndex, length, RSAllocatorNull);
+//                            *configKeyPointer = RSStringCreateWithCharactersNoCopy(nil, uformat + keyIndex, length, RSAllocatorNull);
 //                        }
 //                    }
 //                    return;
@@ -3048,7 +3048,7 @@ void __RSStringAppendBytes(RSMutableStringRef str, const char *cStr, RSIndex app
         BOOL usingPassedInMemory = NO;
         
         vBuf.allocator = RSAllocatorGetDefault();	// We don't want to use client's allocator for temp stuff
-        vBuf.chars.unicode = NULL;	// This will cause the decode function to allocate memory if necessary
+        vBuf.chars.unicode = nil;	// This will cause the decode function to allocate memory if necessary
         
         if (!__RSStringDecodeByteStream3((const uint8_t *)cStr, appendedLength, encoding, __RSStrIsUnicode(str), &vBuf, &usingPassedInMemory, 0)) {
             RSAssert1(0, __RSLogAssertion, "Supplied bytes could not be converted specified encoding %d", encoding);
@@ -3153,7 +3153,7 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
 
 RSExport void RSStringAppendFormatAndArguments(RSMutableStringRef str, RSStringRef format, va_list args)
 {
-    __RSStringAppendFormatCore(str, NULL, nil, format, 0, NULL, 0, args);
+    __RSStringAppendFormatCore(str, nil, nil, format, 0, nil, 0, args);
 }
 
 RSExport void RSStringAppendStringWithFormat(RSMutableStringRef str, RSStringRef format, ...)
@@ -3200,15 +3200,15 @@ void __RSStringAppendBytes(RSMutableStringRef str, const char *cStr, RSIndex app
 TYPE value = (TYPE) WHAT;				\
 if (-1 != specs[curSpec].widthArgNum) {		\
 if (-1 != specs[curSpec].precArgNum) {		\
-snprintf_l(buffer, BUFFER_LEN-1, NULL, formatBuffer, width, precision, value); \
+snprintf_l(buffer, BUFFER_LEN-1, nil, formatBuffer, width, precision, value); \
 } else {					\
-snprintf_l(buffer, BUFFER_LEN-1, NULL, formatBuffer, width, value); \
+snprintf_l(buffer, BUFFER_LEN-1, nil, formatBuffer, width, value); \
 }						\
 } else {						\
 if (-1 != specs[curSpec].precArgNum) {		\
-snprintf_l(buffer, BUFFER_LEN-1, NULL, formatBuffer, precision, value); \
+snprintf_l(buffer, BUFFER_LEN-1, nil, formatBuffer, precision, value); \
 } else {					\
-snprintf_l(buffer, BUFFER_LEN-1, NULL, formatBuffer, value);	\
+snprintf_l(buffer, BUFFER_LEN-1, nil, formatBuffer, value);	\
 }						\
 }}
 #else
@@ -3241,9 +3241,9 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
     RSIndex numSpecs, sizeSpecs, sizeArgNum, formatIdx, curSpec, argNum;
     RSIndex formatLen;
 #define FORMAT_BUFFER_LEN 400
-    const uint8_t *cformat = NULL;
-    const UniChar *uformat = NULL;
-    UniChar *formatChars = NULL;
+    const uint8_t *cformat = nil;
+    const UniChar *uformat = nil;
+    UniChar *formatChars = nil;
     UniChar localFormatBuffer[FORMAT_BUFFER_LEN];
     
 #define VPRINTF_BUFFER_LEN 61
@@ -3255,16 +3255,16 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
     RSDictionaryRef localConfigs[VPRINTF_BUFFER_LEN];
     RSDictionaryRef *configs;
     RSIndex numConfigs;
-    RSAllocatorRef tmpAlloc = NULL;
+    RSAllocatorRef tmpAlloc = nil;
     intmax_t dummyLocation;	    // A place for %n to do its thing in; should be the widest possible int value
     
     numSpecs = 0;
     sizeSpecs = 0;
     sizeArgNum = 0;
     numConfigs = 0;
-    specs = NULL;
-    values = NULL;
-    configs = NULL;
+    specs = nil;
+    values = nil;
+    configs = nil;
     
     
     formatLen = RSStringGetLength(formatString);
@@ -3319,7 +3319,7 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
             specs[curSpec].type = RSFormatLiteralType;
             specs[curSpec].len = newFmtIdx - formatIdx;
         } else {
-            RSStringRef configKey = NULL;
+            RSStringRef configKey = nil;
             newFmtIdx++;	/* Skip % */
             __RSParseFormatSpec(uformat, cformat, &newFmtIdx, (RSBitU32)formatLen, &(specs[curSpec]), &configKey);
             if (RSFormatLiteralType == specs[curSpec].type) {
@@ -3337,7 +3337,7 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
     numSpecs = curSpec;
     
     // Max of three args per spec, reasoning thus: 1 width, 1 prec, 1 value
-    sizeArgNum = ((NULL == originalValues) ? (3 * sizeSpecs + 1) : originalValuesSize);
+    sizeArgNum = ((nil == originalValues) ? (3 * sizeSpecs + 1) : originalValuesSize);
     
     values = (sizeArgNum > VPRINTF_BUFFER_LEN) ? (RSPrintValue *)RSAllocatorAllocate(tmpAlloc, sizeArgNum * sizeof(RSPrintValue)) : localValuesBuffer;
 //    if (values != localValuesBuffer && __RSOASafe) __RSSetLastAllocationEventName(values, "RSString (temp)");
@@ -3398,7 +3398,7 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
     
     /* Collect the arguments in correct type from vararg list */
     for (argNum = 0; argNum < sizeArgNum; argNum++) {
-        if ((NULL != originalValues) && (0 == values[argNum].type)) values[argNum] = originalValues[argNum];
+        if ((nil != originalValues) && (0 == values[argNum].type)) values[argNum] = originalValues[argNum];
         switch (values[argNum].type) {
             case 0:
             case RSFormatLiteralType:
@@ -3445,7 +3445,7 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
     
     /* Format the pieces together */
     
-    if (NULL == originalValues) {
+    if (nil == originalValues) {
         originalValues = values;
         originalValuesSize = sizeArgNum;
     }
@@ -3488,7 +3488,7 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
                 char buffer[BUFFER_LEN + width + precision];
 #else
                 char stackBuffer[BUFFER_LEN];
-                char *dynamicBuffer = NULL;
+                char *dynamicBuffer = nil;
                 char *buffer = stackBuffer;
                 if (256+width+precision > BUFFER_LEN) {
                     dynamicBuffer = (char *)RSAllocatorAllocate(RSAllocatorSystemDefault, 256+width+precision, 0);
@@ -3550,7 +3550,7 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
                             RSStringRef decimalSeparator = RSSTR(".");
 #endif
                             RSStringRef decimalSeparator = RSSTR(".");
-                            if (decimalSeparator != NULL)
+                            if (decimalSeparator != nil)
                             {
                                 // We have a decimal separator in there
                                 RSIndex decimalPointLoc = 0;
@@ -3583,7 +3583,7 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
                 break;
             case RSFormatPascalCharsType:
             case RSFormatCharsType:
-                if (values[specs[curSpec].mainArgNum].value.pointerValue == NULL) {
+                if (values[specs[curSpec].mainArgNum].value.pointerValue == nil) {
                     RSStringAppendCString(outputString, "(null)", RSStringEncodingASCII);
                 } else {
                     RSUInteger len = 0;
@@ -3639,7 +3639,7 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
             case RSFormatUnicharsType:
                 //??? need to handle width, precision, and padding arguments
                 up = (UniChar *)values[specs[curSpec].mainArgNum].value.pointerValue;
-                if (NULL == up) {
+                if (nil == up) {
                     RSStringAppendCString(outputString, "(null)", RSStringEncodingASCII);
                 } else {
                     RSUInteger len;
@@ -3666,8 +3666,8 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
             case RSFormatRSType:
             case RSFormatObjectType:
                 if (specs[curSpec].configDictIndex != -1) { // config dict
-                    RSTypeRef object = NULL;
-//                    RSStringRef innerFormat = NULL;
+                    RSTypeRef object = nil;
+//                    RSStringRef innerFormat = nil;
                     
                     switch (values[specs[curSpec].mainArgNum].type) {
                         case RSFormatLongType:
@@ -3695,7 +3695,7 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
                             
                         case RSFormatPascalCharsType:
                         case RSFormatCharsType:
-                            if (NULL != values[specs[curSpec].mainArgNum].value.pointerValue)
+                            if (nil != values[specs[curSpec].mainArgNum].value.pointerValue)
                             {
                                 RSMutableStringRef aString = RSStringCreateMutable(tmpAlloc, 0);
                                 RSUInteger len;
@@ -3759,7 +3759,7 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
                         case RSFormatUnicharsType:
                             //??? need to handle width, precision, and padding arguments
                             up = (UniChar *)values[specs[curSpec].mainArgNum].value.pointerValue;
-                            if (NULL != up) {
+                            if (nil != up) {
                                 RSMutableStringRef aString = RSStringCreateMutable(tmpAlloc, 0);
                                 RSUInteger len;
                                 for (len = 0; 0 != up[len]; len++);
@@ -3786,15 +3786,15 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
                             
                         case RSFormatRSType:
                         case RSFormatObjectType:
-                            if (NULL != values[specs[curSpec].mainArgNum].value.pointerValue) object = RSRetain(values[specs[curSpec].mainArgNum].value.pointerValue);
+                            if (nil != values[specs[curSpec].mainArgNum].value.pointerValue) object = RSRetain(values[specs[curSpec].mainArgNum].value.pointerValue);
                             break;
                     }
                     
-                    if (NULL != object) RSRelease(object);
+                    if (nil != object) RSRelease(object);
                     
-                } else if (NULL != values[specs[curSpec].mainArgNum].value.pointerValue)
+                } else if (nil != values[specs[curSpec].mainArgNum].value.pointerValue)
                 {
-                    RSStringRef str = NULL;
+                    RSStringRef str = nil;
                     if (copyDescfunc)
                     {
                         str = copyDescfunc(values[specs[curSpec].mainArgNum].value.pointerValue, formatOptions);
@@ -3802,7 +3802,7 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
                     else
                     {
 //                        str = __RSCopyFormattingDescription(values[specs[curSpec].mainArgNum].value.pointerValue, formatOptions);
-//                        if (NULL == str)
+//                        if (nil == str)
 //                        {
                             str = (RSStringRef)RSDescription(values[specs[curSpec].mainArgNum].value.pointerValue);
 //                        }
@@ -3879,7 +3879,7 @@ RSStringRef  _RSStringCreateWithFormatAndArgumentsAux(RSAllocatorRef alloc, RSSt
     RSMutableStringRef outputString = RSStringCreateMutable(RSAllocatorSystemDefault, 0); //should use alloc if no copy/release
     
     __RSStrSetDesiredCapacity(outputString, capacity);	// Given this will be tightened later, choosing a larger working string is fine
-    __RSStringAppendFormatCore(outputString, copyDescfunc, nil, format, 0, NULL, 0, arguments);
+    __RSStringAppendFormatCore(outputString, copyDescfunc, nil, format, 0, nil, 0, arguments);
 
     // ??? copy/release should not be necessary here -- just make immutable, compress if possible
     // (However, this does make the string inline, and cause the supplied allocator to be used...)
@@ -3917,7 +3917,7 @@ typedef RSTypeRef (*RS_STRING_CREATE_COPY)(RSAllocatorRef alloc, RSTypeRef theSt
 static const RSRuntimeClass __RSStringClass = {
     _RSRuntimeScannedObject,
     "RSString",
-    NULL,      // init
+    nil,      // init
     __RSStringCopy,
     __RSStringDeallocate,
     __RSStringEqual,
@@ -3991,7 +3991,7 @@ RSExport RSIndex RSStringGetBytes(RSStringRef str, RSRange range, RSStringEncodi
 
 RSInline void __RSStringReplace(RSMutableStringRef str, RSRange range, RSStringRef replacement)
 {
-    RSStringRef copy = NULL;
+    RSStringRef copy = nil;
     if (replacement == str) copy = replacement = (RSStringRef)RSStringCreateCopy(RSAllocatorSystemDefault, replacement);   // Very special and hopefully rare case
     else if (replacement == nil) replacement = _RSEmptyString;
     RSIndex replacementLength = RSStringGetLength(replacement);
@@ -4002,7 +4002,7 @@ RSInline void __RSStringReplace(RSMutableStringRef str, RSRange range, RSStringR
         RSStringGetCharacters(replacement, RSMakeRange(0, replacementLength), contents + range.location);
     } else {
         uint8_t *contents = (uint8_t *)__RSStrContents(str);
-        RSStringGetBytes(replacement, RSMakeRange(0, replacementLength), __RSStringGetEightBitStringEncoding(), 0, NO, contents + range.location + __RSStrSkipAnyLengthByte(str), replacementLength, NULL);
+        RSStringGetBytes(replacement, RSMakeRange(0, replacementLength), __RSStringGetEightBitStringEncoding(), 0, NO, contents + range.location + __RSStrSkipAnyLengthByte(str), replacementLength, nil);
     }
     
     if (copy) RSRelease(copy);
@@ -4018,7 +4018,7 @@ RSInline RSMutableStringRef __RSStringCreateMutableFunnel(RSAllocatorRef alloc, 
     if (_RSAllocatorIsGCRefZero(alloc)) additionalInfoBits |= __RSHasContentsAllocator;
     BOOL hasExternalContentsAllocator = (additionalInfoBits & __RSHasContentsAllocator) ? YES : NO;
     
-    if (alloc == NULL) alloc = RSAllocatorGetDefault();
+    if (alloc == nil) alloc = RSAllocatorGetDefault();
     
     // Note that if there is an externalContentsAllocator, then we also have the storage for the string allocator...
     str = (RSMutableStringRef)__RSRuntimeCreateInstance(alloc, __RSStringTypeID, sizeof(struct __notInlineMutable) - (hasExternalContentsAllocator ? 0 : sizeof(RSAllocatorRef)));
@@ -4127,11 +4127,11 @@ static RSStringRef __RSStringCreateInstanceImmutable(RSAllocatorRef allocator,
 
     if (contentsDeallocator == ALLOCATORSFREEFUNC) {
         contentsDeallocator = allocator;
-    } else if (contentsDeallocator == NULL) {
+    } else if (contentsDeallocator == nil) {
         contentsDeallocator = RSAllocatorGetDefault();
     }
     
-    if ((NULL != _RSEmptyString) && (numBytes == 0) && (allocator == RSAllocatorSystemDefault))
+    if ((nil != _RSEmptyString) && (numBytes == 0) && (allocator == RSAllocatorSystemDefault))
     {
         // If we are using the system default allocator, and the string is empty, then use the empty string!
         if (noCopy)
@@ -4142,7 +4142,7 @@ static RSStringRef __RSStringCreateInstanceImmutable(RSAllocatorRef allocator,
         return (RSStringRef)RSRetain(_RSEmptyString);	// Quick exit; won't catch all empty strings, but most
     }
     
-    // At this point, contentsDeallocator is either same as allocator, or RSAllocatorNull(do nothing with memeory), or something else, but not NULL
+    // At this point, contentsDeallocator is either same as allocator, or RSAllocatorNull(do nothing with memeory), or something else, but not nil
    
     vBuf.shouldFreeChars = NO;	// We use this to remember to free the buffer possibly allocated by decode
 
@@ -4334,7 +4334,7 @@ RSExport const UniChar *RSStringGetCharactersPtr(RSStringRef str)
     
     __RSAssertIsString(str);
     if (__RSStrIsUnicode(str)) return (const UniChar *)__RSStrContents(str);
-    return NULL;
+    return nil;
 }
 
 RSExport RSRange RSStringGetRange(RSStringRef str)
@@ -4533,7 +4533,7 @@ RSRange RSStringGetRangeOfCharacterClusterAtIndex(RSStringRef string, RSIndex ch
     RSStringInlineBuffer stringBuffer;
     const uint8_t *bmpBitmap;
     const uint8_t *letterBMP;
-    static const uint8_t *combClassBMP = NULL;
+    static const uint8_t *combClassBMP = nil;
     UTF32Char character;
     UTF16Char otherSurrogate;
     
@@ -4545,7 +4545,7 @@ RSRange RSStringGetRangeOfCharacterClusterAtIndex(RSStringRef string, RSIndex ch
     
     bmpBitmap = RSUniCharGetBitmapPtrForPlane((RSBitU32)csetType, 0);
     letterBMP = RSUniCharGetBitmapPtrForPlane(RSUniCharLetterCharacterSet, 0);
-    if (NULL == combClassBMP) combClassBMP = (const uint8_t *)RSUniCharGetUnicodePropertyDataForPlane(RSUniCharCombiningProperty, 0);
+    if (nil == combClassBMP) combClassBMP = (const uint8_t *)RSUniCharGetUnicodePropertyDataForPlane(RSUniCharCombiningProperty, 0);
     
     RSStringInitInlineBuffer(string, &stringBuffer, RSMakeRange(0, length));
     
@@ -4706,7 +4706,7 @@ RSExport RSStringRef  RSStringCreateWithBytesNoCopy(RSAllocatorRef alloc, const 
 }
 
 RSExport RSStringRef  RSStringCreateWithFormatAndArguments(RSAllocatorRef alloc, RSIndex capacity, RSStringRef format, va_list arguments) {
-    return _RSStringCreateWithFormatAndArgumentsAux(alloc, NULL, capacity, format, arguments);
+    return _RSStringCreateWithFormatAndArgumentsAux(alloc, nil, capacity, format, arguments);
 }
 
 RSExport RSStringRef RSStringCreateWithSubstring(RSAllocatorRef alloc, RSStringRef str, RSRange range)
@@ -4741,17 +4741,17 @@ static RSIndex __RSStringFoldCharacterClusterAtIndex(UTF32Char character, RSStri
         UTF16Char lowSurrogate;
         RSIndex planeNo = (character >> 16);
         bool isTurkikCapitalI = NO;
-        static const uint8_t *decompBMP = NULL;
-        static const uint8_t *graphemeBMP = NULL;
+        static const uint8_t *decompBMP = nil;
+        static const uint8_t *graphemeBMP = nil;
         
-        if (NULL == decompBMP) {
+        if (nil == decompBMP) {
             decompBMP = RSUniCharGetBitmapPtrForPlane(RSUniCharCanonicalDecomposableCharacterSet, 0);
             graphemeBMP = RSUniCharGetBitmapPtrForPlane(RSUniCharGraphemeExtendCharacterSet, 0);
         }
         
         ++currentIndex;
         
-        if ((character < 0x0080) && ((NULL == langCode) || (character != 'I'))) { // ASCII
+        if ((character < 0x0080) && ((nil == langCode) || (character != 'I'))) { // ASCII
             if ((flags & RSCompareCaseInsensitive) && (character >= 'A') && (character <= 'Z')) {
                 character += ('a' - 'A');
                 *outCharacters = character;
@@ -4793,15 +4793,15 @@ static RSIndex __RSStringFoldCharacterClusterAtIndex(UTF32Char character, RSStri
             if (flags & RSCompareCaseInsensitive) {
                 const uint8_t *nonBaseBitmap;
                 bool filterNonBase = (((flags & RSCompareDiacriticInsensitive) && (character < 0x0510)) ? YES : NO);
-                static const uint8_t *lowerBMP = NULL;
-                static const uint8_t *caseFoldBMP = NULL;
+                static const uint8_t *lowerBMP = nil;
+                static const uint8_t *caseFoldBMP = nil;
                 
-                if (NULL == lowerBMP) {
+                if (nil == lowerBMP) {
                     lowerBMP = RSUniCharGetBitmapPtrForPlane(RSUniCharHasNonSelfLowercaseCharacterSet, 0);
                     caseFoldBMP = RSUniCharGetBitmapPtrForPlane(RSUniCharHasNonSelfCaseFoldingCharacterSet, 0);
                 }
                 
-                if ((NULL != langCode) && ('I' == character) && ((0 == strcmp((const char *)langCode, "tr")) || (0 == strcmp((const char *)langCode, "az")))) { // do Turkik special-casing
+                if ((nil != langCode) && ('I' == character) && ((0 == strcmp((const char *)langCode, "tr")) || (0 == strcmp((const char *)langCode, "az")))) { // do Turkik special-casing
                     if (filledLength > 1) {
                         if (0x0307 == outCharacters[1]) {
                             if (--filledLength > 1) memmove((outCharacters + 1), (outCharacters + 2), sizeof(UTF32Char) * (filledLength - 1));
@@ -4938,7 +4938,7 @@ static RSIndex __RSStringFoldCharacterClusterAtIndex(UTF32Char character, RSStri
         }
     }
     
-    if ((filledLength > 0) && (NULL != consumedLength)) *consumedLength = (currentIndex - index);
+    if ((filledLength > 0) && (nil != consumedLength)) *consumedLength = (currentIndex - index);
     
     return filledLength;
 }
@@ -5040,24 +5040,24 @@ static UCollator *__RSStringCreateCollator(const void *compareLocale) {
 #define RSMaxCachedDefaultCollators (8)
 static UCollator *__RSDefaultCollators[RSMaxCachedDefaultCollators];
 static RSIndex __RSDefaultCollatorsCount = 0;
-static const void *__RSDefaultCollatorLocale = NULL;
+static const void *__RSDefaultCollatorLocale = nil;
 static RSSpinLock __RSDefaultCollatorLock = RSSpinLockInit;
 
 static UCollator *__RSStringCopyDefaultCollator(RSLocaleRef compareLocale)
 {
-    RSLocaleRef currentLocale = NULL;
-    UCollator * collator = NULL;
+    RSLocaleRef currentLocale = nil;
+    UCollator * collator = nil;
     
     if (compareLocale != __RSDefaultCollatorLocale) {
         currentLocale = RSLocaleCopyCurrent();
         if (compareLocale != currentLocale) {
             RSRelease(currentLocale);
-            return NULL;
+            return nil;
         }
     }
     
     RSSpinLockLock(&__RSDefaultCollatorLock);
-    if ((NULL != currentLocale) && (__RSDefaultCollatorLocale != currentLocale)) {
+    if ((nil != currentLocale) && (__RSDefaultCollatorLocale != currentLocale)) {
         while (__RSDefaultCollatorsCount > 0) ucol_close(__RSDefaultCollators[--__RSDefaultCollatorsCount]);
         __RSDefaultCollatorLocale = RSRetain(currentLocale);
     }
@@ -5065,11 +5065,11 @@ static UCollator *__RSStringCopyDefaultCollator(RSLocaleRef compareLocale)
     if (__RSDefaultCollatorsCount > 0) collator = __RSDefaultCollators[--__RSDefaultCollatorsCount];
     RSSpinLockUnlock(&__RSDefaultCollatorLock);
     
-    if (NULL == collator) {
+    if (nil == collator) {
         collator = __RSStringCreateCollator(compareLocale);
     }
     
-    if (NULL != currentLocale) RSRelease(currentLocale);
+    if (nil != currentLocale) RSRelease(currentLocale);
     
     return collator;
 }
@@ -5078,15 +5078,15 @@ static UCollator *__RSStringCopyDefaultCollator(RSLocaleRef compareLocale)
 static void __collatorFinalize(UCollator *collator)
 {
     RSLocaleRef locale = _RSGetTSD(__RSTSDKeyCollatorLocale);
-    _RSSetTSD(__RSTSDKeyCollatorUCollator, NULL, NULL);
-    _RSSetTSD(__RSTSDKeyCollatorLocale, NULL, NULL);
+    _RSSetTSD(__RSTSDKeyCollatorUCollator, nil, nil);
+    _RSSetTSD(__RSTSDKeyCollatorLocale, nil, nil);
     RSSpinLockLock(&__RSDefaultCollatorLock);
     if ((__RSDefaultCollatorLocale == locale) && (__RSDefaultCollatorsCount < RSMaxCachedDefaultCollators)) {
         __RSDefaultCollators[__RSDefaultCollatorsCount++] = collator;
-        collator = NULL;
+        collator = nil;
     }
     RSSpinLockUnlock(&__RSDefaultCollatorLock);
-    if (NULL != collator) ucol_close(collator);
+    if (nil != collator) ucol_close(collator);
     if (locale) RSRelease(locale);
 }
 #endif
@@ -5094,12 +5094,12 @@ static void __collatorFinalize(UCollator *collator)
 
 #if defined(RSInline)
 RSInline const UniChar *RSStringGetCharactersPtrFromInlineBuffer(RSStringInlineBuffer *buf, RSRange desiredRange) {
-    if ((desiredRange.location < 0) || ((desiredRange.location + desiredRange.length) > buf->rangeToBuffer.length)) return NULL;
+    if ((desiredRange.location < 0) || ((desiredRange.location + desiredRange.length) > buf->rangeToBuffer.length)) return nil;
     
     if (buf->directBuffer) {
         return buf->directBuffer + buf->rangeToBuffer.location + desiredRange.location;
     } else {
-        if (desiredRange.length > __RSStringInlineBufferLength) return NULL;
+        if (desiredRange.length > __RSStringInlineBufferLength) return nil;
         
         if (((desiredRange.location + desiredRange.length) > buf->bufferedRangeEnd) || (desiredRange.location < buf->bufferedRangeStart)) {
             buf->bufferedRangeStart = desiredRange.location;
@@ -5137,7 +5137,7 @@ RSInline void RSStringGetCharactersFromInlineBuffer(RSStringInlineBuffer *buf, R
 }
 
 #else
-#define RSStringGetCharactersPtrFromInlineBuffer(buf, desiredRange) ((buf)->directBuffer ? (buf)->directBuffer + (buf)->rangeToBuffer.location + desiredRange.location : NULL)
+#define RSStringGetCharactersPtrFromInlineBuffer(buf, desiredRange) ((buf)->directBuffer ? (buf)->directBuffer + (buf)->rangeToBuffer.location + desiredRange.location : nil)
 
 #define RSStringGetCharactersFromInlineBuffer(buf, desiredRange, outBuf) \
 if (buf->directBuffer) memmove(outBuf, (buf)->directBuffer + (buf)->rangeToBuffer.location + desiredRange.location, desiredRange.length * sizeof(UniChar)); \
@@ -5346,15 +5346,15 @@ RSPrivate RSComparisonResult _RSCompareStringsWithLocale(RSStringInlineBuffer *s
     BOOL isEqual;
     bool forcedOrdering = ((options & RSCompareForcedOrdering) ? YES : NO);
     
-    UCollator *collator = NULL;
+    UCollator *collator = nil;
     bool defaultCollator = YES;
 #endif
-    static const uint8_t *alnumBMP = NULL;
-    static const uint8_t *nonBaseBMP = NULL;
-    static const uint8_t *punctBMP = NULL;
-    static const uint8_t *controlBMP = NULL;
+    static const uint8_t *alnumBMP = nil;
+    static const uint8_t *nonBaseBMP = nil;
+    static const uint8_t *punctBMP = nil;
+    static const uint8_t *controlBMP = nil;
     
-    if (NULL == alnumBMP) {
+    if (nil == alnumBMP) {
         alnumBMP = RSUniCharGetBitmapPtrForPlane(RSUniCharAlphaNumericCharacterSet, 0);
         nonBaseBMP = RSUniCharGetBitmapPtrForPlane(RSUniCharNonBaseCharacterSet, 0);
         punctBMP = RSUniCharGetBitmapPtrForPlane(RSUniCharPunctuationCharacterSet, 0);
@@ -5388,7 +5388,7 @@ RSPrivate RSComparisonResult _RSCompareStringsWithLocale(RSStringInlineBuffer *s
 #endif
         collator = __RSStringCopyDefaultCollator(compareLocale);
         defaultCollator = YES;
-        if (NULL == collator) {
+        if (nil == collator) {
             collator = __RSStringCreateCollator(compareLocale);
             defaultCollator = NO;
         }
@@ -5400,12 +5400,12 @@ RSPrivate RSComparisonResult _RSCompareStringsWithLocale(RSStringInlineBuffer *s
     characters1 = RSStringGetCharactersPtrFromInlineBuffer(str1, range1);
     characters2 = RSStringGetCharactersPtrFromInlineBuffer(str2, range2);
     
-    if ((NULL != characters1) && (NULL != characters2)) { // do fast
+    if ((nil != characters1) && (nil != characters2)) { // do fast
         range1.length = (str1Range.location + str1Range.length) - range1.location;
         range2.length = (str2Range.location + str2Range.length) - range2.location;
         
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
-        if ((NULL != collator) && (__CompareTextDefault(collator, options, characters1, range1.length, characters2, range2.length, &isEqual, &order) == 0 /* noErr */)) {
+        if ((nil != collator) && (__CompareTextDefault(collator, options, characters1, range1.length, characters2, range2.length, &isEqual, &order) == 0 /* noErr */)) {
             compResult = ((isEqual && !forcedOrdering) ? RSCompareEqualTo : ((order < 0) ? RSCompareLessThan : RSCompareGreaterThan));
         } else
 #endif
@@ -5413,8 +5413,8 @@ RSPrivate RSComparisonResult _RSCompareStringsWithLocale(RSStringInlineBuffer *s
             compResult = ((memcmp(characters1, characters2, sizeof(UniChar) * range1.length) < 0) ? RSCompareLessThan : RSCompareGreaterThan);
         }
     } else {
-        UniChar *buffer1 = NULL;
-        UniChar *buffer2 = NULL;
+        UniChar *buffer1 = nil;
+        UniChar *buffer2 = nil;
         UTF16Char sBuffer1[RSStringCompareAllocationIncrement];
         UTF16Char sBuffer2[RSStringCompareAllocationIncrement];
         RSIndex buffer1Len = 0, buffer2Len = 0;
@@ -5429,7 +5429,7 @@ RSPrivate RSComparisonResult _RSCompareStringsWithLocale(RSStringInlineBuffer *s
                 range1.length = (str1Range.location - range1.location);
                 characters1 = RSStringGetCharactersPtrFromInlineBuffer(str1, range1);
                 
-                if (NULL == characters1) {
+                if (nil == characters1) {
                     if ((0 > buffer1Len) || (range1.length > RSStringCompareAllocationIncrement)) {
                         if (buffer1Len < range1.length) {
                             bufferSize = range1.length + (RSStringCompareAllocationIncrement - (range1.length % RSStringCompareAllocationIncrement));
@@ -5454,7 +5454,7 @@ RSPrivate RSComparisonResult _RSCompareStringsWithLocale(RSStringInlineBuffer *s
                 range2.length = (str2Range.location - range2.location);
                 characters2 = RSStringGetCharactersPtrFromInlineBuffer(str2, range2);
                 
-                if (NULL == characters2) {
+                if (nil == characters2) {
                     if ((0 > buffer2Len) || (range2.length > RSStringCompareAllocationIncrement)) {
                         if (buffer2Len < range2.length) {
                             bufferSize = range2.length + (RSStringCompareAllocationIncrement - (range2.length % RSStringCompareAllocationIncrement));
@@ -5475,7 +5475,7 @@ RSPrivate RSComparisonResult _RSCompareStringsWithLocale(RSStringInlineBuffer *s
             }
             
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
-            if ((NULL != collator) && (__CompareTextDefault(collator, options, characters1, range1.length, characters2, range2.length, &isEqual, &order) ==  0 /* noErr */)) {
+            if ((nil != collator) && (__CompareTextDefault(collator, options, characters1, range1.length, characters2, range2.length, &isEqual, &order) ==  0 /* noErr */)) {
                 if (isEqual) {
                     if (forcedOrdering && (RSCompareEqualTo == compResult) && (0 != order)) compResult = ((order < 0) ? RSCompareLessThan : RSCompareGreaterThan);
                     order = 0;
@@ -5518,7 +5518,7 @@ RSPrivate RSComparisonResult _RSCompareStringsWithLocale(RSStringInlineBuffer *s
         if (threadLocale) __collatorFinalize((UCollator *)_RSGetTSD(__RSTSDKeyCollatorUCollator)); // need to dealloc collators
         
         _RSSetTSD(__RSTSDKeyCollatorUCollator, collator, (void *)__collatorFinalize);
-        _RSSetTSD(__RSTSDKeyCollatorLocale, (void *)RSRetain(compareLocale), NULL);
+        _RSSetTSD(__RSTSDKeyCollatorLocale, (void *)RSRetain(compareLocale), nil);
     }
 #endif
     
@@ -5530,15 +5530,15 @@ extern void __RSLocaleSetNullLocale(struct __RSLocale *locale);
 
 static const char *_RSStrGetLanguageIdentifierForLocale(RSLocaleRef locale) {
     RSStringRef collatorID;
-    const char *langID = NULL;
-    static const void *lastLocale = NULL;
-    static const char *lastLangID = NULL;
+    const char *langID = nil;
+    static const void *lastLocale = nil;
+    static const char *lastLangID = nil;
     static RSSpinLock lock = RSSpinLockInit;
     
-    if (__RSLocaleGetNullLocale((struct __RSLocale *)locale)) return NULL;
+    if (__RSLocaleGetNullLocale((struct __RSLocale *)locale)) return nil;
     
     RSSpinLockLock(&lock);
-    if ((NULL != lastLocale) && (lastLocale == locale)) {
+    if ((nil != lastLocale) && (lastLocale == locale)) {
         RSSpinLockUnlock(&lock);
         return lastLangID;
     }
@@ -5576,7 +5576,7 @@ static const char *_RSStrGetLanguageIdentifierForLocale(RSLocaleRef locale) {
     }
     
     
-    if (langID == NULL) __RSLocaleSetNullLocale((struct __RSLocale *)locale);
+    if (langID == nil) __RSLocaleSetNullLocale((struct __RSLocale *)locale);
     
     RSSpinLockLock(&lock);
     lastLocale = locale;
@@ -5588,12 +5588,12 @@ static const char *_RSStrGetLanguageIdentifierForLocale(RSLocaleRef locale) {
 
 static bool __RSStringFillCharacterSetInlineBuffer(RSCharacterSetInlineBuffer *buffer, RSStringCompareFlags compareOptions) {
     if (0 != (compareOptions & RSCompareIgnoreNonAlphanumeric)) {
-        static RSCharacterSetRef nonAlnumChars = NULL;
+        static RSCharacterSetRef nonAlnumChars = nil;
         
-        if (NULL == nonAlnumChars) {
+        if (nil == nonAlnumChars) {
             RSMutableCharacterSetRef cset = RSCharacterSetCreateMutableCopy(RSAllocatorSystemDefault, RSCharacterSetGetPredefined(RSCharacterSetAlphaNumeric));
             RSCharacterSetInvert(cset);
-            if (!OSAtomicCompareAndSwapPtrBarrier(NULL, cset, (void **)&nonAlnumChars)) RSRelease(cset);
+            if (!OSAtomicCompareAndSwapPtrBarrier(nil, cset, (void **)&nonAlnumChars)) RSRelease(cset);
         }
         
         RSCharacterSetInitInlineBuffer(nonAlnumChars, buffer);
@@ -5635,34 +5635,34 @@ RSExport RSComparisonResult RSStringCompareWithOptionsAndLocale(RSStringRef stri
     RSComparisonResult compareResult = RSCompareEqualTo;
     UTF16Char otherChar;
     BOOL freeLocale = NO;
-    RSCharacterSetInlineBuffer *ignoredChars = NULL;
+    RSCharacterSetInlineBuffer *ignoredChars = nil;
     RSCharacterSetInlineBuffer csetBuffer;
     bool numericEquivalence = NO;
 //
-    if ((compareOptions & RSCompareLocalized) && (NULL == locale)) {
+    if ((compareOptions & RSCompareLocalized) && (nil == locale)) {
         locale = RSLocaleCopyCurrent();
         freeLocale = YES;
     }
     
-    langCode = ((NULL == locale) ? NULL : (const uint8_t *)_RSStrGetLanguageIdentifierForLocale(locale));
+    langCode = ((nil == locale) ? nil : (const uint8_t *)_RSStrGetLanguageIdentifierForLocale(locale));
     
     if (__RSStringFillCharacterSetInlineBuffer(&csetBuffer, compareOptions)) {
         ignoredChars = &csetBuffer;
         equalityOptions = YES;
     }
     
-    if (!numerically) { // could do binary comp (be careful when adding new flags) (NULL == locale) && (NULL == ignoredChars) &&
+    if (!numerically) { // could do binary comp (be careful when adding new flags) (nil == locale) && (nil == ignoredChars) &&
         RSStringEncoding eightBitEncoding = __RSStringGetEightBitStringEncoding();
         const uint8_t *str1Bytes = (const uint8_t *)RSStringGetCStringPtr(string, eightBitEncoding);
         const uint8_t *str2Bytes = (const uint8_t *)RSStringGetCStringPtr(string2, eightBitEncoding);
         RSIndex factor = sizeof(uint8_t);
         
-        if ((NULL != str1Bytes) && (NULL != str2Bytes)) {
+        if ((nil != str1Bytes) && (nil != str2Bytes)) {
             compareOptions &= ~RSCompareNonliteral; // remove non-literal
             
             if ((RSStringEncodingASCII == eightBitEncoding) && (NO == forceOrdering)) {
                 if (caseInsensitive) {
-                    int cmpResult = strncasecmp_l((const char *)str1Bytes + rangeToCompare.location, (const char *)str2Bytes, __RSMin(rangeToCompare.length, str2Len), NULL);
+                    int cmpResult = strncasecmp_l((const char *)str1Bytes + rangeToCompare.location, (const char *)str2Bytes, __RSMin(rangeToCompare.length, str2Len), nil);
                     
                     if (0 == cmpResult) cmpResult = (int)(rangeToCompare.length - str2Len);
                     
@@ -5687,7 +5687,7 @@ RSExport RSComparisonResult RSStringCompareWithOptionsAndLocale(RSStringRef stri
                             
                             if (str1Char != str2Char) return ((str1Char < str2Char) ? RSCompareLessThan : RSCompareGreaterThan);
                         } else {
-                            str1Bytes = NULL;
+                            str1Bytes = nil;
                             break;
                         }
                     }
@@ -5702,12 +5702,12 @@ RSExport RSComparisonResult RSStringCompareWithOptionsAndLocale(RSStringRef stri
                     return ((0 == cmpResult) ? compareResult : ((cmpResult < 0) ? RSCompareLessThan : RSCompareGreaterThan));
                 }
             }
-        } else if (!equalityOptions && (NULL == str1Bytes) && (NULL == str2Bytes)) {
+        } else if (!equalityOptions && (nil == str1Bytes) && (nil == str2Bytes)) {
             str1Bytes = (const uint8_t *)RSStringGetCharactersPtr(string);
             str2Bytes = (const uint8_t *)RSStringGetCharactersPtr(string2);
             factor = sizeof(UTF16Char);
 #if __LITTLE_ENDIAN__
-            if ((NULL != str1Bytes) && (NULL != str2Bytes)) { // we cannot use memcmp
+            if ((nil != str1Bytes) && (nil != str2Bytes)) { // we cannot use memcmp
                 const UTF16Char *str1 = ((const UTF16Char *)str1Bytes) + rangeToCompare.location;
                 const UTF16Char *str1Limit = str1 + __RSMin(rangeToCompare.length, str2Len);
                 const UTF16Char *str2 = (const UTF16Char *)str2Bytes;
@@ -5721,7 +5721,7 @@ RSExport RSComparisonResult RSStringCompareWithOptionsAndLocale(RSStringRef stri
             }
 #endif /* __LITTLE_ENDIAN__ */
         }
-        if ((NULL != str1Bytes) && (NULL != str2Bytes)) {
+        if ((nil != str1Bytes) && (nil != str2Bytes)) {
             int cmpResult = memcmp(str1Bytes + (rangeToCompare.location * factor), str2Bytes, __RSMin(rangeToCompare.length, str2Len) * factor);
             
             if (0 == cmpResult) cmpResult = (int)(rangeToCompare.length - str2Len);
@@ -5733,7 +5733,7 @@ RSExport RSComparisonResult RSStringCompareWithOptionsAndLocale(RSStringRef stri
     RSStringInitInlineBuffer(string, &inlineBuf1, rangeToCompare);
     RSStringInitInlineBuffer(string2, &inlineBuf2, RSMakeRange(0, str2Len));
     
-    if (NULL != locale) {
+    if (nil != locale) {
         str1LocalizedIndex = str1Index;
         str2LocalizedIndex = str2Index;
         
@@ -5746,14 +5746,14 @@ RSExport RSComparisonResult RSStringCompareWithOptionsAndLocale(RSStringRef stri
     while ((str1Index < rangeToCompare.length) && (str2Index < str2Len)) {
         if (strBuf1Len == 0) {
             str1Char = RSStringGetCharacterFromInlineBuffer(&inlineBuf1, str1Index);
-            if (caseInsensitive && (str1Char >= 'A') && (str1Char <= 'Z') && ((NULL == langCode) || (str1Char != 'I')) && ((NO == forceOrdering) || (RSCompareEqualTo != compareResult))) str1Char += ('a' - 'A');
+            if (caseInsensitive && (str1Char >= 'A') && (str1Char <= 'Z') && ((nil == langCode) || (str1Char != 'I')) && ((NO == forceOrdering) || (RSCompareEqualTo != compareResult))) str1Char += ('a' - 'A');
             str1UsedLen = 1;
         } else {
             str1Char = strBuf1[strBuf1Index++];
         }
         if (strBuf2Len == 0) {
             str2Char = RSStringGetCharacterFromInlineBuffer(&inlineBuf2, str2Index);
-            if (caseInsensitive && (str2Char >= 'A') && (str2Char <= 'Z') && ((NULL == langCode) || (str2Char != 'I')) && ((NO == forceOrdering) || (RSCompareEqualTo != compareResult))) str2Char += ('a' - 'A');
+            if (caseInsensitive && (str2Char >= 'A') && (str2Char <= 'Z') && ((nil == langCode) || (str2Char != 'I')) && ((NO == forceOrdering) || (RSCompareEqualTo != compareResult))) str2Char += ('a' - 'A');
             str2UsedLen = 1;
         } else {
             str2Char = strBuf2[strBuf2Index++];
@@ -5798,7 +5798,7 @@ RSExport RSComparisonResult RSStringCompareWithOptionsAndLocale(RSStringRef stri
         
         if (str1Char != str2Char) {
             if (!equalityOptions) {
-                compareResult = ((NULL == locale) ? ((str1Char < str2Char) ? RSCompareLessThan : RSCompareGreaterThan) : _RSCompareStringsWithLocale(&inlineBuf1, RSMakeRange(str1Index, rangeToCompare.length - str1Index), &inlineBuf2, RSMakeRange(str2Index, str2Len - str2Index), compareOptions, locale));
+                compareResult = ((nil == locale) ? ((str1Char < str2Char) ? RSCompareLessThan : RSCompareGreaterThan) : _RSCompareStringsWithLocale(&inlineBuf1, RSMakeRange(str1Index, rangeToCompare.length - str1Index), &inlineBuf2, RSMakeRange(str2Index, str2Len - str2Index), compareOptions, locale));
                 if (freeLocale && locale) {
                     RSRelease(locale);
                 }
@@ -5811,9 +5811,9 @@ RSExport RSComparisonResult RSStringCompareWithOptionsAndLocale(RSStringRef stri
                 forcedIndex2 = str2LocalizedIndex;
             }
             
-            if ((str1Char < 0x80) && (str2Char < 0x80) && (NULL == ignoredChars))
+            if ((str1Char < 0x80) && (str2Char < 0x80) && (nil == ignoredChars))
             {
-                if (NULL != locale)
+                if (nil != locale)
                 {
                     compareResult = _RSCompareStringsWithLocale(&inlineBuf1, RSMakeRange(str1Index, rangeToCompare.length - str1Index), &inlineBuf2, RSMakeRange(str2Index, str2Len - str2Index), compareOptions, locale);
                     if (freeLocale && locale)
@@ -5844,7 +5844,7 @@ RSExport RSComparisonResult RSStringCompareWithOptionsAndLocale(RSStringRef stri
                 str2UsedLen = 2;
             }
             
-            if (NULL != ignoredChars) {
+            if (nil != ignoredChars) {
                 if (RSCharacterSetInlineBufferIsLongCharacterMember(ignoredChars, str1Char)) {
                     if ((strBuf1Len > 0) && (strBuf1Index == strBuf1Len)) strBuf1Len = 0;
                     if (strBuf1Len == 0) str1Index += str1UsedLen;
@@ -5888,7 +5888,7 @@ RSExport RSComparisonResult RSStringCompareWithOptionsAndLocale(RSStringRef stri
                 }
                 
                 if ((0 == strBuf1Len) && (0 < strBuf2Len)) {
-                    compareResult =  ((NULL == locale) ? ((str1Char < str2Char) ? RSCompareLessThan : RSCompareGreaterThan) : _RSCompareStringsWithLocale(&inlineBuf1, RSMakeRange(str1LocalizedIndex, rangeToCompare.length - str1LocalizedIndex), &inlineBuf2, RSMakeRange(str2LocalizedIndex, str2Len - str2LocalizedIndex), compareOptions, locale));
+                    compareResult =  ((nil == locale) ? ((str1Char < str2Char) ? RSCompareLessThan : RSCompareGreaterThan) : _RSCompareStringsWithLocale(&inlineBuf1, RSMakeRange(str1LocalizedIndex, rangeToCompare.length - str1LocalizedIndex), &inlineBuf2, RSMakeRange(str2LocalizedIndex, str2Len - str2LocalizedIndex), compareOptions, locale));
                     if (freeLocale && locale) {
                         RSRelease(locale);
                     }
@@ -5902,7 +5902,7 @@ RSExport RSComparisonResult RSStringCompareWithOptionsAndLocale(RSStringRef stri
                         strBuf2Index = 1;
                     }
                     if ((0 == strBuf2Len) || (str1Char != str2Char)) {
-                        compareResult = ((NULL == locale) ? ((str1Char < str2Char) ? RSCompareLessThan : RSCompareGreaterThan) : _RSCompareStringsWithLocale(&inlineBuf1, RSMakeRange(str1LocalizedIndex, rangeToCompare.length - str1LocalizedIndex), &inlineBuf2, RSMakeRange(str2LocalizedIndex, str2Len - str2LocalizedIndex), compareOptions, locale));
+                        compareResult = ((nil == locale) ? ((str1Char < str2Char) ? RSCompareLessThan : RSCompareGreaterThan) : _RSCompareStringsWithLocale(&inlineBuf1, RSMakeRange(str1LocalizedIndex, rangeToCompare.length - str1LocalizedIndex), &inlineBuf2, RSMakeRange(str2LocalizedIndex, str2Len - str2LocalizedIndex), compareOptions, locale));
                         if (freeLocale && locale) {
                             RSRelease(locale);
                         }
@@ -5917,7 +5917,7 @@ RSExport RSComparisonResult RSStringCompareWithOptionsAndLocale(RSStringRef stri
                     ++strBuf1Index; ++strBuf2Index;
                 }
                 if ((strBuf1Index < strBuf1Len) && (strBuf2Index < strBuf2Len)) {
-                    RSComparisonResult res = ((NULL == locale) ? ((strBuf1[strBuf1Index] < strBuf2[strBuf2Index]) ? RSCompareLessThan : RSCompareGreaterThan) : _RSCompareStringsWithLocale(&inlineBuf1, RSMakeRange(str1LocalizedIndex, rangeToCompare.length - str1LocalizedIndex), &inlineBuf2, RSMakeRange(str2LocalizedIndex, str2Len - str2LocalizedIndex), compareOptions, locale));
+                    RSComparisonResult res = ((nil == locale) ? ((strBuf1[strBuf1Index] < strBuf2[strBuf2Index]) ? RSCompareLessThan : RSCompareGreaterThan) : _RSCompareStringsWithLocale(&inlineBuf1, RSMakeRange(str1LocalizedIndex, rangeToCompare.length - str1LocalizedIndex), &inlineBuf2, RSMakeRange(str2LocalizedIndex, str2Len - str2LocalizedIndex), compareOptions, locale));
                     if (freeLocale && locale) {
                         RSRelease(locale);
                     }
@@ -5937,32 +5937,32 @@ RSExport RSComparisonResult RSStringCompareWithOptionsAndLocale(RSStringRef stri
         }
     }
     
-    if (diacriticsInsensitive || NULL != ignoredChars)
+    if (diacriticsInsensitive || nil != ignoredChars)
     {
         while (str1Index < rangeToCompare.length) {
             str1Char = RSStringGetCharacterFromInlineBuffer(&inlineBuf1, str1Index);
-            if ((str1Char < 0x80) && (NULL == ignoredChars)) break; // found ASCII
+            if ((str1Char < 0x80) && (nil == ignoredChars)) break; // found ASCII
             
             if (RSUniCharIsSurrogateHighCharacter(str1Char) && RSUniCharIsSurrogateLowCharacter((otherChar = RSStringGetCharacterFromInlineBuffer(&inlineBuf1, str1Index + 1)))) str1Char = RSUniCharGetLongCharacterForSurrogatePair(str1Char, otherChar);
             
-            if ((!diacriticsInsensitive || !RSUniCharIsMemberOfBitmap(str1Char, ((str1Char < 0x10000) ? graphemeBMP : RSUniCharGetBitmapPtrForPlane(RSUniCharGraphemeExtendCharacterSet, (str1Char >> 16))))) && ((NULL == ignoredChars) || !RSCharacterSetInlineBufferIsLongCharacterMember(ignoredChars, str1Char))) break;
+            if ((!diacriticsInsensitive || !RSUniCharIsMemberOfBitmap(str1Char, ((str1Char < 0x10000) ? graphemeBMP : RSUniCharGetBitmapPtrForPlane(RSUniCharGraphemeExtendCharacterSet, (str1Char >> 16))))) && ((nil == ignoredChars) || !RSCharacterSetInlineBufferIsLongCharacterMember(ignoredChars, str1Char))) break;
             
             str1Index += ((str1Char < 0x10000) ? 1 : 2);
         }
         
         while (str2Index < str2Len) {
             str2Char = RSStringGetCharacterFromInlineBuffer(&inlineBuf2, str2Index);
-            if ((str2Char < 0x80) && (NULL == ignoredChars)) break; // found ASCII
+            if ((str2Char < 0x80) && (nil == ignoredChars)) break; // found ASCII
             
             if (RSUniCharIsSurrogateHighCharacter(str2Char) && RSUniCharIsSurrogateLowCharacter((otherChar = RSStringGetCharacterFromInlineBuffer(&inlineBuf2, str2Index + 1)))) str2Char = RSUniCharGetLongCharacterForSurrogatePair(str2Char, otherChar);
             
-            if ((!diacriticsInsensitive || !RSUniCharIsMemberOfBitmap(str2Char, ((str2Char < 0x10000) ? graphemeBMP : RSUniCharGetBitmapPtrForPlane(RSUniCharGraphemeExtendCharacterSet, (str2Char >> 16))))) && ((NULL == ignoredChars) || !RSCharacterSetInlineBufferIsLongCharacterMember(ignoredChars, str2Char))) break;
+            if ((!diacriticsInsensitive || !RSUniCharIsMemberOfBitmap(str2Char, ((str2Char < 0x10000) ? graphemeBMP : RSUniCharGetBitmapPtrForPlane(RSUniCharGraphemeExtendCharacterSet, (str2Char >> 16))))) && ((nil == ignoredChars) || !RSCharacterSetInlineBufferIsLongCharacterMember(ignoredChars, str2Char))) break;
             
             str2Index += ((str2Char < 0x10000) ? 1 : 2);
         }
     }
     // Need to recalc localized result here for forced ordering, ICU cannot do numericEquivalence
-    if (!numericEquivalence && (NULL != locale) && (RSCompareEqualTo != compareResult) && (str1Index == rangeToCompare.length) && (str2Index == str2Len)) compareResult = _RSCompareStringsWithLocale(&inlineBuf1, RSMakeRange(forcedIndex1, rangeToCompare.length - forcedIndex1), &inlineBuf2, RSMakeRange(forcedIndex2, str2Len - forcedIndex2), compareOptions, locale);
+    if (!numericEquivalence && (nil != locale) && (RSCompareEqualTo != compareResult) && (str1Index == rangeToCompare.length) && (str2Index == str2Len)) compareResult = _RSCompareStringsWithLocale(&inlineBuf1, RSMakeRange(forcedIndex1, rangeToCompare.length - forcedIndex1), &inlineBuf2, RSMakeRange(forcedIndex2, str2Len - forcedIndex2), compareOptions, locale);
     
     if (freeLocale && locale) {
         RSRelease(locale);
@@ -6231,7 +6231,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
     RSIndex findStrLen = RSStringGetLength(stringToFind);
     BOOL didFind = NO;
     bool lengthVariants = ((compareOptions & (RSCompareCaseInsensitive|RSCompareNonliteral|RSCompareDiacriticInsensitive)) ? YES : NO);
-    RSCharacterSetInlineBuffer *ignoredChars = NULL;
+    RSCharacterSetInlineBuffer *ignoredChars = nil;
     RSCharacterSetInlineBuffer csetBuffer;
     
     if (__RSStringFillCharacterSetInlineBuffer(&csetBuffer, compareOptions))
@@ -6250,7 +6250,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
         const uint8_t *str1Bytes = (const uint8_t *)RSStringGetCStringPtr(string, eightBitEncoding);
         const uint8_t *str2Bytes = (const uint8_t *)RSStringGetCStringPtr(stringToFind, eightBitEncoding);
         const UTF32Char *characters, *charactersLimit;
-        const uint8_t *langCode = NULL;
+        const uint8_t *langCode = nil;
         RSIndex fromLoc, toLoc;
         RSIndex str1Index, str2Index;
         RSIndex strBuf1Len, strBuf2Len;
@@ -6261,7 +6261,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
         bool backwardAnchor = (((RSCompareBackwards|RSCompareAnchored) == (compareOptions & (RSCompareBackwards|RSCompareAnchored))) ? YES : NO);
         int8_t delta;
         
-        if (NULL == locale)
+        if (nil == locale)
         {
             if (compareOptions & RSCompareLocalized)
             {
@@ -6291,7 +6291,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
         
         delta = ((fromLoc <= toLoc) ? 1 : -1);
         
-        if ((NULL != str1Bytes) && (NULL != str2Bytes))
+        if ((nil != str1Bytes) && (nil != str2Bytes))
         {
             uint8_t str1Byte, str2Byte;
             while (1)
@@ -6306,7 +6306,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                     {
                         if (equalityOptions)
                         {
-                            if ((str1Byte < 0x80) && ((NULL == langCode) || ('I' != str1Byte)))
+                            if ((str1Byte < 0x80) && ((nil == langCode) || ('I' != str1Byte)))
                             {
                                 if (caseInsensitive && (str1Byte >= 'A') && (str1Byte <= 'Z'))
                                     str1Byte += ('a' - 'A');
@@ -6316,7 +6316,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                             else
                             {
                                 str1Char = RSStringGetCharacterFromInlineBuffer(&inlineBuf1, str1Index);
-                                strBuf1Len = __RSStringFoldCharacterClusterAtIndex(str1Char, &inlineBuf1, str1Index, compareOptions, langCode, strBuf1, RSStringStackBufferLength, NULL);
+                                strBuf1Len = __RSStringFoldCharacterClusterAtIndex(str1Char, &inlineBuf1, str1Index, compareOptions, langCode, strBuf1, RSStringStackBufferLength, nil);
                                 if (1 > strBuf1Len)
                                 {
                                     *strBuf1 = str1Char;
@@ -6324,7 +6324,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                                 }
                             }
                             
-                            if ((NULL != ignoredChars) &&
+                            if ((nil != ignoredChars) &&
                                 (forwardAnchor || (str1Index != fromLoc)) &&
                                 RSCharacterSetInlineBufferIsLongCharacterMember(ignoredChars,
                                                                                 ((str1Byte < 0x80) ? str1Byte : str1Char)))
@@ -6334,7 +6334,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                             }
                             
                             if ((str2Byte < 0x80) &&
-                                ((NULL == langCode) || ('I' != str2Byte)))
+                                ((nil == langCode) || ('I' != str2Byte)))
                             {
                                 if (caseInsensitive && (str2Byte >= 'A') && (str2Byte <= 'Z'))
                                     str2Byte += ('a' - 'A');
@@ -6344,7 +6344,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                             else
                             {
                                 str2Char = RSStringGetCharacterFromInlineBuffer(&inlineBuf2, str2Index);
-                                strBuf2Len = __RSStringFoldCharacterClusterAtIndex(str2Char, &inlineBuf2, str2Index, compareOptions, langCode, strBuf2, RSStringStackBufferLength, NULL);
+                                strBuf2Len = __RSStringFoldCharacterClusterAtIndex(str2Char, &inlineBuf2, str2Index, compareOptions, langCode, strBuf2, RSStringStackBufferLength, nil);
                                 if (1 > strBuf2Len)
                                 {
                                     *strBuf2 = str2Char;
@@ -6352,7 +6352,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                                 }
                             }
                             
-                            if ((NULL != ignoredChars) &&
+                            if ((nil != ignoredChars) &&
                                 RSCharacterSetInlineBufferIsLongCharacterMember(ignoredChars,
                                                                                 ((str2Byte < 0x80) ? str2Byte : str2Char)))
                             {
@@ -6388,7 +6388,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                                                                                            langCode,
                                                                                            strBuf1,
                                                                                            RSStringStackBufferLength,
-                                                                                           NULL);
+                                                                                           nil);
                                         if ((strBuf1Len > 0) || (*characters != *strBuf1))
                                             break;
                                         ++characters;
@@ -6413,7 +6413,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                                                                                            langCode,
                                                                                            strBuf2,
                                                                                            RSStringStackBufferLength,
-                                                                                           NULL);
+                                                                                           nil);
                                         if ((strBuf2Len > 0) || (*characters != *strBuf2))
                                             break;
                                         ++characters;
@@ -6432,7 +6432,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                     ++str1Index;
                     ++str2Index;
                 }
-                if ((NULL != ignoredChars) &&
+                if ((nil != ignoredChars) &&
                     (str1Index == maxStr1Index) &&
                     (str2Index < findStrLen))
                 {
@@ -6449,7 +6449,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                 
                 if (str2Index == findStrLen)
                 {
-                    if ((NULL != ignoredChars) &&
+                    if ((nil != ignoredChars) &&
                         backwardAnchor &&
                         (str1Index < maxStr1Index))
                     {
@@ -6465,7 +6465,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                     if (!backwardAnchor || (str1Index == maxStr1Index))
                     {
                         didFind = YES;
-                        if (NULL != result)
+                        if (nil != result)
                             *result = RSMakeRange(fromLoc, str1Index - fromLoc);
                     }
                     break;
@@ -6493,7 +6493,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                     if (strBuf1Len == 0)
                     {
                         str1Char = RSStringGetCharacterFromInlineBuffer(&inlineBuf1, str1Index);
-                        if (caseInsensitive && (str1Char >= 'A') && (str1Char <= 'Z') && ((NULL == langCode) || (str1Char != 'I'))) str1Char += ('a' - 'A');
+                        if (caseInsensitive && (str1Char >= 'A') && (str1Char <= 'Z') && ((nil == langCode) || (str1Char != 'I'))) str1Char += ('a' - 'A');
                         str1UsedLen = 1;
                     }
                     else
@@ -6503,7 +6503,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                     if (strBuf2Len == 0)
                     {
                         str2Char = RSStringGetCharacterFromInlineBuffer(&inlineBuf2, str2Index);
-                        if (caseInsensitive && (str2Char >= 'A') && (str2Char <= 'Z') && ((NULL == langCode) || (str2Char != 'I'))) str2Char += ('a' - 'A');
+                        if (caseInsensitive && (str2Char >= 'A') && (str2Char <= 'Z') && ((nil == langCode) || (str2Char != 'I'))) str2Char += ('a' - 'A');
                         str2UsedLen = 1;
                     }
                     else
@@ -6514,8 +6514,8 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                     {
                         if ((str1Char < 0x80) &&
                             (str2Char < 0x80) &&
-                            (NULL == ignoredChars) &&
-                            ((NULL == langCode) || !caseInsensitive))
+                            (nil == ignoredChars) &&
+                            ((nil == langCode) || !caseInsensitive))
                             break;
                         
                         if (RSUniCharIsSurrogateHighCharacter(str1Char) &&
@@ -6531,7 +6531,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                             str2Char = RSUniCharGetLongCharacterForSurrogatePair(str2Char, otherChar);
                             str2UsedLen = 2;
                         }
-                        if (NULL != ignoredChars)
+                        if (nil != ignoredChars)
                         {
                             if ((forwardAnchor ||
                                  (str1Index != fromLoc)) &&
@@ -6629,7 +6629,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                     if (strBuf2Len == 0) str2Index += str2UsedLen;
                 }
                 
-                if ((NULL != ignoredChars) && (str1Index == maxStr1Index) && (str2Index < findStrLen))
+                if ((nil != ignoredChars) && (str1Index == maxStr1Index) && (str2Index < findStrLen))
                 {
                     // Process the stringToFind tail
                     while (str2Index < findStrLen)
@@ -6728,7 +6728,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                     
                     if (match)
                     {
-                        if ((NULL != ignoredChars) && backwardAnchor && (str1Index < maxStr1Index))
+                        if ((nil != ignoredChars) && backwardAnchor && (str1Index < maxStr1Index))
                         { // Process the anchor tail
                             while (str1Index < maxStr1Index)
                             {
@@ -6746,7 +6746,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                         if (!backwardAnchor || (str1Index == maxStr1Index))
                         {
                             didFind = YES;
-                            if (NULL != result)
+                            if (nil != result)
                                 *result = RSMakeRange(fromLoc, str1Index - fromLoc);
                         }
                         break;
@@ -6775,7 +6775,7 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
                 if (str2Index == findStrLen)
                 {
                     didFind = YES;
-                    if (NULL != result)
+                    if (nil != result)
                         *result = RSMakeRange(fromLoc, findStrLen);
                     break;
                 }
@@ -6790,17 +6790,17 @@ BOOL RSStringFindWithOptionsAndLocale(RSStringRef string, RSStringRef stringToFi
 
 RSExport BOOL RSStringFindWithOptions(RSStringRef string, RSStringRef stringToFind, RSRange rangeToSearch, RSStringCompareFlags compareOptions, RSRange *result)
 {
-    return RSStringFindWithOptionsAndLocale(string, stringToFind, rangeToSearch, compareOptions, NULL, result);
+    return RSStringFindWithOptionsAndLocale(string, stringToFind, rangeToSearch, compareOptions, nil, result);
 }
 
 RSExport BOOL RSStringHasPrefix(RSStringRef string, RSStringRef prefix)
 {
-    return RSStringFindWithOptions(string, prefix, RSMakeRange(0, RSStringGetLength(string)), RSCompareAnchored, NULL);
+    return RSStringFindWithOptions(string, prefix, RSMakeRange(0, RSStringGetLength(string)), RSCompareAnchored, nil);
 }
 
 RSExport BOOL RSStringHasSuffix(RSStringRef string, RSStringRef suffix)
 {
-    return RSStringFindWithOptions(string, suffix, RSMakeRange(0, RSStringGetLength(string)), RSCompareAnchored|RSCompareBackwards, NULL);
+    return RSStringFindWithOptions(string, suffix, RSMakeRange(0, RSStringGetLength(string)), RSCompareAnchored|RSCompareBackwards, nil);
 }
 
 RSExport RSStringRef RSStringCreateSubStringWithRange(RSAllocatorRef allocator, RSStringRef aString, RSRange range)
@@ -6885,7 +6885,7 @@ static void __rangeRelease(RSAllocatorRef allocator, const void *ptr) {
 
 static RSStringRef __rangeCopyDescription(const void *ptr) {
     RSRange range = *(RSRange *)ptr;
-    return RSStringCreateWithFormat(RSAllocatorSystemDefault, NULL, RSSTR("{%d, %d}"), range.location, range.length);
+    return RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("{%d, %d}"), range.location, range.length);
 }
 
 static BOOL	__rangeEqual(const void *ptr1, const void *ptr2) {
@@ -6901,12 +6901,12 @@ RSArrayRef RSStringCreateArrayWithFindResults(RSAllocatorRef alloc, RSStringRef 
     RSRange foundRange;
     Boolean backwards = ((compareOptions & RSCompareBackwards) != 0);
     UInt32 endIndex = (RSBitU32)(rangeToSearch.location + rangeToSearch.length);
-    RSMutableDataRef rangeStorage = NULL;	// Basically an array of RSRange, RSDataRef (packed)
-    uint8_t *rangeStorageBytes = NULL;
+    RSMutableDataRef rangeStorage = nil;	// Basically an array of RSRange, RSDataRef (packed)
+    uint8_t *rangeStorageBytes = nil;
     RSIndex foundCount = 0;
     RSIndex capacity = 0;		// Number of RSRange, RSDataRef element slots in rangeStorage
     
-    if (alloc == NULL) alloc = RSAllocatorGetDefault();
+    if (alloc == nil) alloc = RSAllocatorGetDefault();
     
     while ((rangeToSearch.length > 0) && RSStringFindWithOptions(string, stringToFind, rangeToSearch, compareOptions, &foundRange))
     {
@@ -6921,7 +6921,7 @@ RSArrayRef RSStringCreateArrayWithFindResults(RSAllocatorRef alloc, RSStringRef 
         // If necessary, grow the data and squirrel away the found range
         if (foundCount >= capacity) {
             // Note that rangeStorage is not allowed to be allocated from one of the GCRefZero allocators
-            if (rangeStorage == NULL) rangeStorage = RSDataCreateMutable((alloc), 0);
+            if (rangeStorage == nil) rangeStorage = RSDataCreateMutable((alloc), 0);
             capacity = (capacity + 4) * 2;
             RSDataSetLength(rangeStorage, capacity * (sizeof(RSRange) + sizeof(RSDataRef)));
             rangeStorageBytes = (uint8_t *)RSDataGetMutableBytesPtr(rangeStorage) + foundCount * (sizeof(RSRange) + sizeof(RSDataRef));
@@ -6948,7 +6948,7 @@ RSArrayRef RSStringCreateArrayWithFindResults(RSAllocatorRef alloc, RSStringRef 
         RSRelease(rangeStorage);		// We want the data to go away when all RSRanges inside it are released...
         return array;
     } else {
-        return NULL;
+        return nil;
     }
 }
 
@@ -6963,15 +6963,15 @@ RSExport RSStringRef RSStringCreateByCombiningStrings(RSAllocatorRef alloc, RSAr
     RSStringRef otherString;
     void *buffer;
     uint8_t *bufPtr;
-    const void *separatorContents = NULL;
+    const void *separatorContents = nil;
     
     if (stringCount == 0) {
-        return RSStringCreateWithCharacters(alloc, NULL, 0);
+        return RSStringCreateWithCharacters(alloc, nil, 0);
     } else if (stringCount == 1) {
         return (RSStringRef)RSStringCreateCopy(alloc, (RSStringRef)RSArrayObjectAtIndex(array, 0));
     }
     
-    if (alloc == NULL) alloc = RSAllocatorSystemDefault;
+    if (alloc == nil) alloc = RSAllocatorSystemDefault;
     
     numChars = RSStringGetLength(separatorString) * (stringCount - 1);
     for (idx = 0; idx < stringCount; idx++)
@@ -7021,7 +7021,7 @@ RSExport RSStringRef RSStringCreateByCombiningStrings(RSAllocatorRef alloc, RSAr
             bufPtr += otherNumByte;
         }
     }
-    if (canBeEightbit) *bufPtr = 0; // NULL byte;
+    if (canBeEightbit) *bufPtr = 0; // nil byte;
     
     return canBeEightbit ?
     RSStringCreateWithCStringNoCopy(alloc, (const char*)buffer, __RSStringGetEightBitStringEncoding(), alloc) :
@@ -7080,7 +7080,7 @@ RSExport RSDataRef RSStringCreateExternalRepresentation(RSAllocatorRef alloc, RS
         }
     }
     
-    if (alloc == NULL) alloc = RSAllocatorSystemDefault;
+    if (alloc == nil) alloc = RSAllocatorSystemDefault;
     
     if (((encoding & 0x0FFF) == RSStringEncodingUnicode) && ((encoding == RSStringEncodingUnicode) || ((encoding > RSStringEncodingUTF8) && (encoding <= RSStringEncodingUTF32LE)))) {
         guessedByteLength = (length + 1) * ((((encoding >> 26)  & 2) == 0) ? sizeof(UTF16Char) : sizeof(UTF32Char)); // UTF32 format has the bit set
@@ -7091,11 +7091,11 @@ RSExport RSDataRef RSStringCreateExternalRepresentation(RSAllocatorRef alloc, RS
             if (aLength > 0) guessedByteLength = aLength;
         } else {
 #endif
-            result = (int)__RSStringEncodeByteStream(string, 0, length, YES, encoding, (RSBitU8)lossByte, NULL, LONG_MAX, &guessedByteLength);
+            result = (int)__RSStringEncodeByteStream(string, 0, length, YES, encoding, (RSBitU8)lossByte, nil, LONG_MAX, &guessedByteLength);
             // if result == length, we always succeed
             //   otherwise, if result == 0, we fail
             //   otherwise, if there was a lossByte but still result != length, we fail
-            if ((result != length) && (!result || !lossByte)) return NULL;
+            if ((result != length) && (!result || !lossByte)) return nil;
             if (guessedByteLength == length && __RSStrIsEightBit(string) && __RSStringEncodingIsSupersetOfASCII(encoding)) { // It's all ASCII !!
                 return RSDataCreate(alloc, ((uint8_t *)__RSStrContents(string) + __RSStrSkipAnyLengthByte(string)), __RSStrLength(string));
             }
@@ -7110,7 +7110,7 @@ RSExport RSDataRef RSStringCreateExternalRepresentation(RSAllocatorRef alloc, RS
     
     if ((result != length) && (!result || !lossByte)) {		// see comment above about what this means
         RSAllocatorDeallocate(alloc, bytes);
-        return NULL;
+        return nil;
     }
     return RSDataCreateWithNoCopy(alloc, bytes, usedLength, YES, alloc);
 }

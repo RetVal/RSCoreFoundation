@@ -334,7 +334,7 @@ static void printoption(struct SessionHandle *data,
         else if(option == CURL_TELOPT_EXOPL)
           opt = "EXOPL";
         else
-          opt = NULL;
+          opt = nil;
 
         if(opt)
           infof(data, "%s %s %s\n", direction, fmt, opt);
@@ -841,7 +841,7 @@ static CURLcode check_telnet_options(struct connectdata *conn)
     beg = curl_slist_append(tn->telnet_vars, option_arg);
     if(!beg) {
       curl_slist_free_all(tn->telnet_vars);
-      tn->telnet_vars = NULL;
+      tn->telnet_vars = nil;
       return CURLE_OUT_OF_MEMORY;
     }
     tn->telnet_vars = beg;
@@ -916,7 +916,7 @@ static CURLcode check_telnet_options(struct connectdata *conn)
 
   if(result) {
     curl_slist_free_all(tn->telnet_vars);
-    tn->telnet_vars = NULL;
+    tn->telnet_vars = nil;
   }
 
   return result;
@@ -1277,7 +1277,7 @@ static CURLcode telnet_done(struct connectdata *conn,
     return CURLE_OK;
 
   curl_slist_free_all(tn->telnet_vars);
-  tn->telnet_vars = NULL;
+  tn->telnet_vars = nil;
 
   Curl_safefree(conn->data->state.proto.telnet);
 
@@ -1341,14 +1341,14 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
   /* OK, so we have WinSock 2.0.  We need to dynamically */
   /* load ws2_32.dll and get the function pointers we need. */
   wsock2 = LoadLibrary("WS2_32.DLL");
-  if(wsock2 == NULL) {
+  if(wsock2 == nil) {
     failf(data,"failed to load WS2_32.DLL (%d)", ERRNO);
     return CURLE_FAILED_INIT;
   }
 
   /* Grab a pointer to WSACreateEvent */
   create_event_func = GetProcAddress(wsock2,"WSACreateEvent");
-  if(create_event_func == NULL) {
+  if(create_event_func == nil) {
     failf(data,"failed to find WSACreateEvent function (%d)",
           ERRNO);
     FreeLibrary(wsock2);
@@ -1357,7 +1357,7 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
 
   /* And WSACloseEvent */
   close_event_func = GetProcAddress(wsock2,"WSACloseEvent");
-  if(close_event_func == NULL) {
+  if(close_event_func == nil) {
     failf(data,"failed to find WSACloseEvent function (%d)",
           ERRNO);
     FreeLibrary(wsock2);
@@ -1366,7 +1366,7 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
 
   /* And WSAEventSelect */
   event_select_func = GetProcAddress(wsock2,"WSAEventSelect");
-  if(event_select_func == NULL) {
+  if(event_select_func == nil) {
     failf(data,"failed to find WSAEventSelect function (%d)",
           ERRNO);
     FreeLibrary(wsock2);
@@ -1375,7 +1375,7 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
 
   /* And WSAEnumNetworkEvents */
   enum_netevents_func = GetProcAddress(wsock2,"WSAEnumNetworkEvents");
-  if(enum_netevents_func == NULL) {
+  if(enum_netevents_func == nil) {
     failf(data,"failed to find WSAEnumNetworkEvents function (%d)",
           ERRNO);
     FreeLibrary(wsock2);
@@ -1450,8 +1450,8 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
         }
         else {
           /* read from stdin */
-          if(!PeekNamedPipe(stdin_handle, NULL, 0, NULL,
-                            &readfile_read, NULL)) {
+          if(!PeekNamedPipe(stdin_handle, nil, 0, nil,
+                            &readfile_read, nil)) {
             keepon = FALSE;
             code = CURLE_READ_ERROR;
             break;
@@ -1461,7 +1461,7 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
             break;
 
           if(!ReadFile(stdin_handle, buf, sizeof(data->state.buffer),
-                       &readfile_read, NULL)) {
+                       &readfile_read, nil)) {
             keepon = FALSE;
             code = CURLE_READ_ERROR;
             break;
@@ -1480,7 +1480,7 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
     case WAIT_OBJECT_0 + 1:
     {
       if(!ReadFile(stdin_handle, buf, sizeof(data->state.buffer),
-                   &readfile_read, NULL)) {
+                   &readfile_read, nil)) {
         keepon = FALSE;
         code = CURLE_READ_ERROR;
         break;
@@ -1559,10 +1559,10 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
   }
 
   /* "Forget" pointers into the library we're about to free */
-  create_event_func = NULL;
-  close_event_func = NULL;
-  event_select_func = NULL;
-  enum_netevents_func = NULL;
+  create_event_func = nil;
+  close_event_func = nil;
+  event_select_func = nil;
+  enum_netevents_func = nil;
 
   /* We called LoadLibrary, so call FreeLibrary */
   if(!FreeLibrary(wsock2))
@@ -1676,7 +1676,7 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
   }
 #endif
   /* mark this as "no further transfer wanted" */
-  Curl_setup_transfer(conn, -1, -1, FALSE, NULL, -1, NULL);
+  Curl_setup_transfer(conn, -1, -1, FALSE, nil, -1, nil);
 
   return code;
 }

@@ -129,7 +129,7 @@ RSExport RSDictionaryRef RSSocketGetAddressInfo(struct sockaddr* addr, socklen_t
 {
     RSBlock h[RSBufferSize] = {0}, s[RSBufferSize] = {0};
     if (!getnameinfo(addr, addr_len, h, RSBufferSize, s, RSBufferSize, 0))
-        return RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, RSAutorelease(RSStringCreateWithCString(RSAllocatorSystemDefault, h, RSStringEncodingUTF8)), RSSTR("hostName"), RSAutorelease(RSStringCreateWithCString(RSAllocatorSystemDefault, s, RSStringEncodingUTF8)), RSSTR("serverName"), NULL));
+        return RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, RSAutorelease(RSStringCreateWithCString(RSAllocatorSystemDefault, h, RSStringEncodingUTF8)), RSSTR("hostName"), RSAutorelease(RSStringCreateWithCString(RSAllocatorSystemDefault, s, RSStringEncodingUTF8)), RSSTR("serverName"), nil));
     return nil;
     
 }
@@ -361,13 +361,13 @@ static const RSRuntimeClass __RSSocketClass = {
     _RSRuntimeScannedObject,
     "RSSocket",
     __RSSocketClassInit,
-    NULL,
+    nil,
     __RSSocketClassDeallocate,
     __RSSocketClassEqual,
     __RSSocketHash,
-    NULL,
-    NULL,
-    NULL,
+    nil,
+    nil,
+    nil,
 };
 
 static RSTypeID _RSSocketTypeID = _RSRuntimeNotATypeID;
@@ -592,7 +592,7 @@ static void _calcMinTimeout_locked(const void* val, void* ctxt)
 {
     RSSocketRef s = (RSSocketRef) val;
     struct timeval** minTime = (struct timeval**) ctxt;
-    if (timerisset(&s->_readBufferTimeout) && (*minTime == NULL || timercmp(&s->_readBufferTimeout, *minTime, <)))
+    if (timerisset(&s->_readBufferTimeout) && (*minTime == nil || timercmp(&s->_readBufferTimeout, *minTime, <)))
         *minTime = &s->_readBufferTimeout;
     else if (RSQueueGetCount(s->_dataReadQueue))
 	{
@@ -612,7 +612,7 @@ static void* __RSSocketManager(void* info)
     pthread_setname_np("com.retval.RSSocket.private");
     RSBit32 nrfds, maxnrfds, fdentries = 1;
     RSBit32 rfds, wfds;
-    fd_set *exceptfds = NULL;
+    fd_set *exceptfds = nil;
     fd_set *writefds = (fd_set *)RSAllocatorAllocate(RSAllocatorSystemDefault, fdentries * sizeof(fd_mask));
     fd_set *readfds = (fd_set *)RSAllocatorAllocate(RSAllocatorSystemDefault, fdentries * sizeof(fd_mask));
     fd_set *tempfds;
@@ -623,7 +623,7 @@ static void* __RSSocketManager(void* info)
     RSIndex selectedWriteSocketsIndex = 0, selectedReadSocketsIndex = 0;
     
     struct timeval tv;
-    struct timeval* pTimeout = NULL;
+    struct timeval* pTimeout = nil;
     struct timeval timeBeforeSelect;
     __RSCLog(RSLogLevelNotice, "Socket pair <%d, %d>\n", __RSWakeupSocketPair[0], __RSWakeupSocketPair[1]);
     for (;;)
@@ -654,19 +654,19 @@ static void* __RSSocketManager(void* info)
 		
         if (__RSReadSocketsTimeoutInvalid)
 		{
-            struct timeval* minTimeout = NULL;
+            struct timeval* minTimeout = nil;
             __RSReadSocketsTimeoutInvalid = NO;
 #if defined(LOG_RSSOCKET)
             __RSCLog(RSLogLevelNotice, "Figuring out which sockets have timeouts...\n");
 #endif
             RSArrayApplyFunction(__RSReadSockets, RSMakeRange(0, RSArrayGetCount(__RSReadSockets)), _calcMinTimeout_locked, (void*) &minTimeout);
 			
-            if (minTimeout == NULL)
+            if (minTimeout == nil)
 			{
 #if defined(LOG_RSSOCKET)
                 __RSCLog(RSLogLevelNotice, "No one wants a timeout!\n");
 #endif
-                pTimeout = NULL;
+                pTimeout = nil;
             }
 			else
 			{
@@ -683,7 +683,7 @@ static void* __RSSocketManager(void* info)
 #if defined(LOG_RSSOCKET)
             __RSCLog(RSLogLevelNotice, "select will have a %ld, %d timeout\n", pTimeout->tv_sec, pTimeout->tv_usec);
 #endif
-            gettimeofday(&timeBeforeSelect, NULL);
+            gettimeofday(&timeBeforeSelect, nil);
         }
 		
 		RSSpinLockUnlock(&__RSActiveSocketsLock);
@@ -709,7 +709,7 @@ static void* __RSSocketManager(void* info)
 		{
 			struct timeval timeAfterSelect;
 			struct timeval deltaTime;
-			gettimeofday(&timeAfterSelect, NULL);
+			gettimeofday(&timeAfterSelect, nil);
 			/* timeBeforeSelect becomes the delta */
 			timersub(&timeAfterSelect, &timeBeforeSelect, &deltaTime);
 			
@@ -719,7 +719,7 @@ static void* __RSSocketManager(void* info)
 			
 			RSSpinLockLock(&__RSActiveSocketsLock);
 			
-			tempfds = NULL;
+			tempfds = nil;
 			cnt = (RSBit32)RSArrayGetCount(__RSReadSockets);
 			for (idx = 0; idx < cnt; idx++)
 			{
@@ -803,7 +803,7 @@ static void* __RSSocketManager(void* info)
 #endif
         }
         RSSpinLockLock(&__RSActiveSocketsLock);
-        tempfds = NULL;
+        tempfds = nil;
         cnt = (RSBit32)RSArrayGetCount(__RSWriteSockets);
         for (idx = 0; idx < cnt; idx++)
 		{
@@ -829,7 +829,7 @@ static void* __RSSocketManager(void* info)
                 }
             }
         }
-        tempfds = NULL;
+        tempfds = nil;
         cnt = (RSBit32)RSArrayGetCount(__RSReadSockets);
         for (idx = 0; idx < cnt; idx++)
 		{
@@ -919,7 +919,7 @@ static void __RSSocketHandleWrite(RSSocketRef s, BOOL callBackNow)
 static void __RSSocketHandleRead(RSSocketRef s, BOOL causedByTimeout)
 {
 	RSSocketHandle sock = INVALID_SOCKET;
-    RSDataRef data = NULL, address = NULL;
+    RSDataRef data = nil, address = nil;
     if (!RSSocketIsValid(s)) return;
 	RSOptionFlags readCallBackType = __RSSocketReadCallBackType(s);
     if (readCallBackType & RSSocketDataCallBack ||
@@ -987,7 +987,7 @@ static void __RSSocketHandleRead(RSSocketRef s, BOOL causedByTimeout)
             //??? should return error
             return;
         }
-        if (NULL != name && 0 < namelen) {
+        if (nil != name && 0 < namelen) {
             address = RSDataCreate(RSGetAllocator(s), name, namelen);
         } else {
             address = (RSDataRef)RSRetain(RSNil);
@@ -1152,7 +1152,7 @@ RSExport RSSocketError RSSocketSetAddress(RSSocketRef s, RSDataRef address)
 
 RSExport RSSocketError RSSocketSendData(RSSocketRef s, RSDataRef address, RSDataRef data, RSTimeInterval timeout)
 {
-    const RSBitU8 *dataptr, *addrptr = NULL;
+    const RSBitU8 *dataptr, *addrptr = nil;
     RSBit32 datalen, addrlen = 0, size = 0;
     RSSocketHandle sock = INVALID_SOCKET;
     struct timeval tv;
@@ -1172,7 +1172,7 @@ RSExport RSSocketError RSSocketSendData(RSSocketRef s, RSDataRef address, RSData
         tv.tv_sec = (timeout <= 0.0 || (RSTimeInterval)INT_MAX <= timeout) ? INT_MAX : (int)floor(timeout);
         tv.tv_usec = (int)floor(1.0e+6 * (timeout - floor(timeout)));
         setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof(tv));	// cast for WinSock bad API
-        if (NULL != addrptr && 0 < addrlen)
+        if (nil != addrptr && 0 < addrlen)
 		{
             size = (RSBit32)sendto(sock, (char *)dataptr, datalen, 0, (struct sockaddr *)addrptr, addrlen);
         }
@@ -1221,7 +1221,7 @@ RSExport RSSocketError RSSocketConnectToAddress(RSSocketRef s, RSDataRef address
 {
 	if (s == nil || address == nil) return RSSocketUnSuccess;
 	RSSocketHandle sock = RSSocketGetHandle(s);
-	const uint8_t *name = NULL;
+	const uint8_t *name = nil;
 	RSBit32 namelen = 0, result = -1, connect_err = 0, select_err = 0;
 	RSBitU32 yes = 1, no = 0;
 	BOOL wasBlocking = YES;
@@ -1262,7 +1262,7 @@ RSExport RSSocketError RSSocketConnectToAddress(RSSocketRef s, RSDataRef address
             __RSSocketFdSet(sock, fds);
             tv.tv_sec = (timeout <= 0.0 || (RSTimeInterval)INT_MAX <= timeout) ? INT_MAX : (int)floor(timeout);
             tv.tv_usec = (int)floor(1.0e+6 * (timeout - floor(timeout)));
-            nrfds = select((int)__RSSocketFdGetSize(fds), NULL, (fd_set *)RSDataGetBytesPtr(fds), NULL, &tv);
+            nrfds = select((int)__RSSocketFdGetSize(fds), nil, (fd_set *)RSDataGetBytesPtr(fds), nil, &tv);
             if (nrfds < 0)
 			{
                 select_err = __RSSocketLastError();
@@ -1311,8 +1311,8 @@ RSExport void RSSocketInvalidate(RSSocketRef s)
 	{
         RSIndex idx;
         RSRunLoopSourceRef source0;
-        void *contextInfo = NULL;
-        void (*contextRelease)(const void *info) = NULL;
+        void *contextInfo = nil;
+        void (*contextRelease)(const void *info) = nil;
         __RSSocketUnsetValid(s);
         
         RSSpinLockLock(&__RSActiveSocketsLock);
@@ -1515,7 +1515,7 @@ static void __RSSocketCancel(void* info, RSRunLoopRef rl, RSStringRef mode)
         }
         RSSpinLockUnlock(&__RSActiveSocketsLock);
     }
-    if (NULL != s->_source0)
+    if (nil != s->_source0)
 	{
 		s->_source0 = nil;
     }
@@ -1538,7 +1538,7 @@ static void __RSSocketPerformV0(void* info, RSSocketCallBackType type)
 	RSSocketHandle sock = INVALID_SOCKET;
 	if (RSSocketReadCallBack == type)
 	{
-        if (NULL != s->_dataReadQueue && 0 < RSQueueGetCount(s->_dataReadQueue))
+        if (nil != s->_dataReadQueue && 0 < RSQueueGetCount(s->_dataReadQueue))
 		{
             data = (RSDataRef)RSQueueDequeue(s->_dataReadQueue);
             address = (RSDataRef)RSQueueDequeue(s->_addressQueue);
@@ -1546,7 +1546,7 @@ static void __RSSocketPerformV0(void* info, RSSocketCallBackType type)
     }
 	else if (RSSocketAcceptCallBack == type)
 	{
-        if (NULL != s->_dataReadQueue && 0 < RSQueueGetCount(s->_dataReadQueue))
+        if (nil != s->_dataReadQueue && 0 < RSQueueGetCount(s->_dataReadQueue))
 		{
             data = (RSDataRef)RSQueueDequeue(s->_dataReadQueue);
 			if (sizeof(RSSocketHandle) == RSDataGetLength(data))

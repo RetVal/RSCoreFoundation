@@ -10,7 +10,7 @@
 
 BOOL _RSGetCurrentDirectory(char *path, int maxlen)
 {
-    return getcwd(path, maxlen) != NULL;
+    return getcwd(path, maxlen) != nil;
 }
 
 BOOL _RSGetExecutablePath(char *path, int maxlen)
@@ -106,8 +106,8 @@ void _RSCloseHandle(RSHandle handle)
     return;
 }
 
-static const char *__RSProcessPath = NULL;
-static const char *__RSprogname = NULL;
+static const char *__RSProcessPath = nil;
+static const char *__RSprogname = nil;
 
 const char **_RSGetProgname(void) {
     if (!__RSprogname)
@@ -125,10 +125,10 @@ const char **_RSGetProcessPath(void) {
 const char *_RSProcessPath(void) {
     if (__RSProcessPath) return __RSProcessPath;
     wchar_t buf[RSMaxPathSize] = {0};
-    DWORD rlen = GetModuleFileNameW(NULL, buf, sizeof(buf) / sizeof(buf[0]));
+    DWORD rlen = GetModuleFileNameW(nil, buf, sizeof(buf) / sizeof(buf[0]));
     if (0 < rlen) {
         char asciiBuf[RSMaxPathSize] = {0};
-        int res = WideCharToMultiByte(CP_UTF8, 0, buf, rlen, asciiBuf, sizeof(asciiBuf) / sizeof(asciiBuf[0]), NULL, NULL);
+        int res = WideCharToMultiByte(CP_UTF8, 0, buf, rlen, asciiBuf, sizeof(asciiBuf) / sizeof(asciiBuf[0]), nil, nil);
         if (0 < res) {
             __RSProcessPath = strdup(asciiBuf);
             __RSprogname = strrchr(__RSProcessPath, PATH_SEP);

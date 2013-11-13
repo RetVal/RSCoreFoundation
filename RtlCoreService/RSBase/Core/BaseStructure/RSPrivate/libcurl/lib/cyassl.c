@@ -80,8 +80,8 @@ cyassl_connect_step1(struct connectdata *conn,
 {
   struct SessionHandle *data = conn->data;
   struct ssl_connect_data* conssl = &conn->ssl[sockindex];
-  SSL_METHOD* req_method = NULL;
-  void* ssl_sessionid = NULL;
+  SSL_METHOD* req_method = nil;
+  void* ssl_sessionid = nil;
   curl_socket_t sockfd = conn->sock[sockindex];
 
   if(conssl->state == ssl_connection_complete)
@@ -189,7 +189,7 @@ cyassl_connect_step1(struct connectdata *conn,
    * SSL_get_verify_result() below. */
   SSL_CTX_set_verify(conssl->ctx,
                      data->set.ssl.verifypeer?SSL_VERIFY_PEER:SSL_VERIFY_NONE,
-                     NULL);
+                     nil);
 
   /* Let's make an SSL structure */
   if(conssl->handle)
@@ -201,11 +201,11 @@ cyassl_connect_step1(struct connectdata *conn,
   }
 
   /* Check if there's a cached ID we can/should use here! */
-  if(!Curl_ssl_getsessionid(conn, &ssl_sessionid, NULL)) {
+  if(!Curl_ssl_getsessionid(conn, &ssl_sessionid, nil)) {
     /* we got a session id, use it! */
     if(!SSL_set_session(conssl->handle, ssl_sessionid)) {
       failf(data, "SSL: SSL_set_session failed: %s",
-            ERR_error_string(SSL_get_error(conssl->handle, 0),NULL));
+            ERR_error_string(SSL_get_error(conssl->handle, 0),nil));
       return CURLE_SSL_CONNECT_ERROR;
     }
     /* Informational message */
@@ -269,7 +269,7 @@ cyassl_connect_step3(struct connectdata *conn,
                      int sockindex)
 {
   CURLcode retcode = CURLE_OK;
-  void *old_ssl_sessionid=NULL;
+  void *old_ssl_sessionid=nil;
   struct SessionHandle *data = conn->data;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   int incache;
@@ -279,7 +279,7 @@ cyassl_connect_step3(struct connectdata *conn,
 
   our_ssl_sessionid = SSL_get_session(connssl->handle);
 
-  incache = !(Curl_ssl_getsessionid(conn, &old_ssl_sessionid, NULL));
+  incache = !(Curl_ssl_getsessionid(conn, &old_ssl_sessionid, nil));
   if(incache) {
     if(old_ssl_sessionid != our_ssl_sessionid) {
       infof(data, "old SSL session ID is stale, removing\n");
@@ -344,11 +344,11 @@ void Curl_cyassl_close(struct connectdata *conn, int sockindex)
   if(conssl->handle) {
     (void)SSL_shutdown(conssl->handle);
     SSL_free (conssl->handle);
-    conssl->handle = NULL;
+    conssl->handle = nil;
   }
   if(conssl->ctx) {
     SSL_CTX_free (conssl->ctx);
-    conssl->ctx = NULL;
+    conssl->ctx = nil;
   }
 }
 
@@ -435,7 +435,7 @@ int Curl_cyassl_shutdown(struct connectdata *conn, int sockindex)
 
   if(connssl->handle) {
     SSL_free (connssl->handle);
-    connssl->handle = NULL;
+    connssl->handle = nil;
   }
   return retval;
 }
@@ -462,7 +462,7 @@ cyassl_connect_common(struct connectdata *conn,
 
   if(ssl_connect_1==connssl->connecting_state) {
     /* Find out how much more time we're allowed */
-    timeout_ms = Curl_timeleft(data, NULL, TRUE);
+    timeout_ms = Curl_timeleft(data, nil, TRUE);
 
     if(timeout_ms < 0) {
       /* no need to continue if time already is up */
@@ -479,7 +479,7 @@ cyassl_connect_common(struct connectdata *conn,
         ssl_connect_2_writing == connssl->connecting_state) {
 
     /* check allowed time left */
-    timeout_ms = Curl_timeleft(data, NULL, TRUE);
+    timeout_ms = Curl_timeleft(data, nil, TRUE);
 
     if(timeout_ms < 0) {
       /* no need to continue if time already is up */

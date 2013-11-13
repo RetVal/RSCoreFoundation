@@ -88,7 +88,7 @@ static BOOL __RSFromASCII(uint32_t flags, uint8_t byte, UniChar *character) {
 
 __private_extern__ const RSStringEncodingConverter __RSConverterASCII = {
     __RSToASCII, __RSFromASCII, 1, 1, RSStringEncodingConverterCheapEightBit,
-    NULL, NULL, NULL, NULL, NULL, NULL,
+    nil, nil, nil, nil, nil, nil,
 };
 
 /* ISO Latin 1 (8859-1) */
@@ -124,7 +124,7 @@ static RSIndex __RSToISOLatin1Precompose(uint32_t flags, const UniChar *characte
 
 __private_extern__ const RSStringEncodingConverter __RSConverterISOLatin1 = {
     __RSToISOLatin1, __RSFromISOLatin1, 1, 1, RSStringEncodingConverterCheapEightBit,
-    NULL, NULL, NULL, NULL, __RSToISOLatin1Precompose, RSStringEncodingIsValidCombiningCharacterForLatin1,
+    nil, nil, nil, nil, __RSToISOLatin1Precompose, RSStringEncodingIsValidCombiningCharacterForLatin1,
 };
 
 /* Mac Roman */
@@ -421,7 +421,7 @@ static RSIndex __RSToMacRomanPrecompose(uint32_t flags, const UniChar *character
 
 __private_extern__ const RSStringEncodingConverter __RSConverterMacRoman = {
     __RSToMacRoman, __RSFromMacRoman, 1, 1, RSStringEncodingConverterCheapEightBit,
-    NULL, NULL, NULL, NULL, __RSToMacRomanPrecompose, RSStringEncodingIsValidCombiningCharacterForLatin1,
+    nil, nil, nil, nil, __RSToMacRomanPrecompose, RSStringEncodingIsValidCombiningCharacterForLatin1,
 };
 
 /* Win Latin1 (ANSI CodePage 1252) */
@@ -519,7 +519,7 @@ static RSIndex __RSToWinLatin1Precompose(uint32_t flags, const UniChar *characte
 
 __private_extern__ const RSStringEncodingConverter __RSConverterWinLatin1 = {
     __RSToWinLatin1, __RSFromWinLatin1, 1, 1, RSStringEncodingConverterCheapEightBit,
-    NULL, NULL, NULL, NULL, __RSToWinLatin1Precompose, RSStringEncodingIsValidCombiningCharacterForLatin1,
+    nil, nil, nil, nil, __RSToWinLatin1Precompose, RSStringEncodingIsValidCombiningCharacterForLatin1,
 };
 
 /* NEXTSTEP Encoding */
@@ -819,7 +819,7 @@ static RSIndex __RSToNextStepLatinPrecompose(uint32_t flags, const UniChar *char
 
 __private_extern__ const RSStringEncodingConverter __RSConverterNextStepLatin = {
     __RSToNextStepLatin, __RSFromNextStepLatin, 1, 1, RSStringEncodingConverterCheapEightBit,
-    NULL, NULL, NULL, NULL, __RSToNextStepLatinPrecompose, RSStringEncodingIsValidCombiningCharacterForLatin1,
+    nil, nil, nil, nil, __RSToNextStepLatinPrecompose, RSStringEncodingIsValidCombiningCharacterForLatin1,
 };
 
 /* UTF8 */
@@ -1173,6 +1173,6 @@ static RSIndex __RSFromUTF8Len(uint32_t flags, const uint8_t *source, RSIndex nu
 
 __private_extern__ const RSStringEncodingConverter __RSConverterUTF8 = {
     __RSToUTF8, __RSFromUTF8, 3, 2, RSStringEncodingConverterStandard,
-    __RSToUTF8Len, __RSFromUTF8Len, NULL, NULL, NULL, NULL,
+    __RSToUTF8Len, __RSFromUTF8Len, nil, nil, nil, nil,
 };
 

@@ -436,7 +436,7 @@ static CURLcode imap_state_fetch_resp(struct connectdata *conn,
     ptr++;
 
   if(*ptr == '{') {
-    curl_off_t filesize = curlx_strtoofft(ptr+1, NULL, 10);
+    curl_off_t filesize = curlx_strtoofft(ptr+1, nil, 10);
     if(filesize)
       Curl_pgrsSetDownloadSize(data, filesize);
 
@@ -468,7 +468,7 @@ static CURLcode imap_state_fetch_resp(struct connectdata *conn,
       else {
         /* cache is drained */
         free(pp->cache);
-        pp->cache = NULL;
+        pp->cache = nil;
         pp->cache_size = 0;
       }
     }
@@ -477,11 +477,11 @@ static CURLcode imap_state_fetch_resp(struct connectdata *conn,
 
     if(!filesize)
       /* the entire data is already transferred! */
-      Curl_setup_transfer(conn, -1, -1, FALSE, NULL, -1, NULL);
+      Curl_setup_transfer(conn, -1, -1, FALSE, nil, -1, nil);
     else
       /* IMAP download */
       Curl_setup_transfer(conn, FIRSTSOCKET, filesize, FALSE,
-                          imap->bytecountp, -1, NULL); /* no upload here */
+                          imap->bytecountp, -1, nil); /* no upload here */
 
     data->req.maxdownload = filesize;
   }
@@ -907,7 +907,7 @@ static CURLcode imap_logout(struct connectdata *conn)
 
   str = getcmdid(conn);
 
-  result = imapsendf(conn, str, "%s LOGOUT", str, NULL);
+  result = imapsendf(conn, str, "%s LOGOUT", str, nil);
   if(result)
     return result;
   state(conn, IMAP_LOGOUT);
@@ -958,7 +958,7 @@ static CURLcode imap_parse_url_path(struct connectdata *conn)
     path = "INBOX";
 
   /* url decode the path and use this mailbox */
-  return Curl_urldecode(data, path, 0, &imapc->mailbox, NULL, TRUE);
+  return Curl_urldecode(data, path, 0, &imapc->mailbox, nil, TRUE);
 }
 
 /* call this when the DO phase has completed */
@@ -970,7 +970,7 @@ static CURLcode imap_dophase_done(struct connectdata *conn,
 
   if(imap->transfer != FTPTRANSFER_BODY)
     /* no data to transfer */
-    Curl_setup_transfer(conn, -1, -1, FALSE, NULL, -1, NULL);
+    Curl_setup_transfer(conn, -1, -1, FALSE, nil, -1, nil);
 
   return CURLE_OK;
 }

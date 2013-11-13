@@ -103,11 +103,11 @@ int Curl_wait_ms(int timeout_ms)
     initial_tv = curlx_tvnow();
     do {
 #if defined(HAVE_POLL_FINE)
-        r = poll(NULL, 0, pending_ms);
+        r = poll(nil, 0, pending_ms);
 #else
         pending_tv.tv_sec = pending_ms / 1000;
         pending_tv.tv_usec = (pending_ms % 1000) * 1000;
-        r = select(0, NULL, NULL, NULL, &pending_tv);
+        r = select(0, nil, nil, nil, &pending_tv);
 #endif /* HAVE_POLL_FINE */
         if(r != -1)
             break;
@@ -285,7 +285,7 @@ int Curl_socket_check(curl_socket_t readfd0, /* two sockets to read from */
             maxfd = writefd;
     }
     
-    ptimeout = (timeout_ms < 0) ? NULL : &pending_tv;
+    ptimeout = (timeout_ms < 0) ? nil : &pending_tv;
     
     do {
         if(timeout_ms > 0) {
@@ -455,7 +455,7 @@ int Curl_poll(struct pollfd ufds[], unsigned int nfds, int timeout_ms)
         }
     }
     
-    ptimeout = (timeout_ms < 0) ? NULL : &pending_tv;
+    ptimeout = (timeout_ms < 0) ? nil : &pending_tv;
     
     do {
         if(timeout_ms > 0) {

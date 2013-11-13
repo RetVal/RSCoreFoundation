@@ -187,7 +187,7 @@ extern "C" {
      *          must never expose complex structs to applications, as then we'll
      *          undoubtably get backwards compatibility problems in the future.
      *
-     * Returns: A pointer to a filled-in struct, or NULL if it failed or ran out
+     * Returns: A pointer to a filled-in struct, or nil if it failed or ran out
      *          of structs. It also writes the number of messages left in the
      *          queue (after this read) in the integer the second argument points
      *          to.

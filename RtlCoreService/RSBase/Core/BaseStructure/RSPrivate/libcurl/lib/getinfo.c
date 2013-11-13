@@ -58,7 +58,7 @@ CURLcode Curl_initinfo(struct SessionHandle *data)
     
     if(info->contenttype)
         free(info->contenttype);
-    info->contenttype = NULL;
+    info->contenttype = nil;
     
     info->header_size = 0;
     info->request_size = 0;
@@ -75,10 +75,10 @@ CURLcode Curl_initinfo(struct SessionHandle *data)
 CURLcode Curl_getinfo(struct SessionHandle *data, CURLINFO info, ...)
 {
     va_list arg;
-    long *param_longp=NULL;
-    double *param_doublep=NULL;
-    char **param_charp=NULL;
-    struct curl_slist **param_slistp=NULL;
+    long *param_longp=nil;
+    double *param_doublep=nil;
+    char **param_charp=nil;
+    struct curl_slist **param_slistp=nil;
     int type;
     curl_socket_t sockfd;
     
@@ -96,22 +96,22 @@ CURLcode Curl_getinfo(struct SessionHandle *data, CURLINFO info, ...)
     switch(type) {
         case CURLINFO_STRING:
             param_charp = va_arg(arg, char **);
-            if(NULL == param_charp)
+            if(nil == param_charp)
                 return CURLE_BAD_FUNCTION_ARGUMENT;
             break;
         case CURLINFO_LONG:
             param_longp = va_arg(arg, long *);
-            if(NULL == param_longp)
+            if(nil == param_longp)
                 return CURLE_BAD_FUNCTION_ARGUMENT;
             break;
         case CURLINFO_DOUBLE:
             param_doublep = va_arg(arg, double *);
-            if(NULL == param_doublep)
+            if(nil == param_doublep)
                 return CURLE_BAD_FUNCTION_ARGUMENT;
             break;
         case CURLINFO_SLIST:
             param_slistp = va_arg(arg, struct curl_slist **);
-            if(NULL == param_slistp)
+            if(nil == param_slistp)
                 return CURLE_BAD_FUNCTION_ARGUMENT;
             break;
         default:
@@ -217,7 +217,7 @@ CURLcode Curl_getinfo(struct SessionHandle *data, CURLINFO info, ...)
             *param_charp = data->state.most_recent_ftp_entrypath;
             break;
         case CURLINFO_LASTSOCKET:
-            sockfd = Curl_getconnectinfo(data, NULL);
+            sockfd = Curl_getconnectinfo(data, nil);
             
             /* note: this is not a good conversion for systems with 64 bit sockets and
              32 bit longs */

@@ -64,7 +64,7 @@ CURLcode Curl_nss_force_init(struct SessionHandle *data);
 #define curlssl_shutdown(x,y) (x=x, y=y, 1)
 #define curlssl_set_engine(x,y) (x=x, y=y, CURLE_NOT_BUILT_IN)
 #define curlssl_set_engine_default(x) (x=x, CURLE_NOT_BUILT_IN)
-#define curlssl_engines_list(x) (x=x, (struct curl_slist *)NULL)
+#define curlssl_engines_list(x) (x=x, (struct curl_slist *)nil)
 #define curlssl_version Curl_nss_version
 #define curlssl_check_cxn(x) Curl_nss_check_cxn(x)
 #define curlssl_data_pending(x,y) (x=x, y=y, 0)

@@ -818,7 +818,7 @@ static RSDictionaryRef __RSNotificationToDictionary(RSNotificationRef notificati
 {
     RSDictionaryRef dict = RSDictionaryCreateWithObjectsAndOKeys(RSGetAllocator(notification),
                                                                  RSNotificationGetName(notification), RSSTR("Name"),
-                                                                 RSNotificationGetUserInfo(notification), RSSTR("userInfo"), NULL);
+                                                                 RSNotificationGetUserInfo(notification), RSSTR("userInfo"), nil);
     return dict;
 }
 
@@ -862,7 +862,7 @@ static void __RSDistributedNotificationCenterCallBack(RSSocketRef s, RSSocketCal
                                                                         RSSTR("RSDistributedAddClient"), RSDistributedRequest,
                                                                         RSSTR("__RSNotificationConnectSuccess all success."), RSDistributedRequestReason,
                                                                         RSSTR("__RSNotificationLocalNC"), RSDistributedRequestDomain,
-                                                                        dictForNotification, RSDistributedRequestPayload, NULL);
+                                                                        dictForNotification, RSDistributedRequestPayload, nil);
         RSRelease(dictForNotification);
         RSDataRef data = RSPropertyListCreateXMLData(RSAllocatorSystemDefault, request);
         RSRelease(request);

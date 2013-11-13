@@ -332,7 +332,7 @@ CURLcode Curl_convert_form(struct SessionHandle *data, struct FormData *form)
       if(rc != CURLE_OK)
         return rc;
     }
-  } while((form = next) != NULL); /* continue */
+  } while((form = next) != nil); /* continue */
   return CURLE_OK;
 }
 

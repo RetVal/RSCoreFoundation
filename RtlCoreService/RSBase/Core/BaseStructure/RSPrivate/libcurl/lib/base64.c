@@ -75,7 +75,7 @@ static void decodeQuantum(unsigned char *dest, const char *src)
  * Returns CURLE_OK on success, otherwise specific error code. Function
  * output shall not be considered valid unless CURLE_OK is returned.
  *
- * When decoded data length is 0, returns NULL in *outptr.
+ * When decoded data length is 0, returns nil in *outptr.
  *
  * @unittest: 1302
  */
@@ -90,7 +90,7 @@ CURLcode Curl_base64_decode(const char *src,
   size_t rawlen = 0;
   unsigned char *newstr;
 
-  *outptr = NULL;
+  *outptr = nil;
   *outlen = 0;
 
   while((src[length] != '=') && src[length])
@@ -151,7 +151,7 @@ CURLcode Curl_base64_decode(const char *src,
  * Returns CURLE_OK on success, otherwise specific error code. Function
  * output shall not be considered valid unless CURLE_OK is returned.
  *
- * When encoded data length is 0, returns NULL in *outptr.
+ * When encoded data length is 0, returns nil in *outptr.
  *
  * @unittest: 1302
  */
@@ -166,18 +166,18 @@ CURLcode Curl_base64_encode(struct SessionHandle *data,
   int inputparts;
   char *output;
   char *base64data;
-  char *convbuf = NULL;
+  char *convbuf = nil;
 
   const char *indata = inputbuff;
 
-  *outptr = NULL;
+  *outptr = nil;
   *outlen = 0;
 
   if(0 == insize)
     insize = strlen(indata);
 
   base64data = output = malloc(insize*4/3+4);
-  if(NULL == output)
+  if(nil == output)
     return CURLE_OUT_OF_MEMORY;
 
   /*

@@ -166,9 +166,9 @@ int Curl_input_negotiate(struct connectdata *conn, bool proxy,
             return -1;
         
         neg_ctx->status =
-        s_pSecFn->AcquireCredentialsHandle(NULL, (SEC_CHAR *)"Negotiate",
-                                           SECPKG_CRED_OUTBOUND, NULL, NULL,
-                                           NULL, NULL, neg_ctx->credentials,
+        s_pSecFn->AcquireCredentialsHandle(nil, (SEC_CHAR *)"Negotiate",
+                                           SECPKG_CRED_OUTBOUND, nil, nil,
+                                           nil, nil, neg_ctx->credentials,
                                            &lifetime);
         if(neg_ctx->status != SEC_E_OK)
             return -1;
@@ -240,7 +240,7 @@ CURLcode Curl_output_negotiate(struct connectdata *conn, bool proxy)
 {
     struct negotiatedata *neg_ctx = proxy?&conn->data->state.proxyneg:
     &conn->data->state.negotiate;
-    char *encoded = NULL;
+    char *encoded = nil;
     size_t len = 0;
     char *userp;
     CURLcode error;
@@ -264,7 +264,7 @@ CURLcode Curl_output_negotiate(struct connectdata *conn, bool proxy)
         conn->allocptr.userpwd = userp;
     free(encoded);
     Curl_cleanup_negotiate (conn->data);
-    return (userp == NULL) ? CURLE_OUT_OF_MEMORY : CURLE_OK;
+    return (userp == nil) ? CURLE_OUT_OF_MEMORY : CURLE_OK;
 }
 
 static void cleanup(struct negotiatedata *neg_ctx)

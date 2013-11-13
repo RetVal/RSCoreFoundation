@@ -103,7 +103,7 @@ size_t strlcpy (char *dst, const char *src, size_t dst_sz);
 static int
 krb4_check_prot(void *app_data, int level)
 {
-  app_data = NULL; /* prevent compiler warning */
+  app_data = nil; /* prevent compiler warning */
   if(level == PROT_CONFIDENTIAL)
     return -1;
   return 0;
@@ -138,7 +138,7 @@ static int
 krb4_overhead(void *app_data, int level, int len)
 {
   /* no arguments are used, just init them to prevent compiler warnings */
-  app_data = NULL;
+  app_data = nil;
   level = 0;
   len = 0;
   return 31;
@@ -234,7 +234,7 @@ krb4_auth(void *app_data, struct connectdata *conn)
 
     if(krb_get_our_ip_for_realm(krb_realmofhost(host),
                                  &natAddr) != KSUCCESS
-        && krb_get_our_ip_for_realm(NULL, &natAddr) != KSUCCESS)
+        && krb_get_our_ip_for_realm(nil, &natAddr) != KSUCCESS)
       infof(data, "Can't get address for realm %s\n",
                  krb_realmofhost(host));
     else {
@@ -262,7 +262,7 @@ krb4_auth(void *app_data, struct connectdata *conn)
   if(result)
     return -2;
 
-  if(Curl_GetFTPResponse(&nread, conn, NULL))
+  if(Curl_GetFTPResponse(&nread, conn, nil))
     return -1;
 
   if(data->state.buffer[0] != '2') {
@@ -283,7 +283,7 @@ krb4_auth(void *app_data, struct connectdata *conn)
   }
   if(len > sizeof(adat.dat)-1) {
     free(ptr);
-    ptr = NULL;
+    ptr = nil;
     len = 0;
   }
   if(!len || !ptr) {
@@ -312,9 +312,9 @@ krb4_auth(void *app_data, struct connectdata *conn)
 struct Curl_sec_client_mech Curl_krb4_client_mech = {
     "KERBEROS_V4",
     sizeof(struct krb4_data),
-    NULL, /* init */
+    nil, /* init */
     krb4_auth,
-    NULL, /* end */
+    nil, /* end */
     krb4_check_prot,
     krb4_overhead,
     krb4_encode,
@@ -352,7 +352,7 @@ CURLcode Curl_krb_kauth(struct connectdata *conn)
   if(result)
     return result;
 
-  result = Curl_GetFTPResponse(&nread, conn, NULL);
+  result = Curl_GetFTPResponse(&nread, conn, nil);
   if(result)
     return result;
 
@@ -376,7 +376,7 @@ CURLcode Curl_krb_kauth(struct connectdata *conn)
   }
   if(tmp >= sizeof(tkt.dat)) {
     free(ptr);
-    ptr = NULL;
+    ptr = nil;
     tmp = 0;
   }
   if(!tmp || !ptr) {
@@ -432,7 +432,7 @@ CURLcode Curl_krb_kauth(struct connectdata *conn)
   if(result)
     return result;
 
-  result = Curl_GetFTPResponse(&nread, conn, NULL);
+  result = Curl_GetFTPResponse(&nread, conn, nil);
   if(result)
     return result;
   krb4_set_command_prot(conn, save);

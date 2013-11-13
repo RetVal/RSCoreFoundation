@@ -346,18 +346,18 @@ _CURL_WARNING(_curl_easy_getinfo_err_curl_slist,
 #define _curl_is_any_ptr(expr)                                                \
   (sizeof(expr) == sizeof(void*))
 
-/* evaluates to true if expr is NULL */
+/* evaluates to true if expr is nil */
 /* XXX: must not evaluate expr, so this check is not accurate */
 #define _curl_is_NULL(expr)                                                   \
-  (__builtin_types_compatible_p(__typeof__(expr), __typeof__(NULL)))
+  (__builtin_types_compatible_p(__typeof__(expr), __typeof__(nil)))
 
-/* evaluates to true if expr is type*, const type* or NULL */
+/* evaluates to true if expr is type*, const type* or nil */
 #define _curl_is_ptr(expr, type)                                              \
   (_curl_is_NULL(expr) ||                                                     \
    __builtin_types_compatible_p(__typeof__(expr), type *) ||                  \
    __builtin_types_compatible_p(__typeof__(expr), const type *))
 
-/* evaluates to true if expr is one of type[], type*, NULL or const type* */
+/* evaluates to true if expr is one of type[], type*, nil or const type* */
 #define _curl_is_arr(expr, type)                                              \
   (_curl_is_ptr((expr), type) ||                                              \
    __builtin_types_compatible_p(__typeof__(expr), type []))

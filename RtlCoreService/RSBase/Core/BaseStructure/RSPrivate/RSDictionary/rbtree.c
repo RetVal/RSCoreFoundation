@@ -234,7 +234,7 @@ void rb_erase(struct rb_node *node, struct rb_root *root)
 		struct rb_node *old = node, *left;
 
 		node = node->rb_right;
-		while ((left = node->rb_left) != NULL)
+		while ((left = node->rb_left) != nil)
 			node = left;
 
 		if (rb_parent(old)) {
@@ -368,7 +368,7 @@ struct rb_node *rb_first(const struct rb_root *root)
 
 	n = root->rb_node;
 	if (!n)
-		return NULL;
+		return nil;
 	while (n->rb_left)
 		n = n->rb_left;
 	return n;
@@ -381,7 +381,7 @@ struct rb_node *rb_last(const struct rb_root *root)
 
 	n = root->rb_node;
 	if (!n)
-		return NULL;
+		return nil;
 	while (n->rb_right)
 		n = n->rb_right;
 	return n;
@@ -393,7 +393,7 @@ struct rb_node *rb_next(const struct rb_node *node)
 	struct rb_node *parent;
 
 	if (rb_parent(node) == node)
-		return NULL;
+		return nil;
 
 	/* If we have a right-hand child, go down and then left as far
 	   as we can. */
@@ -422,7 +422,7 @@ struct rb_node *rb_prev(const struct rb_node *node)
 	struct rb_node *parent;
 
 	if (rb_parent(node) == node)
-		return NULL;
+		return nil;
 
 	/* If we have a left-hand child, go down and then right as far
 	   as we can. */

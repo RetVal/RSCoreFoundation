@@ -35,22 +35,22 @@ static
 char *GetEnv(const char *variable)
 {
 #ifdef _WIN32_WCE
-  return NULL;
+  return nil;
 #else
 #ifdef WIN32
   char env[MAX_PATH]; /* MAX_PATH is from windef.h */
   char *temp = getenv(variable);
   env[0] = '\0';
-  if(temp != NULL)
+  if(temp != nil)
     ExpandEnvironmentStrings(temp, env, sizeof(env));
-  return (env[0] != '\0')?strdup(env):NULL;
+  return (env[0] != '\0')?strdup(env):nil;
 #else
   char *env = getenv(variable);
 #ifdef __VMS
   if(env && strcmp("HOME",variable) == 0)
     env = decc_translate_vms(env);
 #endif
-  return (env && env[0])?strdup(env):NULL;
+  return (env && env[0])?strdup(env):nil;
 #endif
 #endif
 }

@@ -69,7 +69,7 @@ static size_t convert_lineends(struct SessionHandle *data,
   char *inPtr, *outPtr;
 
   /* sanity check */
-  if((startPtr == NULL) || (size < 1)) {
+  if((startPtr == nil) || (size < 1)) {
     return(size);
   }
 
@@ -150,7 +150,7 @@ void Curl_infof(struct SessionHandle *data, const char *fmt, ...)
     vsnprintf(print_buffer, sizeof(print_buffer), fmt, ap);
     va_end(ap);
     len = strlen(print_buffer);
-    Curl_debug(data, CURLINFO_TEXT, print_buffer, len, NULL);
+    Curl_debug(data, CURLINFO_TEXT, print_buffer, len, nil);
   }
 }
 
@@ -176,7 +176,7 @@ void Curl_failf(struct SessionHandle *data, const char *fmt, ...)
       data->state.buffer[len] = '\n';
       data->state.buffer[++len] = '\0';
     }
-    Curl_debug(data, CURLINFO_TEXT, data->state.buffer, len, NULL);
+    Curl_debug(data, CURLINFO_TEXT, data->state.buffer, len, nil);
   }
 
   va_end(ap);
@@ -535,7 +535,7 @@ CURLcode Curl_read(struct connectdata *conn, /* connection data */
   CURLcode curlcode = CURLE_RECV_ERROR;
   ssize_t nread = 0;
   size_t bytesfromsocket = 0;
-  char *buffertofill = NULL;
+  char *buffertofill = nil;
   bool pipelining = (conn->data->multi &&
                      Curl_multi_canPipeline(conn->data->multi)) ? TRUE : FALSE;
 
@@ -664,7 +664,7 @@ int Curl_debug(struct SessionHandle *data, curl_infotype type,
   int rc;
   if(data->set.printhost && conn && conn->host.dispname) {
     char buffer[160];
-    const char *t=NULL;
+    const char *t=nil;
     const char *w="Data";
     switch (type) {
     case CURLINFO_HEADER_IN:

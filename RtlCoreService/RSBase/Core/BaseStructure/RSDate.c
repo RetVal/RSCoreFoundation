@@ -30,6 +30,34 @@ RSPrivate RSTimeInterval __RSTSRToTimeInterval(int64_t tsr) {
     return (RSTimeInterval)((double)tsr * __RS1_TSRRate);
 }
 
+#include <dispatch/dispatch.h>
+#include <mach/mach_time.h>
+RSPrivate RSTimeInterval __RSTimeIntervalUntilTSR(uint64_t tsr) {
+    RSDateGetTypeID();
+    uint64_t now = mach_absolute_time();
+    if (tsr >= now) {
+        return __RSTSRToTimeInterval(tsr - now);
+    } else {
+        return -__RSTSRToTimeInterval(now - tsr);
+    }
+}
+// Technically this is 'TSR units' not a strict 'TSR' absolute time
+RSPrivate uint64_t __RSTSRToNanoseconds(uint64_t tsr) {
+    double tsrInNanoseconds = floor(tsr * __RS1_TSRRate * NSEC_PER_SEC);
+    uint64_t ns = (uint64_t)tsrInNanoseconds;
+    return ns;
+}
+
+RSPrivate dispatch_time_t __RSTSRToDispatchTime(uint64_t tsr) {
+    uint64_t tsrInNanoseconds = __RSTSRToNanoseconds(tsr);
+    
+    // It's important to clamp this value to INT64_MAX or it will become interpreted by dispatch_time as a relative value instead of absolute time
+    if (tsrInNanoseconds > INT64_MAX - 1) tsrInNanoseconds = INT64_MAX - 1;
+    
+    // 2nd argument of dispatch_time is a value in nanoseconds, but tsr does not equal nanoseconds on all platforms.
+    return dispatch_time(1, (int64_t)tsrInNanoseconds);
+}
+
 
 struct	__RSTimeBase
 {
@@ -283,12 +311,12 @@ struct  __RSRuntimeClass __RSDateClass =
     "RSDate",
     __RSDateClassInit,
     __RSDateClassCopy,
-    NULL,
+    nil,
     __RSDateClassEqual,
     __RSDateClassHash,
     __RSDateClassDescription,
-    NULL,
-    NULL,
+    nil,
+    nil,
 };
 static  void __RSDateAvailable(RSDateRef date)
 {
@@ -300,6 +328,28 @@ static  RSTypeID __RSDateTypeID = _RSRuntimeNotATypeID;
 
 RSPrivate void __RSDateInitialize()
 {
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
+    struct mach_timebase_info info;
+    mach_timebase_info(&info);
+    __RSTSRRate = (1.0E9 / (double)info.numer) * (double)info.denom;
+    __RS1_TSRRate = 1.0 / __RSTSRRate;
+#elif DEPLOYMENT_TARGET_WINDOWS
+    LARGE_INTEGER freq;
+    if (!QueryPerformanceFrequency(&freq)) {
+        HALT;
+    }
+    __RSTSRRate = (double)freq.QuadPart;
+    __RS1_TSRRate = 1.0 / __RSTSRRate;
+#elif DEPLOYMENT_TARGET_LINUX
+    struct timespec res;
+    if (clock_getres(CLOCK_MONOTONIC, &res) != 0) {
+        HALT;
+    }
+    __RSTSRRate = res.tv_sec + (1000000000 * res.tv_nsec);
+    __RS1_TSRRate = 1.0 / __RSTSRRate;
+#else
+#error Unable to initialize date
+#endif
     __RSDateTypeID = __RSRuntimeRegisterClass(&__RSDateClass);
     __RSRuntimeSetClassTypeID(&__RSDateClass, __RSDateTypeID);
 }
@@ -313,7 +363,7 @@ RSExport RSAbsoluteTime RSAbsoluteTimeGetCurrent()
 {
     RSAbsoluteTime ret;
     struct timeval tv;
-    gettimeofday(&tv, NULL);
+    gettimeofday(&tv, nil);
     ret = (RSTimeInterval)tv.tv_sec - RSAbsoluteTimeIntervalSince1970;
     ret += (1.0E-6 * (RSTimeInterval)tv.tv_usec);
     return ret;
@@ -325,11 +375,11 @@ RSExport RSAbsoluteTime RSGregorianDateGetAbsoluteTime(RSGregorianDate gdate, RS
     at = 86400.0 * __RSAbsoluteFromYMD(gdate.year - 2001, gdate.month, gdate.day);
     at += 3600.0 * gdate.hour + 60.0 * gdate.minute + gdate.second;
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
-//    if (NULL != tz) {
+//    if (nil != tz) {
 //        __RSGenericValidateType(tz, RSTimeZoneGetTypeID());
 //    }
     RSTimeInterval offset0, offset1;
-    if (NULL != tz)
+    if (nil != tz)
     {
         offset0 = RSTimeZoneGetSecondsFromGMT(tz, at);
         offset1 = RSTimeZoneGetSecondsFromGMT(tz, at - offset0);
@@ -346,10 +396,10 @@ RSExport RSGregorianDate RSAbsoluteTimeGetGregorianDate(RSAbsoluteTime at, RSTim
     int8_t month, day;
     RSAbsoluteTime fixedat;
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
-//    if (NULL != tz) {
+//    if (nil != tz) {
 //        __RSGenericValidateType(tz, RSTimeZoneGetTypeID());
 //    }
-    fixedat = at + (NULL != tz ? RSTimeZoneGetSecondsFromGMT(tz, 0) : 0.0);
+    fixedat = at + (nil != tz ? RSTimeZoneGetSecondsFromGMT(tz, 0) : 0.0);
 #else
     fixedat = at;
 #endif
@@ -413,7 +463,7 @@ RSExport RSBitU32 RSAbsoluteTimeGetDayOfWeek(RSAbsoluteTime at, RSTimeZoneRef tz
     if (tz) {
         if (RSTimeZoneGetTypeID() != RSGetTypeID(tz)) HALTWithError(RSInvalidArgumentException, "timezone is not kind of RSTimeZone");
     }
-    fixedat = at + (NULL != tz ? RSTimeZoneGetSecondsFromGMT(tz, at) : 0.0);
+    fixedat = at + (nil != tz ? RSTimeZoneGetSecondsFromGMT(tz, at) : 0.0);
 #else
     fixedat = at;
 #endif
@@ -430,7 +480,7 @@ RSExport RSBitU32 RSAbsoluteTimeGetDayOfYear(RSAbsoluteTime at, RSTimeZoneRef tz
     if (tz) {
         if (RSTimeZoneGetTypeID() != RSGetTypeID(tz)) HALTWithError(RSInvalidArgumentException, "timezone is not kind of RSTimeZone");
     }
-    fixedat = at + (NULL != tz ? RSTimeZoneGetSecondsFromGMT(tz, at) : 0.0);
+    fixedat = at + (nil != tz ? RSTimeZoneGetSecondsFromGMT(tz, at) : 0.0);
 #else
     fixedat = at;
 #endif
@@ -448,7 +498,7 @@ RSExport RSBitU32 RSAbsoluteTimeGetWeekOfYear(RSAbsoluteTime at, RSTimeZoneRef t
     if (tz) {
         if (RSTimeZoneGetTypeID() != RSGetTypeID(tz)) HALTWithError(RSInvalidArgumentException, "timezone is not kind of RSTimeZone");
     }
-    fixedat = at + (NULL != tz ? RSTimeZoneGetSecondsFromGMT(tz, at) : 0.0);
+    fixedat = at + (nil != tz ? RSTimeZoneGetSecondsFromGMT(tz, at) : 0.0);
 #else
     fixedat = at;
 #endif

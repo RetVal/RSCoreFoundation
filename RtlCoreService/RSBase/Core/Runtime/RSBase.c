@@ -36,9 +36,9 @@ RSInline RSTypeID __RSGetTypeID(RSTypeRef obj)
 
 RSInline BOOL   __RSCheckInstanceISCustomReferenceType(RSTypeRef obj) {
     RSTypeID typeID = __RSGetTypeID(obj);
-    if (typeID == _RSRuntimeNotATypeID) HALTWithError(RSInvalidArgumentException, "the object is not a registered instance in runtime");
-    RSRuntimeBase* base = (RSRuntimeBase*)obj;
-    if (base->_rsinfo._customRef) return YES;
+    if (typeID == _RSRuntimeNotATypeID) HALTWithError(RSInvalidArgumentException, "the type of the object is not a registered class in runtime");
+    const RSRuntimeClass *cls = __RSRuntimeGetClassWithTypeID(typeID);
+    if (cls && cls->refcount) return YES;
     return NO;
 }
 
@@ -143,7 +143,7 @@ RSExport RSMutableTypeRef RSAutorelease(RSTypeRef obj)
     {
         __RSCLog(RSLogLevelWarning, "%s want to add autoreleased object. refuse adding it<%p, %s>\n", __FUNCTION__, obj, __RSRuntimeGetClassNameWithInstance(obj));
 //        __RSLog(RSLogLevelWarning, RSSTR("%s want to add autoreleased object. refuse adding it<%p, %s>\n"), __FUNCTION__, obj, __RSRuntimeGetClassNameWithInstance(obj));
-        return (RSMutableTypeRef)obj;
+        return (RSMutableTypeRef)__RSAutorelease(obj);
     }
     __RSSetAutorelease(obj);
 #endif

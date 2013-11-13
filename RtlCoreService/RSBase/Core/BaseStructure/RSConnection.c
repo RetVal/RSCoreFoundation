@@ -748,7 +748,7 @@ static void __RSConnectionClassDeallocate(RSTypeRef rs)
 #if !OS_OBJECT_USE_OBJC
 	if (instance->socketQueue) dispatch_release(instance->socketQueue);
 #endif
-	instance->socketQueue = NULL;
+	instance->socketQueue = nil;
     
     if (instance->connectInterface4) RSRelease(instance->connectInterface4);
     if (instance->connectInterface6) RSRelease(instance->connectInterface6);
@@ -813,7 +813,7 @@ RSExport RSStringRef RSConnectionGetHostFromSockaddr4(const struct sockaddr_in *
 {
     char addrBuf[INET_ADDRSTRLEN];
 	
-	if (inet_ntop(AF_INET, &pSockaddr4->sin_addr, addrBuf, (socklen_t)sizeof(addrBuf)) == NULL)
+	if (inet_ntop(AF_INET, &pSockaddr4->sin_addr, addrBuf, (socklen_t)sizeof(addrBuf)) == nil)
 	{
 		addrBuf[0] = '\0';
 	}
@@ -825,7 +825,7 @@ RSExport RSStringRef RSConnectionGetHostFromSockaddr6(const struct sockaddr_in6 
 {
     char addrBuf[INET6_ADDRSTRLEN];
 	
-	if (inet_ntop(AF_INET6, &pSockaddr6->sin6_addr, addrBuf, (socklen_t)sizeof(addrBuf)) == NULL)
+	if (inet_ntop(AF_INET6, &pSockaddr6->sin6_addr, addrBuf, (socklen_t)sizeof(addrBuf)) == nil)
 	{
 		addrBuf[0] = '\0';
 	}
@@ -924,7 +924,7 @@ static RSConnectionRef __RSConnectionCreateInstance(RSAllocatorRef allocator, vo
     instance->IsOnSocketQueueOrTargetQueueKey = &instance->IsOnSocketQueueOrTargetQueueKey;
     
     void *nonNullUnusedPointer = (void *)instance;
-    dispatch_queue_set_specific(instance->socketQueue, instance->IsOnSocketQueueOrTargetQueueKey, nonNullUnusedPointer, NULL);
+    dispatch_queue_set_specific(instance->socketQueue, instance->IsOnSocketQueueOrTargetQueueKey, nonNullUnusedPointer, nil);
     
     instance->readQueue = RSArrayCreateMutable(RSAllocatorSystemDefault, 5);
     instance->currentRead = nil;
@@ -1056,8 +1056,8 @@ RSExport void RSConnectionGetDelegateAndQueue(RSConnectionRef connection, ISA *d
 	}
 	else
 	{
-		__block ISA dPtr = NULL;
-		__block dispatch_queue_t dqPtr = NULL;
+		__block ISA dPtr = nil;
+		__block dispatch_queue_t dqPtr = nil;
 		
 		dispatch_sync(connection->socketQueue, ^{
 			dPtr = connection->delegate;
@@ -1227,7 +1227,7 @@ static RSErrorRef __RSConnectionGaiError(RSErrorCode gaiCode)
 
 static RSErrorRef __RSConnectionErrnoError()
 {
-    return RSErrorWithDomainCodeAndUserInfo(RSErrorDomainPOSIX, errno, RSDictionaryWithObjectForKey(RSStringWithUTF8String((UTF8Char *)strerror(errno)), RSErrorLocalizedDescriptionKey));
+    return RSErrorWithDomainCodeAndUserInfo(RSErrorDomainPOSIX, errno, RSDictionaryWithObjectForKey(RSStringWithUTF8String(strerror(errno)), RSErrorLocalizedDescriptionKey));
 }
 
 RSExport BOOL RSConnectionIsDisconnected(RSConnectionRef connection)
@@ -1674,7 +1674,7 @@ RSExport void RSConnectionGetInterfaceInformation(RSMutableDataRef *interfaceAdd
         if (getifaddrs(&addrs))
         {
             cursor = addrs;
-			while (cursor != NULL)
+			while (cursor != nil)
 			{
 				if ((addr4 == nil) && (cursor->ifa_addr->sa_family == AF_INET))
 				{
@@ -1696,7 +1696,7 @@ RSExport void RSConnectionGetInterfaceInformation(RSMutableDataRef *interfaceAdd
 						
 						const char *conversion = inet_ntop(AF_INET, &nativeAddr4.sin_addr, ip, sizeof(ip));
 						
-						if ((conversion != NULL) && (strcmp(ip, iface) == 0))
+						if ((conversion != nil) && (strcmp(ip, iface) == 0))
 						{
 							// IP match
 							
@@ -1725,7 +1725,7 @@ RSExport void RSConnectionGetInterfaceInformation(RSMutableDataRef *interfaceAdd
 						
 						const char *conversion = inet_ntop(AF_INET6, &nativeAddr6.sin6_addr, ip, sizeof(ip));
 						
-						if ((conversion != NULL) && (strcmp(ip, iface) == 0))
+						if ((conversion != nil) && (strcmp(ip, iface) == 0))
 						{
 							// IP match
 							
@@ -2033,13 +2033,13 @@ RSExport void RSConnectionEndConnectTimeout(RSConnectionRef connection)
 	if (connection->connectTimer)
 	{
 		dispatch_source_cancel(connection->connectTimer);
-		connection->connectTimer = NULL;
+		connection->connectTimer = nil;
 	}
 	
 	// Increment connectIndex.
 	// This will prevent us from processing results from any related background asynchronous operations.
 	//
-	// Note: This should be called from close method even if connectTimer is NULL.
+	// Note: This should be called from close method even if connectTimer is nil.
 	// This is because one might disconnect a socket prior to a successful connection which had no timeout.
 	
 	connection->connectIndex++;
@@ -2061,7 +2061,7 @@ RSExport void RSConnectionEndCurrentRead(RSConnectionRef connection)
 	if (connection->readTimer)
 	{
 		dispatch_source_cancel(connection->readTimer);
-		connection->readTimer = NULL;
+		connection->readTimer = nil;
 	}
 	
     RSRelease(connection->currentRead);
@@ -2073,7 +2073,7 @@ RSExport void RSConnectionEndCurrentWrite(RSConnectionRef connection)
 	if (connection->writeTimer)
 	{
 		dispatch_source_cancel(connection->writeTimer);
-		connection->writeTimer = NULL;
+		connection->writeTimer = nil;
 	}
 	
     RSRelease(connection->currentWrite);
@@ -2154,28 +2154,28 @@ RSExport void RSConnectionCloseWithError(RSConnectionRef connection, RSErrorRef 
             {
                 dispatch_source_cancel(connection->accept4Source);
                 // We never suspend accept4Source
-                connection->accept4Source = NULL;
+                connection->accept4Source = nil;
             }
             
             if (connection->accept6Source)
             {
                 dispatch_source_cancel(connection->accept6Source);
                 // We never suspend accept6Source
-                connection->accept6Source = NULL;
+                connection->accept6Source = nil;
             }
             
             if (connection->readSource)
             {
                 dispatch_source_cancel(connection->readSource);
                 RSConnectionResumeReadSource(connection);
-                connection->readSource = NULL;
+                connection->readSource = nil;
             }
             
             if (connection->writeSource)
             {
                 dispatch_source_cancel(connection->writeSource);
                 RSConnectionResumeWriteSource(connection);
-                connection->writeSource = NULL;
+                connection->writeSource = nil;
             }
             
             // The sockets will be closed by the cancel handlers of the corresponding source

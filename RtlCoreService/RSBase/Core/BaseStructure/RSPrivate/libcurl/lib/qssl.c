@@ -99,7 +99,7 @@ static CURLcode Curl_qsossl_init_session(struct SessionHandle * data)
   if(rc == SSL_ERROR_NOT_REGISTERED) {
     initstr.keyringFileName = certname;
     initstr.keyringPassword = data->set.str[STRING_KEY];
-    initstr.cipherSuiteList = NULL;    /* Use default. */
+    initstr.cipherSuiteList = nil;    /* Use default. */
     initstr.cipherSuiteListLen = 0;
     rc = SSL_Init(&initstr);
     }
@@ -127,7 +127,7 @@ static CURLcode Curl_qsossl_init_session(struct SessionHandle * data)
     return CURLE_SSL_CERTPROBLEM;
 
   default:
-    failf(data, "SSL_Init(): %s", SSL_Strerror(rc, NULL));
+    failf(data, "SSL_Init(): %s", SSL_Strerror(rc, nil));
     return CURLE_SSL_CONNECT_ERROR;
   }
 
@@ -169,13 +169,13 @@ static CURLcode Curl_qsossl_handshake(struct connectdata * conn, int sockindex)
   SSLHandle * h = connssl->handle;
   long timeout_ms;
 
-  h->exitPgm = NULL;
+  h->exitPgm = nil;
 
   if(!data->set.ssl.verifyhost)
     h->exitPgm = Curl_qsossl_trap_cert;
 
   /* figure out how long time we should wait at maximum */
-  timeout_ms = Curl_timeleft(data, NULL, TRUE);
+  timeout_ms = Curl_timeleft(data, nil, TRUE);
 
   if(timeout_ms < 0) {
     /* time-out, bail out, go home */
@@ -234,7 +234,7 @@ static CURLcode Curl_qsossl_handshake(struct connectdata * conn, int sockindex)
     return CURLE_SSL_CONNECT_ERROR;
 
   default:
-    failf(data, "SSL_Handshake(): %s", SSL_Strerror(rc, NULL));
+    failf(data, "SSL_Handshake(): %s", SSL_Strerror(rc, nil));
     return CURLE_SSL_CONNECT_ERROR;
   }
 
@@ -261,7 +261,7 @@ CURLcode Curl_qsossl_connect(struct connectdata * conn, int sockindex)
       rc = Curl_qsossl_handshake(conn, sockindex);
     else {
       SSL_Destroy(connssl->handle);
-      connssl->handle = NULL;
+      connssl->handle = nil;
       connssl->use = FALSE;
       connssl->state = ssl_connection_none;
     }
@@ -294,11 +294,11 @@ static int Curl_qsossl_close_one(struct ssl_connect_data * conn,
     }
 
     /* An SSL error. */
-    failf(data, "SSL_Destroy() returned error %s", SSL_Strerror(rc, NULL));
+    failf(data, "SSL_Destroy() returned error %s", SSL_Strerror(rc, nil));
     return -1;
   }
 
-  conn->handle = NULL;
+  conn->handle = nil;
   return 0;
 }
 
@@ -415,7 +415,7 @@ static ssize_t qsossl_send(struct connectdata * conn, int sockindex,
 
     /* An SSL error. */
     failf(conn->data, "SSL_Write() returned error %s",
-          SSL_Strerror(rc, NULL));
+          SSL_Strerror(rc, nil));
     *curlcode = CURLE_SEND_ERROR;
     return -1;
   }
@@ -459,7 +459,7 @@ static ssize_t qsossl_recv(struct connectdata * conn, int num, char * buf,
       return -1;
 
     default:
-      failf(conn->data, "SSL read error: %s", SSL_Strerror(nread, NULL));
+      failf(conn->data, "SSL read error: %s", SSL_Strerror(nread, nil));
       *curlcode = CURLE_RECV_ERROR;
       return -1;
     }

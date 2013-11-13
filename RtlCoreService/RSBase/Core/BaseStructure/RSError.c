@@ -90,13 +90,13 @@ static RSRuntimeClass __RSErrorClass = {
     _RSRuntimeScannedObject,
     "RSError",
     __RSErrorClassInit,
-    NULL,
+    nil,
     __RSErrorClassDeallocate,
     __RSErrorClassEqual,
     __RSErrorClassHash,
     __RSErrorClassDescription,
-    NULL,
-    NULL,
+    nil,
+    nil,
 };
 
 static RSTypeID __RSErrorTypeID = _RSRuntimeNotATypeID;

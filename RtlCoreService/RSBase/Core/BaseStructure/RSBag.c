@@ -26,8 +26,8 @@ const RSBagKeyCallBacks RSTypeBagKeyCallBacks = {0, __RSTypeCollectionRetain, __
 const RSBagKeyCallBacks RSCopyStringBagKeyCallBacks = {0, __RSStringCollectionCopy, __RSTypeCollectionRelease, RSDescription, RSEqual, RSHash};
 const RSBagValueCallBacks RSTypeBagValueCallBacks = {0, __RSTypeCollectionRetain, __RSTypeCollectionRelease, RSDescription, RSEqual};
 RSPrivate const RSBagValueCallBacks RSTypeBagValueCompactableCallBacks = {0, __RSTypeCollectionRetain, __RSTypeCollectionRelease, RSDescription, RSEqual};
-static const RSBagKeyCallBacks __RSNullBagKeyCallBacks = {0, NULL, NULL, NULL, NULL, NULL};
-static const RSBagValueCallBacks __RSNullBagValueCallBacks = {0, NULL, NULL, NULL, NULL};
+static const RSBagKeyCallBacks __RSNullBagKeyCallBacks = {0, nil, nil, nil, nil, nil};
+static const RSBagValueCallBacks __RSNullBagValueCallBacks = {0, nil, nil, nil, nil};
 
 #define RSHashRef RSDictionaryRef
 #define RSMutableHashRef RSMutableDictionaryRef
@@ -38,7 +38,7 @@ static const RSBagValueCallBacks __RSNullBagValueCallBacks = {0, NULL, NULL, NUL
 #if RSSet
 const RSBagCallBacks RSTypeBagCallBacks = {0, __RSTypeCollectionRetain, __RSTypeCollectionRelease, RSDescription, RSEqual, RSHash};
 const RSBagCallBacks RSCopyStringBagCallBacks = {0, __RSStringCollectionCopy, __RSTypeCollectionRelease, RSDescription, RSEqual, RSHash};
-static const RSBagCallBacks __RSNullBagCallBacks = {0, NULL, NULL, NULL, NULL, NULL};
+static const RSBagCallBacks __RSNullBagCallBacks = {0, nil, nil, nil, nil, nil};
 
 #define RSBagKeyCallBacks RSBagCallBacks
 #define RSBagValueCallBacks RSBagCallBacks
@@ -56,7 +56,7 @@ static const RSBagCallBacks __RSNullBagCallBacks = {0, NULL, NULL, NULL, NULL, N
 #if RSBag
 const RSBagCallBacks RSTypeBagCallBacks = {0, __RSTypeCollectionRetain, __RSTypeCollectionRelease, RSDescription, RSEqual, RSHash};
 const RSBagCallBacks RSCopyStringBagCallBacks = {0, __RSStringCollectionCopy, __RSTypeCollectionRelease, RSDescription, RSEqual, RSHash};
-static const RSBagCallBacks __RSNullBagCallBacks = {0, NULL, NULL, NULL, NULL, NULL};
+static const RSBagCallBacks __RSNullBagCallBacks = {0, nil, nil, nil, nil, nil};
 
 #define RSBagKeyCallBacks RSBagCallBacks
 #define RSBagValueCallBacks RSBagCallBacks
@@ -97,14 +97,14 @@ static RSTypeID __RSBagTypeID = _RSRuntimeNotATypeID;
 static const RSRuntimeClass __RSBagClass = {
     _RSRuntimeScannedObject,
     "RSBag",
-    NULL,        // init
-    NULL,        // copy
+    nil,        // init
+    nil,        // copy
     __RSBagClassDeallocate,
     __RSBagClassEqual,
     __RSBagClassHash,
     __RSBagClassDescription,
-    NULL,
-    NULL
+    nil,
+    nil
 };
 
 RSTypeID RSBagGetTypeID(void) {
@@ -161,12 +161,12 @@ static uintptr_t __RSBagStandardGetIndirectKey(RSConstBasicHashRef ht, uintptr_t
 }
 
 static RSStringRef __RSBagStandardCopyValueDescription(RSConstBasicHashRef ht, uintptr_t stack_value) {
-    if (RSBasicHashGetSpecialBits(ht) & 0x0800) return RSStringCreateWithFormat(RSAllocatorSystemDefault, NULL, RSSTR("<%p>"), (void *)stack_value);
+    if (RSBasicHashGetSpecialBits(ht) & 0x0800) return RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("<%p>"), (void *)stack_value);
     return RSDescription((RSTypeRef)stack_value);
 }
 
 static RSStringRef __RSBagStandardCopyKeyDescription(RSConstBasicHashRef ht, uintptr_t stack_key) {
-    if (RSBasicHashGetSpecialBits(ht) & 0x0010) return RSStringCreateWithFormat(RSAllocatorSystemDefault, NULL, RSSTR("<%p>"), (void *)stack_key);
+    if (RSBasicHashGetSpecialBits(ht) & 0x0010) return RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("<%p>"), (void *)stack_key);
     return RSDescription((RSTypeRef)stack_key);
 }
 
@@ -197,9 +197,9 @@ static void __RSBagStandardFreeCallbacks(RSConstBasicHashRef ht, RSAllocatorRef 
 
 
 static RSBasicHashCallbacks *__RSBagCopyCallbacks(RSConstBasicHashRef ht, RSAllocatorRef allocator, RSBasicHashCallbacks *cb) {
-    RSBasicHashCallbacks *newcb = NULL;
+    RSBasicHashCallbacks *newcb = nil;
     newcb = (RSBasicHashCallbacks *)RSAllocatorAllocate(allocator, sizeof(RSBasicHashCallbacks) + 10 * sizeof(void *));
-    if (!newcb) return NULL;
+    if (!newcb) return nil;
     memmove(newcb, (void *)cb, sizeof(RSBasicHashCallbacks) + 10 * sizeof(void *));
     return newcb;
 }
@@ -214,47 +214,47 @@ static void __RSBagFreeCallbacks(RSConstBasicHashRef ht, RSAllocatorRef allocato
 static uintptr_t __RSBagRetainValue(RSConstBasicHashRef ht, uintptr_t stack_value) {
     const RSBasicHashCallbacks *cb = RSBasicHashGetCallbacks(ht);
     const_any_pointer_t (*value_retain)(RSAllocatorRef, const_any_pointer_t) = (const_any_pointer_t (*)(RSAllocatorRef, const_any_pointer_t))cb->context[0];
-    if (NULL == value_retain) return stack_value;
+    if (nil == value_retain) return stack_value;
     return (uintptr_t)INVOKE_CALLBACK2(value_retain, RSGetAllocator(ht), (const_any_pointer_t)stack_value);
 }
 
 static uintptr_t __RSBagRetainKey(RSConstBasicHashRef ht, uintptr_t stack_key) {
     const RSBasicHashCallbacks *cb = RSBasicHashGetCallbacks(ht);
     const_any_pointer_t (*key_retain)(RSAllocatorRef, const_any_pointer_t) = (const_any_pointer_t (*)(RSAllocatorRef, const_any_pointer_t))cb->context[1];
-    if (NULL == key_retain) return stack_key;
+    if (nil == key_retain) return stack_key;
     return (uintptr_t)INVOKE_CALLBACK2(key_retain, RSGetAllocator(ht), (const_any_pointer_t)stack_key);
 }
 
 static void __RSBagReleaseValue(RSConstBasicHashRef ht, uintptr_t stack_value) {
     const RSBasicHashCallbacks *cb = RSBasicHashGetCallbacks(ht);
     void (*value_release)(RSAllocatorRef, const_any_pointer_t) = (void (*)(RSAllocatorRef, const_any_pointer_t))cb->context[2];
-    if (NULL != value_release) INVOKE_CALLBACK2(value_release, RSGetAllocator(ht), (const_any_pointer_t) stack_value);
+    if (nil != value_release) INVOKE_CALLBACK2(value_release, RSGetAllocator(ht), (const_any_pointer_t) stack_value);
 }
 
 static void __RSBagReleaseKey(RSConstBasicHashRef ht, uintptr_t stack_key) {
     const RSBasicHashCallbacks *cb = RSBasicHashGetCallbacks(ht);
     void (*key_release)(RSAllocatorRef, const_any_pointer_t) = (void (*)(RSAllocatorRef, const_any_pointer_t))cb->context[3];
-    if (NULL != key_release) INVOKE_CALLBACK2(key_release, RSGetAllocator(ht), (const_any_pointer_t) stack_key);
+    if (nil != key_release) INVOKE_CALLBACK2(key_release, RSGetAllocator(ht), (const_any_pointer_t) stack_key);
 }
 
 static BOOL __RSBagEquateValues(RSConstBasicHashRef ht, uintptr_t coll_value1, uintptr_t stack_value2) {
     const RSBasicHashCallbacks *cb = RSBasicHashGetCallbacks(ht);
     BOOL (*value_equal)(const_any_pointer_t, const_any_pointer_t) = (BOOL (*)(const_any_pointer_t, const_any_pointer_t))cb->context[4];
-    if (NULL == value_equal) return (coll_value1 == stack_value2);
+    if (nil == value_equal) return (coll_value1 == stack_value2);
     return INVOKE_CALLBACK2(value_equal, (const_any_pointer_t) coll_value1, (const_any_pointer_t) stack_value2) ? 1 : 0;
 }
 
 static BOOL __RSBagEquateKeys(RSConstBasicHashRef ht, uintptr_t coll_key1, uintptr_t stack_key2) {
     const RSBasicHashCallbacks *cb = RSBasicHashGetCallbacks(ht);
     BOOL (*key_equal)(const_any_pointer_t, const_any_pointer_t) = (BOOL (*)(const_any_pointer_t, const_any_pointer_t))cb->context[5];
-    if (NULL == key_equal) return (coll_key1 == stack_key2);
+    if (nil == key_equal) return (coll_key1 == stack_key2);
     return INVOKE_CALLBACK2(key_equal, (const_any_pointer_t) coll_key1, (const_any_pointer_t) stack_key2) ? 1 : 0;
 }
 
 static uintptr_t __RSBagHashKey(RSConstBasicHashRef ht, uintptr_t stack_key) {
     const RSBasicHashCallbacks *cb = RSBasicHashGetCallbacks(ht);
     RSHashCode (*hash)(const_any_pointer_t) = (RSHashCode (*)(const_any_pointer_t))cb->context[6];
-    if (NULL == hash) return stack_key;
+    if (nil == hash) return stack_key;
     return (uintptr_t)INVOKE_CALLBACK1(hash, (const_any_pointer_t) stack_key);
 }
 
@@ -265,14 +265,14 @@ static uintptr_t __RSBagGetIndirectKey(RSConstBasicHashRef ht, uintptr_t coll_va
 static RSStringRef __RSBagCopyValueDescription(RSConstBasicHashRef ht, uintptr_t stack_value) {
     const RSBasicHashCallbacks *cb = RSBasicHashGetCallbacks(ht);
     RSStringRef (*value_describe)(const_any_pointer_t) = (RSStringRef (*)(const_any_pointer_t))cb->context[8];
-    if (NULL == value_describe) return RSStringCreateWithFormat(RSAllocatorSystemDefault, NULL, RSSTR("<%p>"), (const_any_pointer_t) stack_value);
+    if (nil == value_describe) return RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("<%p>"), (const_any_pointer_t) stack_value);
     return (RSStringRef)INVOKE_CALLBACK1(value_describe, (const_any_pointer_t) stack_value);
 }
 
 static RSStringRef __RSBagCopyKeyDescription(RSConstBasicHashRef ht, uintptr_t stack_key) {
     const RSBasicHashCallbacks *cb = RSBasicHashGetCallbacks(ht);
     RSStringRef (*key_describe)(const_any_pointer_t) = (RSStringRef (*)(const_any_pointer_t))cb->context[9];
-    if (NULL == key_describe) return RSStringCreateWithFormat(RSAllocatorSystemDefault, NULL, RSSTR("<%p>"), (const_any_pointer_t) stack_key);
+    if (nil == key_describe) return RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("<%p>"), (const_any_pointer_t) stack_key);
     return (RSStringRef)INVOKE_CALLBACK1(key_describe, (const_any_pointer_t) stack_key);
 }
 
@@ -280,25 +280,25 @@ static RSBasicHashRef __RSBagCreateGeneric(RSAllocatorRef allocator, const RSHas
     RSOptionFlags flags = RSBasicHashLinearHashing; // RSBasicHashExponentialHashing
     flags |= (RSDictionary ? RSBasicHashHasKeys : 0) | (RSBag ? RSBasicHashHasCounts : 0);
     
-    RSBasicHashCallbacks *cb = NULL;
+    RSBasicHashCallbacks *cb = nil;
     BOOL std_cb = false;
     uint16_t specialBits = 0;
-    const_any_pointer_t (*key_retain)(RSAllocatorRef, const_any_pointer_t) = NULL;
-    void (*key_release)(RSAllocatorRef, const_any_pointer_t) = NULL;
-    const_any_pointer_t (*value_retain)(RSAllocatorRef, const_any_pointer_t) = NULL;
-    void (*value_release)(RSAllocatorRef, const_any_pointer_t) = NULL;
+    const_any_pointer_t (*key_retain)(RSAllocatorRef, const_any_pointer_t) = nil;
+    void (*key_release)(RSAllocatorRef, const_any_pointer_t) = nil;
+    const_any_pointer_t (*value_retain)(RSAllocatorRef, const_any_pointer_t) = nil;
+    void (*value_release)(RSAllocatorRef, const_any_pointer_t) = nil;
     
-    if ((NULL == keyCallBacks || 0 == keyCallBacks->version) && (!useValueCB || NULL == valueCallBacks || 0 == valueCallBacks->version)) {
-        BOOL keyRetainNull = NULL == keyCallBacks || NULL == keyCallBacks->retain;
-        BOOL keyReleaseNull = NULL == keyCallBacks || NULL == keyCallBacks->release;
-        BOOL keyEquateNull = NULL == keyCallBacks || NULL == keyCallBacks->equal;
-        BOOL keyHashNull = NULL == keyCallBacks || NULL == keyCallBacks->hash;
-        BOOL keyDescribeNull = NULL == keyCallBacks || NULL == keyCallBacks->copyDescription;
+    if ((nil == keyCallBacks || 0 == keyCallBacks->version) && (!useValueCB || nil == valueCallBacks || 0 == valueCallBacks->version)) {
+        BOOL keyRetainNull = nil == keyCallBacks || nil == keyCallBacks->retain;
+        BOOL keyReleaseNull = nil == keyCallBacks || nil == keyCallBacks->release;
+        BOOL keyEquateNull = nil == keyCallBacks || nil == keyCallBacks->equal;
+        BOOL keyHashNull = nil == keyCallBacks || nil == keyCallBacks->hash;
+        BOOL keyDescribeNull = nil == keyCallBacks || nil == keyCallBacks->copyDescription;
         
-        BOOL valueRetainNull = (useValueCB && (NULL == valueCallBacks || NULL == valueCallBacks->retain)) || (!useValueCB && keyRetainNull);
-        BOOL valueReleaseNull = (useValueCB && (NULL == valueCallBacks || NULL == valueCallBacks->release)) || (!useValueCB && keyReleaseNull);
-        BOOL valueEquateNull = (useValueCB && (NULL == valueCallBacks || NULL == valueCallBacks->equal)) || (!useValueCB && keyEquateNull);
-        BOOL valueDescribeNull = (useValueCB && (NULL == valueCallBacks || NULL == valueCallBacks->copyDescription)) || (!useValueCB && keyDescribeNull);
+        BOOL valueRetainNull = (useValueCB && (nil == valueCallBacks || nil == valueCallBacks->retain)) || (!useValueCB && keyRetainNull);
+        BOOL valueReleaseNull = (useValueCB && (nil == valueCallBacks || nil == valueCallBacks->release)) || (!useValueCB && keyReleaseNull);
+        BOOL valueEquateNull = (useValueCB && (nil == valueCallBacks || nil == valueCallBacks->equal)) || (!useValueCB && keyEquateNull);
+        BOOL valueDescribeNull = (useValueCB && (nil == valueCallBacks || nil == valueCallBacks->copyDescription)) || (!useValueCB && keyDescribeNull);
         
         BOOL keyRetainStd = keyRetainNull || __RSTypeCollectionRetain == keyCallBacks->retain;
         BOOL keyReleaseStd = keyReleaseNull || __RSTypeCollectionRelease == keyCallBacks->release;
@@ -317,11 +317,11 @@ static RSBasicHashRef __RSBagCreateGeneric(RSAllocatorRef allocator, const RSHas
                 std_cb = true;
             } else {
                 // just set these to tickle the GC Strong logic below in a way that mimics past practice
-                key_retain = keyCallBacks ? keyCallBacks->retain : NULL;
-                key_release = keyCallBacks ? keyCallBacks->release : NULL;
+                key_retain = keyCallBacks ? keyCallBacks->retain : nil;
+                key_release = keyCallBacks ? keyCallBacks->release : nil;
                 if (useValueCB) {
-                    value_retain = valueCallBacks ? valueCallBacks->retain : NULL;
-                    value_release = valueCallBacks ? valueCallBacks->release : NULL;
+                    value_retain = valueCallBacks ? valueCallBacks->retain : nil;
+                    value_release = valueCallBacks ? valueCallBacks->release : nil;
                 } else {
                     value_retain = key_retain;
                     value_release = key_release;
@@ -340,31 +340,31 @@ static RSBasicHashRef __RSBagCreateGeneric(RSAllocatorRef allocator, const RSHas
     }
     
     if (!cb) {
-        BOOL (*key_equal)(const_any_pointer_t, const_any_pointer_t) = NULL;
-        BOOL (*value_equal)(const_any_pointer_t, const_any_pointer_t) = NULL;
-        RSStringRef (*key_describe)(const_any_pointer_t) = NULL;
-        RSStringRef (*value_describe)(const_any_pointer_t) = NULL;
-        RSHashCode (*hash_key)(const_any_pointer_t) = NULL;
-        key_retain = keyCallBacks ? keyCallBacks->retain : NULL;
-        key_release = keyCallBacks ? keyCallBacks->release : NULL;
-        key_equal = keyCallBacks ? keyCallBacks->equal : NULL;
-        key_describe = keyCallBacks ? keyCallBacks->copyDescription : NULL;
+        BOOL (*key_equal)(const_any_pointer_t, const_any_pointer_t) = nil;
+        BOOL (*value_equal)(const_any_pointer_t, const_any_pointer_t) = nil;
+        RSStringRef (*key_describe)(const_any_pointer_t) = nil;
+        RSStringRef (*value_describe)(const_any_pointer_t) = nil;
+        RSHashCode (*hash_key)(const_any_pointer_t) = nil;
+        key_retain = keyCallBacks ? keyCallBacks->retain : nil;
+        key_release = keyCallBacks ? keyCallBacks->release : nil;
+        key_equal = keyCallBacks ? keyCallBacks->equal : nil;
+        key_describe = keyCallBacks ? keyCallBacks->copyDescription : nil;
         if (useValueCB) {
-            value_retain = valueCallBacks ? valueCallBacks->retain : NULL;
-            value_release = valueCallBacks ? valueCallBacks->release : NULL;
-            value_equal = valueCallBacks ? valueCallBacks->equal : NULL;
-            value_describe = valueCallBacks ? valueCallBacks->copyDescription : NULL;
+            value_retain = valueCallBacks ? valueCallBacks->retain : nil;
+            value_release = valueCallBacks ? valueCallBacks->release : nil;
+            value_equal = valueCallBacks ? valueCallBacks->equal : nil;
+            value_describe = valueCallBacks ? valueCallBacks->copyDescription : nil;
         } else {
             value_retain = key_retain;
             value_release = key_release;
             value_equal = key_equal;
             value_describe = key_describe;
         }
-        hash_key = keyCallBacks ? keyCallBacks->hash : NULL;
+        hash_key = keyCallBacks ? keyCallBacks->hash : nil;
         
-        RSBasicHashCallbacks *newcb = NULL;
+        RSBasicHashCallbacks *newcb = nil;
         newcb = (RSBasicHashCallbacks *)RSAllocatorAllocate(allocator, sizeof(RSBasicHashCallbacks) + 10 * sizeof(void *));
-        if (!newcb) return NULL;
+        if (!newcb) return nil;
         newcb->copyCallbacks = __RSBagCopyCallbacks;
         newcb->freeCallbacks = __RSBagFreeCallbacks;
         newcb->retainValue = __RSBagRetainValue;
@@ -390,10 +390,10 @@ static RSBasicHashRef __RSBagCreateGeneric(RSAllocatorRef allocator, const RSHas
     }
     
     if (RS_IS_COLLECTABLE_ALLOCATOR(allocator)) {
-        if (std_cb || value_retain != NULL || value_release != NULL) {
+        if (std_cb || value_retain != nil || value_release != nil) {
             flags |= RSBasicHashStrongValues;
         }
-        if (std_cb || key_retain != NULL || key_release != NULL) {
+        if (std_cb || key_retain != nil || key_release != nil) {
             flags |= RSBasicHashStrongKeys;
         }
 #if RSDictionary
@@ -448,22 +448,22 @@ static RSBasicHashRef __RSBagCreateGeneric(RSAllocatorRef allocator, const RSHas
     if (RS_IS_COLLECTABLE_ALLOCATOR(allocator)) { // all this crap is just for figuring out two flags for GC in the way done historically; it probably simplifies down to three lines, but we let the compiler worry about that
         BOOL set_cb = false;
         BOOL std_cb = false;
-        const_any_pointer_t (*key_retain)(RSAllocatorRef, const_any_pointer_t) = NULL;
-        void (*key_release)(RSAllocatorRef, const_any_pointer_t) = NULL;
-        const_any_pointer_t (*value_retain)(RSAllocatorRef, const_any_pointer_t) = NULL;
-        void (*value_release)(RSAllocatorRef, const_any_pointer_t) = NULL;
+        const_any_pointer_t (*key_retain)(RSAllocatorRef, const_any_pointer_t) = nil;
+        void (*key_release)(RSAllocatorRef, const_any_pointer_t) = nil;
+        const_any_pointer_t (*value_retain)(RSAllocatorRef, const_any_pointer_t) = nil;
+        void (*value_release)(RSAllocatorRef, const_any_pointer_t) = nil;
         
-        if ((NULL == keyCallBacks || 0 == keyCallBacks->version) && (!useValueCB || NULL == valueCallBacks || 0 == valueCallBacks->version)) {
-            BOOL keyRetainNull = NULL == keyCallBacks || NULL == keyCallBacks->retain;
-            BOOL keyReleaseNull = NULL == keyCallBacks || NULL == keyCallBacks->release;
-            BOOL keyEquateNull = NULL == keyCallBacks || NULL == keyCallBacks->equal;
-            BOOL keyHashNull = NULL == keyCallBacks || NULL == keyCallBacks->hash;
-            BOOL keyDescribeNull = NULL == keyCallBacks || NULL == keyCallBacks->copyDescription;
+        if ((nil == keyCallBacks || 0 == keyCallBacks->version) && (!useValueCB || nil == valueCallBacks || 0 == valueCallBacks->version)) {
+            BOOL keyRetainNull = nil == keyCallBacks || nil == keyCallBacks->retain;
+            BOOL keyReleaseNull = nil == keyCallBacks || nil == keyCallBacks->release;
+            BOOL keyEquateNull = nil == keyCallBacks || nil == keyCallBacks->equal;
+            BOOL keyHashNull = nil == keyCallBacks || nil == keyCallBacks->hash;
+            BOOL keyDescribeNull = nil == keyCallBacks || nil == keyCallBacks->copyDescription;
             
-            BOOL valueRetainNull = (useValueCB && (NULL == valueCallBacks || NULL == valueCallBacks->retain)) || (!useValueCB && keyRetainNull);
-            BOOL valueReleaseNull = (useValueCB && (NULL == valueCallBacks || NULL == valueCallBacks->release)) || (!useValueCB && keyReleaseNull);
-            BOOL valueEquateNull = (useValueCB && (NULL == valueCallBacks || NULL == valueCallBacks->equal)) || (!useValueCB && keyEquateNull);
-            BOOL valueDescribeNull = (useValueCB && (NULL == valueCallBacks || NULL == valueCallBacks->copyDescription)) || (!useValueCB && keyDescribeNull);
+            BOOL valueRetainNull = (useValueCB && (nil == valueCallBacks || nil == valueCallBacks->retain)) || (!useValueCB && keyRetainNull);
+            BOOL valueReleaseNull = (useValueCB && (nil == valueCallBacks || nil == valueCallBacks->release)) || (!useValueCB && keyReleaseNull);
+            BOOL valueEquateNull = (useValueCB && (nil == valueCallBacks || nil == valueCallBacks->equal)) || (!useValueCB && keyEquateNull);
+            BOOL valueDescribeNull = (useValueCB && (nil == valueCallBacks || nil == valueCallBacks->copyDescription)) || (!useValueCB && keyDescribeNull);
             
             BOOL keyRetainStd = keyRetainNull || __RSTypeCollectionRetain == keyCallBacks->retain;
             BOOL keyReleaseStd = keyReleaseNull || __RSTypeCollectionRelease == keyCallBacks->release;
@@ -482,11 +482,11 @@ static RSBasicHashRef __RSBagCreateGeneric(RSAllocatorRef allocator, const RSHas
                     std_cb = true;
                 } else {
                     // just set these to tickle the GC Strong logic below in a way that mimics past practice
-                    key_retain = keyCallBacks ? keyCallBacks->retain : NULL;
-                    key_release = keyCallBacks ? keyCallBacks->release : NULL;
+                    key_retain = keyCallBacks ? keyCallBacks->retain : nil;
+                    key_release = keyCallBacks ? keyCallBacks->release : nil;
                     if (useValueCB) {
-                        value_retain = valueCallBacks ? valueCallBacks->retain : NULL;
-                        value_release = valueCallBacks ? valueCallBacks->release : NULL;
+                        value_retain = valueCallBacks ? valueCallBacks->retain : nil;
+                        value_release = valueCallBacks ? valueCallBacks->release : nil;
                     } else {
                         value_retain = key_retain;
                         value_release = key_release;
@@ -496,37 +496,37 @@ static RSBasicHashRef __RSBagCreateGeneric(RSAllocatorRef allocator, const RSHas
         }
         
         if (!set_cb) {
-            key_retain = keyCallBacks ? keyCallBacks->retain : NULL;
-            key_release = keyCallBacks ? keyCallBacks->release : NULL;
+            key_retain = keyCallBacks ? keyCallBacks->retain : nil;
+            key_release = keyCallBacks ? keyCallBacks->release : nil;
             if (useValueCB) {
-                value_retain = valueCallBacks ? valueCallBacks->retain : NULL;
-                value_release = valueCallBacks ? valueCallBacks->release : NULL;
+                value_retain = valueCallBacks ? valueCallBacks->retain : nil;
+                value_release = valueCallBacks ? valueCallBacks->release : nil;
             } else {
                 value_retain = key_retain;
                 value_release = key_release;
             }
         }
         
-        if (std_cb || value_retain != NULL || value_release != NULL) {
+        if (std_cb || value_retain != nil || value_release != nil) {
             flags |= RSBasicHashStrongValues;
         }
-        if (std_cb || key_retain != NULL || key_release != NULL) {
+        if (std_cb || key_retain != nil || key_release != nil) {
             flags |= RSBasicHashStrongKeys;
         }
     }
     
     
     RSBasicHashCallbacks callbacks;
-    callbacks.retainKey = keyCallBacks ? (uintptr_t (*)(RSAllocatorRef, uintptr_t))keyCallBacks->retain : NULL;
-    callbacks.releaseKey = keyCallBacks ? (void (*)(RSAllocatorRef, uintptr_t))keyCallBacks->release : NULL;
-    callbacks.equateKeys = keyCallBacks ? (BOOL (*)(uintptr_t, uintptr_t))keyCallBacks->equal : NULL;
-    callbacks.hashKey = keyCallBacks ? (RSHashCode (*)(uintptr_t))keyCallBacks->hash : NULL;
-    callbacks.getIndirectKey = NULL;
-    callbacks.copyKeyDescription = keyCallBacks ? (RSStringRef (*)(uintptr_t))keyCallBacks->copyDescription : NULL;
-    callbacks.retainValue = useValueCB ? (valueCallBacks ? (uintptr_t (*)(RSAllocatorRef, uintptr_t))valueCallBacks->retain : NULL) : (callbacks.retainKey);
-    callbacks.releaseValue = useValueCB ? (valueCallBacks ? (void (*)(RSAllocatorRef, uintptr_t))valueCallBacks->release : NULL) : (callbacks.releaseKey);
-    callbacks.equateValues = useValueCB ? (valueCallBacks ? (BOOL (*)(uintptr_t, uintptr_t))valueCallBacks->equal : NULL) : (callbacks.equateKeys);
-    callbacks.copyValueDescription = useValueCB ? (valueCallBacks ? (RSStringRef (*)(uintptr_t))valueCallBacks->copyDescription : NULL) : (callbacks.copyKeyDescription);
+    callbacks.retainKey = keyCallBacks ? (uintptr_t (*)(RSAllocatorRef, uintptr_t))keyCallBacks->retain : nil;
+    callbacks.releaseKey = keyCallBacks ? (void (*)(RSAllocatorRef, uintptr_t))keyCallBacks->release : nil;
+    callbacks.equateKeys = keyCallBacks ? (BOOL (*)(uintptr_t, uintptr_t))keyCallBacks->equal : nil;
+    callbacks.hashKey = keyCallBacks ? (RSHashCode (*)(uintptr_t))keyCallBacks->hash : nil;
+    callbacks.getIndirectKey = nil;
+    callbacks.copyKeyDescription = keyCallBacks ? (RSStringRef (*)(uintptr_t))keyCallBacks->copyDescription : nil;
+    callbacks.retainValue = useValueCB ? (valueCallBacks ? (uintptr_t (*)(RSAllocatorRef, uintptr_t))valueCallBacks->retain : nil) : (callbacks.retainKey);
+    callbacks.releaseValue = useValueCB ? (valueCallBacks ? (void (*)(RSAllocatorRef, uintptr_t))valueCallBacks->release : nil) : (callbacks.releaseKey);
+    callbacks.equateValues = useValueCB ? (valueCallBacks ? (BOOL (*)(uintptr_t, uintptr_t))valueCallBacks->equal : nil) : (callbacks.equateKeys);
+    callbacks.copyValueDescription = useValueCB ? (valueCallBacks ? (RSStringRef (*)(uintptr_t))valueCallBacks->copyDescription : nil) : (callbacks.copyKeyDescription);
     
     RSBasicHashRef ht = RSBasicHashCreate(allocator, flags, &callbacks);
     return ht;
@@ -553,7 +553,7 @@ RSPrivate RSHashRef __RSBagCreateTransfer(RSAllocatorRef allocator, const_any_po
     callbacks.releaseKey = (void (*)(RSAllocatorRef, uintptr_t))RSTypeBagKeyCallBacks.release;
     callbacks.equateKeys = (BOOL (*)(uintptr_t, uintptr_t))RSTypeBagKeyCallBacks.equal;
     callbacks.hashKey = (RSHashCode (*)(uintptr_t))RSTypeBagKeyCallBacks.hash;
-    callbacks.getIndirectKey = NULL;
+    callbacks.getIndirectKey = nil;
     callbacks.copyKeyDescription = (RSStringRef (*)(uintptr_t))RSTypeBagKeyCallBacks.copyDescription;
     callbacks.retainValue = RSDictionary ? (uintptr_t (*)(RSAllocatorRef, uintptr_t))RSTypeBagValueCallBacks.retain : callbacks.retainKey;
     callbacks.releaseValue = RSDictionary ? (void (*)(RSAllocatorRef, uintptr_t))RSTypeBagValueCallBacks.release : callbacks.releaseKey;
@@ -588,7 +588,7 @@ RSHashRef RSBagCreate(RSAllocatorRef allocator, const_any_pointer_t *klist, RSIn
     RSTypeID typeID = RSBagGetTypeID();
     RSAssert2(0 <= numValues, __RSLogAssertion, "%s(): numValues (%ld) cannot be less than zero", __PRETTY_FUNCTION__, numValues);
     RSBasicHashRef ht = __RSBagCreateGeneric(allocator, keyCallBacks, valueCallBacks, RSDictionary);
-    if (!ht) return NULL;
+    if (!ht) return nil;
     if (0 < numValues) RSBasicHashSetCapacity(ht, numValues);
     for (RSIndex idx = 0; idx < numValues; idx++) {
         RSBasicHashAddValue(ht, (uintptr_t)klist[idx], (uintptr_t)vlist[idx]);
@@ -614,7 +614,7 @@ RSMutableHashRef RSBagCreateMutable(RSAllocatorRef allocator, RSIndex capacity, 
     RSTypeID typeID = RSBagGetTypeID();
     RSAssert2(0 <= capacity, __RSLogAssertion, "%s(): capacity (%ld) cannot be less than zero", __PRETTY_FUNCTION__, capacity);
     RSBasicHashRef ht = __RSBagCreateGeneric(allocator, keyCallBacks, valueCallBacks, RSDictionary);
-    if (!ht) return NULL;
+    if (!ht) return nil;
     *(uintptr_t *)ht = __RSISAForTypeID(typeID);
     __RSRuntimeSetInstanceTypeID(ht, typeID);
     //        if (__RSOASafe) __RSSetLastAllocationEventName(ht, "RSBag (mutable)");
@@ -623,9 +623,9 @@ RSMutableHashRef RSBagCreateMutable(RSAllocatorRef allocator, RSIndex capacity, 
 
 RSHashRef RSBagCreateCopy(RSAllocatorRef allocator, RSHashRef other) {
     RSTypeID typeID = RSBagGetTypeID();
-    RSAssert1(other, __RSLogAssertion, "%s(): other RSBag cannot be NULL", __PRETTY_FUNCTION__);
+    RSAssert1(other, __RSLogAssertion, "%s(): other RSBag cannot be nil", __PRETTY_FUNCTION__);
     __RSGenericValidInstance(other, typeID);
-    RSBasicHashRef ht = NULL;
+    RSBasicHashRef ht = nil;
     if (RS_IS_OBJC(typeID, other)) {
         RSIndex numValues = RSBagGetCount(other);
         const_any_pointer_t vbuffer[256], kbuffer[256];
@@ -638,7 +638,7 @@ RSHashRef RSBagCreateCopy(RSAllocatorRef allocator, RSHashRef other) {
         const_any_pointer_t *klist = (numValues <= 256) ? kbuffer : (const_any_pointer_t *)RSAllocatorAllocate(RSAllocatorSystemDefault, numValues * sizeof(const_any_pointer_t), 0);
         RSDictionaryGetKeysAndValues(other, klist, vlist);
 #endif
-        ht = __RSBagCreateGeneric(allocator, & RSTypeBagKeyCallBacks, RSDictionary ? & RSTypeBagValueCallBacks : NULL, RSDictionary);
+        ht = __RSBagCreateGeneric(allocator, & RSTypeBagKeyCallBacks, RSDictionary ? & RSTypeBagValueCallBacks : nil, RSDictionary);
         if (ht && 0 < numValues) RSBasicHashSetCapacity(ht, numValues);
         for (RSIndex idx = 0; ht && idx < numValues; idx++) {
             RSBasicHashAddValue(ht, (uintptr_t)klist[idx], (uintptr_t)vlist[idx]);
@@ -648,7 +648,7 @@ RSHashRef RSBagCreateCopy(RSAllocatorRef allocator, RSHashRef other) {
     } else {
         ht = RSBasicHashCreateCopy(allocator, (RSBasicHashRef)other);
     }
-    if (!ht) return NULL;
+    if (!ht) return nil;
     RSBasicHashMakeImmutable(ht);
     *(uintptr_t *)ht = __RSISAForTypeID(typeID);
     __RSRuntimeSetInstanceTypeID(ht, typeID);
@@ -658,10 +658,10 @@ RSHashRef RSBagCreateCopy(RSAllocatorRef allocator, RSHashRef other) {
 
 RSMutableHashRef RSBagCreateMutableCopy(RSAllocatorRef allocator, RSIndex capacity, RSHashRef other) {
     RSTypeID typeID = RSBagGetTypeID();
-    RSAssert1(other, __RSLogAssertion, "%s(): other RSBag cannot be NULL", __PRETTY_FUNCTION__);
+    RSAssert1(other, __RSLogAssertion, "%s(): other RSBag cannot be nil", __PRETTY_FUNCTION__);
     __RSGenericValidInstance(other, typeID);
     RSAssert2(0 <= capacity, __RSLogAssertion, "%s(): capacity (%ld) cannot be less than zero", __PRETTY_FUNCTION__, capacity);
-    RSBasicHashRef ht = NULL;
+    RSBasicHashRef ht = nil;
     if (RS_IS_OBJC(typeID, other)) {
         RSIndex numValues = RSBagGetCount(other);
         const_any_pointer_t vbuffer[256], kbuffer[256];
@@ -674,7 +674,7 @@ RSMutableHashRef RSBagCreateMutableCopy(RSAllocatorRef allocator, RSIndex capaci
         const_any_pointer_t *klist = (numValues <= 256) ? kbuffer : (const_any_pointer_t *)RSAllocatorAllocate(RSAllocatorSystemDefault, numValues * sizeof(const_any_pointer_t), 0);
         RSDictionaryGetKeysAndValues(other, klist, vlist);
 #endif
-        ht = __RSBagCreateGeneric(allocator, & RSTypeBagKeyCallBacks, RSDictionary ? & RSTypeBagValueCallBacks : NULL, RSDictionary);
+        ht = __RSBagCreateGeneric(allocator, & RSTypeBagKeyCallBacks, RSDictionary ? & RSTypeBagValueCallBacks : nil, RSDictionary);
         if (ht && 0 < numValues) RSBasicHashSetCapacity(ht, numValues);
         for (RSIndex idx = 0; ht && idx < numValues; idx++) {
             RSBasicHashAddValue(ht, (uintptr_t)klist[idx], (uintptr_t)vlist[idx]);
@@ -684,7 +684,7 @@ RSMutableHashRef RSBagCreateMutableCopy(RSAllocatorRef allocator, RSIndex capaci
     } else {
         ht = RSBasicHashCreateCopy(allocator, (RSBasicHashRef)other);
     }
-    if (!ht) return NULL;
+    if (!ht) return nil;
     *(uintptr_t *)ht = __RSISAForTypeID(typeID);
     __RSRuntimeSetInstanceTypeID(ht, typeID);
     //        if (__RSOASafe) __RSSetLastAllocationEventName(ht, "RSBag (mutable)");

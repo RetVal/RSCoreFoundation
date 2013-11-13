@@ -98,7 +98,7 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
            reasons, and we don't really use the newly cloned URL here
            then. Just free() it. */
         free(data->req.newurl);
-        data->req.newurl = NULL;
+        data->req.newurl = nil;
       }
 
       /* initialize a dynamic send-buffer */
@@ -170,7 +170,7 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
             Curl_add_buffer_send(req_buffer, conn,
                                  &data->info.request_size, 0, sockindex);
         }
-        req_buffer = NULL;
+        req_buffer = nil;
         if(result)
           failf(data, "Failed sending CONNECT to proxy");
       }
@@ -435,7 +435,7 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
                   }
                   else if(checkprefix("Content-Length:", line_start)) {
                     cl = curlx_strtoofft(line_start +
-                                         strlen("Content-Length:"), NULL, 10);
+                                         strlen("Content-Length:"), nil, 10);
                   }
                   else if(Curl_compareheader(line_start,
                                              "Connection:", "close"))
@@ -512,7 +512,7 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
      make sure that it isn't accidentally used for the document request
      after we've connected. So let's free and clear it here. */
   Curl_safefree(conn->allocptr.proxyuserpwd);
-  conn->allocptr.proxyuserpwd = NULL;
+  conn->allocptr.proxyuserpwd = nil;
 
   data->state.authproxy.done = TRUE;
 

@@ -54,7 +54,7 @@ static char* subUtfString(const unsigned char *str, RSIndex start, RSIndex end)
 {
     RSIndex len = __RSGetUTF8Length(str);
     
-    if(start >= len) return NULL;
+    if(start >= len) return nil;
     if(end > len) end = len;
     
     const unsigned char *sptr = str;
@@ -590,7 +590,7 @@ static int __char16ToInt(char c)
 static BOOL __isValidateStr16(const char *str)
 {
     size_t len,i;
-    if (NULL == str)
+    if (nil == str)
     {
         return NO;
     }

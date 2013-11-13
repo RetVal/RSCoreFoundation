@@ -111,7 +111,7 @@ struct memdebug {
  */
 
 #define logfile curl_debuglogfile
-FILE *curl_debuglogfile = NULL;
+FILE *curl_debuglogfile = nil;
 static bool memlimit = FALSE; /* enable memory limit */
 static long memsize = 0;  /* set number of mallocs allowed */
 
@@ -125,7 +125,7 @@ void curl_memdebug(const char *logname)
       logfile = stderr;
 #ifdef MEMDEBUG_LOG_SYNC
     /* Flush the log file after every line so the log isn't lost in a crash */
-    setvbuf(logfile, (char *)NULL, _IOLBF, 0);
+    setvbuf(logfile, (char *)nil, _IOLBF, 0);
 #endif
   }
 }
@@ -143,7 +143,7 @@ void curl_memlimit(long limit)
 /* returns TRUE if this isn't allowed! */
 static bool countcheck(const char *func, int line, const char *source)
 {
-  /* if source is NULL, then the call is made internally and this check
+  /* if source is nil, then the call is made internally and this check
      should not be made */
   if(memlimit && source) {
     if(!memsize) {
@@ -179,7 +179,7 @@ void *curl_domalloc(size_t wantedsize, int line, const char *source)
   assert(wantedsize != 0);
 
   if(countcheck("malloc", line, source))
-    return NULL;
+    return nil;
 
   /* alloc at least 64 bytes */
   size = sizeof(struct memdebug)+wantedsize;
@@ -194,7 +194,7 @@ void *curl_domalloc(size_t wantedsize, int line, const char *source)
   if(source)
     curl_memlog("MEM %s:%d malloc(%zd) = %p\n",
                 source, line, wantedsize, mem ? mem->mem : 0);
-  return (mem ? mem->mem : NULL);
+  return (mem ? mem->mem : nil);
 }
 
 void *curl_docalloc(size_t wanted_elements, size_t wanted_size,
@@ -207,7 +207,7 @@ void *curl_docalloc(size_t wanted_elements, size_t wanted_size,
   assert(wanted_size != 0);
 
   if(countcheck("calloc", line, source))
-    return NULL;
+    return nil;
 
   /* alloc at least 64 bytes */
   user_size = wanted_size * wanted_elements;
@@ -220,7 +220,7 @@ void *curl_docalloc(size_t wanted_elements, size_t wanted_size,
   if(source)
     curl_memlog("MEM %s:%d calloc(%zu,%zu) = %p\n",
                 source, line, wanted_elements, wanted_size, mem?mem->mem:0);
-  return (mem ? mem->mem : NULL);
+  return (mem ? mem->mem : nil);
 }
 
 char *curl_dostrdup(const char *str, int line, const char *source)
@@ -228,14 +228,14 @@ char *curl_dostrdup(const char *str, int line, const char *source)
   char *mem;
   size_t len;
 
-  assert(str != NULL);
+  assert(str != nil);
 
   if(countcheck("strdup", line, source))
-    return NULL;
+    return nil;
 
   len=strlen(str)+1;
 
-  mem=curl_domalloc(len, 0, NULL); /* NULL prevents logging */
+  mem=curl_domalloc(len, 0, nil); /* nil prevents logging */
   if(mem)
     memcpy(mem, str, len);
 
@@ -246,19 +246,19 @@ char *curl_dostrdup(const char *str, int line, const char *source)
   return mem;
 }
 
-/* We provide a realloc() that accepts a NULL as pointer, which then
+/* We provide a realloc() that accepts a nil as pointer, which then
    performs a malloc(). In order to work with ares. */
 void *curl_dorealloc(void *ptr, size_t wantedsize,
                      int line, const char *source)
 {
-  struct memdebug *mem=NULL;
+  struct memdebug *mem=nil;
 
   size_t size = sizeof(struct memdebug)+wantedsize;
 
   assert(wantedsize != 0);
 
   if(countcheck("realloc", line, source))
-    return NULL;
+    return nil;
 
 #ifdef __INTEL_COMPILER
 #  pragma warning(push)
@@ -276,21 +276,21 @@ void *curl_dorealloc(void *ptr, size_t wantedsize,
   mem = (Curl_crealloc)(mem, size);
   if(source)
     curl_memlog("MEM %s:%d realloc(%p, %zu) = %p\n",
-                source, line, ptr, wantedsize, mem?mem->mem:NULL);
+                source, line, ptr, wantedsize, mem?mem->mem:nil);
 
   if(mem) {
     mem->size = wantedsize;
     return mem->mem;
   }
 
-  return NULL;
+  return nil;
 }
 
 void curl_dofree(void *ptr, int line, const char *source)
 {
   struct memdebug *mem;
 
-  assert(ptr != NULL);
+  assert(ptr != nil);
 
 #ifdef __INTEL_COMPILER
 #  pragma warning(push)
@@ -411,7 +411,7 @@ int curl_fclose(FILE *file, int line, const char *source)
 {
   int res;
 
-  assert(file != NULL);
+  assert(file != nil);
 
   res=fclose(file);
   if(source)

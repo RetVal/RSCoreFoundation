@@ -701,7 +701,7 @@ static RSStringRef CreateStringFromFileSystemRepresentationByAddingPercentEscape
 
 // Returns nil if str cannot be converted for whatever reason, str if str contains no characters in need of escaping, or a newly-created string with the appropriate % escape codes in place.  Caller must always release the returned string.
 RSInline RSStringRef _replacePathIllegalCharacters(RSStringRef str, RSAllocatorRef alloc, BOOL preserveSlashes) {
-    RSStringRef result = NULL;
+    RSStringRef result = nil;
     STACK_BUFFER_DECL(char, buffer, PATH_MAX);
     if ( RSStringGetCString(str, buffer, PATH_MAX, RSStringEncodingUTF8) )
     {
@@ -1309,7 +1309,7 @@ static void constructBuffers(RSAllocatorRef alloc, RSStringRef string, BOOL useE
     
     *cstring = RSStringGetCStringPtr(string, (useEightBitStringEncoding ? __RSStringGetEightBitStringEncoding() : RSStringEncodingISOLatin1));
     if (*cstring) {
-        *ustring = NULL;
+        *ustring = nil;
         *useCString = true;
         *freeCharacters = false;
         return;
@@ -1324,10 +1324,10 @@ static void constructBuffers(RSAllocatorRef alloc, RSStringRef string, BOOL useE
     
     length = RSStringGetLength(string);
     rg = RSMakeRange(0, length);
-    RSStringGetBytes(string, rg, RSStringEncodingISOLatin1, 0, false, NULL, INT_MAX, &neededLength);
+    RSStringGetBytes(string, rg, RSStringEncodingISOLatin1, 0, false, nil, INT_MAX, &neededLength);
     if (neededLength == length) {
         char *buf;
-        if ( (inBuffer != NULL) && (length <= inBufferSize) ) {
+        if ( (inBuffer != nil) && (length <= inBufferSize) ) {
             buf = (char *)inBuffer;
             *freeCharacters = false;
         }
@@ -1335,12 +1335,12 @@ static void constructBuffers(RSAllocatorRef alloc, RSStringRef string, BOOL useE
             buf = (char *)RSAllocatorAllocate(alloc, length);
             *freeCharacters = true;
         }
-        RSStringGetBytes(string, rg, RSStringEncodingISOLatin1, 0, false, (uint8_t *)buf, length, NULL);
+        RSStringGetBytes(string, rg, RSStringEncodingISOLatin1, 0, false, (uint8_t *)buf, length, nil);
         *cstring = buf;
         *useCString = true;
     } else {
         UniChar *buf;
-        if ( (inBuffer != NULL) && ((length * sizeof(UniChar)) <= inBufferSize) ) {
+        if ( (inBuffer != nil) && ((length * sizeof(UniChar)) <= inBufferSize) ) {
             buf = (UniChar *)inBuffer;
             *freeCharacters = false;
         }

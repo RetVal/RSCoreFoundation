@@ -93,6 +93,7 @@ RSExport void RSStringInsert(RSMutableStringRef aString, RSIndex location, RSStr
 //
 //
 RSExport const char* RSStringCopyUTF8String(RSStringRef str) RS_AVAILABLE(0_0);
+RSExport const char* RSStringGetUTF8String(RSStringRef str) RS_AVAILABLE(0_0);
 RSExport RSIndex RSStringGetCString(RSStringRef str, char *buffer, RSIndex bufferSize, RSStringEncoding encoding) RS_AVAILABLE(0_0);
 RSExport const char* RSStringGetCStringPtr(RSStringRef str, RSStringEncoding encoding) RS_AVAILABLE(0_0);
 RSExport const UniChar *RSStringGetCharactersPtr(RSStringRef str) RS_AVAILABLE(0_0);
@@ -145,13 +146,13 @@ RSInline UTF32Char RSStringGetLongCharacterForSurrogatePair(UniChar surrogateHig
 RSInline BOOL RSStringGetSurrogatePairForLongCharacter(UTF32Char character, UniChar *surrogates) {
     if ((character > 0xFFFFUL) && (character < 0x110000UL)) { // Non-BMP character
         character -= 0x10000;
-        if (NULL != surrogates) {
+        if (nil != surrogates) {
             surrogates[0] = (UniChar)((character >> 10) + 0xD800UL);
             surrogates[1] = (UniChar)((character & 0x3FF) + 0xDC00UL);
         }
         return YES;
     } else {
-        if (NULL != surrogates) *surrogates = (UniChar)character;
+        if (nil != surrogates) *surrogates = (UniChar)character;
         return NO;
     }
 }

@@ -200,14 +200,14 @@ static void destroy_async_data (struct Curl_async *async)
     if(res) {
       if(res->temp_ai) {
         Curl_freeaddrinfo(res->temp_ai);
-        res->temp_ai = NULL;
+        res->temp_ai = nil;
       }
       free(res);
     }
-    async->os_specific = NULL;
+    async->os_specific = nil;
   }
 
-  async->hostname = NULL;
+  async->hostname = nil;
 }
 
 /*
@@ -320,7 +320,7 @@ CURLcode Curl_resolver_is_resolved(struct connectdata *conn,
   struct ResolverResults *res = (struct ResolverResults *)
     conn->async.os_specific;
 
-  *dns = NULL;
+  *dns = nil;
 
   waitperform(conn, 0);
 
@@ -328,7 +328,7 @@ CURLcode Curl_resolver_is_resolved(struct connectdata *conn,
     (void)Curl_addrinfo_callback(conn, res->last_status, res->temp_ai);
     /* temp_ai ownership is moved to the connection, so we need not free-up
        them */
-    res->temp_ai = NULL;
+    res->temp_ai = nil;
     destroy_async_data(&conn->async);
     if(!conn->async.dns) {
       failf(data, "Could not resolve %s: %s (%s)",
@@ -350,7 +350,7 @@ CURLcode Curl_resolver_is_resolved(struct connectdata *conn,
  * waits for a resolve to finish. This function should be avoided since using
  * this risk getting the multi interface to "hang".
  *
- * If 'entry' is non-NULL, make it point to the resolved dns entry
+ * If 'entry' is non-nil, make it point to the resolved dns entry
  *
  * Returns CURLE_COULDNT_RESOLVE_HOST if the host was not resolved, and
  * CURLE_OPERATION_TIMEDOUT if a time-out occurred.
@@ -563,18 +563,18 @@ Curl_addrinfo *Curl_resolver_getaddrinfo(struct connectdata *conn,
 
   bufp = strdup(hostname);
   if(bufp) {
-    struct ResolverResults *res = NULL;
+    struct ResolverResults *res = nil;
     Curl_safefree(conn->async.hostname);
     conn->async.hostname = bufp;
     conn->async.port = port;
     conn->async.done = FALSE;   /* not done */
     conn->async.status = 0;     /* clear */
-    conn->async.dns = NULL;     /* clear */
+    conn->async.dns = nil;     /* clear */
     res = calloc(sizeof(struct ResolverResults),1);
     if(!res) {
       Curl_safefree(conn->async.hostname);
-      conn->async.hostname = NULL;
-      return NULL;
+      conn->async.hostname = nil;
+      return nil;
     }
     conn->async.os_specific = res;
 
@@ -602,7 +602,7 @@ Curl_addrinfo *Curl_resolver_getaddrinfo(struct connectdata *conn,
 
     *waitp = 1; /* expect asynchronous response */
   }
-  return NULL; /* no struct yet */
+  return nil; /* no struct yet */
 }
 
 CURLcode Curl_set_dns_servers(struct SessionHandle *data,

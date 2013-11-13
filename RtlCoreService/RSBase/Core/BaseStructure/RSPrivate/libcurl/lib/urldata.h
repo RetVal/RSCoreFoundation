@@ -508,7 +508,7 @@ struct Curl_async {
 #define SECONDARYSOCKET 1
 
 /* These function pointer types are here only to allow easier typecasting
- within the source when we need to cast between data pointers (such as NULL)
+ within the source when we need to cast between data pointers (such as nil)
  and function pointers. */
 typedef CURLcode (*Curl_do_more_func)(struct connectdata *, bool *);
 typedef CURLcode (*Curl_done_func)(struct connectdata *, CURLcode, bool);
@@ -531,11 +531,11 @@ enum expect100 {
  */
 struct SingleRequest {
     curl_off_t size;        /* -1 if unknown at this point */
-    curl_off_t *bytecountp; /* return number of bytes read or NULL */
+    curl_off_t *bytecountp; /* return number of bytes read or nil */
     
     curl_off_t maxdownload; /* in bytes, the maximum amount of data to fetch,
                              -1 means unlimited */
-    curl_off_t *writebytecountp; /* return number of bytes written or NULL */
+    curl_off_t *writebytecountp; /* return number of bytes written or nil */
     
     curl_off_t bytecount;         /* total number of bytes read */
     curl_off_t writebytecount;    /* number of bytes written */
@@ -760,7 +760,7 @@ struct connectdata {
     
     /* 'dns_entry' is the particular host we use. This points to an entry in the
      DNS cache and it will not get pruned while locked. It gets unlocked in
-     Curl_done(). This entry will be NULL if the connection is re-used as then
+     Curl_done(). This entry will be nil if the connection is re-used as then
      there is no name resolve done. */
     struct Curl_dns_entry *dns_entry;
     
@@ -1011,7 +1011,7 @@ struct PureInfo {
 
 
 struct Progress {
-    long lastshow; /* time() of the last displayed progress meter or NULL to
+    long lastshow; /* time() of the last displayed progress meter or nil to
                     force redraw at next call */
     curl_off_t size_dl; /* total expected size */
     curl_off_t size_ul; /* total expected size */
@@ -1204,7 +1204,7 @@ struct UrlState {
     /* for FTP downloads: how many CRLFs did we converted to LFs? */
     curl_off_t crlf_conversions;
 #endif
-    /* If set to non-NULL, there's a connection in a shared connection cache
+    /* If set to non-nil, there's a connection in a shared connection cache
      that uses this handle so we can't kill this SessionHandle just yet but
      must keep it around and add it to the list of handles to kill once all
      its connections are gone */
@@ -1250,7 +1250,7 @@ struct UrlState {
         struct FTP *pop3;
         struct FTP *smtp;
     } proto;
-    /* current user of this SessionHandle instance, or NULL */
+    /* current user of this SessionHandle instance, or nil */
     struct connectdata *current_conn;
     
     /* if true, force SSL connection retry (workaround for certain servers) */
@@ -1302,7 +1302,7 @@ enum dupstring {
     STRING_KEY_PASSWD,      /* plain text private key password */
     STRING_KEY_TYPE,        /* format for private key (default: PEM) */
     STRING_KRB_LEVEL,       /* krb security level */
-    STRING_NETRC_FILE,      /* if not NULL, use this instead of trying to find
+    STRING_NETRC_FILE,      /* if not nil, use this instead of trying to find
                              $HOME/.netrc */
     STRING_COPYPOSTFIELDS,  /* if POST, set the fields' values here */
     STRING_PROXY,           /* proxy to use */
@@ -1355,8 +1355,8 @@ struct UserDefined {
                      this. */
     void *out;         /* the fetched file goes here */
     void *in;          /* the uploaded file is read from here */
-    void *writeheader; /* write the header to this if non-NULL */
-    void *rtp_out;     /* write RTP to this if non-NULL */
+    void *writeheader; /* write the header to this if non-nil */
+    void *rtp_out;     /* write RTP to this if non-nil */
     long use_port;     /* which port to use (when not using default) */
     long httpauth;     /* what kind of HTTP authentication to use (bitmask) */
     long proxyauth;    /* what kind of proxy authentication to use (bitmask) */
@@ -1380,8 +1380,8 @@ struct UserDefined {
     curl_write_callback fwrite_header; /* function that stores headers */
     curl_write_callback fwrite_rtp;    /* function that stores interleaved RTP */
     curl_read_callback fread_func;     /* function that reads the input */
-    int is_fread_set; /* boolean, has read callback been set to non-NULL? */
-    int is_fwrite_set; /* boolean, has write callback been set to non-NULL? */
+    int is_fread_set; /* boolean, has read callback been set to non-nil? */
+    int is_fwrite_set; /* boolean, has write callback been set to non-nil? */
     curl_progress_callback fprogress;  /* function for progress information */
     curl_debug_callback fdebug;      /* function that write informational data */
     curl_ioctl_callback ioctl_func;  /* function for I/O control */
@@ -1565,9 +1565,9 @@ struct Names {
 
 struct SessionHandle {
     struct Names dns;
-    struct Curl_multi *multi;    /* if non-NULL, points to the multi handle
+    struct Curl_multi *multi;    /* if non-nil, points to the multi handle
                                   struct to which this "belongs" */
-    struct Curl_one_easy *multi_pos; /* if non-NULL, points to its position
+    struct Curl_one_easy *multi_pos; /* if non-nil, points to its position
                                       in multi controlling structure to assist
                                       in removal. */
     struct Curl_share *share;    /* Share, handles global variable mutexing */

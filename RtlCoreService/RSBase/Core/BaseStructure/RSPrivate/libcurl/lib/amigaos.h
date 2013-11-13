@@ -37,7 +37,7 @@
 #include "config-amigaos.h"
 
 #ifndef select
-# define select(args...) WaitSelect( args, NULL)
+# define select(args...) WaitSelect( args, nil)
 #endif
 #ifndef ioctl
 # define ioctl(a,b,c,d)  IoctlSocket( (LONG)a, (ULONG)b, (char*)c)

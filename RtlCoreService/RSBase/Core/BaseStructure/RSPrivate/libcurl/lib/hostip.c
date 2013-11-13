@@ -126,7 +126,7 @@ static void freednsentry(void *freethis);
  * Global DNS cache is general badness. Do not use. This will be removed in
  * a future version. Use the share interface instead!
  *
- * Returns a struct curl_hash pointer on success, NULL on failure.
+ * Returns a struct curl_hash pointer on success, nil on failure.
  */
 struct curl_hash *Curl_global_host_cache_init(void)
 {
@@ -137,7 +137,7 @@ struct curl_hash *Curl_global_host_cache_init(void)
     if(!rc)
       host_cache_initialized = 1;
   }
-  return rc?NULL:&hostname_cache;
+  return rc?nil:&hostname_cache;
 }
 
 /*
@@ -169,7 +169,7 @@ int Curl_num_addresses(const Curl_addrinfo *addr)
  * given in the 'ai' argument. The result will be stored in the buf that is
  * bufsize bytes big.
  *
- * If the conversion fails, it returns NULL.
+ * If the conversion fails, it returns nil.
  */
 const char *
 Curl_printable_address(const Curl_addrinfo *ai, char *buf, size_t bufsize)
@@ -197,7 +197,7 @@ Curl_printable_address(const Curl_addrinfo *ai, char *buf, size_t bufsize)
     default:
       break;
   }
-  return NULL;
+  return nil;
 }
 
 /*
@@ -267,7 +267,7 @@ void Curl_hostcache_prune(struct SessionHandle *data)
   time_t now;
 
   if((data->set.dns_cache_timeout == -1) || !data->dns.hostcache)
-    /* cache forever means never prune, and NULL hostcache means
+    /* cache forever means never prune, and nil hostcache means
        we can't do it */
     return;
 
@@ -294,7 +294,7 @@ remove_entry_if_stale(struct SessionHandle *data, struct Curl_dns_entry *dns)
   struct hostcache_prune_data user;
 
   if(!dns || (data->set.dns_cache_timeout == -1) || !data->dns.hostcache)
-    /* cache forever means never prune, and NULL hostcache means
+    /* cache forever means never prune, and nil hostcache means
        we can't do it */
     return 0;
 
@@ -327,7 +327,7 @@ sigjmp_buf curl_jmpenv;
  * address, we call this function to store the information in the dns
  * cache etc
  *
- * Returns the Curl_dns_entry entry pointer or NULL if the storage failed.
+ * Returns the Curl_dns_entry entry pointer or nil if the storage failed.
  */
 struct Curl_dns_entry *
 Curl_cache_addr(struct SessionHandle *data,
@@ -344,14 +344,14 @@ Curl_cache_addr(struct SessionHandle *data,
   entry_id = create_hostcache_id(hostname, port);
   /* If we can't create the entry id, fail */
   if(!entry_id)
-    return NULL;
+    return nil;
   entry_len = strlen(entry_id);
 
   /* Create a new cache entry */
   dns = calloc(1, sizeof(struct Curl_dns_entry));
   if(!dns) {
     free(entry_id);
-    return NULL;
+    return nil;
   }
 
   dns->inuse = 0;   /* init to not used */
@@ -366,7 +366,7 @@ Curl_cache_addr(struct SessionHandle *data,
   if(!dns2) {
     free(dns);
     free(entry_id);
-    return NULL;
+    return nil;
   }
 
   dns = dns2;
@@ -404,14 +404,14 @@ int Curl_resolv(struct connectdata *conn,
                 int port,
                 struct Curl_dns_entry **entry)
 {
-  char *entry_id = NULL;
-  struct Curl_dns_entry *dns = NULL;
+  char *entry_id = nil;
+  struct Curl_dns_entry *dns = nil;
   size_t entry_len;
   struct SessionHandle *data = conn->data;
   CURLcode result;
   int rc = CURLRESOLV_ERROR; /* default to failure */
 
-  *entry = NULL;
+  *entry = nil;
 
   /* Create an entry id, based upon the hostname and port */
   entry_id = create_hostcache_id(hostname, port);
@@ -432,7 +432,7 @@ int Curl_resolv(struct connectdata *conn,
 
   /* See whether the returned entry is stale. Done before we release lock */
   if(remove_entry_if_stale(data, dns))
-    dns = NULL; /* the memory deallocation is being handled by the hash */
+    dns = nil; /* the memory deallocation is being handled by the hash */
 
   if(dns) {
     dns->inuse++; /* we use it! */
@@ -453,7 +453,7 @@ int Curl_resolv(struct connectdata *conn,
     if(!Curl_ipvalid(conn))
       return CURLRESOLV_ERROR;
 
-    /* If Curl_getaddrinfo() returns NULL, 'respwait' might be set to a
+    /* If Curl_getaddrinfo() returns nil, 'respwait' might be set to a
        non-zero value indicating that we need to wait for the response to the
        resolve call */
     addr = Curl_getaddrinfo(conn,
@@ -561,7 +561,7 @@ int Curl_resolv_timeout(struct connectdata *conn,
 #endif /* USE_ALARM_TIMEOUT */
   int rc;
 
-  *entry = NULL;
+  *entry = nil;
 
   if(timeoutms < 0)
     /* got an already expired timeout */
@@ -588,7 +588,7 @@ int Curl_resolv_timeout(struct connectdata *conn,
    * Store the old value to be able to set it back later!
    *************************************************************/
 #ifdef HAVE_SIGACTION
-  sigaction(SIGALRM, NULL, &sigact);
+  sigaction(SIGALRM, nil, &sigact);
   keep_sigact = sigact;
   keep_copysig = TRUE; /* yes, we have a copy */
   sigact.sa_handler = alarmfunc;
@@ -597,7 +597,7 @@ int Curl_resolv_timeout(struct connectdata *conn,
   sigact.sa_flags &= ~SA_RESTART;
 #endif
   /* now set the new struct */
-  sigaction(SIGALRM, &sigact, NULL);
+  sigaction(SIGALRM, &sigact, nil);
 #else /* HAVE_SIGACTION */
   /* no sigaction(), revert to the much lamer signal() */
 #ifdef HAVE_SIGNAL
@@ -647,7 +647,7 @@ clean_up:
   if(keep_copysig) {
     /* we got a struct as it looked before, now put that one back nice
        and clean */
-    sigaction(SIGALRM, &keep_sigact, NULL); /* put it back */
+    sigaction(SIGALRM, &keep_sigact, nil); /* put it back */
   }
 #else
 #ifdef HAVE_SIGNAL
@@ -750,7 +750,7 @@ void Curl_hostcache_destroy(struct SessionHandle *data)
 
   Curl_hash_destroy(data->dns.hostcache);
   data->dns.hostcachetype = HCACHE_NONE;
-  data->dns.hostcache = NULL;
+  data->dns.hostcache = nil;
 }
 
 CURLcode Curl_loadhostpairs(struct SessionHandle *data)
@@ -816,7 +816,7 @@ CURLcode Curl_loadhostpairs(struct SessionHandle *data)
             hostname, port, address);
     }
   }
-  data->change.resolve = NULL; /* dealt with now */
+  data->change.resolve = nil; /* dealt with now */
 
   return CURLE_OK;
 }

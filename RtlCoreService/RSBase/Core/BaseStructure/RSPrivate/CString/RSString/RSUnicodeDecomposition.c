@@ -16,26 +16,26 @@
 #include "RSUniCharPrivate.h"
 
 // Canonical Decomposition
-static UTF32Char *__RSUniCharDecompositionTable = NULL;
+static UTF32Char *__RSUniCharDecompositionTable = nil;
 static uint32_t __RSUniCharDecompositionTableLength = 0;
-static UTF32Char *__RSUniCharMultipleDecompositionTable = NULL;
+static UTF32Char *__RSUniCharMultipleDecompositionTable = nil;
 
-static const uint8_t *__RSUniCharDecomposableBitmapForBMP = NULL;
-static const uint8_t *__RSUniCharHFSPlusDecomposableBitmapForBMP = NULL;
+static const uint8_t *__RSUniCharDecomposableBitmapForBMP = nil;
+static const uint8_t *__RSUniCharHFSPlusDecomposableBitmapForBMP = nil;
 
 static RSSpinLock __RSUniCharDecompositionTableLock = RSSpinLockInit;
 
-static const uint8_t **__RSUniCharCombiningPriorityTable = NULL;
+static const uint8_t **__RSUniCharCombiningPriorityTable = nil;
 static uint8_t __RSUniCharCombiningPriorityTableNumPlane = 0;
 
 static void __RSUniCharLoadDecompositionTable(void) {
     
     RSSpinLockLock(&__RSUniCharDecompositionTableLock);
     
-    if (NULL == __RSUniCharDecompositionTable) {
+    if (nil == __RSUniCharDecompositionTable) {
         const uint32_t *bytes = (uint32_t *)RSUniCharGetMappingData(RSUniCharCanonicalDecompMapping);
         
-        if (NULL == bytes) {
+        if (nil == bytes) {
             RSSpinLockUnlock(&__RSUniCharDecompositionTableLock);
             return;
         }
@@ -59,18 +59,18 @@ static void __RSUniCharLoadDecompositionTable(void) {
 }
 
 static RSSpinLock __RSUniCharCompatibilityDecompositionTableLock = RSSpinLockInit;
-static UTF32Char *__RSUniCharCompatibilityDecompositionTable = NULL;
+static UTF32Char *__RSUniCharCompatibilityDecompositionTable = nil;
 static uint32_t __RSUniCharCompatibilityDecompositionTableLength = 0;
-static UTF32Char *__RSUniCharCompatibilityMultipleDecompositionTable = NULL;
+static UTF32Char *__RSUniCharCompatibilityMultipleDecompositionTable = nil;
 
 static void __RSUniCharLoadCompatibilityDecompositionTable(void) {
     
     RSSpinLockLock(&__RSUniCharCompatibilityDecompositionTableLock);
     
-    if (NULL == __RSUniCharCompatibilityDecompositionTable) {
+    if (nil == __RSUniCharCompatibilityDecompositionTable) {
         const uint32_t *bytes = (uint32_t *)RSUniCharGetMappingData(RSUniCharCompatibilityDecompMapping);
         
-        if (NULL == bytes) {
+        if (nil == bytes) {
             RSSpinLockUnlock(&__RSUniCharCompatibilityDecompositionTableLock);
             return;
         }
@@ -89,7 +89,7 @@ RSInline BOOL __RSUniCharIsDecomposableCharacterWithFlag(UTF32Char character, BO
     return RSUniCharIsMemberOfBitmap(character, (character < 0x10000 ? (isHFSPlus ? __RSUniCharHFSPlusDecomposableBitmapForBMP : __RSUniCharDecomposableBitmapForBMP) : RSUniCharGetBitmapPtrForPlane(RSUniCharCanonicalDecomposableCharacterSet, ((character >> 16) & 0xFF))));
 }
 
-RSInline uint8_t __RSUniCharGetCombiningPropertyForCharacter(UTF32Char character) { return RSUniCharGetCombiningPropertyForCharacter(character, (((character) >> 16) < __RSUniCharCombiningPriorityTableNumPlane ? __RSUniCharCombiningPriorityTable[(character) >> 16] : NULL)); }
+RSInline uint8_t __RSUniCharGetCombiningPropertyForCharacter(UTF32Char character) { return RSUniCharGetCombiningPropertyForCharacter(character, (((character) >> 16) < __RSUniCharCombiningPriorityTableNumPlane ? __RSUniCharCombiningPriorityTable[(character) >> 16] : nil)); }
 
 RSInline BOOL __RSUniCharIsNonBaseCharacter(UTF32Char character) { return ((0 == __RSUniCharGetCombiningPropertyForCharacter(character)) ? NO : YES); } // the notion of non-base in normalization is characters with non-0 combining class
 
@@ -177,7 +177,7 @@ static RSIndex __RSUniCharRecursivelyDecomposeCharacter(UTF32Char character, UTF
 #define HANGUL_NCOUNT (HANGUL_VCOUNT * HANGUL_TCOUNT)
 
 RSIndex RSUniCharDecomposeCharacter(UTF32Char character, UTF32Char *convertedChars, RSIndex maxBufferLength) {
-    if (NULL == __RSUniCharDecompositionTable) __RSUniCharLoadDecompositionTable();
+    if (nil == __RSUniCharDecompositionTable) __RSUniCharLoadDecompositionTable();
     if (character >= HANGUL_SBASE && character <= (HANGUL_SBASE + HANGUL_SCOUNT)) {
         RSIndex length;
         
@@ -212,7 +212,7 @@ BOOL RSUniCharDecompose(const UTF16Char *src, RSIndex length, RSIndex *consumedL
     RSIndex segmentLength = 0;
     UTF32Char currentChar;
     
-    if (NULL == __RSUniCharDecompositionTable) __RSUniCharLoadDecompositionTable();
+    if (nil == __RSUniCharDecompositionTable) __RSUniCharLoadDecompositionTable();
     
     while ((length - segmentLength) > 0) {
         currentChar = *(src++);
@@ -344,7 +344,7 @@ RSPrivate RSIndex RSUniCharCompatibilityDecompose(UTF32Char *convertedChars, RSI
     const UTF32Char *limit = convertedChars + length;
     RSIndex filledLength;
     
-    if (NULL == __RSUniCharCompatibilityDecompositionTable) __RSUniCharLoadCompatibilityDecompositionTable();
+    if (nil == __RSUniCharCompatibilityDecompositionTable) __RSUniCharLoadCompatibilityDecompositionTable();
     
     while (convertedChars < limit) {
         currentChar = *convertedChars;

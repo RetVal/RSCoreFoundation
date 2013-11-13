@@ -68,7 +68,7 @@ int Curl_parsenetrc(const char *host,
   FILE *file;
   int retcode=1;
   int specific_login = (login[0] != 0);
-  char *home = NULL;
+  char *home = nil;
   bool home_alloc = FALSE;
   bool netrc_alloc = FALSE;
   enum host_lookup_state state=NOTHING;
@@ -180,7 +180,7 @@ int Curl_parsenetrc(const char *host,
             DEBUGASSERT(0);
         } /* switch (state) */
 
-        tok = strtok_r(NULL, " \t\n", &tok_buf);
+        tok = strtok_r(nil, " \t\n", &tok_buf);
       } /* while(tok) */
     } /* while fgets() */
 

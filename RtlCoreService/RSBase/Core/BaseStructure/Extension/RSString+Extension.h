@@ -13,7 +13,7 @@
 
 RS_EXTERN_C_BEGIN
 
-RSExport RSStringRef RSStringWithUTF8String(UTF8Char* nullTerminatingString) RS_AVAILABLE(0_4);
+RSExport RSStringRef RSStringWithUTF8String(const char* nullTerminatingString) RS_AVAILABLE(0_4);
 RSExport RSStringRef RSStringWithCString(RSCBuffer nullTerminatingString, RSStringEncoding encoding) RS_AVAILABLE(0_4);
 RSExport RSStringRef RSStringWithCStringNoCopy(RSCBuffer nullTerminatingString, RSStringEncoding encoding, RSAllocatorRef contentsDeallocator) RS_AVAILABLE(0_4);
 RSExport RSStringRef RSStringWithFormat(RSStringRef format, ...) RS_AVAILABLE(0_4);

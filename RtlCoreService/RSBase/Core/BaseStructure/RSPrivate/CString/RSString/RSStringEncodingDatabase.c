@@ -284,42 +284,42 @@ static const char *__RSCanonicalNameList[] = {
     "ukrainian",
     "inuit",
     
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
     
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
     
     "us-ascii",
     
-    NULL,
+    nil,
     "gb18030",
     
     "iso-2022-jp",
@@ -345,7 +345,7 @@ static const char *__RSCanonicalNameList[] = {
     "big5-hkscs",
     "viscii",
     "koi8-u",
-    NULL,
+    nil,
     "utf7-imap",
     
     "x-nextstep",
@@ -411,15 +411,15 @@ RSPrivate RSStringEncoding __RSStringEncodingGetFromWindowsCodePage(uint16_t cod
     if ((codepage > ISO8859CODEPAGE_BASE) && (codepage <= (ISO8859CODEPAGE_BASE + 16))) {
         return (codepage - ISO8859CODEPAGE_BASE) + 0x0200;
     } else {
-        static RSMutableDictionaryRef mappingTable = NULL;
+        static RSMutableDictionaryRef mappingTable = nil;
         static RSSpinLock lock = RSSpinLockInit;
         uintptr_t value;
         
         RSSpinLockLock(&lock);
-        if (NULL == mappingTable) {
+        if (nil == mappingTable) {
             RSIndex index, count = sizeof(__RSKnownEncodingList) / sizeof(*__RSKnownEncodingList);
             
-            mappingTable = RSDictionaryCreateMutable(NULL, 0, NULL);
+            mappingTable = RSDictionaryCreateMutable(nil, 0, nil);
             RSAutorelease(mappingTable);
             for (index = 0;index < count;index++) {
                 if (0 != __RSWindowsCPList[index]) RSDictionarySetValue(mappingTable, (const void *)(uintptr_t)__RSWindowsCPList[index], (const void *)(uintptr_t)__RSKnownEncodingList[index]);
@@ -440,7 +440,7 @@ RSPrivate RSStringEncoding __RSStringEncodingGetFromWindowsCodePage(uint16_t cod
 
 RSPrivate BOOL __RSStringEncodingGetCanonicalName(RSStringEncoding encoding, char *buffer, RSIndex bufferSize) {
     const char *format = "%s";
-    const char *name = NULL;
+    const char *name = nil;
     uint32_t value = 0;
     RSIndex index;
     
@@ -483,7 +483,7 @@ RSPrivate BOOL __RSStringEncodingGetCanonicalName(RSStringEncoding encoding, cha
             break;
     }
     
-    if ((0 == value) && (NULL == name)) {
+    if ((0 == value) && (nil == name)) {
         return NO;
     } else if (0 != value) {
         return ((snprintf(buffer, bufferSize, format, value) < bufferSize) ? YES : NO);
@@ -493,7 +493,7 @@ RSPrivate BOOL __RSStringEncodingGetCanonicalName(RSStringEncoding encoding, cha
 }
 
 #define LENGTH_LIMIT (256)
-static BOOL __RSCanonicalNameCompare(const void *value1, const void *value2) { return 0 == strncasecmp_l((const char *)value1, (const char *)value2, LENGTH_LIMIT, NULL) ? YES : NO; }
+static BOOL __RSCanonicalNameCompare(const void *value1, const void *value2) { return 0 == strncasecmp_l((const char *)value1, (const char *)value2, LENGTH_LIMIT, nil) ? YES : NO; }
 
 static RSHashCode __RSCanonicalNameHash(const void *value) {
     const char *name = (const char *)value;
@@ -511,36 +511,36 @@ static RSHashCode __RSCanonicalNameHash(const void *value) {
 RSPrivate RSStringEncoding __RSStringEncodingGetFromCanonicalName(const char *canonicalName) {
     RSStringEncoding encoding;
     RSIndex prefixLength;
-    static RSMutableDictionaryRef mappingTable = NULL;
+    static RSMutableDictionaryRef mappingTable = nil;
     static RSSpinLock lock = RSSpinLockInit;
     
     prefixLength = strlen("iso-8859-");
-    if (0 == strncasecmp_l(canonicalName, "iso-8859-", prefixLength, NULL)) {// do ISO
-        encoding = (RSStringEncoding)strtol(canonicalName + prefixLength, NULL, 10);
+    if (0 == strncasecmp_l(canonicalName, "iso-8859-", prefixLength, nil)) {// do ISO
+        encoding = (RSStringEncoding)strtol(canonicalName + prefixLength, nil, 10);
         
         return (((0 == encoding) || (encoding > 16)) ? RSStringEncodingInvalidId : encoding + 0x0200);
     }
     
     prefixLength = strlen("cp");
-    if (0 == strncasecmp_l(canonicalName, "cp", prefixLength, NULL)) {// do DOS
-        encoding = (RSStringEncoding)strtol(canonicalName + prefixLength, NULL, 10);
+    if (0 == strncasecmp_l(canonicalName, "cp", prefixLength, nil)) {// do DOS
+        encoding = (RSStringEncoding)strtol(canonicalName + prefixLength, nil, 10);
         
         return __RSStringEncodingGetFromWindowsCodePage(encoding);
     }
     
     prefixLength = strlen("windows-");
-    if (0 == strncasecmp_l(canonicalName, "windows-", prefixLength, NULL)) {// do DOS
-        encoding = (RSStringEncoding)strtol(canonicalName + prefixLength, NULL, 10);
+    if (0 == strncasecmp_l(canonicalName, "windows-", prefixLength, nil)) {// do DOS
+        encoding = (RSStringEncoding)strtol(canonicalName + prefixLength, nil, 10);
         
         return __RSStringEncodingGetFromWindowsCodePage(encoding);
     }
     
     RSSpinLockLock(&lock);
-    if (NULL == mappingTable) {
+    if (nil == mappingTable) {
         RSIndex index, count = sizeof(__RSKnownEncodingList) / sizeof(*__RSKnownEncodingList);
         
         RSDictionaryKeyContext keys = {
-            NULL, NULL, NULL, NULL, &__RSCanonicalNameHash, &__RSCanonicalNameCompare
+            nil, nil, nil, nil, &__RSCanonicalNameHash, &__RSCanonicalNameCompare
         };
         RSDictionaryContext context = {
             0, &keys, RSDictionaryDoNilValueContext
@@ -559,16 +559,16 @@ RSPrivate RSStringEncoding __RSStringEncodingGetFromCanonicalName(const char *ca
         RSDictionarySetValue(mappingTable, "utf-32le", (const void *)RSStringEncodingUTF32LE);
         
         for (index = 0;index < count;index++) {
-            if (NULL != __RSCanonicalNameList[index]) RSDictionarySetValue(mappingTable, (const void *)(uintptr_t)__RSCanonicalNameList[index], (const void *)(uintptr_t)__RSKnownEncodingList[index]);
+            if (nil != __RSCanonicalNameList[index]) RSDictionarySetValue(mappingTable, (const void *)(uintptr_t)__RSCanonicalNameList[index], (const void *)(uintptr_t)__RSKnownEncodingList[index]);
         }
     }
     RSSpinLockUnlock(&lock);
     
-    if (0 == strncasecmp_l(canonicalName, "macintosh", sizeof("macintosh") - 1, NULL)) return RSStringEncodingMacRoman;
+    if (0 == strncasecmp_l(canonicalName, "macintosh", sizeof("macintosh") - 1, nil)) return RSStringEncodingMacRoman;
     
     
     prefixLength = strlen("x-mac-");
-    encoding = (RSStringEncoding)(RSIndex)RSDictionaryGetValue(mappingTable, canonicalName + ((0 == strncasecmp_l(canonicalName, "x-mac-", prefixLength, NULL)) ? prefixLength : 0));
+    encoding = (RSStringEncoding)(RSIndex)RSDictionaryGetValue(mappingTable, canonicalName + ((0 == strncasecmp_l(canonicalName, "x-mac-", prefixLength, nil)) ? prefixLength : 0));
     
     return ((0 == encoding) ? RSStringEncodingInvalidId : encoding);
 }
@@ -676,7 +676,7 @@ static const char *__RSISONameList[] = {
     "Turkish (ISO Latin 5)",
     "Nordic (ISO Latin 6)",
     "Thai (ISO 8859-11)",
-    NULL,
+    nil,
     "Baltic (ISO Latin 7)",
     "Celtic (ISO Latin 8)",
     "Western (ISO Latin 9)",
@@ -776,10 +776,10 @@ static const char *__RSOtherNameList[] = {
     "Western (Mac Mail)",
     "Simplified Chinese (HZ GB 2312)",
     "Traditional Chinese (Big 5 HKSCS)",
-    NULL,
+    nil,
     "Ukrainian (KOI8-U)",
     "Traditional Chinese (Big 5-E)",
-    NULL,
+    nil,
     "Western (NextStep)",
     "Western (EBCDIC Latin 1)",
 };
@@ -835,6 +835,6 @@ RSPrivate const char *__RSStringEncodingGetName(RSStringEncoding encoding) {
     }
 #endif /* DEPLOYMENT_TARGET_MACOSX */
     
-    return NULL;
+    return nil;
 }
 

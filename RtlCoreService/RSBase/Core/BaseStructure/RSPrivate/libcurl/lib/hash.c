@@ -42,7 +42,7 @@ hash_element_dtor(void *user, void *element)
 
   if(e->ptr) {
     h->dtor(e->ptr);
-    e->ptr = NULL;
+    e->ptr = nil;
   }
 
   e->key_len = 0;
@@ -76,11 +76,11 @@ Curl_hash_init(struct curl_hash *h,
       h->table[i] = Curl_llist_alloc((curl_llist_dtor) hash_element_dtor);
       if(!h->table[i]) {
         while(i--) {
-          Curl_llist_destroy(h->table[i], NULL);
-          h->table[i] = NULL;
+          Curl_llist_destroy(h->table[i], nil);
+          h->table[i] = nil;
         }
         free(h->table);
-        h->table = NULL;
+        h->table = nil;
         h->slots = 0;
         return 1; /* failure */
       }
@@ -102,7 +102,7 @@ Curl_hash_alloc(int slots,
   struct curl_hash *h;
 
   if(!slots || !hfunc || !comparator ||!dtor) {
-    return NULL; /* failure */
+    return nil; /* failure */
   }
 
   h = malloc(sizeof(struct curl_hash));
@@ -110,7 +110,7 @@ Curl_hash_alloc(int slots,
     if(Curl_hash_init(h, slots, hfunc, comparator, dtor)) {
       /* failure */
       free(h);
-      h = NULL;
+      h = nil;
     }
   }
 
@@ -137,7 +137,7 @@ mk_hash_element(const void *key, size_t key_len, const void *p)
     else {
       /* failed to duplicate the key, free memory and fail */
       free(he);
-      he = NULL;
+      he = nil;
     }
   }
   return he;
@@ -182,7 +182,7 @@ Curl_hash_add(struct curl_hash *h, void *key, size_t key_len, void *p)
     free(he);
   }
 
-  return NULL; /* failure */
+  return nil; /* failure */
 }
 
 /* remove the identified hash entry, returns non-zero on failure */
@@ -217,7 +217,7 @@ Curl_hash_pick(struct curl_hash *h, void *key, size_t key_len)
     }
   }
 
-  return NULL;
+  return nil;
 }
 
 #if defined(DEBUGBUILD) && defined(AGGRESIVE_TEST)
@@ -246,11 +246,11 @@ Curl_hash_clean(struct curl_hash *h)
 
   for(i = 0; i < h->slots; ++i) {
     Curl_llist_destroy(h->table[i], (void *) h);
-    h->table[i] = NULL;
+    h->table[i] = nil;
   }
 
   free(h->table);
-  h->table = NULL;
+  h->table = nil;
   h->size = 0;
   h->slots = 0;
 }

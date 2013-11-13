@@ -766,7 +766,7 @@ static RSDataRef __RSArraySerializeCallBack(RSArchiverRef archiver, RSTypeRef ob
     ctx.context = array;
     RSArrayApplyFunction(object, RSMakeRange(0, RSArrayGetCount(object)), __RSArrayApplySerializeCallBack, &ctx);
 #endif
-    RSDictionaryRef dict = RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, array, RSSTR("array"), NULL);
+    RSDictionaryRef dict = RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, array, RSSTR("array"), nil);
     RSRelease(array);
     data = __RSPropertyListCreateWithError(dict, nil);
     RSRelease(dict);

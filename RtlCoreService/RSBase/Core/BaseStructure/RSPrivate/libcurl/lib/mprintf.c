@@ -846,7 +846,7 @@ static int dprintf_formatf(
         size_t len;
 
         str = (char *) p->data.str;
-        if(str == NULL) {
+        if(str == nil) {
           /* Write null[] if there's space.  */
           if(prec == -1 || prec >= (long) sizeof(null) - 1) {
             str = null;
@@ -889,8 +889,8 @@ static int dprintf_formatf(
       {
         void *ptr;
         ptr = (void *) p->data.ptr;
-        if(ptr != NULL) {
-          /* If the pointer is not NULL, write it as a %#x spec.  */
+        if(ptr != nil) {
+          /* If the pointer is not nil, write it as a %#x spec.  */
           base = 16;
           digits = (p->flags & FLAGS_UPPER)? upper_digits : lower_digits;
           is_alt = 1;
@@ -1091,7 +1091,7 @@ char *curl_maprintf(const char *format, ...)
   int retcode;
   struct asprintf info;
 
-  info.buffer = NULL;
+  info.buffer = nil;
   info.len = 0;
   info.alloc = 0;
   info.fail = 0;
@@ -1102,7 +1102,7 @@ char *curl_maprintf(const char *format, ...)
   if((-1 == retcode) || info.fail) {
     if(info.alloc)
       free(info.buffer);
-    return NULL;
+    return nil;
   }
   if(info.alloc) {
     info.buffer[info.len] = 0; /* we terminate this with a zero byte */
@@ -1117,7 +1117,7 @@ char *curl_mvaprintf(const char *format, va_list ap_save)
   int retcode;
   struct asprintf info;
 
-  info.buffer = NULL;
+  info.buffer = nil;
   info.len = 0;
   info.alloc = 0;
   info.fail = 0;
@@ -1126,7 +1126,7 @@ char *curl_mvaprintf(const char *format, va_list ap_save)
   if((-1 == retcode) || info.fail) {
     if(info.alloc)
       free(info.buffer);
-    return NULL;
+    return nil;
   }
 
   if(info.alloc) {

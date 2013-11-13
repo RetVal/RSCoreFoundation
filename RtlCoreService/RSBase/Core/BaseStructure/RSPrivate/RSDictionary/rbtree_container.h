@@ -46,20 +46,20 @@ typedef struct
 /* 初始化 */
 void rbtree_container_init(rbtree_container *tree, size_t key_length, RSKeyCompare key_compare_function);
 
-/* 查找 （无则返回NULL） */
+/* 查找 （无则返回nil） */
 rbtree_container_node* rbtree_container_search(rbtree_container *tree, RSTypeRef key);
 
 /* 插入 （成功返回0，键重复返回-1） */
 int rbtree_container_insert(rbtree_container *tree, rbtree_container_node *cont);
 
-/* 删除 （成功返回删除了的节点，key不存在返回NULL） */
+/* 删除 （成功返回删除了的节点，key不存在返回nil） */
 rbtree_container_node *rbtree_container_delete(rbtree_container *tree, RSTypeRef key);
 
-/* 替换 （成功返回被替换掉的节点，cont的key不存在则返回NULL） */
+/* 替换 （成功返回被替换掉的节点，cont的key不存在则返回nil） */
 rbtree_container_node *rbtree_container_replace(rbtree_container *tree, rbtree_container_node *cont);
 
 /*
- * 迭代器 （无则返回NULL）
+ * 迭代器 （无则返回nil）
  */
 
 /* 获取迭代的开始节点 */

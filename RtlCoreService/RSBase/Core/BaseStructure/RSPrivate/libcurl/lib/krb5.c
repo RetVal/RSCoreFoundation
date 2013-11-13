@@ -95,7 +95,7 @@ krb5_decode(void *app_data, void *buf, int len,
 
   enc.value = buf;
   enc.length = len;
-  maj = gss_unseal(&min, *context, &enc, &dec, NULL, NULL);
+  maj = gss_unseal(&min, *context, &enc, &dec, nil, nil);
   if(maj != GSS_S_COMPLETE) {
     if(len >= 4)
       strcpy(buf, "599 ");
@@ -130,7 +130,7 @@ krb5_encode(void *app_data, const void *from, int length, int level, void **to,
   int len;
 
   /* shut gcc up */
-  conn = NULL;
+  conn = nil;
 
   /* NOTE that the cast is safe, neither of the krb5, gnu gss and heimdal
    * libraries modify the input buffer in gss_seal()
@@ -187,7 +187,7 @@ krb5_auth(void *app_data, struct connectdata *conn)
   chan.acceptor_address.value =
     &((struct sockaddr_in *)REMOTE_ADDR)->sin_addr.s_addr;
   chan.application_data.length = 0;
-  chan.application_data.value = NULL;
+  chan.application_data.value = nil;
 
   /* this loop will execute twice (once for service, once for host) */
   for(;;) {
@@ -197,7 +197,7 @@ krb5_auth(void *app_data, struct connectdata *conn)
 
       if(result)
         return -2;
-      if(Curl_GetFTPResponse(&nread, conn, NULL))
+      if(Curl_GetFTPResponse(&nread, conn, nil))
         return -1;
 
       if(data->state.buffer[0] != '3')
@@ -219,8 +219,8 @@ krb5_auth(void *app_data, struct connectdata *conn)
       service = srv_host;
       continue;
     }
-    /* We pass NULL as |output_name_type| to avoid a leak. */
-    gss_display_name(&min, gssname, &output_buffer, NULL);
+    /* We pass nil as |output_name_type| to avoid a leak. */
+    gss_display_name(&min, gssname, &output_buffer, nil);
     Curl_infof(data, "Trying against %s\n", output_buffer.value);
     gssresp = GSS_C_NO_BUFFER;
     *context = GSS_C_NO_CONTEXT;
@@ -238,11 +238,11 @@ krb5_auth(void *app_data, struct connectdata *conn)
                                       &chan,
                                       gssresp,
                                       &output_buffer,
-                                      NULL);
+                                      nil);
 
       if(gssresp) {
         free(_gssresp.value);
-        gssresp = NULL;
+        gssresp = nil;
       }
 
       if(GSS_ERROR(maj)) {
@@ -269,7 +269,7 @@ krb5_auth(void *app_data, struct connectdata *conn)
           break;
         }
 
-        if(Curl_GetFTPResponse(&nread, conn, NULL)) {
+        if(Curl_GetFTPResponse(&nread, conn, nil)) {
           ret = -1;
           break;
         }

@@ -112,7 +112,7 @@ static char *unescape_word(struct SessionHandle *data, const char *inputbuff)
 
   newp = curl_easy_unescape(data, inputbuff, 0, &len);
   if(!newp)
-    return NULL;
+    return nil;
 
   dictp = malloc(((size_t)len)*2 + 1); /* add one for terminating zero */
   if(dictp) {
@@ -139,9 +139,9 @@ static CURLcode dict_do(struct connectdata *conn, bool *done)
   char *word;
   char *eword;
   char *ppath;
-  char *database = NULL;
-  char *strategy = NULL;
-  char *nthdef = NULL; /* This is not part of the protocol, but required
+  char *database = nil;
+  char *strategy = nil;
+  char *nthdef = nil; /* This is not part of the protocol, but required
                           by RFC 2229 */
   CURLcode result=CURLE_OK;
   struct SessionHandle *data=conn->data;
@@ -177,14 +177,14 @@ static CURLcode dict_do(struct connectdata *conn, bool *done)
       }
     }
 
-    if((word == NULL) || (*word == (char)0)) {
+    if((word == nil) || (*word == (char)0)) {
       infof(data, "lookup word is missing\n");
       word=(char *)"default";
     }
-    if((database == NULL) || (*database == (char)0)) {
+    if((database == nil) || (*database == (char)0)) {
       database = (char *)"!";
     }
-    if((strategy == NULL) || (*strategy == (char)0)) {
+    if((strategy == nil) || (*strategy == (char)0)) {
       strategy = (char *)".";
     }
 
@@ -212,7 +212,7 @@ static CURLcode dict_do(struct connectdata *conn, bool *done)
       return result;
     }
     Curl_setup_transfer(conn, FIRSTSOCKET, -1, FALSE, bytecount,
-                        -1, NULL); /* no upload */
+                        -1, nil); /* no upload */
   }
   else if(Curl_raw_nequal(path, DICT_DEFINE, sizeof(DICT_DEFINE)-1) ||
            Curl_raw_nequal(path, DICT_DEFINE2, sizeof(DICT_DEFINE2)-1) ||
@@ -231,11 +231,11 @@ static CURLcode dict_do(struct connectdata *conn, bool *done)
       }
     }
 
-    if((word == NULL) || (*word == (char)0)) {
+    if((word == nil) || (*word == (char)0)) {
       infof(data, "lookup word is missing\n");
       word=(char *)"default";
     }
-    if((database == NULL) || (*database == (char)0)) {
+    if((database == nil) || (*database == (char)0)) {
       database = (char *)"!";
     }
 
@@ -259,7 +259,7 @@ static CURLcode dict_do(struct connectdata *conn, bool *done)
       return result;
     }
     Curl_setup_transfer(conn, FIRSTSOCKET, -1, FALSE, bytecount,
-                        -1, NULL); /* no upload */
+                        -1, nil); /* no upload */
   }
   else {
 
@@ -281,7 +281,7 @@ static CURLcode dict_do(struct connectdata *conn, bool *done)
         return result;
       }
 
-      Curl_setup_transfer(conn, FIRSTSOCKET, -1, FALSE, bytecount, -1, NULL);
+      Curl_setup_transfer(conn, FIRSTSOCKET, -1, FALSE, bytecount, -1, nil);
     }
   }
 

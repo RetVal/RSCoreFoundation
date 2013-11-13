@@ -129,7 +129,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
   gss_name_t       server = GSS_C_NO_NAME;
   gss_name_t       gss_client_name = GSS_C_NO_NAME;
   unsigned short   us_length;
-  char             *user=NULL;
+  char             *user=nil;
   unsigned char socksreq[4]; /* room for gssapi exchange header only */
   char *serviceptr = data->set.str[STRING_SOCKS5_GSSAPI_SERVICE];
 
@@ -180,7 +180,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
                                                  &gss_minor_status,
                                                  &gss_context,
                                                  server,
-                                                 NULL,
+                                                 nil,
                                                  gss_token,
                                                  &gss_send_token,
                                                  &gss_ret_flags);
@@ -192,7 +192,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
       gss_release_name(&gss_status, &server);
       gss_release_buffer(&gss_status, &gss_recv_token);
       gss_release_buffer(&gss_status, &gss_send_token);
-      gss_delete_sec_context(&gss_status, &gss_context, NULL);
+      gss_delete_sec_context(&gss_status, &gss_context, nil);
       failf(data, "Failed to initial GSSAPI token.");
       return CURLE_COULDNT_CONNECT;
     }
@@ -209,7 +209,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
         gss_release_name(&gss_status, &server);
         gss_release_buffer(&gss_status, &gss_recv_token);
         gss_release_buffer(&gss_status, &gss_send_token);
-        gss_delete_sec_context(&gss_status, &gss_context, NULL);
+        gss_delete_sec_context(&gss_status, &gss_context, nil);
         return CURLE_COULDNT_CONNECT;
       }
 
@@ -221,7 +221,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
         gss_release_name(&gss_status, &server);
         gss_release_buffer(&gss_status, &gss_recv_token);
         gss_release_buffer(&gss_status, &gss_send_token);
-        gss_delete_sec_context(&gss_status, &gss_context, NULL);
+        gss_delete_sec_context(&gss_status, &gss_context, nil);
         return CURLE_COULDNT_CONNECT;
       }
 
@@ -245,7 +245,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
     if(result != CURLE_OK || actualread != 4) {
       failf(data, "Failed to receive GSSAPI authentication response.");
       gss_release_name(&gss_status, &server);
-      gss_delete_sec_context(&gss_status, &gss_context, NULL);
+      gss_delete_sec_context(&gss_status, &gss_context, nil);
       return CURLE_COULDNT_CONNECT;
     }
 
@@ -254,7 +254,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
       failf(data, "User was rejected by the SOCKS5 server (%d %d).",
             socksreq[0], socksreq[1]);
       gss_release_name(&gss_status, &server);
-      gss_delete_sec_context(&gss_status, &gss_context, NULL);
+      gss_delete_sec_context(&gss_status, &gss_context, nil);
       return CURLE_COULDNT_CONNECT;
     }
 
@@ -262,7 +262,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
       failf(data, "Invalid GSSAPI authentication response type (%d %d).",
             socksreq[0], socksreq[1]);
       gss_release_name(&gss_status, &server);
-      gss_delete_sec_context(&gss_status, &gss_context, NULL);
+      gss_delete_sec_context(&gss_status, &gss_context, nil);
       return CURLE_COULDNT_CONNECT;
     }
 
@@ -276,7 +276,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
             "Could not allocate memory for GSSAPI authentication "
             "response token.");
       gss_release_name(&gss_status, &server);
-      gss_delete_sec_context(&gss_status, &gss_context, NULL);
+      gss_delete_sec_context(&gss_status, &gss_context, nil);
       return CURLE_OUT_OF_MEMORY;
     }
 
@@ -287,7 +287,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
       failf(data, "Failed to receive GSSAPI authentication token.");
       gss_release_name(&gss_status, &server);
       gss_release_buffer(&gss_status, &gss_recv_token);
-      gss_delete_sec_context(&gss_status, &gss_context, NULL);
+      gss_delete_sec_context(&gss_status, &gss_context, nil);
       return CURLE_COULDNT_CONNECT;
     }
 
@@ -298,20 +298,20 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
 
   /* Everything is good so far, user was authenticated! */
   gss_major_status = gss_inquire_context (&gss_minor_status, gss_context,
-                                          &gss_client_name, NULL, NULL, NULL,
-                                          NULL, NULL, NULL);
+                                          &gss_client_name, nil, nil, nil,
+                                          nil, nil, nil);
   if(check_gss_err(data,gss_major_status,
                    gss_minor_status,"gss_inquire_context")) {
-    gss_delete_sec_context(&gss_status, &gss_context, NULL);
+    gss_delete_sec_context(&gss_status, &gss_context, nil);
     gss_release_name(&gss_status, &gss_client_name);
     failf(data, "Failed to determine user name.");
     return CURLE_COULDNT_CONNECT;
   }
   gss_major_status = gss_display_name(&gss_minor_status, gss_client_name,
-                                      &gss_send_token, NULL);
+                                      &gss_send_token, nil);
   if(check_gss_err(data,gss_major_status,
                    gss_minor_status,"gss_display_name")) {
-    gss_delete_sec_context(&gss_status, &gss_context, NULL);
+    gss_delete_sec_context(&gss_status, &gss_context, nil);
     gss_release_name(&gss_status, &gss_client_name);
     gss_release_buffer(&gss_status, &gss_send_token);
     failf(data, "Failed to determine user name.");
@@ -319,7 +319,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
   }
   user=malloc(gss_send_token.length+1);
   if(!user) {
-    gss_delete_sec_context(&gss_status, &gss_context, NULL);
+    gss_delete_sec_context(&gss_status, &gss_context, nil);
     gss_release_name(&gss_status, &gss_client_name);
     gss_release_buffer(&gss_status, &gss_send_token);
     return CURLE_OUT_OF_MEMORY;
@@ -331,7 +331,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
   gss_release_buffer(&gss_status, &gss_send_token);
   infof(data, "SOCKS5 server authencticated user %s with gssapi.\n",user);
   free(user);
-  user=NULL;
+  user=nil;
 
   /* Do encryption */
   socksreq[0] = 1;    /* gssapi subnegotiation version */
@@ -387,7 +387,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
     gss_send_token.length = 1;
     gss_send_token.value = malloc(1);
     if(!gss_send_token.value) {
-      gss_delete_sec_context(&gss_status, &gss_context, NULL);
+      gss_delete_sec_context(&gss_status, &gss_context, nil);
       return CURLE_OUT_OF_MEMORY;
     }
     memcpy(gss_send_token.value, &gss_enc, 1);
@@ -399,7 +399,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
     if(check_gss_err(data,gss_major_status,gss_minor_status,"gss_wrap")) {
       gss_release_buffer(&gss_status, &gss_send_token);
       gss_release_buffer(&gss_status, &gss_w_token);
-      gss_delete_sec_context(&gss_status, &gss_context, NULL);
+      gss_delete_sec_context(&gss_status, &gss_context, nil);
       failf(data, "Failed to wrap GSSAPI encryption value into token.");
       return CURLE_COULDNT_CONNECT;
     }
@@ -413,7 +413,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
   if((code != CURLE_OK) || (4 != written)) {
     failf(data, "Failed to send GSSAPI encryption request.");
     gss_release_buffer(&gss_status, &gss_w_token);
-    gss_delete_sec_context(&gss_status, &gss_context, NULL);
+    gss_delete_sec_context(&gss_status, &gss_context, nil);
     return CURLE_COULDNT_CONNECT;
   }
 
@@ -422,7 +422,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
     code = Curl_write_plain(conn, sock, socksreq, 1, &written);
     if((code != CURLE_OK) || ( 1 != written)) {
       failf(data, "Failed to send GSSAPI encryption type.");
-      gss_delete_sec_context(&gss_status, &gss_context, NULL);
+      gss_delete_sec_context(&gss_status, &gss_context, nil);
       return CURLE_COULDNT_CONNECT;
     }
   }
@@ -432,7 +432,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
     if((code != CURLE_OK) || ((ssize_t)gss_w_token.length != written)) {
       failf(data, "Failed to send GSSAPI encryption type.");
       gss_release_buffer(&gss_status, &gss_w_token);
-      gss_delete_sec_context(&gss_status, &gss_context, NULL);
+      gss_delete_sec_context(&gss_status, &gss_context, nil);
       return CURLE_COULDNT_CONNECT;
     }
     gss_release_buffer(&gss_status, &gss_w_token);
@@ -441,7 +441,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
   result=Curl_blockread_all(conn, sock, (char *)socksreq, 4, &actualread);
   if(result != CURLE_OK || actualread != 4) {
     failf(data, "Failed to receive GSSAPI encryption response.");
-    gss_delete_sec_context(&gss_status, &gss_context, NULL);
+    gss_delete_sec_context(&gss_status, &gss_context, nil);
     return CURLE_COULDNT_CONNECT;
   }
 
@@ -449,14 +449,14 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
   if(socksreq[1] == 255) { /* status / message type */
     failf(data, "User was rejected by the SOCKS5 server (%d %d).",
           socksreq[0], socksreq[1]);
-    gss_delete_sec_context(&gss_status, &gss_context, NULL);
+    gss_delete_sec_context(&gss_status, &gss_context, nil);
     return CURLE_COULDNT_CONNECT;
   }
 
   if(socksreq[1] != 2) { /* status / messgae type */
     failf(data, "Invalid GSSAPI encryption response type (%d %d).",
           socksreq[0], socksreq[1]);
-    gss_delete_sec_context(&gss_status, &gss_context, NULL);
+    gss_delete_sec_context(&gss_status, &gss_context, nil);
     return CURLE_COULDNT_CONNECT;
   }
 
@@ -466,7 +466,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
   gss_recv_token.length= us_length;
   gss_recv_token.value=malloc(gss_recv_token.length);
   if(!gss_recv_token.value) {
-    gss_delete_sec_context(&gss_status, &gss_context, NULL);
+    gss_delete_sec_context(&gss_status, &gss_context, nil);
     return CURLE_OUT_OF_MEMORY;
   }
   result=Curl_blockread_all(conn, sock, (char *)gss_recv_token.value,
@@ -475,7 +475,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
   if(result != CURLE_OK || actualread != us_length) {
     failf(data, "Failed to receive GSSAPI encryptrion type.");
     gss_release_buffer(&gss_status, &gss_recv_token);
-    gss_delete_sec_context(&gss_status, &gss_context, NULL);
+    gss_delete_sec_context(&gss_status, &gss_context, nil);
     return CURLE_COULDNT_CONNECT;
   }
 
@@ -487,7 +487,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
     if(check_gss_err(data,gss_major_status,gss_minor_status,"gss_unwrap")) {
       gss_release_buffer(&gss_status, &gss_recv_token);
       gss_release_buffer(&gss_status, &gss_w_token);
-      gss_delete_sec_context(&gss_status, &gss_context, NULL);
+      gss_delete_sec_context(&gss_status, &gss_context, nil);
       failf(data, "Failed to unwrap GSSAPI encryption value into token.");
       return CURLE_COULDNT_CONNECT;
     }
@@ -497,7 +497,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
       failf(data, "Invalid GSSAPI encryption response length (%d).",
             gss_w_token.length);
       gss_release_buffer(&gss_status, &gss_w_token);
-      gss_delete_sec_context(&gss_status, &gss_context, NULL);
+      gss_delete_sec_context(&gss_status, &gss_context, nil);
       return CURLE_COULDNT_CONNECT;
     }
 
@@ -509,7 +509,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
       failf(data, "Invalid GSSAPI encryption response length (%d).",
             gss_recv_token.length);
       gss_release_buffer(&gss_status, &gss_recv_token);
-      gss_delete_sec_context(&gss_status, &gss_context, NULL);
+      gss_delete_sec_context(&gss_status, &gss_context, nil);
       return CURLE_COULDNT_CONNECT;
     }
 
@@ -523,7 +523,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
 
   conn->socks5_gssapi_enctype = socksreq[0];
   if(socksreq[0] == 0)
-    gss_delete_sec_context(&gss_status, &gss_context, NULL);
+    gss_delete_sec_context(&gss_status, &gss_context, nil);
 
   return CURLE_OK;
 }

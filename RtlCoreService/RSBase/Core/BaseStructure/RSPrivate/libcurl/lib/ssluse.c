@@ -324,7 +324,7 @@ int cert_stuff(struct connectdata *conn,
     
     int file_type = do_file_type(cert_type);
     
-    if(cert_file != NULL || file_type == SSL_FILETYPE_ENGINE) {
+    if(cert_file != nil || file_type == SSL_FILETYPE_ENGINE) {
         SSL *ssl;
         X509 *x509;
         int cert_done = 0;
@@ -385,21 +385,21 @@ int cert_stuff(struct connectdata *conn,
                     } params;
                     
                     params.cert_id = cert_file;
-                    params.cert = NULL;
+                    params.cert = nil;
                     
                     /* Does the engine supports LOAD_CERT_CTRL ? */
                     if(!ENGINE_ctrl(data->state.engine, ENGINE_CTRL_GET_CMD_FROM_NAME,
-                                    0, (void *)cmd_name, NULL)) {
+                                    0, (void *)cmd_name, nil)) {
                         failf(data, "ssl engine does not support loading certificates");
                         return 0;
                     }
                     
                     /* Load the certificate from the engine */
                     if(!ENGINE_ctrl_cmd(data->state.engine, cmd_name,
-                                        0, &params, NULL, 1)) {
+                                        0, &params, nil, 1)) {
                         failf(data, "ssl engine cannot load client cert with id"
                               " '%s' [%s]", cert_file,
-                              ERR_error_string(ERR_get_error(), NULL));
+                              ERR_error_string(ERR_get_error(), nil));
                         return 0;
                     }
                     
@@ -433,7 +433,7 @@ int cert_stuff(struct connectdata *conn,
                 FILE *f;
                 PKCS12 *p12;
                 EVP_PKEY *pri;
-                STACK_OF(X509) *ca = NULL;
+                STACK_OF(X509) *ca = nil;
                 int i;
                 
                 f = fopen(cert_file,"rb");
@@ -441,7 +441,7 @@ int cert_stuff(struct connectdata *conn,
                     failf(data, "could not open PKCS12 file '%s'", cert_file);
                     return 0;
                 }
-                p12 = d2i_PKCS12_fp(f, NULL);
+                p12 = d2i_PKCS12_fp(f, nil);
                 fclose(f);
                 
                 if(!p12) {
@@ -455,7 +455,7 @@ int cert_stuff(struct connectdata *conn,
                                  &ca)) {
                     failf(data,
                           "could not parse PKCS12 file, check password, OpenSSL error %s",
-                          ERR_error_string(ERR_get_error(), NULL) );
+                          ERR_error_string(ERR_get_error(), nil) );
                     PKCS12_free(p12);
                     return 0;
                 }
@@ -528,7 +528,7 @@ int cert_stuff(struct connectdata *conn,
             case SSL_FILETYPE_PEM:
                 if(cert_done)
                     break;
-                if(key_file == NULL)
+                if(key_file == nil)
                 /* cert & key can only be in PEM case in the same file */
                     key_file=cert_file;
             case SSL_FILETYPE_ASN1:
@@ -541,7 +541,7 @@ int cert_stuff(struct connectdata *conn,
             case SSL_FILETYPE_ENGINE:
 #ifdef HAVE_OPENSSL_ENGINE_H
             {                         /* XXXX still needs some work */
-                EVP_PKEY *priv_key = NULL;
+                EVP_PKEY *priv_key = nil;
                 if(data->state.engine) {
 #ifdef HAVE_ENGINE_LOAD_FOUR_ARGS
                     UI_METHOD *ui_method = UI_OpenSSL();
@@ -586,7 +586,7 @@ int cert_stuff(struct connectdata *conn,
         }
         
         ssl=SSL_new(ctx);
-        if(NULL == ssl) {
+        if(nil == ssl) {
             failf(data,"unable to create an SSL structure");
             return 0;
         }
@@ -595,7 +595,7 @@ int cert_stuff(struct connectdata *conn,
         
         /* This version was provided by Evan Jordan and is supposed to not
          leak memory as the previous version: */
-        if(x509 != NULL) {
+        if(x509 != nil) {
             EVP_PKEY *pktmp = X509_get_pubkey(x509);
             EVP_PKEY_copy_parameters(pktmp,SSL_get_privatekey(ssl));
             EVP_PKEY_free(pktmp);
@@ -730,7 +730,7 @@ void Curl_ossl_cleanup(void)
     
     /* Free thread local error state, destroying hash upon zero refcount */
 #ifdef HAVE_ERR_REMOVE_THREAD_STATE
-    ERR_remove_thread_state(NULL);
+    ERR_remove_thread_state(nil);
 #else
     ERR_remove_state(0);
 #endif
@@ -785,7 +785,7 @@ CURLcode Curl_ossl_set_engine(struct SessionHandle *data, const char *engine)
     if(data->state.engine) {
         ENGINE_finish(data->state.engine);
         ENGINE_free(data->state.engine);
-        data->state.engine = NULL;
+        data->state.engine = nil;
     }
     if(!ENGINE_init(e)) {
         char buf[256];
@@ -830,7 +830,7 @@ CURLcode Curl_ossl_set_engine_default(struct SessionHandle *data)
  */
 struct curl_slist *Curl_ossl_engines_list(struct SessionHandle *data)
 {
-    struct curl_slist *list = NULL;
+    struct curl_slist *list = nil;
 #if defined(USE_SSLEAY) && defined(HAVE_OPENSSL_ENGINE_H)
     struct curl_slist *beg;
     ENGINE *e;
@@ -839,7 +839,7 @@ struct curl_slist *Curl_ossl_engines_list(struct SessionHandle *data)
         beg = curl_slist_append(list, ENGINE_get_id(e));
         if(!beg) {
             curl_slist_free_all(list);
-            return NULL;
+            return nil;
         }
         list = beg;
     }
@@ -861,11 +861,11 @@ void Curl_ossl_close(struct connectdata *conn, int sockindex)
         SSL_set_connect_state(connssl->handle);
         
         SSL_free (connssl->handle);
-        connssl->handle = NULL;
+        connssl->handle = nil;
     }
     if(connssl->ctx) {
         SSL_CTX_free (connssl->ctx);
-        connssl->ctx = NULL;
+        connssl->ctx = nil;
     }
 }
 
@@ -965,7 +965,7 @@ int Curl_ossl_shutdown(struct connectdata *conn, int sockindex)
         }
         
         SSL_free (connssl->handle);
-        connssl->handle = NULL;
+        connssl->handle = nil;
     }
     return retval;
 }
@@ -986,7 +986,7 @@ int Curl_ossl_close_all(struct SessionHandle *data)
     if(data->state.engine) {
         ENGINE_finish(data->state.engine);
         ENGINE_free(data->state.engine);
-        data->state.engine = NULL;
+        data->state.engine = nil;
     }
 #else
     (void)data;
@@ -1146,7 +1146,7 @@ static CURLcode verifyhost(struct connectdata *conn,
         }
     
     /* get a "list" of alternative names */
-    altnames = X509_get_ext_d2i(server_cert, NID_subject_alt_name, NULL, NULL);
+    altnames = X509_get_ext_d2i(server_cert, NID_subject_alt_name, nil, nil);
     
     if(altnames) {
         int numalts;
@@ -1262,7 +1262,7 @@ static CURLcode verifyhost(struct connectdata *conn,
         }
         
         if(peer_CN == nulstr)
-            peer_CN = NULL;
+            peer_CN = nil;
         else {
             /* convert peer_CN from UTF8 */
             CURLcode rc = Curl_convert_from_utf8(data, peer_CN, strlen(peer_CN));
@@ -1402,10 +1402,10 @@ static void ssl_tls_trace(int direction, int ssl_ver, int content_type,
     
     txt_len = snprintf(ssl_buf, sizeof(ssl_buf), "SSLv%c, %s%s (%d):\n",
                        ver, tls_rt_name, msg_name, msg_type);
-    Curl_debug(data, CURLINFO_TEXT, ssl_buf, (size_t)txt_len, NULL);
+    Curl_debug(data, CURLINFO_TEXT, ssl_buf, (size_t)txt_len, nil);
     
     Curl_debug(data, (direction == 1) ? CURLINFO_SSL_DATA_OUT :
-               CURLINFO_SSL_DATA_IN, (char *)buf, len, NULL);
+               CURLINFO_SSL_DATA_IN, (char *)buf, len, nil);
     (void) ssl;
 }
 #endif
@@ -1426,9 +1426,9 @@ ossl_connect_step1(struct connectdata *conn,
     CURLcode retcode = CURLE_OK;
     
     struct SessionHandle *data = conn->data;
-    SSL_METHOD_QUAL SSL_METHOD *req_method=NULL;
-    void *ssl_sessionid=NULL;
-    X509_LOOKUP *lookup=NULL;
+    SSL_METHOD_QUAL SSL_METHOD *req_method=nil;
+    void *ssl_sessionid=nil;
+    X509_LOOKUP *lookup=nil;
     curl_socket_t sockfd = conn->sock[sockindex];
     struct ssl_connect_data *connssl = &conn->ssl[sockindex];
     long ctx_options;
@@ -1495,7 +1495,7 @@ ossl_connect_step1(struct connectdata *conn,
     
     if(!connssl->ctx) {
         failf(data, "SSL: couldn't create a context: %s",
-              ERR_error_string(ERR_peek_error(), NULL));
+              ERR_error_string(ERR_peek_error(), nil));
         return CURLE_OUT_OF_MEMORY;
     }
     
@@ -1582,7 +1582,7 @@ ossl_connect_step1(struct connectdata *conn,
      * SSL_ERROR_WANT_x.
      */
     if(data->state.used_interface == Curl_if_multi)
-        SSL_CTX_ctrl(connssl->ctx, BIO_C_SET_NBIO, 1, NULL);
+        SSL_CTX_ctrl(connssl->ctx, BIO_C_SET_NBIO, 1, nil);
 #endif
     
     if(data->set.str[STRING_CERT] || data->set.str[STRING_CERT_TYPE]) {
@@ -1728,11 +1728,11 @@ ossl_connect_step1(struct connectdata *conn,
 #endif
     
     /* Check if there's a cached ID we can/should use here! */
-    if(!Curl_ssl_getsessionid(conn, &ssl_sessionid, NULL)) {
+    if(!Curl_ssl_getsessionid(conn, &ssl_sessionid, nil)) {
         /* we got a session id, use it! */
         if(!SSL_set_session(connssl->handle, ssl_sessionid)) {
             failf(data, "SSL: SSL_set_session failed: %s",
-                  ERR_error_string(ERR_get_error(),NULL));
+                  ERR_error_string(ERR_get_error(),nil));
             return CURLE_SSL_CONNECT_ERROR;
         }
         /* Informational message */
@@ -1742,7 +1742,7 @@ ossl_connect_step1(struct connectdata *conn,
     /* pass the raw socket into the SSL layers */
     if(!SSL_set_fd(connssl->handle, (int)sockfd)) {
         failf(data, "SSL: SSL_set_fd failed: %s",
-              ERR_error_string(ERR_get_error(),NULL));
+              ERR_error_string(ERR_get_error(),nil));
         return CURLE_SSL_CONNECT_ERROR;
     }
     
@@ -1785,7 +1785,7 @@ ossl_connect_step2(struct connectdata *conn, int sockindex)
             char error_buffer[256]; /* OpenSSL documents that this must be at least
                                      256 bytes long. */
             CURLcode rc;
-            const char *cert_problem = NULL;
+            const char *cert_problem = nil;
             
             connssl->connecting_state = ssl_connect_2; /* the connection failed,
                                                         we're not waiting for
@@ -1894,7 +1894,7 @@ static CURLcode push_certinfo_len(struct SessionHandle *data,
     free(output);
     if(!nl) {
         curl_slist_free_all(ci->certinfo[certnum]);
-        ci->certinfo[certnum] = NULL;
+        ci->certinfo[certnum] = nil;
         res = CURLE_OUT_OF_MEMORY;
     }
     else
@@ -1945,7 +1945,7 @@ static void pubkey_show(struct SessionHandle *data,
 
 #define print_pubkey_BN(_type, _name, _num)    \
 do {                              \
-if(pubkey->pkey._type->_name != NULL) { \
+if(pubkey->pkey._type->_name != nil) { \
 int len = BN_num_bytes(pubkey->pkey._type->_name);  \
 if(len < CERTBUFFERSIZE) {                                    \
 BN_bn2bin(pubkey->pkey._type->_name, (unsigned char*)bufp); \
@@ -2114,7 +2114,7 @@ static CURLcode get_cert_chain(struct connectdata *conn,
 #endif
         
         X509_CINF *cinf;
-        EVP_PKEY *pubkey=NULL;
+        EVP_PKEY *pubkey=nil;
         int j;
         char *ptr;
         
@@ -2279,7 +2279,7 @@ static CURLcode servercert(struct connectdata *conn,
         if(strict)
             failf(data, "SSL: couldn't get X509-subject!");
         X509_free(connssl->server_cert);
-        connssl->server_cert = NULL;
+        connssl->server_cert = nil;
         return CURLE_SSL_CONNECT_ERROR;
     }
     infof(data, "\t subject: %s\n", buffer);
@@ -2296,7 +2296,7 @@ static CURLcode servercert(struct connectdata *conn,
         retcode = verifyhost(conn, connssl->server_cert);
         if(retcode) {
             X509_free(connssl->server_cert);
-            connssl->server_cert = NULL;
+            connssl->server_cert = nil;
             return retcode;
         }
     }
@@ -2322,10 +2322,10 @@ static CURLcode servercert(struct connectdata *conn,
                     failf(data, "SSL: Unable to open issuer cert (%s)\n",
                           data->set.str[STRING_SSL_ISSUERCERT]);
                 X509_free(connssl->server_cert);
-                connssl->server_cert = NULL;
+                connssl->server_cert = nil;
                 return CURLE_SSL_ISSUER_ERROR;
             }
-            issuer = PEM_read_X509(fp,NULL,ZERO_NULL,NULL);
+            issuer = PEM_read_X509(fp,nil,ZERO_NULL,nil);
             if(!issuer) {
                 if(strict)
                     failf(data, "SSL: Unable to read issuer cert (%s)\n",
@@ -2342,7 +2342,7 @@ static CURLcode servercert(struct connectdata *conn,
                           data->set.str[STRING_SSL_ISSUERCERT]);
                 X509_free(connssl->server_cert);
                 X509_free(issuer);
-                connssl->server_cert = NULL;
+                connssl->server_cert = nil;
                 return CURLE_SSL_ISSUER_ERROR;
             }
             infof(data, "\t SSL certificate issuer check ok (%s)\n",
@@ -2371,7 +2371,7 @@ static CURLcode servercert(struct connectdata *conn,
     }
     
     X509_free(connssl->server_cert);
-    connssl->server_cert = NULL;
+    connssl->server_cert = nil;
     connssl->connecting_state = ssl_connect_done;
     
     return retcode;
@@ -2383,7 +2383,7 @@ ossl_connect_step3(struct connectdata *conn,
                    int sockindex)
 {
     CURLcode retcode = CURLE_OK;
-    void *old_ssl_sessionid=NULL;
+    void *old_ssl_sessionid=nil;
     struct SessionHandle *data = conn->data;
     struct ssl_connect_data *connssl = &conn->ssl[sockindex];
     int incache;
@@ -2411,7 +2411,7 @@ ossl_connect_step3(struct connectdata *conn,
      */
 #endif
     
-    incache = !(Curl_ssl_getsessionid(conn, &old_ssl_sessionid, NULL));
+    incache = !(Curl_ssl_getsessionid(conn, &old_ssl_sessionid, nil));
     if(incache) {
         if(old_ssl_sessionid != our_ssl_sessionid) {
             infof(data, "old SSL session ID is stale, removing\n");
@@ -2478,7 +2478,7 @@ ossl_connect_common(struct connectdata *conn,
     
     if(ssl_connect_1==connssl->connecting_state) {
         /* Find out how much more time we're allowed */
-        timeout_ms = Curl_timeleft(data, NULL, TRUE);
+        timeout_ms = Curl_timeleft(data, nil, TRUE);
         
         if(timeout_ms < 0) {
             /* no need to continue if time already is up */
@@ -2495,7 +2495,7 @@ ossl_connect_common(struct connectdata *conn,
           ssl_connect_2_writing == connssl->connecting_state) {
         
         /* check allowed time left */
-        timeout_ms = Curl_timeleft(data, NULL, TRUE);
+        timeout_ms = Curl_timeleft(data, nil, TRUE);
         
         if(timeout_ms < 0) {
             /* no need to continue if time already is up */

@@ -236,6 +236,8 @@ typedef UniCharCount *                  UniCharCountPtr;
 
 typedef RSTimeInterval RSAbsoluteTime;
 
+typedef uintptr_t RSPointer;
+
 typedef enum {
     RSWriteFileDefault = 0,
     RSWriteFileAutomatically = 1

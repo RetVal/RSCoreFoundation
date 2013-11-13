@@ -82,7 +82,7 @@ enum {
 
 RSExport BOOL RSUniCharIsMemberOf(UTF32Char theChar, uint32_t charset);
 
-// This function returns NULL for RSUniCharControlCharacterSet, RSUniCharWhitespaceCharacterSet, RSUniCharWhitespaceAndNewlineCharacterSet, & RSUniCharIllegalCharacterSet
+// This function returns nil for RSUniCharControlCharacterSet, RSUniCharWhitespaceCharacterSet, RSUniCharWhitespaceAndNewlineCharacterSet, & RSUniCharIllegalCharacterSet
 RSExport const uint8_t *RSUniCharGetBitmapPtrForPlane(uint32_t charset, uint32_t plane);
 
 enum {

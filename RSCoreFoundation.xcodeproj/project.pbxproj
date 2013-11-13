@@ -345,6 +345,7 @@
 		41C0DC4B182F14CC0022D5DC /* RSBag.c in Sources */ = {isa = PBXBuildFile; fileRef = 41C0DC49182F14CC0022D5DC /* RSBag.c */; };
 		41C0DC4C182F14CC0022D5DC /* RSBag.h in Headers */ = {isa = PBXBuildFile; fileRef = 41C0DC4A182F14CC0022D5DC /* RSBag.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		41C583E61776D42D00E037E4 /* RSCoreFoundation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4158D55A1625C4C60070E69F /* RSCoreFoundation.framework */; };
+		41D340321831E36300A9B93E /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41B0E3C6182F434000A5E00D /* CoreFoundation.framework */; };
 		41D49BE816797659002AB893 /* RSStringEncoding.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D49BE716797659002AB893 /* RSStringEncoding.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		41D919231652758E007568E9 /* RSInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D919221652758E007568E9 /* RSInternal.h */; };
 		41D9375D17A538AB004E5E0F /* RSUniChar.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D9375C17A538AB004E5E0F /* RSUniChar.h */; };
@@ -1316,6 +1317,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				41D340321831E36300A9B93E /* CoreFoundation.framework in Frameworks */,
 				4129250E1822BAE800F2D71B /* libcrypto.dylib in Frameworks */,
 				4129250C1822BAE200F2D71B /* libssl.dylib in Frameworks */,
 				4129250A1822BADE00F2D71B /* libldap.dylib in Frameworks */,
@@ -3462,7 +3464,7 @@
 					"$(SDKROOT)/usr/lib/system",
 				);
 				PRODUCT_NAME = RSCoreFoundation;
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx10.9;
 				USER_HEADER_SEARCH_PATHS = "icu/**";
 				WRAPPER_EXTENSION = framework;
 			};
@@ -3531,7 +3533,7 @@
 					"$(SDKROOT)/usr/lib/system",
 				);
 				PRODUCT_NAME = RSCoreFoundation;
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx10.9;
 				USER_HEADER_SEARCH_PATHS = "icu/**";
 				WRAPPER_EXTENSION = framework;
 			};
@@ -3762,6 +3764,7 @@
 				41B0E3BE182F338300A5E00D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		41E928F917C32AD3003DB0ED /* Build configuration list for PBXNativeTarget "RSProcessInfo" */ = {
 			isa = XCConfigurationList;

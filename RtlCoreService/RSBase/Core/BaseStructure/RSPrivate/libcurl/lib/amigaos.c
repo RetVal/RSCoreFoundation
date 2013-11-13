@@ -25,7 +25,7 @@
 #include "amigaos.h"
 #include <amitcp/socketbasetags.h>
 
-struct Library *SocketBase = NULL;
+struct Library *SocketBase = nil;
 extern int errno, h_errno;
 
 #ifdef __libnix__
@@ -39,7 +39,7 @@ void amiga_cleanup()
 {
   if(SocketBase) {
     CloseLibrary(SocketBase);
-    SocketBase = NULL;
+    SocketBase = nil;
   }
 }
 

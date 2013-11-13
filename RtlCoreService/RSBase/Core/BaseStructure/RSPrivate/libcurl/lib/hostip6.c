@@ -119,7 +119,7 @@ bool Curl_ipv6works(void)
       ipv6_works = 0;
     else {
       ipv6_works = 1;
-      Curl_closesocket(NULL, s);
+      Curl_closesocket(nil, s);
     }
   }
   return (ipv6_works>0)?TRUE:FALSE;
@@ -175,7 +175,7 @@ Curl_addrinfo *Curl_getaddrinfo(struct connectdata *conn,
   Curl_addrinfo *res;
   int error;
   char sbuf[NI_MAXSERV];
-  char *sbufptr = NULL;
+  char *sbufptr = nil;
   char addrbuf[128];
   int pf;
   struct SessionHandle *data = conn->data;
@@ -218,7 +218,7 @@ Curl_addrinfo *Curl_getaddrinfo(struct connectdata *conn,
   error = Curl_getaddrinfo_ex(hostname, sbufptr, &hints, &res);
   if(error) {
     infof(data, "getaddrinfo(3) failed for %s:%d\n", hostname, port);
-    return NULL;
+    return nil;
   }
 
   dump_addrinfo(conn, res);

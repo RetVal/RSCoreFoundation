@@ -11,7 +11,7 @@
 #include <sys/fcntl.h>  /*open*/
 static BOOL __rs_mmap(int fd, void ** buf, size_t *size)
 {
-    *buf = mmap(NULL, *size, PROT_READ, MAP_PRIVATE, fd, 0);
+    *buf = mmap(nil, *size, PROT_READ, MAP_PRIVATE, fd, 0);
     return (*buf) ? YES : NO;
 }
 

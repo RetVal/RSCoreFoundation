@@ -470,10 +470,10 @@ static RSAutoreleasePoolRef __RSAutoreleasePoolCreateInstance(RSAllocatorRef all
     __RSRuntimeSetInstanceTypeID(pool, _RSAutoreleasePoolTypeID);
     const RSRuntimeClass* cls = __RSRuntimeGetClassWithTypeID(_RSAutoreleasePoolTypeID);
     __RSSetValid(pool);
-    if (cls->refcount) {
-        ((RSRuntimeBase*)pool)->_rsinfo._customRef = 1;
-    }else
-        ((RSRuntimeBase*)pool)->_rsinfo._customRef = 0;
+//    if (cls->refcount) {
+//        ((RSRuntimeBase*)pool)->_rsinfo._customRef = 1;
+//    }else
+//        ((RSRuntimeBase*)pool)->_rsinfo._customRef = 0;
     RSRetain(pool);
     __RSRuntimeSetInstanceSpecial(pool, YES);
     if (cls->init) cls->init(pool);

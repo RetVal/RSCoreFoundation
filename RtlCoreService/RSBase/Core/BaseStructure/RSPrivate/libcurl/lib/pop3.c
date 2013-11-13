@@ -384,7 +384,7 @@ static CURLcode pop3_state_retr_resp(struct connectdata *conn,
 
   /* POP3 download */
   Curl_setup_transfer(conn, FIRSTSOCKET, -1, FALSE,
-                      pop3->bytecountp, -1, NULL); /* no upload here */
+                      pop3->bytecountp, -1, nil); /* no upload here */
 
   if(pp->cache) {
     /* At this point there is a bunch of data in the header "cache" that is
@@ -398,7 +398,7 @@ static CURLcode pop3_state_retr_resp(struct connectdata *conn,
 
     /* cache is drained */
     free(pp->cache);
-    pp->cache = NULL;
+    pp->cache = nil;
     pp->cache_size = 0;
   }
 
@@ -437,7 +437,7 @@ static CURLcode pop3_state_list_resp(struct connectdata *conn,
 
   /* POP3 download */
   Curl_setup_transfer(conn, FIRSTSOCKET, -1, FALSE, pop3->bytecountp,
-                      -1, NULL); /* no upload here */
+                      -1, nil); /* no upload here */
 
   if(pp->cache) {
     /* cache holds the email ID listing */
@@ -449,7 +449,7 @@ static CURLcode pop3_state_list_resp(struct connectdata *conn,
 
     /* cache is drained */
     free(pp->cache);
-    pp->cache = NULL;
+    pp->cache = nil;
     pp->cache_size = 0;
   }
 
@@ -753,7 +753,7 @@ static CURLcode pop3_done(struct connectdata *conn, CURLcode status,
   }
 
   Curl_safefree(pop3c->mailbox);
-  pop3c->mailbox = NULL;
+  pop3c->mailbox = nil;
 
   /* clear these for next connection */
   pop3->transfer = FTPTRANSFER_BODY;
@@ -862,7 +862,7 @@ static CURLcode pop3_quit(struct connectdata *conn)
 {
   CURLcode result = CURLE_OK;
 
-  result = Curl_pp_sendf(&conn->proto.pop3c.pp, "QUIT", NULL);
+  result = Curl_pp_sendf(&conn->proto.pop3c.pp, "QUIT", nil);
   if(result)
     return result;
   state(conn, POP3_QUIT);
@@ -914,7 +914,7 @@ static CURLcode pop3_parse_url_path(struct connectdata *conn)
   const char *path = data->state.path;
 
   /* url decode the path and use this mailbox */
-  return Curl_urldecode(data, path, 0, &pop3c->mailbox, NULL, TRUE);
+  return Curl_urldecode(data, path, 0, &pop3c->mailbox, nil, TRUE);
 }
 
 /* call this when the DO phase has completed */
@@ -926,7 +926,7 @@ static CURLcode pop3_dophase_done(struct connectdata *conn,
 
   if(pop3->transfer != FTPTRANSFER_BODY)
     /* no data to transfer */
-    Curl_setup_transfer(conn, -1, -1, FALSE, NULL, -1, NULL);
+    Curl_setup_transfer(conn, -1, -1, FALSE, nil, -1, nil);
 
   return CURLE_OK;
 }

@@ -52,7 +52,7 @@ int Curl_qsossl_check_cxn(struct connectdata * cxn);
 #define curlssl_shutdown(x,y) Curl_qsossl_shutdown(x,y)
 #define curlssl_set_engine(x,y) CURLE_NOT_BUILT_IN
 #define curlssl_set_engine_default(x) CURLE_NOT_BUILT_IN
-#define curlssl_engines_list(x) NULL
+#define curlssl_engines_list(x) nil
 #define curlssl_version Curl_qsossl_version
 #define curlssl_check_cxn(x) Curl_qsossl_check_cxn(x)
 #define curlssl_data_pending(x,y) 0

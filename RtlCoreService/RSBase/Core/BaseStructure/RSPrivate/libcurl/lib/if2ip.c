@@ -78,7 +78,7 @@ bool Curl_if_is_interface_name(const char *interf)
   struct ifaddrs *iface, *head;
 
   if(getifaddrs(&head) >= 0) {
-    for(iface=head; iface != NULL; iface=iface->ifa_next) {
+    for(iface=head; iface != nil; iface=iface->ifa_next) {
       if(curl_strequal(iface->ifa_name, interf)) {
         result = TRUE;
         break;
@@ -92,11 +92,11 @@ bool Curl_if_is_interface_name(const char *interf)
 char *Curl_if2ip(int af, const char *interf, char *buf, int buf_size)
 {
   struct ifaddrs *iface, *head;
-  char *ip = NULL;
+  char *ip = nil;
 
   if(getifaddrs(&head) >= 0) {
-    for(iface=head; iface != NULL; iface=iface->ifa_next) {
-      if((iface->ifa_addr != NULL) &&
+    for(iface=head; iface != nil; iface=iface->ifa_next) {
+      if((iface->ifa_addr != nil) &&
          (iface->ifa_addr->sa_family == af) &&
          curl_strequal(iface->ifa_name, interf)) {
         void *addr;
@@ -134,7 +134,7 @@ bool Curl_if_is_interface_name(const char *interf)
 
   char *ip = Curl_if2ip(AF_INET, interf, buf, sizeof(buf));
 
-  return (ip != NULL) ? TRUE : FALSE;
+  return (ip != nil) ? TRUE : FALSE;
 }
 
 char *Curl_if2ip(int af, const char *interf, char *buf, int buf_size)
@@ -147,15 +147,15 @@ char *Curl_if2ip(int af, const char *interf, char *buf, int buf_size)
   char *ip;
 
   if(!interf || (af != AF_INET))
-    return NULL;
+    return nil;
 
   len = strlen(interf);
   if(len >= sizeof(req.ifr_name))
-    return NULL;
+    return nil;
 
   dummy = socket(AF_INET, SOCK_STREAM, 0);
   if(CURL_SOCKET_BAD == dummy)
-    return NULL;
+    return nil;
 
   memset(&req, 0, sizeof(req));
   memcpy(req.ifr_name, interf, len+1);
@@ -163,7 +163,7 @@ char *Curl_if2ip(int af, const char *interf, char *buf, int buf_size)
 
   if(ioctl(dummy, SIOCGIFADDR, &req) < 0) {
     sclose(dummy);
-    return NULL;
+    return nil;
   }
 
   s = (struct sockaddr_in *)&req.ifr_addr;
@@ -189,7 +189,7 @@ char *Curl_if2ip(int af, const char *interf, char *buf, int buf_size)
     (void) interf;
     (void) buf;
     (void) buf_size;
-    return NULL;
+    return nil;
 }
 
 #endif

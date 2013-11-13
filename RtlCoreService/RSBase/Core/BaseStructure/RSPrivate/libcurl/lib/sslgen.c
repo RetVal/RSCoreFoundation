@@ -77,7 +77,7 @@ static bool safe_strequal(char* str1, char* str2)
     /* both pointers point to something then compare them */
     return (0 != Curl_raw_equal(str1, str2)) ? TRUE : FALSE;
   else
-    /* if both pointers are NULL then treat them as equal */
+    /* if both pointers are nil then treat them as equal */
     return (!str1 && !str2) ? TRUE : FALSE;
 }
 
@@ -113,7 +113,7 @@ Curl_clone_ssl_config(struct ssl_config_data *source,
       return FALSE;
   }
   else
-    dest->CAfile = NULL;
+    dest->CAfile = nil;
 
   if(source->CApath) {
     dest->CApath = strdup(source->CApath);
@@ -121,7 +121,7 @@ Curl_clone_ssl_config(struct ssl_config_data *source,
       return FALSE;
   }
   else
-    dest->CApath = NULL;
+    dest->CApath = nil;
 
   if(source->cipher_list) {
     dest->cipher_list = strdup(source->cipher_list);
@@ -129,7 +129,7 @@ Curl_clone_ssl_config(struct ssl_config_data *source,
       return FALSE;
   }
   else
-    dest->cipher_list = NULL;
+    dest->cipher_list = nil;
 
   if(source->egdsocket) {
     dest->egdsocket = strdup(source->egdsocket);
@@ -137,7 +137,7 @@ Curl_clone_ssl_config(struct ssl_config_data *source,
       return FALSE;
   }
   else
-    dest->egdsocket = NULL;
+    dest->egdsocket = nil;
 
   if(source->random_file) {
     dest->random_file = strdup(source->random_file);
@@ -145,7 +145,7 @@ Curl_clone_ssl_config(struct ssl_config_data *source,
       return FALSE;
   }
   else
-    dest->random_file = NULL;
+    dest->random_file = nil;
 
   return TRUE;
 }
@@ -239,7 +239,7 @@ int Curl_ssl_getsessionid(struct connectdata *conn,
   long *general_age;
   bool no_match = TRUE;
 
-  *ssl_sessionid = NULL;
+  *ssl_sessionid = nil;
 
   if(!conn->ssl_config.sessionid)
     /* session ID re-use is disabled */
@@ -290,7 +290,7 @@ void Curl_ssl_kill_session(struct curl_ssl_session *session)
     /* free the ID the SSL-layer specific way */
     curlssl_session_free(session->sessionid);
 
-    session->sessionid = NULL;
+    session->sessionid = nil;
     session->age = 0; /* fresh */
 
     Curl_free_ssl_config(&session->ssl_config);
@@ -390,7 +390,7 @@ CURLcode Curl_ssl_addsessionid(struct connectdata *conn,
     Curl_share_unlock(data, CURL_LOCK_DATA_SSL_SESSION);
 
   if(!Curl_clone_ssl_config(&conn->ssl_config, &store->ssl_config)) {
-    store->sessionid = NULL; /* let caller free sessionid */
+    store->sessionid = nil; /* let caller free sessionid */
     free(clone_host);
     return CURLE_OUT_OF_MEMORY;
   }
@@ -510,10 +510,10 @@ void Curl_ssl_free_certinfo(struct SessionHandle *data)
     /* free all individual lists used */
     for(i=0; i<ci->num_of_certs; i++) {
       curl_slist_free_all(ci->certinfo[i]);
-      ci->certinfo[i] = NULL;
+      ci->certinfo[i] = nil;
     }
     free(ci->certinfo); /* free the actual array too */
-    ci->certinfo = NULL;
+    ci->certinfo = nil;
     ci->num_of_certs = 0;
   }
 }

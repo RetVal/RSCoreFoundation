@@ -259,7 +259,7 @@ CURLcode Curl_ntlm_decode_type2_message(struct SessionHandle *data,
   */
 
   size_t size = 0;
-  unsigned char *buffer = NULL;
+  unsigned char *buffer = nil;
   CURLcode error;
 
 #if defined(CURL_DISABLE_VERBOSE_STRINGS) || defined(USE_WINDOWS_SSPI)
@@ -277,7 +277,7 @@ CURLcode Curl_ntlm_decode_type2_message(struct SessionHandle *data,
 
 #ifdef USE_WINDOWS_SSPI
   ntlm->type_2 = malloc(size + 1);
-  if(ntlm->type_2 == NULL) {
+  if(ntlm->type_2 == nil) {
     free(buffer);
     return CURLE_OUT_OF_MEMORY;
   }
@@ -317,7 +317,7 @@ void Curl_ntlm_sspi_cleanup(struct ntlmdata *ntlm)
 {
   if(ntlm->type_2) {
     free(ntlm->type_2);
-    ntlm->type_2 = NULL;
+    ntlm->type_2 = nil;
   }
   if(ntlm->has_handles) {
     s_pSecFn->DeleteSecurityContext(&ntlm->c_handle);
@@ -328,7 +328,7 @@ void Curl_ntlm_sspi_cleanup(struct ntlmdata *ntlm)
     if(ntlm->identity.User) free(ntlm->identity.User);
     if(ntlm->identity.Password) free(ntlm->identity.Password);
     if(ntlm->identity.Domain) free(ntlm->identity.Domain);
-    ntlm->p_identity = NULL;
+    ntlm->p_identity = nil;
   }
 }
 #endif
@@ -431,15 +431,15 @@ CURLcode Curl_ntlm_create_type1_message(const char *userp,
      */
     ntlm->p_identity = &ntlm->identity;
     memset(ntlm->p_identity, 0, sizeof(*ntlm->p_identity));
-    if((ntlm->identity.User = (unsigned char *)strdup(user)) == NULL)
+    if((ntlm->identity.User = (unsigned char *)strdup(user)) == nil)
       return CURLE_OUT_OF_MEMORY;
 
     ntlm->identity.UserLength = (unsigned long)userlen;
-    if((ntlm->identity.Password = (unsigned char *)strdup(passwdp)) == NULL)
+    if((ntlm->identity.Password = (unsigned char *)strdup(passwdp)) == nil)
       return CURLE_OUT_OF_MEMORY;
 
     ntlm->identity.PasswordLength = (unsigned long)strlen(passwdp);
-    if((ntlm->identity.Domain = malloc(domlen + 1)) == NULL)
+    if((ntlm->identity.Domain = malloc(domlen + 1)) == nil)
       return CURLE_OUT_OF_MEMORY;
 
     strncpy((char *)ntlm->identity.Domain, domain, domlen);
@@ -448,11 +448,11 @@ CURLcode Curl_ntlm_create_type1_message(const char *userp,
     ntlm->identity.Flags = SEC_WINNT_AUTH_IDENTITY_ANSI;
   }
   else
-    ntlm->p_identity = NULL;
+    ntlm->p_identity = nil;
 
-  status = s_pSecFn->AcquireCredentialsHandleA(NULL, (void *)"NTLM",
-                                               SECPKG_CRED_OUTBOUND, NULL,
-                                               ntlm->p_identity, NULL, NULL,
+  status = s_pSecFn->AcquireCredentialsHandleA(nil, (void *)"NTLM",
+                                               SECPKG_CRED_OUTBOUND, nil,
+                                               ntlm->p_identity, nil, nil,
                                                &ntlm->handle, &tsDummy);
   if(status != SEC_E_OK)
     return CURLE_OUT_OF_MEMORY;
@@ -464,13 +464,13 @@ CURLcode Curl_ntlm_create_type1_message(const char *userp,
   buf.BufferType = SECBUFFER_TOKEN;
   buf.pvBuffer   = ntlmbuf;
 
-  status = s_pSecFn->InitializeSecurityContextA(&ntlm->handle, NULL,
+  status = s_pSecFn->InitializeSecurityContextA(&ntlm->handle, nil,
                                                 (void *)dest,
                                                 ISC_REQ_CONFIDENTIALITY |
                                                 ISC_REQ_REPLAY_DETECT |
                                                 ISC_REQ_CONNECTION,
                                                 0, SECURITY_NETWORK_DREP,
-                                                NULL, 0,
+                                                nil, 0,
                                                 &ntlm->c_handle, &desc,
                                                 &attrs, &tsDummy);
 
@@ -564,7 +564,7 @@ CURLcode Curl_ntlm_create_type1_message(const char *userp,
   });
 
   /* Return with binary blob encoded into base64 */
-  return Curl_base64_encode(NULL, (char *)ntlmbuf, size, outptr, outlen);
+  return Curl_base64_encode(nil, (char *)ntlmbuf, size, outptr, outlen);
 }
 
 /*
@@ -966,7 +966,7 @@ CURLcode Curl_ntlm_create_type3_message(struct SessionHandle *data,
 #endif
 
   /* Return with binary blob encoded into base64 */
-  return Curl_base64_encode(NULL, (char *)ntlmbuf, size, outptr, outlen);
+  return Curl_base64_encode(nil, (char *)ntlmbuf, size, outptr, outlen);
 }
 
 #endif /* USE_NTLM */

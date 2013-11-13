@@ -74,7 +74,7 @@ static const void *__RSGetSectDataPtr(const char *segname, const char *sectname,
         return (char *)sect->addr + _dyld_get_image_vmaddr_slide(idx);
     }
     if (sizep) *sizep = 0ULL;
-    return NULL;
+    return nil;
 }
 #endif
 
@@ -123,7 +123,7 @@ static int __nNumStateEntries = -1;
 CRITICAL_SECTION __bitmapStateLock = {0};
 
 BOOL __GetBitmapStateForName(const wchar_t *bitmapName) {
-    if (NULL == __bitmapStateLock.DebugInfo)
+    if (nil == __bitmapStateLock.DebugInfo)
         InitializeCriticalSection(&__bitmapStateLock);
     EnterCriticalSection(&__bitmapStateLock);
     if (__nNumStateEntries >= 0) {
@@ -138,7 +138,7 @@ BOOL __GetBitmapStateForName(const wchar_t *bitmapName) {
     return NO;
 }
 void __AddBitmapStateForName(const wchar_t *bitmapName) {
-    if (NULL == __bitmapStateLock.DebugInfo)
+    if (nil == __bitmapStateLock.DebugInfo)
         InitializeCriticalSection(&__bitmapStateLock);
     EnterCriticalSection(&__bitmapStateLock);
     __nNumStateEntries++;
@@ -156,31 +156,31 @@ static BOOL __RSUniCharLoadBytesFromFile(const wchar_t *fileName, const void **b
 #error Unknown or unspecified DEPLOYMENT_TARGET
 #endif
 #if DEPLOYMENT_TARGET_WINDOWS
-    HANDLE bitmapFileHandle = NULL;
-    HANDLE mappingHandle = NULL;
+    HANDLE bitmapFileHandle = nil;
+    HANDLE mappingHandle = nil;
     
     if (__GetBitmapStateForName(fileName)) {
         // The fileName has been tried in the past, so just return NO
         // and move on.
-        *bytes = NULL;
+        *bytes = nil;
         return NO;
     }
     mappingHandle = OpenFileMappingW(FILE_MAP_READ, TRUE, fileName);
-    if (NULL == mappingHandle) {
-        if ((bitmapFileHandle = CreateFileW(fileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE) {
+    if (nil == mappingHandle) {
+        if ((bitmapFileHandle = CreateFileW(fileName, GENERIC_READ, FILE_SHARE_READ, nil, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nil)) == INVALID_HANDLE_VALUE) {
             // We tried to get the bitmap file for mapping, but it's not there.  Add to list of non-existant bitmap-files so
             // we don't have to try this again in the future.
             __AddBitmapStateForName(fileName);
             return NO;
         }
-        mappingHandle = CreateFileMapping(bitmapFileHandle, NULL, PAGE_READONLY, 0, 0, NULL);
+        mappingHandle = CreateFileMapping(bitmapFileHandle, nil, PAGE_READONLY, 0, 0, nil);
         CloseHandle(bitmapFileHandle);
         if (!mappingHandle) return NO;
     }
     
     *bytes = MapViewOfFileEx(mappingHandle, FILE_MAP_READ, 0, 0, 0, 0);
     
-    if (NULL != fileSize) {
+    if (nil != fileSize) {
         MEMORY_BASIC_INFORMATION memoryInfo;
         
         if (0 == VirtualQueryEx(mappingHandle, *bytes, &memoryInfo, sizeof(memoryInfo))) {
@@ -206,7 +206,7 @@ static BOOL __RSUniCharLoadBytesFromFile(const wchar_t *fileName, const void **b
     }
     close(fd);
     
-    if (NULL != fileSize) *fileSize = statBuf.st_size;
+    if (nil != fileSize) *fileSize = statBuf.st_size;
     
     return YES;
 #endif
@@ -222,9 +222,9 @@ static BOOL __RSUniCharLoadFile(const wchar_t *bitmapName, const void **bytes, i
 #error Unknown or unspecified DEPLOYMENT_TARGET
 #endif
 #if USE_MACHO_SEGMENT
-    *bytes = __RSGetSectDataPtr("__UNICODE", bitmapName, NULL);
+    *bytes = __RSGetSectDataPtr("__UNICODE", bitmapName, nil);
     
-    if (NULL != fileSize) *fileSize = 0;
+    if (nil != fileSize) *fileSize = 0;
     
     return *bytes ? YES : NO;
 #else
@@ -300,7 +300,7 @@ typedef struct {
 static char __RSUniCharUnicodeVersionString[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 static uint32_t __RSUniCharNumberOfBitmaps = 0;
-static __RSUniCharBitmapData *__RSUniCharBitmapDataArray = NULL;
+static __RSUniCharBitmapData *__RSUniCharBitmapDataArray = nil;
 
 static RSSpinLock __RSUniCharBitmapLock = RSSpinLockInit;
             
@@ -376,7 +376,7 @@ static BOOL __RSUniCharLoadBitmapData(void) {
 #endif
                 
             } else {
-                array[idx]._planes[bitmapIndex] = NULL;
+                array[idx]._planes[bitmapIndex] = nil;
             }
         }
     }
@@ -389,7 +389,7 @@ static BOOL __RSUniCharLoadBitmapData(void) {
 }
             
 RSPrivate const char *__RSUniCharGetUnicodeVersionString(void) {
-    if (NULL == __RSUniCharBitmapDataArray) __RSUniCharLoadBitmapData();
+    if (nil == __RSUniCharBitmapDataArray) __RSUniCharLoadBitmapData();
     return __RSUniCharUnicodeVersionString;
 }
             
@@ -398,18 +398,18 @@ BOOL RSUniCharIsMemberOf(UTF32Char theChar, uint32_t charset) {
     
     switch (charset) {
         case RSUniCharWhitespaceCharacterSet:
-            return isWhitespace(theChar, charset, NULL);
+            return isWhitespace(theChar, charset, nil);
             
         case RSUniCharWhitespaceAndNewlineCharacterSet:
-            return isWhitespaceAndNewline(theChar, charset, NULL);
+            return isWhitespaceAndNewline(theChar, charset, nil);
             
         case RSUniCharNewlineCharacterSet:
-            return isNewline(theChar, charset, NULL);
+            return isNewline(theChar, charset, nil);
             
         default: {
             uint32_t tableIndex = __RSUniCharMapExternalSetToInternalIndex(charset);
             
-            if (NULL == __RSUniCharBitmapDataArray) __RSUniCharLoadBitmapData();
+            if (nil == __RSUniCharBitmapDataArray) __RSUniCharLoadBitmapData();
             
             if (tableIndex < __RSUniCharNumberOfBitmaps) {
                 __RSUniCharBitmapData *data = __RSUniCharBitmapDataArray + tableIndex;
@@ -442,7 +442,7 @@ BOOL RSUniCharIsMemberOf(UTF32Char theChar, uint32_t charset) {
 }
             
 const uint8_t *RSUniCharGetBitmapPtrForPlane(uint32_t charset, uint32_t plane) {
-    if (NULL == __RSUniCharBitmapDataArray) __RSUniCharLoadBitmapData();
+    if (nil == __RSUniCharBitmapDataArray) __RSUniCharLoadBitmapData();
     
     charset = __RSUniCharMapCompatibilitySetID(charset);
     
@@ -452,10 +452,10 @@ const uint8_t *RSUniCharGetBitmapPtrForPlane(uint32_t charset, uint32_t plane) {
         if (tableIndex < __RSUniCharNumberOfBitmaps) {
             __RSUniCharBitmapData *data = __RSUniCharBitmapDataArray + tableIndex;
             
-            return (plane < data->_numPlanes ? data->_planes[plane] : NULL);
+            return (plane < data->_numPlanes ? data->_planes[plane] : nil);
         }
     }
-    return NULL;
+    return nil;
 }
             
 RSPrivate uint8_t RSUniCharGetBitmapForPlane(uint32_t charset, uint32_t plane, void *bitmap, BOOL isInverted) {
@@ -596,7 +596,7 @@ RSPrivate uint32_t RSUniCharGetNumberOfPlanes(uint32_t charset) {
     } else {
         uint32_t numPlanes;
         
-        if (NULL == __RSUniCharBitmapDataArray) __RSUniCharLoadBitmapData();
+        if (nil == __RSUniCharBitmapDataArray) __RSUniCharLoadBitmapData();
         
         numPlanes = __RSUniCharBitmapDataArray[__RSUniCharMapExternalSetToInternalIndex(__RSUniCharMapCompatibilitySetID(charset))]._numPlanes;
         
@@ -605,7 +605,7 @@ RSPrivate uint32_t RSUniCharGetNumberOfPlanes(uint32_t charset) {
 }
 
 // Mapping data loading
-static const void **__RSUniCharMappingTables = NULL;
+static const void **__RSUniCharMappingTables = nil;
 
 static RSSpinLock __RSUniCharMappingTableLock = RSSpinLockInit;
             
@@ -646,7 +646,7 @@ RSPrivate const void *RSUniCharGetMappingData(uint32_t type) {
     
     RSSpinLockLock(&__RSUniCharMappingTableLock);
     
-    if (NULL == __RSUniCharMappingTables) {
+    if (nil == __RSUniCharMappingTables) {
         const void *bytes;
         const void *bodyBase;
         int headerSize;
@@ -655,7 +655,7 @@ RSPrivate const void *RSUniCharGetMappingData(uint32_t type) {
         
         if (!__RSUniCharLoadFile(MAPPING_TABLE_FILE, &bytes, &fileSize) || !__RSSimpleFileSizeVerification(bytes, fileSize)) {
             RSSpinLockUnlock(&__RSUniCharMappingTableLock);
-            return NULL;
+            return nil;
         }
         
 #if defined (__cplusplus)
@@ -689,9 +689,9 @@ RSPrivate const void *RSUniCharGetMappingData(uint32_t type) {
             // Case mapping functions
 #define DO_SPECIAL_CASE_MAPPING 1
             
-static uint32_t *__RSUniCharCaseMappingTableCounts = NULL;
-static uint32_t **__RSUniCharCaseMappingTable = NULL;
-static const uint32_t **__RSUniCharCaseMappingExtraTable = NULL;
+static uint32_t *__RSUniCharCaseMappingTableCounts = nil;
+static uint32_t **__RSUniCharCaseMappingTable = nil;
+static const uint32_t **__RSUniCharCaseMappingExtraTable = nil;
             
 typedef struct {
     uint32_t _key;
@@ -722,8 +722,8 @@ static BOOL __RSUniCharLoadCaseMappingTable(void) {
     uint32_t *countArray;
     int idx;
     
-    if (NULL == __RSUniCharMappingTables) (void)RSUniCharGetMappingData(RSUniCharToLowercase);
-    if (NULL == __RSUniCharMappingTables) return NO;
+    if (nil == __RSUniCharMappingTables) (void)RSUniCharGetMappingData(RSUniCharToLowercase);
+    if (nil == __RSUniCharMappingTables) return NO;
     
     RSSpinLockLock(&__RSUniCharMappingTableLock);
     
@@ -904,7 +904,7 @@ caseFoldRetry:
     }
 #endif // DO_SPECIAL_CASE_MAPPING
     
-    if (NULL == __RSUniCharBitmapDataArray) __RSUniCharLoadBitmapData();
+    if (nil == __RSUniCharBitmapDataArray) __RSUniCharLoadBitmapData();
     
     data = __RSUniCharBitmapDataArray + __RSUniCharMapExternalSetToInternalIndex(__RSUniCharMapCompatibilitySetID(ctype + RSUniCharHasNonSelfLowercaseCharacterSet));
     
@@ -988,7 +988,7 @@ RSIndex RSUniCharMapTo(UniChar theChar, UniChar *convertedChar, RSIndex maxLengt
             return 1;
         }
     } else {
-        return RSUniCharMapCaseTo(theChar, convertedChar, maxLength, ctype, flags, NULL);
+        return RSUniCharMapCaseTo(theChar, convertedChar, maxLength, ctype, flags, nil);
     }
 }
             
@@ -1134,7 +1134,7 @@ RSPrivate uint32_t RSUniCharGetConditionalCaseMappingFlags(UTF32Char theChar, UT
 }
             
 // Unicode property database
-static __RSUniCharBitmapData *__RSUniCharUnicodePropertyTable = NULL;
+static __RSUniCharBitmapData *__RSUniCharUnicodePropertyTable = nil;
 static int __RSUniCharUnicodePropertyTableCount = 0;
 
 static RSSpinLock __RSUniCharPropTableLock = RSSpinLockInit;
@@ -1159,7 +1159,7 @@ const void *RSUniCharGetUnicodePropertyDataForPlane(uint32_t propertyType, uint3
     
     RSSpinLockLock(&__RSUniCharPropTableLock);
     
-    if (NULL == __RSUniCharUnicodePropertyTable) {
+    if (nil == __RSUniCharUnicodePropertyTable) {
         __RSUniCharBitmapData *table;
         const void *bytes;
         const void *bodyBase;
@@ -1172,7 +1172,7 @@ const void *RSUniCharGetUnicodePropertyDataForPlane(uint32_t propertyType, uint3
         
         if (!__RSUniCharLoadFile(PROP_DB_FILE, &bytes, &fileSize) || !__RSSimpleFileSizeVerification(bytes, fileSize)) {
             RSSpinLockUnlock(&__RSUniCharPropTableLock);
-            return NULL;
+            return nil;
         }
         
 #if defined (__cplusplus)
@@ -1205,7 +1205,7 @@ const void *RSUniCharGetUnicodePropertyDataForPlane(uint32_t propertyType, uint3
                     planeBase += (planeSize * 256);
 #endif
                 } else {
-                    table[idx]._planes[planeIndex] = NULL;
+                    table[idx]._planes[planeIndex] = nil;
                 }
             }
             
@@ -1223,7 +1223,7 @@ const void *RSUniCharGetUnicodePropertyDataForPlane(uint32_t propertyType, uint3
     
     RSSpinLockUnlock(&__RSUniCharPropTableLock);
     
-    return (plane < __RSUniCharUnicodePropertyTable[propertyType]._numPlanes ? __RSUniCharUnicodePropertyTable[propertyType]._planes[plane] : NULL);
+    return (plane < __RSUniCharUnicodePropertyTable[propertyType]._numPlanes ? __RSUniCharUnicodePropertyTable[propertyType]._planes[plane] : nil);
 }
             
 RSPrivate uint32_t RSUniCharGetNumberOfPlanesForUnicodePropertyData(uint32_t propertyType) {
@@ -1368,14 +1368,14 @@ void __RSUniCharCleanup(void)
     // cleanup memory allocated by __RSUniCharLoadBitmapData()
     RSSpinLockLock(&__RSUniCharBitmapLock);
     
-    if (__RSUniCharBitmapDataArray != NULL) {
+    if (__RSUniCharBitmapDataArray != nil) {
         for (idx = 0; idx < (int)__RSUniCharNumberOfBitmaps; idx++) {
             RSAllocatorDeallocate(RSAllocatorSystemDefault, __RSUniCharBitmapDataArray[idx]._planes);
-            __RSUniCharBitmapDataArray[idx]._planes = NULL;
+            __RSUniCharBitmapDataArray[idx]._planes = nil;
         }
         
         RSAllocatorDeallocate(RSAllocatorSystemDefault, __RSUniCharBitmapDataArray);
-        __RSUniCharBitmapDataArray = NULL;
+        __RSUniCharBitmapDataArray = nil;
         __RSUniCharNumberOfBitmaps = 0;
     }
     
@@ -1384,18 +1384,18 @@ void __RSUniCharCleanup(void)
     // cleanup memory allocated by RSUniCharGetMappingData()
     RSSpinLockLock(&__RSUniCharMappingTableLock);
     
-    if (__RSUniCharMappingTables != NULL) {
+    if (__RSUniCharMappingTables != nil) {
         RSAllocatorDeallocate(RSAllocatorSystemDefault, __RSUniCharMappingTables);
-        __RSUniCharMappingTables = NULL;
+        __RSUniCharMappingTables = nil;
     }
     
     // cleanup memory allocated by __RSUniCharLoadCaseMappingTable()
-    if (__RSUniCharCaseMappingTableCounts != NULL) {
+    if (__RSUniCharCaseMappingTableCounts != nil) {
         RSAllocatorDeallocate(RSAllocatorSystemDefault, __RSUniCharCaseMappingTableCounts);
-        __RSUniCharCaseMappingTableCounts = NULL;
+        __RSUniCharCaseMappingTableCounts = nil;
         
-        __RSUniCharCaseMappingTable = NULL;
-        __RSUniCharCaseMappingExtraTable = NULL;
+        __RSUniCharCaseMappingTable = nil;
+        __RSUniCharCaseMappingExtraTable = nil;
     }
     
     RSSpinLockUnlock(&__RSUniCharMappingTableLock);
@@ -1403,14 +1403,14 @@ void __RSUniCharCleanup(void)
     // cleanup memory allocated by RSUniCharGetUnicodePropertyDataForPlane()
     RSSpinLockLock(&__RSUniCharPropTableLock);
     
-    if (__RSUniCharUnicodePropertyTable != NULL) {
+    if (__RSUniCharUnicodePropertyTable != nil) {
         for (idx = 0; idx < __RSUniCharUnicodePropertyTableCount; idx++) {
             RSAllocatorDeallocate(RSAllocatorSystemDefault, __RSUniCharUnicodePropertyTable[idx]._planes);
-            __RSUniCharUnicodePropertyTable[idx]._planes = NULL;
+            __RSUniCharUnicodePropertyTable[idx]._planes = nil;
         }
         
         RSAllocatorDeallocate(RSAllocatorSystemDefault, __RSUniCharUnicodePropertyTable);
-        __RSUniCharUnicodePropertyTable = NULL;
+        __RSUniCharUnicodePropertyTable = nil;
         __RSUniCharUnicodePropertyTableCount = 0;
     }
     

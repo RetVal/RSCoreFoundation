@@ -10,7 +10,7 @@
 #include <RSCoreFoundation/RSData+Extension.h>
 #include <RSCoreFoundation/RSString+Extension.h>
 
-RSExport RSStringRef RSStringWithUTF8String(UTF8Char* nullTerminatingString)
+RSExport RSStringRef RSStringWithUTF8String(const char* nullTerminatingString)
 {
     return RSStringWithCString((RSCBuffer)nullTerminatingString, RSStringEncodingUTF8);
 }

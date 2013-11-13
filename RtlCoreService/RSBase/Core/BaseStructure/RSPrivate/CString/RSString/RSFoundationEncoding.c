@@ -86,7 +86,7 @@ RSExport RSStringEncoding RSStringGetSystemEncoding(void) {
     if (__RSDefaultSystemEncoding == RSStringEncodingInvalidId) {
         __RSDefaultSystemEncoding = __defaultEncoding;
         const RSStringEncodingConverter *converter = RSStringEncodingGetConverter(__RSDefaultSystemEncoding);
-        __RSSetCharToUniCharFunc(converter->encodingClass == RSStringEncodingConverterCheapEightBit ? (UNI_CHAR_FUNC)converter->toUnicode : NULL);
+        __RSSetCharToUniCharFunc(converter->encodingClass == RSStringEncodingConverterCheapEightBit ? (UNI_CHAR_FUNC)converter->toUnicode : nil);
     }
     return __RSDefaultSystemEncoding;
 }
@@ -179,7 +179,7 @@ BOOL __RSStringDecodeByteStream3(const uint8_t *bytes, RSIndex len, RSStringEnco
 #else
             if (bom != 0xFEFF) swap = YES;
 #endif
-            if (bom) useClientsMemoryPtr = NULL;
+            if (bom) useClientsMemoryPtr = nil;
         } else {
 #if __RS_BIG_ENDIAN__
             if (RSStringEncodingUTF16LE == encoding) swap = YES;
@@ -218,7 +218,7 @@ BOOL __RSStringDecodeByteStream3(const uint8_t *bytes, RSIndex len, RSStringEnco
             if (buffer->isASCII)
             {
                 uint8_t *dst;
-                if (NULL == buffer->chars.ascii)
+                if (nil == buffer->chars.ascii)
                 {
                     // we never reallocate when buffer is supplied
                     if (buffer->numChars > MAX_LOCAL_CHARS)
@@ -244,7 +244,7 @@ BOOL __RSStringDecodeByteStream3(const uint8_t *bytes, RSIndex len, RSStringEnco
             {
                 UTF16Char *dst;
                 
-                if (NULL == buffer->chars.unicode)
+                if (nil == buffer->chars.unicode)
                 {
                     // we never reallocate when buffer is supplied
                     if (buffer->numChars > MAX_LOCAL_UNICHARS)
@@ -317,7 +317,7 @@ BOOL __RSStringDecodeByteStream3(const uint8_t *bytes, RSIndex len, RSStringEnco
         if (buffer->isASCII)
         {
             uint8_t *dst;
-            if (NULL == buffer->chars.ascii)
+            if (nil == buffer->chars.ascii)
             {
                 // we never reallocate when buffer is supplied
                 if (buffer->numChars > MAX_LOCAL_CHARS)
@@ -344,7 +344,7 @@ BOOL __RSStringDecodeByteStream3(const uint8_t *bytes, RSIndex len, RSStringEnco
         }
         else
         {
-            if (NULL == buffer->chars.unicode)
+            if (nil == buffer->chars.unicode)
             {
                 // we never reallocate when buffer is supplied
                 if (buffer->numChars > MAX_LOCAL_UNICHARS)
@@ -387,7 +387,7 @@ BOOL __RSStringDecodeByteStream3(const uint8_t *bytes, RSIndex len, RSStringEnco
         else
         {
             RSIndex numDone;
-            static RSStringEncodingToUnicodeProc __RSFromUTF8 = NULL;
+            static RSStringEncodingToUnicodeProc __RSFromUTF8 = nil;
             
             if (!__RSFromUTF8)
             {
@@ -595,7 +595,7 @@ BOOL __RSStringDecodeByteStream3(const uint8_t *bytes, RSIndex len, RSStringEnco
                 
                 if (lossyFlag == (UInt32)-1) lossyFlag = 0;
                 
-                if (RSStringEncodingBytesToUnicode(encoding, lossyFlag|__RSGetASCIICompatibleFlag(), bytes, len, NULL, buffer->chars.unicode, (guessedLength > MAX_LOCAL_UNICHARS ? guessedLength : MAX_LOCAL_UNICHARS), &(buffer->numChars))) result = NO;
+                if (RSStringEncodingBytesToUnicode(encoding, lossyFlag|__RSGetASCIICompatibleFlag(), bytes, len, nil, buffer->chars.unicode, (guessedLength > MAX_LOCAL_UNICHARS ? guessedLength : MAX_LOCAL_UNICHARS), &(buffer->numChars))) result = NO;
             }
         }
     }
@@ -607,7 +607,7 @@ BOOL __RSStringDecodeByteStream3(const uint8_t *bytes, RSIndex len, RSStringEnco
         if (buffer->shouldFreeChars && buffer->chars.unicode) RSAllocatorDeallocate(buffer->allocator, buffer->chars.unicode);
         buffer->isASCII = !alwaysUnicode;
         buffer->shouldFreeChars = NO;
-        buffer->chars.ascii = NULL;
+        buffer->chars.ascii = nil;
         buffer->numChars = 0;
     }
     return result;
@@ -621,7 +621,7 @@ RSExport RSIndex __RSStringEncodeByteStream(RSStringRef string, RSIndex rangeLoc
     
     if (encoding == RSStringEncodingUTF8 && (unichars = RSStringGetCharactersPtr(string)))
     {
-        static RSStringEncodingToBytesProc __RSToUTF8 = NULL;
+        static RSStringEncodingToBytesProc __RSToUTF8 = nil;
         
         if (!__RSToUTF8)
         {
@@ -795,7 +795,7 @@ RSExport RSIndex __RSStringEncodeByteStream(RSStringRef string, RSIndex rangeLoc
     {
         RSIndex numChars;
         UInt32 flags;
-        const unsigned char *cString = NULL;
+        const unsigned char *cString = nil;
         BOOL isASCIISuperset = __RSStringEncodingIsSupersetOfASCII(encoding);
         
         if (!RSStringEncodingIsValidEncoding(encoding)) return 0;
@@ -809,7 +809,7 @@ RSExport RSIndex __RSStringEncodeByteStream(RSStringRef string, RSIndex rangeLoc
                 ptr = (cString += rangeLoc);
                 if (__RSStringGetEightBitStringEncoding() == encoding)
                 {
-                    numCharsProcessed = (rangeLen < max || buffer == NULL ? rangeLen : max);
+                    numCharsProcessed = (rangeLen < max || buffer == nil ? rangeLen : max);
                     if (buffer) memmove(buffer, cString, numCharsProcessed);
                     if (usedBufLen) *usedBufLen = numCharsProcessed;
                     return numCharsProcessed;
@@ -843,7 +843,7 @@ RSExport RSIndex __RSStringEncodeByteStream(RSStringRef string, RSIndex rangeLoc
                 ptr = (cString += (rangeLoc + 1));
                 if (__RSStringGetEightBitStringEncoding() == encoding)
                 {
-                    numCharsProcessed = (rangeLen < max || buffer == NULL ? rangeLen : max);
+                    numCharsProcessed = (rangeLen < max || buffer == nil ? rangeLen : max);
                     if (buffer) memmove(buffer, cString, numCharsProcessed);
                     if (usedBufLen) *usedBufLen = numCharsProcessed;
                     return numCharsProcessed;
@@ -933,13 +933,13 @@ RSExport RSIndex __RSStringEncodeByteStream(RSStringRef string, RSIndex rangeLoc
                                 // Try if the composed range can be converted
                                 RSStringGetCharacters(string, composedRange, charBuf);
                                 
-                                if (RSStringEncodingUnicodeToBytes(encoding, flags, charBuf, composedRange.length, &numChars, NULL, 0, &usedLen) == RSStringEncodingConversionSuccess) { // OK let's try the last run
+                                if (RSStringEncodingUnicodeToBytes(encoding, flags, charBuf, composedRange.length, &numChars, nil, 0, &usedLen) == RSStringEncodingConversionSuccess) { // OK let's try the last run
                                     RSIndex lastRangeLoc = rangeLoc - lastNumChars;
                                     
                                     currentLength = composedRange.location - lastRangeLoc;
                                     RSStringGetCharacters(string, RSMakeRange(lastRangeLoc, currentLength), charBuf);
                                     
-                                    result = RSStringEncodingUnicodeToBytes(encoding, flags|streamingMask, charBuf, currentLength, &numChars, (max ? buffer - lastUsedLen : NULL), (max ? max + lastUsedLen : 0), &usedLen);
+                                    result = RSStringEncodingUnicodeToBytes(encoding, flags|streamingMask, charBuf, currentLength, &numChars, (max ? buffer - lastUsedLen : nil), (max ? max + lastUsedLen : 0), &usedLen);
                                     streamID = RSStringEncodingStreamIDFromMask(result);
                                     result &= ~RSStringEncodingStreamIDMask;
                                     

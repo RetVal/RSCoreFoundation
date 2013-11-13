@@ -289,6 +289,8 @@ curl_easy_strerror(CURLcode error)
         case CURLE_CHUNK_FAILED:
             return "Chunk callback failed";
             
+        case CURLE_NO_CONNECTION_AVAILABLE:
+            return "No Connection Available";
             /* error codes not used by current libcurl */
         case CURLE_OBSOLETE16:
         case CURLE_OBSOLETE20:
@@ -580,11 +582,11 @@ get_winsock_error (int err, char *buf, size_t len)
             break;
             
         default:
-            return NULL;
+            return nil;
     }
 #else
     if(err == CURLE_OK)
-        return NULL;
+        return nil;
     else
         p = "error";
 #endif
@@ -625,8 +627,8 @@ const char *Curl_strerror(struct connectdata *conn, int err)
         wchar_t wbuf[256];
         wbuf[0] = L'\0';
         
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err,
-                      LANG_NEUTRAL, wbuf, sizeof(wbuf)/sizeof(wchar_t), NULL);
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nil, err,
+                      LANG_NEUTRAL, wbuf, sizeof(wbuf)/sizeof(wchar_t), nil);
         wcstombs(buf,wbuf,max);
     }
 #else
@@ -635,8 +637,8 @@ const char *Curl_strerror(struct connectdata *conn, int err)
         strncpy(buf, strerror(err), max);
     else {
         if(!get_winsock_error(err, buf, max) &&
-           !FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err,
-                          LANG_NEUTRAL, buf, (DWORD)max, NULL))
+           !FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nil, err,
+                          LANG_NEUTRAL, buf, (DWORD)max, nil))
             snprintf(buf, max, "Unknown error %d (%#x)", err, err);
     }
 #endif
@@ -657,7 +659,7 @@ const char *Curl_strerror(struct connectdata *conn, int err)
     /*
      * The glibc-style strerror_r() only *might* use the buffer we pass to
      * the function, but it always returns the error message as a pointer,
-     * so we must copy that string unconditionally (if non-NULL).
+     * so we must copy that string unconditionally (if non-nil).
      */
     {
         char buffer[256];
@@ -694,9 +696,9 @@ const char *Curl_strerror(struct connectdata *conn, int err)
     buf[max] = '\0'; /* make sure the string is zero terminated */
     
     /* strip trailing '\r\n' or '\n'. */
-    if((p = strrchr(buf,'\n')) != NULL && (p - buf) >= 2)
+    if((p = strrchr(buf,'\n')) != nil && (p - buf) >= 2)
         *p = '\0';
-    if((p = strrchr(buf,'\r')) != NULL && (p - buf) >= 1)
+    if((p = strrchr(buf,'\r')) != nil && (p - buf) >= 1)
         *p = '\0';
     
     if(old_errno != ERRNO)
@@ -765,7 +767,7 @@ const char *Curl_idn_strerror (struct connectdata *conn, int err)
             break;
         default:
             snprintf(buf, max, "error %d", err);
-            str = NULL;
+            str = nil;
             break;
     }
 #else

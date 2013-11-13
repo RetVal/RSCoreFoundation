@@ -266,8 +266,6 @@ RSExport RSTypeRef __RSRuntimeCreateInstance(RSAllocatorRef allocator, RSTypeID 
 #if __RSRuntimeInstanceManageWatcher
             __RSCLog(RSLogLevelDebug, "%s alloc - <%p>\n", cls->className, obj);
 #endif
-            if (cls->refcount) ((RSRuntimeBase*)obj)->_rsinfo._customRef = 1;
-            else ((RSRuntimeBase*)obj)->_rsinfo._customRef = 0;
         }
     }
 #if defined(RSAutoMemoryLog)
@@ -826,8 +824,11 @@ extern void __RSCalendarInitialize();
 //extern void __RSBaseHeapInitialize();
 extern void __RSUUIDInitialize();
 extern void __RSRunLoopInitialize();
-extern void __RSSocketInitialize();
 extern void __RSRunLoopSourceInitialize();
+extern void __RSRunLoopObserverInitialize();
+extern void __RSRunLoopTimerInitialize();
+
+extern void __RSSocketInitialize();
 extern void __RSBasicHashInitialize();
 extern void __RSSetInitialize();
 extern void __RSErrorInitialize();
@@ -915,12 +916,16 @@ RSExport __RS_INIT_ROUTINE(RSRuntimePriority) void RSCoreFoundationInitialize()
     __RSJSONSerializationInitialize(); // not register class
 //    __RSBaseHeapInitialize();   //  27
     
-    __RSRunLoopInitialize();    //  27  rely on RSDictionary, RSArray, RSString, RSUUID.
-    __RSRunLoopSourceInitialize();//28  do for the RSRunLoop.
-    __RSURLInitialize();        // 29
+    __RSRuntimeClassTableCount = 40;
+    __RSRunLoopInitialize();
+    __RSRunLoopSourceInitialize();
+    __RSRunLoopObserverInitialize();
+    __RSRunLoopTimerInitialize();
+    
+    __RSURLInitialize();
     
     
-    __RSSocketInitialize();     //  30  run in the RunLoop by RunLoopSource.
+    __RSSocketInitialize();
     
     
     

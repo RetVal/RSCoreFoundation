@@ -223,7 +223,7 @@ int init_thread_sync_data(struct thread_sync_data * tsd,
 #endif
     
     tsd->mtx = malloc(sizeof(curl_mutex_t));
-    if(tsd->mtx == NULL)
+    if(tsd->mtx == nil)
         goto err_exit;
     
     Curl_mutex_init(tsd->mtx);
@@ -252,9 +252,9 @@ static int getaddrinfo_complete(struct connectdata *conn)
     
     rc = Curl_addrinfo_callback(conn, tsd->sock_error, tsd->res);
     /* The tsd->res structure has been copied to async.dns and perhaps the DNS
-     cache.  Set our copy to NULL so destroy_thread_sync_data doesn't free it.
+     cache.  Set our copy to nil so destroy_thread_sync_data doesn't free it.
      */
-    tsd->res = NULL;
+    tsd->res = nil;
     
     return rc;
 }
@@ -335,8 +335,8 @@ static void destroy_async_data (struct Curl_async *async)
         
         free(async->os_specific);
     }
-    async->hostname = NULL;
-    async->os_specific = NULL;
+    async->hostname = nil;
+    async->os_specific = nil;
 }
 
 /*
@@ -359,7 +359,7 @@ static bool init_resolve_thread (struct connectdata *conn,
     conn->async.port = port;
     conn->async.done = FALSE;
     conn->async.status = 0;
-    conn->async.dns = NULL;
+    conn->async.dns = nil;
     td->thread_hnd = curl_thread_t_null;
     
     if(!init_thread_sync_data(&td->tsd, hostname, port, hints))
@@ -456,7 +456,7 @@ static const char *gai_strerror(int ecode)
      * waits for a resolve to finish. This function should be avoided since using
      * this risk getting the multi interface to "hang".
      *
-     * If 'entry' is non-NULL, make it point to the resolved dns entry
+     * If 'entry' is non-nil, make it point to the resolved dns entry
      *
      * This is the version for resolves-in-a-thread.
      */
@@ -511,7 +511,7 @@ static const char *gai_strerror(int ecode)
         struct thread_data   *td = (struct thread_data*) conn->async.os_specific;
         int done = 0;
         
-        *entry = NULL;
+        *entry = nil;
         
         if(!td) {
             DEBUGASSERT(td);
@@ -583,9 +583,9 @@ static const char *gai_strerror(int ecode)
             return Curl_ip2addr(AF_INET, &in, hostname, port);
         
         /* fire up a new resolver thread! */
-        if(init_resolve_thread(conn, hostname, port, NULL)) {
+        if(init_resolve_thread(conn, hostname, port, nil)) {
             *waitp = 1; /* expect asynchronous response */
-            return NULL;
+            return nil;
         }
         
         /* fall-back to blocking version */
@@ -655,7 +655,7 @@ static const char *gai_strerror(int ecode)
         /* fire up a new resolver thread! */
         if(init_resolve_thread(conn, hostname, port, &hints)) {
             *waitp = 1; /* expect asynchronous response */
-            return NULL;
+            return nil;
         }
         
         /* fall-back to blocking version */
@@ -666,7 +666,7 @@ static const char *gai_strerror(int ecode)
         if(error) {
             infof(conn->data, "getaddrinfo() failed for %s:%d; %s\n",
                   hostname, port, Curl_strerror(conn, SOCKERRNO));
-            return NULL;
+            return nil;
         }
         return res;
     }

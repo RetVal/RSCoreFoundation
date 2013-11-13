@@ -209,7 +209,7 @@ static void showtime(struct SessionHandle *data,
 static gnutls_datum load_file (const char *file)
 {
   FILE *f;
-  gnutls_datum loaded_file = { NULL, 0 };
+  gnutls_datum loaded_file = { nil, 0 };
   long filelen;
   void *ptr;
 
@@ -253,7 +253,7 @@ static CURLcode handshake(struct connectdata *conn,
 
   for(;;) {
     /* check allowed time left */
-    timeout_ms = Curl_timeleft(data, NULL, duringconnect);
+    timeout_ms = Curl_timeleft(data, nil, duringconnect);
 
     if(timeout_ms < 0) {
       /* no need to continue if time already is up */
@@ -564,7 +564,7 @@ gtls_connect_step3(struct connectdata *conn,
        data->set.ssl.issuercert) {
 #ifdef USE_TLS_SRP
       if(data->set.ssl.authtype == CURL_TLSAUTH_SRP
-         && data->set.ssl.username != NULL
+         && data->set.ssl.username != nil
          && !data->set.ssl.verifypeer
          && gnutls_cipher_get(session)) {
         /* no peer cert, but auth is ok if we have SRP user and cipher and no
@@ -676,7 +676,7 @@ gtls_connect_step3(struct connectdata *conn,
     return CURLE_SSL_CONNECT_ERROR;
   }
 
-  if(certclock < time(NULL)) {
+  if(certclock < time(nil)) {
     if(data->set.ssl.verifypeer) {
       failf(data, "server certificate expiration date has passed.");
       return CURLE_PEER_FAILED_VERIFICATION;
@@ -694,7 +694,7 @@ gtls_connect_step3(struct connectdata *conn,
     return CURLE_SSL_CONNECT_ERROR;
   }
 
-  if(certclock > time(NULL)) {
+  if(certclock > time(nil)) {
     if(data->set.ssl.verifypeer) {
       failf(data, "server certificate not activated yet.");
       return CURLE_PEER_FAILED_VERIFICATION;
@@ -746,7 +746,7 @@ after_server_cert_verification:
 
   /* compression algorithm (if any) */
   ptr = gnutls_compression_get_name(gnutls_compression_get(session));
-  /* the *_get_name() says "NULL" if GNUTLS_COMP_NULL is returned */
+  /* the *_get_name() says "nil" if GNUTLS_COMP_NULL is returned */
   infof(data, "\t compression: %s\n", ptr);
 
   /* the name of the cipher used. ie 3DES. */
@@ -770,14 +770,14 @@ after_server_cert_verification:
     size_t connect_idsize;
 
     /* get the session ID data size */
-    gnutls_session_get_data(session, NULL, &connect_idsize);
+    gnutls_session_get_data(session, nil, &connect_idsize);
     connect_sessionid = malloc(connect_idsize); /* get a buffer for it */
 
     if(connect_sessionid) {
       /* extract session ID to the allocated buffer */
       gnutls_session_get_data(session, connect_sessionid, &connect_idsize);
 
-      incache = !(Curl_ssl_getsessionid(conn, &ssl_sessionid, NULL));
+      incache = !(Curl_ssl_getsessionid(conn, &ssl_sessionid, nil));
       if(incache) {
         /* there was one before in the cache, so instead of risking that the
            previous one was rejected, we just kill that and store the new */
@@ -897,16 +897,16 @@ static void close_one(struct connectdata *conn,
   if(conn->ssl[idx].session) {
     gnutls_bye(conn->ssl[idx].session, GNUTLS_SHUT_RDWR);
     gnutls_deinit(conn->ssl[idx].session);
-    conn->ssl[idx].session = NULL;
+    conn->ssl[idx].session = nil;
   }
   if(conn->ssl[idx].cred) {
     gnutls_certificate_free_credentials(conn->ssl[idx].cred);
-    conn->ssl[idx].cred = NULL;
+    conn->ssl[idx].cred = nil;
   }
 #ifdef USE_TLS_SRP
   if(conn->ssl[idx].srp_client_cred) {
     gnutls_srp_free_client_credentials(conn->ssl[idx].srp_client_cred);
-    conn->ssl[idx].srp_client_cred = NULL;
+    conn->ssl[idx].srp_client_cred = nil;
   }
 #endif
 }
@@ -980,12 +980,12 @@ int Curl_gtls_shutdown(struct connectdata *conn, int sockindex)
 
 #ifdef USE_TLS_SRP
   if(data->set.ssl.authtype == CURL_TLSAUTH_SRP
-     && data->set.ssl.username != NULL)
+     && data->set.ssl.username != nil)
     gnutls_srp_free_client_credentials(conn->ssl[sockindex].srp_client_cred);
 #endif
 
-  conn->ssl[sockindex].cred = NULL;
-  conn->ssl[sockindex].session = NULL;
+  conn->ssl[sockindex].cred = nil;
+  conn->ssl[sockindex].session = nil;
 
   return retval;
 }
@@ -1033,7 +1033,7 @@ void Curl_gtls_session_free(void *ptr)
 
 size_t Curl_gtls_version(char *buffer, size_t size)
 {
-  return snprintf(buffer, size, "GnuTLS/%s", gnutls_check_version(NULL));
+  return snprintf(buffer, size, "GnuTLS/%s", gnutls_check_version(nil));
 }
 
 int Curl_gtls_seed(struct SessionHandle *data)

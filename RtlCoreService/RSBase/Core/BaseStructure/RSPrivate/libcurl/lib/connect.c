@@ -106,7 +106,7 @@ singleipconnect(struct connectdata *conn,
  * The start time is stored in progress.t_startsingle - as set with
  * Curl_pgrsTime(..., TIMER_STARTSINGLE);
  *
- * If 'nowp' is non-NULL, it points to the current time.
+ * If 'nowp' is non-nil, it points to the current time.
  * 'duringconnect' is FALSE if not during a connect, as then of course the
  * connect timeout is not taken into account!
  *
@@ -185,7 +185,7 @@ int waitconnect(struct connectdata *conn,
   /* Call this function once now, and ignore the results. We do this to
      "clear" the error state on the socket so that we can later read it
      reliably. This is reported necessary on the MPE/iX operating system. */
-  (void)verifyconnect(sockfd, NULL);
+  (void)verifyconnect(sockfd, nil);
 #endif
 
   for(;;) {
@@ -231,7 +231,7 @@ static CURLcode bindlocal(struct connectdata *conn,
   struct sockaddr_in6 *si6 = (struct sockaddr_in6 *)&sa;
 #endif
 
-  struct Curl_dns_entry *h=NULL;
+  struct Curl_dns_entry *h=nil;
   unsigned short port = data->set.localport; /* use this port number, 0 for
                                                 "random" */
   /* how many port numbers to try to bind to, increasing one at a time */
@@ -266,7 +266,7 @@ static CURLcode bindlocal(struct connectdata *conn,
 
     /* interface */
     if(!is_host && (is_interface || Curl_if_is_interface_name(dev))) {
-      if(Curl_if2ip(af, dev, myhost, sizeof(myhost)) == NULL)
+      if(Curl_if2ip(af, dev, myhost, sizeof(myhost)) == nil)
         return CURLE_INTERFACE_FAILED;
 
       /*
@@ -545,12 +545,12 @@ static bool getaddressinfo(struct sockaddr* sa, char* addr,
                            long* port)
 {
   unsigned short us_port;
-  struct sockaddr_in* si = NULL;
+  struct sockaddr_in* si = nil;
 #ifdef ENABLE_IPV6
-  struct sockaddr_in6* si6 = NULL;
+  struct sockaddr_in6* si6 = nil;
 #endif
 #if defined(HAVE_SYS_UN_H) && defined(AF_UNIX)
-  struct sockaddr_un* su = NULL;
+  struct sockaddr_un* su = nil;
 #endif
 
   switch (sa->sa_family) {
@@ -1085,7 +1085,7 @@ curl_socket_t Curl_getconnectinfo(struct SessionHandle *data,
   DEBUGASSERT(data);
 
   if((data->state.lastconnect != -1) &&
-     (data->state.connc->connects[data->state.lastconnect] != NULL)) {
+     (data->state.connc->connects[data->state.lastconnect] != nil)) {
     struct connectdata *c =
       data->state.connc->connects[data->state.lastconnect];
     if(connp)
@@ -1120,7 +1120,7 @@ curl_socket_t Curl_getconnectinfo(struct SessionHandle *data,
 /*
  * Close a socket.
  *
- * 'conn' can be NULL, beware!
+ * 'conn' can be nil, beware!
  */
 int Curl_closesocket(struct connectdata *conn,
                      curl_socket_t sock)
@@ -1141,7 +1141,7 @@ int Curl_closesocket(struct connectdata *conn,
 /*
  * Create a socket based on info from 'conn' and 'ai'.
  *
- * 'addr' should be a pointer to the correct struct to get data back, or NULL.
+ * 'addr' should be a pointer to the correct struct to get data back, or nil.
  * 'sockfd' must be a pointer to a socket descriptor.
  *
  * If the open socket callback is set, used that!

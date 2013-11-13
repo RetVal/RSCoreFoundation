@@ -56,7 +56,7 @@ Curl_memrchr(const void *s, int c, size_t n)
     p--;
   }
 
-  return NULL;
+  return nil;
 }
 
 #endif /* HAVE_MEMRCHR */

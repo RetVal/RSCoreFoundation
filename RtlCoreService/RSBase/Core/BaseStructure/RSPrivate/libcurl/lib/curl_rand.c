@@ -53,7 +53,7 @@ void Curl_srand(void)
 {
   /* Randomize pseudo-random number sequence. */
 
-  randseed = (unsigned int) time(NULL);
+  randseed = (unsigned int) time(nil);
   Curl_rand();
   Curl_rand();
   Curl_rand();

@@ -49,14 +49,14 @@ static RSStringRef __RSISAPayloadClassDecription(RSTypeRef rs)
 static RSRuntimeClass __RSISAPayloadClass = {
     _RSRuntimeScannedObject,
     "__RSISAPayload",
-    NULL,
-    NULL,
+    nil,
+    nil,
     __RSISAPayloadClassDeallocate,
-    NULL,
-    NULL,
+    nil,
+    nil,
     __RSISAPayloadClassDecription,
-    NULL,
-    NULL,
+    nil,
+    nil,
 };
 
 static RSTypeID __RSISAPayloadTypeID = _RSRuntimeNotATypeID;
@@ -309,10 +309,10 @@ static RSRuntimeClass __RSDataClass = {
     __RSDataClassCopy,
     __RSDataClassDeallocate,
     __RSDataClassEqual,
-    NULL,
+    nil,
     __RSDataClassDecription,
-    NULL,
-    NULL,
+    nil,
+    nil,
 };
 
 static RSTypeID _RSDataTypeID = _RSRuntimeNotATypeID;

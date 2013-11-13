@@ -33,9 +33,9 @@ static struct curl_slist *slist_get_last(struct curl_slist *list)
 {
   struct curl_slist     *item;
 
-  /* if caller passed us a NULL, return now */
+  /* if caller passed us a nil, return now */
   if(!list)
-    return NULL;
+    return nil;
 
   /* loop through to find the last item */
   item = list;
@@ -62,16 +62,16 @@ struct curl_slist *curl_slist_append(struct curl_slist *list,
   if(new_item) {
     char *dupdata = strdup(data);
     if(dupdata) {
-      new_item->next = NULL;
+      new_item->next = nil;
       new_item->data = dupdata;
     }
     else {
       free(new_item);
-      return NULL;
+      return nil;
     }
   }
   else
-    return NULL;
+    return nil;
 
   if(list) {
     last = slist_get_last(list);
@@ -85,12 +85,12 @@ struct curl_slist *curl_slist_append(struct curl_slist *list,
 
 /*
  * Curl_slist_duplicate() duplicates a linked list. It always returns the
- * address of the first record of the cloned list or NULL in case of an
- * error (or if the input list was NULL).
+ * address of the first record of the cloned list or nil in case of an
+ * error (or if the input list was nil).
  */
 struct curl_slist *Curl_slist_duplicate(struct curl_slist *inlist)
 {
-  struct curl_slist *outlist = NULL;
+  struct curl_slist *outlist = nil;
   struct curl_slist *tmp;
 
   while(inlist) {
@@ -98,7 +98,7 @@ struct curl_slist *Curl_slist_duplicate(struct curl_slist *inlist)
 
     if(!tmp) {
       curl_slist_free_all(outlist);
-      return NULL;
+      return nil;
     }
 
     outlist = tmp;

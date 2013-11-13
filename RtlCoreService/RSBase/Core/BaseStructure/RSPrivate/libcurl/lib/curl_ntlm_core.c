@@ -172,12 +172,12 @@ static bool encrypt_des(const unsigned char *in, unsigned char *out,
                         const unsigned char *key_56)
 {
   const CK_MECHANISM_TYPE mech = CKM_DES_ECB; /* DES cipher in ECB mode */
-  PK11SlotInfo *slot = NULL;
+  PK11SlotInfo *slot = nil;
   char key[8];                                /* expanded 64 bit key */
   SECItem key_item;
-  PK11SymKey *symkey = NULL;
-  SECItem *param = NULL;
-  PK11Context *ctx = NULL;
+  PK11SymKey *symkey = nil;
+  SECItem *param = nil;
+  PK11Context *ctx = nil;
   int out_len;                                /* not used, required by NSS */
   bool rv = FALSE;
 
@@ -191,12 +191,12 @@ static bool encrypt_des(const unsigned char *in, unsigned char *out,
   key_item.data = (unsigned char *)key;
   key_item.len = /* hard-wired */ 8;
   symkey = PK11_ImportSymKey(slot, mech, PK11_OriginUnwrap, CKA_ENCRYPT,
-                             &key_item, NULL);
+                             &key_item, nil);
   if(!symkey)
     goto fail;
 
   /* create DES encryption context */
-  param = PK11_ParamFromIV(mech, /* no IV in ECB mode */ NULL);
+  param = PK11_ParamFromIV(mech, /* no IV in ECB mode */ nil);
   if(!param)
     goto fail;
   ctx = PK11_CreateContextBySymKey(mech, CKA_ENCRYPT, symkey, param);

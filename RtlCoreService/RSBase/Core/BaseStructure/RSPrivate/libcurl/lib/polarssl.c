@@ -80,7 +80,7 @@
 #ifdef POLARSSL_DEBUG
 static void polarssl_debug(void *context, int level, char *line)
 {
-  struct SessionHandle *data = NULL;
+  struct SessionHandle *data = nil;
 
   if(!context)
     return;
@@ -111,7 +111,7 @@ Curl_polarssl_connect(struct connectdata *conn,
 #else
   struct in_addr addr;
 #endif
-  void *old_session = NULL;
+  void *old_session = nil;
   size_t old_session_size = 0;
   char buffer[1024];
 
@@ -251,7 +251,7 @@ Curl_polarssl_connect(struct connectdata *conn,
     }
     else {
       /* wait for data from server... */
-      long timeout_ms = Curl_timeleft(data, NULL, TRUE);
+      long timeout_ms = Curl_timeleft(data, nil, TRUE);
 
       if(timeout_ms < 0) {
         failf(data, "SSL connection timeout");

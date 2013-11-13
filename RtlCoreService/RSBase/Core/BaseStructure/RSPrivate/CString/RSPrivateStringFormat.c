@@ -59,7 +59,7 @@ do { \
 const int value = abs (va_arg (ap, int)); \
 char buf[32]; \
 ptr++; /* Go past the asterisk.  */ \
-*sptr = '\0'; /* NULL terminate sptr.  */ \
+*sptr = '\0'; /* nil terminate sptr.  */ \
 sprintf(buf, "%d", value); \
 strcat(sptr, buf); \
 while (*sptr) sptr++; \
@@ -160,7 +160,7 @@ RSIndex __RSFormatPrint(RSBuffer* buf, RSIndex* retBufferSize, RSCUBuffer format
                     case 'c':
                     {
                         *sptr++ = *ptr++; /* Copy the type specifier.  */
-                        *sptr = '\0'; /* NULL terminate sptr.  */
+                        *sptr = '\0'; /* nil terminate sptr.  */
                         if (short_width)
                         {
                             //PRINT_TYPE(int);
@@ -302,12 +302,12 @@ RSIndex __RSFormatPrint(RSBuffer* buf, RSIndex* retBufferSize, RSCUBuffer format
                     case 'G':
                     {
                         *sptr++ = *ptr++; /* Copy the type specifier.  */
-                        *sptr = '\0'; /* NULL terminate sptr.  */
+                        *sptr = '\0'; /* nil terminate sptr.  */
                         if (wide_width == 0)
                         {
                             //RSIndex result;
                             //                            *sptr++ = *ptr++; /* Copy the type specifier.  */
-                            //                            *sptr = '\0'; /* NULL terminate sptr.  */
+                            //                            *sptr = '\0'; /* nil terminate sptr.  */
                         RETRY_B5:
                             length = vsnprintf(cacheForNumber, sizeof(cacheForNumber), specifier, ap);
                             if (length < (size - pc))
@@ -340,7 +340,7 @@ RSIndex __RSFormatPrint(RSBuffer* buf, RSIndex* retBufferSize, RSCUBuffer format
 #if defined(__GNUC__) || defined(HAVE_LONG_DOUBLE)
                             //PRINT_TYPE(long double);
                             //                            *sptr++ = *ptr++; /* Copy the type specifier.  */
-                            //                            *sptr = '\0'; /* NULL terminate sptr.  */
+                            //                            *sptr = '\0'; /* nil terminate sptr.  */
                         RETRY_B6:
                             length = vsnprintf(cacheForNumber, sizeof(cacheForNumber), specifier, ap);
                             if (length < (size - pc))
@@ -397,7 +397,7 @@ RSIndex __RSFormatPrint(RSBuffer* buf, RSIndex* retBufferSize, RSCUBuffer format
                     case 's':
                         //PRINT_TYPE(char *);
                         *sptr++ = *ptr++; /* Copy the type specifier.  */
-                        *sptr = '\0'; /* NULL terminate sptr.  */
+                        *sptr = '\0'; /* nil terminate sptr.  */
                         cStr = va_arg(ap, char*);
                     RETRY_B7:
                         if ((length = strlen(cStr)) < (size - pc))
@@ -425,7 +425,7 @@ RSIndex __RSFormatPrint(RSBuffer* buf, RSIndex* retBufferSize, RSCUBuffer format
                     case 'R':
                     case 'r':
                         *sptr++ = *ptr++; /* Copy the type specifier.  */
-                        *sptr = '\0'; /* NULL terminate sptr.  */
+                        *sptr = '\0'; /* nil terminate sptr.  */
                         des = RSDescription(va_arg(ap, RSTypeRef));
                         length = RSStringGetLength(des);
                         
@@ -484,7 +484,7 @@ RSIndex __RSFormatPrint(RSBuffer* buf, RSIndex* retBufferSize, RSCUBuffer format
                     case 'p':
                         //PRINT_TYPE(void *);
                         *sptr++ = *ptr++; /* Copy the type specifier.  */
-                        *sptr = '\0'; /* NULL terminate sptr.  */
+                        *sptr = '\0'; /* nil terminate sptr.  */
                     RETRY_B9:
                         length = vsnprintf(cacheForNumber, sizeof(cacheForNumber), specifier, ap);
                         //length = vsnprintf(base, (size - pc), specifier, ap);

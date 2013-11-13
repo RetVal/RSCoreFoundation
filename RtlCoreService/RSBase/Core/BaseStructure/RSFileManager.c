@@ -1152,7 +1152,7 @@ RSExport __autorelease RSDictionaryRef RSFileManagerAttributesOfDirectoryAtPath(
     BOOL isDir = NO;
     if (RSFileManagerFileExistsAtPath(fmg, dir, &isDir) && isDir)
         return RSFileManagerAttributesOfFileAtPath(fmg, dir);
-    return RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, NULL));
+    return RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, nil));
 }
 
 RSExport BOOL RSFileManagerCopyDirctoryToPath(RSFileManagerRef fmg, RSStringRef from, RSStringRef to)
@@ -1466,4 +1466,5 @@ RSExport void RSFileWatcherAddFileHandle(RSFileWatcherRef fileWatcher, RSFileHan
     RSFileHandle fd = RSFileHandleGetHandle(handle);
     __RSFWAddFDToQueue(fileWatcher, fd, mode, timeout);
 }
+
 #endif

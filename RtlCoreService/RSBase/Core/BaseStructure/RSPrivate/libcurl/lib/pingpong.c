@@ -197,7 +197,7 @@ CURLcode Curl_pp_vsendf(struct pingpong *pp,
 
   DEBUGASSERT(pp->sendleft == 0);
   DEBUGASSERT(pp->sendsize == 0);
-  DEBUGASSERT(pp->sendthis == NULL);
+  DEBUGASSERT(pp->sendthis == nil);
 
   fmt_crlf = aprintf("%s\r\n", fmt); /* append a trailing CRLF */
   if(!fmt_crlf)
@@ -247,7 +247,7 @@ CURLcode Curl_pp_vsendf(struct pingpong *pp,
   }
   else {
     free(s);
-    pp->sendthis = NULL;
+    pp->sendthis = nil;
     pp->sendleft = pp->sendsize = 0;
     pp->response = Curl_tvnow();
   }
@@ -323,7 +323,7 @@ CURLcode Curl_pp_readresp(curl_socket_t sockfd,
       memcpy(ptr, pp->cache, pp->cache_size);
       gotbytes = (ssize_t)pp->cache_size;
       free(pp->cache);    /* free the cache */
-      pp->cache = NULL;   /* clear the pointer */
+      pp->cache = nil;   /* clear the pointer */
       pp->cache_size = 0; /* zero the size just in case */
     }
     else {
@@ -514,7 +514,7 @@ CURLcode Curl_pp_flushsend(struct pingpong *pp)
   }
   else {
     free(pp->sendthis);
-    pp->sendthis=NULL;
+    pp->sendthis=nil;
     pp->sendleft = pp->sendsize = 0;
     pp->response = Curl_tvnow();
   }
@@ -525,7 +525,7 @@ CURLcode Curl_pp_disconnect(struct pingpong *pp)
 {
   if(pp->cache) {
     free(pp->cache);
-    pp->cache = NULL;
+    pp->cache = nil;
   }
   return CURLE_OK;
 }

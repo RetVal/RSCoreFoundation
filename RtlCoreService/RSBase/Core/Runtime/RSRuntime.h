@@ -43,20 +43,24 @@ enum {
 typedef struct __RSRuntimeBaseInfo
 {
 #if __LP64__
-    RSBitU32 _rsinfo    :8;   // reserved for runtime
-    RSBitU32 _reserved  :4;   // class self
+    RSBitU32 _rsinfo    :8;   // reserved for runtime (at least 5 bits)
+    RSBitU32 _objId     :10;  // reserved for runtime
+    RSBitU32 _reserved2 :2;
+    RSBitU32 _rsinfo1   :8;   // class self
+    RSBitU32 _reserved  :3;   // class self (at least 3 bits)
+    RSBitU32 _special   :1;   // never retain/releases
 #else
     RSBitU32 _rc        :7;   // reference count in 32 bits.
-    RSBitU32 _rsinfo    :5;   // reserved for runtime
-#endif
     RSBitU32 _special   :1;   // never retain/releases
-    RSBitU32 _rsinfo1   :8;   // class self
-    RSBitU32 _customRef :1;   // use self ref function or not.
     RSBitU32 _objId     :10;  // reserved for runtime
+    RSBitU32 _rsinfo    :6;   // reserved for runtime
+    RSBitU32 _rsinfo1   :8;   // class self
+#endif
+    
 }RSRuntimeBaseInfo;
 
 typedef struct __RSRuntimeBase {
-    RSIndex _rsisa;     // this field may be used for RSCreateInstance.
+    RSPointer _rsisa;     // this field may be used for RSCreateInstance.
     RSRuntimeBaseInfo _rsinfo;
 #if __LP64__
     RSBitU32 _rc;
@@ -86,7 +90,7 @@ RSInline BOOL __RSIsObjC(RSTypeRef base)
 RSInline void __RSSetValid(RSTypeRef base)
 {
 #if !__RSRuntimeISABaseOnEmptyField
-    ((RSRuntimeBase*)base)->_rsisa = (RSIndex)base;
+    ((RSRuntimeBase*)base)->_rsisa = (RSPointer)base;
 #endif
     ((RSRuntimeBase*)base)->_rsinfo._rsinfo |= (1<<3);
 }
@@ -98,6 +102,7 @@ RSInline void __RSSetInValid(RSTypeRef base)
 
 RSInline BOOL __RSIsValid(RSTypeRef base)
 {
+    return YES;
     BOOL valid = (((RSRuntimeBase*)base)->_rsinfo._rsinfo & (1<<3)) == (1<<3);
     if (NO == ((RSRuntimeBase*)base)->_rsinfo._special)
         return __RSRuntimeInstanceIsStackValue(base) || (valid && ((RSIndex)base == (RSIndex)((RSRuntimeBase*)base)->_rsisa));
@@ -136,9 +141,24 @@ RSInline BOOL __RSAllocatorIsSystemDefault(RSTypeRef base)
     return (((RSRuntimeBase*)base)->_rsinfo._rsinfo & (1<<5)) == (1 << 5);
 }
 #if __LP64__
-#define RSRuntimeBaseDefault(...) {0, {8, 0, 1, 0, 1, 0},0}
+#define RSRuntimeBaseDefault(...)\
+    ._base._rsisa = 0,\
+    ._base._rc = 1,\
+    ._base._rsinfo._reserved = 0,\
+    ._base._rsinfo._special = 1,\
+    ._base._rsinfo._objId = 0,\
+    ._base._rsinfo._rsinfo1 = 0,\
+    ._base._rsinfo._rsinfo = (1 << 1) | (1 << 3)
+
 #else
-#define RSRuntimeBaseDefault(...) {0, {1, 8, 0, 1, 0, 1, 0}}
+#define RSRuntimeBaseDefault(...)\
+    ._base._rsisa = 0,\
+    ._base._rc = 1,\
+    ._base._rsinfo._reserved = 0,\
+    ._base._rsinfo._special = 1,\
+    ._base._rsinfo._objId = 7,\
+    ._base._rsinfo._rsinfo1 = 0,\
+    ._base._rsinfo._rsinfo = (1 << 1) | (1 << 3)
 #endif
 
 #define __CONSTANT_RSSTRINGS__

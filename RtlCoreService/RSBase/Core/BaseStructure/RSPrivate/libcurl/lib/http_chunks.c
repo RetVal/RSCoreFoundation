@@ -158,7 +158,7 @@ CHUNKcode Curl_httpchunk_read(struct connectdata *conn,
           return(CHUNKE_ILLEGAL_HEX);
         }
 
-        ch->datasize=strtoul(ch->hexbuffer, NULL, 16);
+        ch->datasize=strtoul(ch->hexbuffer, nil, 16);
         ch->state = CHUNK_POSTHEX;
       }
       break;

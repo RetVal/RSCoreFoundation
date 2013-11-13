@@ -196,7 +196,7 @@ static CURLcode file_connect(struct connectdata *conn, bool *done)
      sessionhandle, deal with it */
   Curl_reset_reqproto(conn);
 
-  real_path = curl_easy_unescape(data, data->state.path, 0, NULL);
+  real_path = curl_easy_unescape(data, data->state.path, 0, nil);
   if(!real_path)
     return CURLE_OUT_OF_MEMORY;
 
@@ -212,7 +212,7 @@ static CURLcode file_connect(struct connectdata *conn, bool *done)
     /* file is not a protocol that can deal with "persistancy" */
     file = data->state.proto.file;
     Curl_safefree(file->freepath);
-    file->path = NULL;
+    file->path = nil;
     if(file->fd != -1)
       close(file->fd);
     file->fd = -1;
@@ -274,7 +274,7 @@ static CURLcode file_done(struct connectdata *conn,
 
   if(file) {
     Curl_safefree(file->freepath);
-    file->path = NULL;
+    file->path = nil;
     if(file->fd != -1)
       close(file->fd);
     file->fd = -1;
@@ -291,7 +291,7 @@ static CURLcode file_disconnect(struct connectdata *conn,
 
   if(file) {
     Curl_safefree(file->freepath);
-    file->path = NULL;
+    file->path = nil;
     if(file->fd != -1)
       close(file->fd);
     file->fd = -1;

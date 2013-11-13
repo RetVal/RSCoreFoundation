@@ -112,14 +112,14 @@ static void __RSCalendarDeallocate(RSTypeRef obj)
 static RSRuntimeClass __RSCalendarClass = {
     _RSRuntimeScannedObject,
     "RSCalendar",
-    NULL,
-    NULL,
+    nil,
+    nil,
     __RSCalendarDeallocate,
     __RSCalendarEqual,
     __RSCalendarHash,
     __RSCalendarDescription,
-    NULL,
-    NULL,
+    nil,
+    nil,
 };
 
 static RSTypeID __RSCalendarTypeID = _RSRuntimeNotATypeID;
@@ -209,7 +209,7 @@ static RSCalendarRef __RSCalendarCreateInstance(RSAllocatorRef allocator, RSStri
         else if (RSEqual(RSIslamicCivilCalendar, identifier)) identifier = RSIslamicCivilCalendar;
         else if (RSEqual(RSHebrewCalendar, identifier)) identifier = RSHebrewCalendar;
         //	else if (RSEqual(RSChineseCalendar, identifier)) identifier = RSChineseCalendar;
-        else return NULL;
+        else return nil;
     }
     RSCalendarRef calendar = (RSCalendarRef)__RSRuntimeCreateInstance(allocator, RSCalendarGetTypeID(), sizeof(struct __RSCalendar) - sizeof(struct __RSRuntimeBase));
     __RSCalendarSetIndentifier(calendar, identifier);
@@ -323,7 +323,7 @@ RSExport RSDateRef RSCalendarCopyGregorianStartDate(RSCalendarRef calendar) {
         RSAbsoluteTime at = (double)udate / 1000.0 - RSAbsoluteTimeIntervalSince1970;
         return RSDateCreate(RSGetAllocator(calendar), at);
     }
-    return NULL;
+    return nil;
 }
 
 RSExport void RSCalendarSetGregorianStartDate(RSCalendarRef calendar, RSDateRef date) {

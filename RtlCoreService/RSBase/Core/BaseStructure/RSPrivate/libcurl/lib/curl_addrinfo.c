@@ -82,7 +82,7 @@ Curl_freeaddrinfo(Curl_addrinfo *cahead)
   Curl_addrinfo *vqualifier canext;
   Curl_addrinfo *ca;
 
-  for(ca = cahead; ca != NULL; ca = canext) {
+  for(ca = cahead; ca != nil; ca = canext) {
 
     if(ca->ai_addr)
       free(ca->ai_addr);
@@ -120,13 +120,13 @@ Curl_getaddrinfo_ex(const char *nodename,
 {
   const struct addrinfo *ai;
   struct addrinfo *aihead;
-  Curl_addrinfo *cafirst = NULL;
-  Curl_addrinfo *calast = NULL;
+  Curl_addrinfo *cafirst = nil;
+  Curl_addrinfo *calast = nil;
   Curl_addrinfo *ca;
   size_t ss_size;
   int error;
 
-  *result = NULL; /* assume failure */
+  *result = nil; /* assume failure */
 
   error = getaddrinfo(nodename, servname, hints, &aihead);
   if(error)
@@ -134,7 +134,7 @@ Curl_getaddrinfo_ex(const char *nodename,
 
   /* traverse the addrinfo list */
 
-  for(ai = aihead; ai != NULL; ai = ai->ai_next) {
+  for(ai = aihead; ai != nil; ai = ai->ai_next) {
 
     /* ignore elements with unsupported address family, */
     /* settle family-specific sockaddr structure size.  */
@@ -148,14 +148,14 @@ Curl_getaddrinfo_ex(const char *nodename,
       continue;
 
     /* ignore elements without required address info */
-    if((ai->ai_addr == NULL) || !(ai->ai_addrlen > 0))
+    if((ai->ai_addr == nil) || !(ai->ai_addrlen > 0))
       continue;
 
     /* ignore elements with bogus address size */
     if((size_t)ai->ai_addrlen < ss_size)
       continue;
 
-    if((ca = malloc(sizeof(Curl_addrinfo))) == NULL) {
+    if((ca = malloc(sizeof(Curl_addrinfo))) == nil) {
       error = EAI_MEMORY;
       break;
     }
@@ -168,19 +168,19 @@ Curl_getaddrinfo_ex(const char *nodename,
     ca->ai_socktype  = ai->ai_socktype;
     ca->ai_protocol  = ai->ai_protocol;
     ca->ai_addrlen   = (curl_socklen_t)ss_size;
-    ca->ai_addr      = NULL;
-    ca->ai_canonname = NULL;
-    ca->ai_next      = NULL;
+    ca->ai_addr      = nil;
+    ca->ai_canonname = nil;
+    ca->ai_next      = nil;
 
-    if((ca->ai_addr = malloc(ss_size)) == NULL) {
+    if((ca->ai_addr = malloc(ss_size)) == nil) {
       error = EAI_MEMORY;
       free(ca);
       break;
     }
     memcpy(ca->ai_addr, ai->ai_addr, ss_size);
 
-    if(ai->ai_canonname != NULL) {
-      if((ca->ai_canonname = strdup(ai->ai_canonname)) == NULL) {
+    if(ai->ai_canonname != nil) {
+      if((ca->ai_canonname = strdup(ai->ai_canonname)) == nil) {
         error = EAI_MEMORY;
         free(ca->ai_addr);
         free(ca);
@@ -206,7 +206,7 @@ Curl_getaddrinfo_ex(const char *nodename,
   /* if we failed, also destroy the Curl_addrinfo list */
   if(error) {
     Curl_freeaddrinfo(cafirst);
-    cafirst = NULL;
+    cafirst = nil;
   }
   else if(!cafirst) {
 #ifdef EAI_NONAME
@@ -274,8 +274,8 @@ Curl_addrinfo *
 Curl_he2ai(const struct hostent *he, int port)
 {
   Curl_addrinfo *ai;
-  Curl_addrinfo *prevai = NULL;
-  Curl_addrinfo *firstai = NULL;
+  Curl_addrinfo *prevai = nil;
+  Curl_addrinfo *firstai = nil;
   struct sockaddr_in *addr;
 #ifdef ENABLE_IPV6
   struct sockaddr_in6 *addr6;
@@ -286,11 +286,11 @@ Curl_he2ai(const struct hostent *he, int port)
 
   if(!he)
     /* no input == no output! */
-    return NULL;
+    return nil;
 
-  DEBUGASSERT((he->h_name != NULL) && (he->h_addr_list != NULL));
+  DEBUGASSERT((he->h_name != nil) && (he->h_addr_list != nil));
 
-  for(i=0; (curr = he->h_addr_list[i]) != NULL; i++) {
+  for(i=0; (curr = he->h_addr_list[i]) != nil; i++) {
 
     size_t ss_size;
 #ifdef ENABLE_IPV6
@@ -300,16 +300,16 @@ Curl_he2ai(const struct hostent *he, int port)
 #endif
       ss_size = sizeof (struct sockaddr_in);
 
-    if((ai = calloc(1, sizeof(Curl_addrinfo))) == NULL) {
+    if((ai = calloc(1, sizeof(Curl_addrinfo))) == nil) {
       result = CURLE_OUT_OF_MEMORY;
       break;
     }
-    if((ai->ai_canonname = strdup(he->h_name)) == NULL) {
+    if((ai->ai_canonname = strdup(he->h_name)) == nil) {
       result = CURLE_OUT_OF_MEMORY;
       free(ai);
       break;
     }
-    if((ai->ai_addr = calloc(1, ss_size)) == NULL) {
+    if((ai->ai_addr = calloc(1, ss_size)) == nil) {
       result = CURLE_OUT_OF_MEMORY;
       free(ai->ai_canonname);
       free(ai);
@@ -359,7 +359,7 @@ Curl_he2ai(const struct hostent *he, int port)
 
   if(result != CURLE_OK) {
     Curl_freeaddrinfo(firstai);
-    firstai = NULL;
+    firstai = nil;
   }
 
   return firstai;
@@ -409,12 +409,12 @@ Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port)
 
   buf = malloc(sizeof(struct namebuff));
   if(!buf)
-    return NULL;
+    return nil;
 
   hoststr = strdup(hostname);
   if(!hoststr) {
     free(buf);
-    return NULL;
+    return nil;
   }
 
   switch(af) {
@@ -433,17 +433,17 @@ Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port)
   default:
     free(hoststr);
     free(buf);
-    return NULL;
+    return nil;
   }
 
   h = &buf->hostentry;
   h->h_name = hoststr;
-  h->h_aliases = NULL;
+  h->h_aliases = nil;
   h->h_addrtype = (short)af;
   h->h_length = (short)addrsize;
   h->h_addr_list = &buf->h_addr_list[0];
   h->h_addr_list[0] = addrentry;
-  h->h_addr_list[1] = NULL; /* terminate list of entries */
+  h->h_addr_list[1] = nil; /* terminate list of entries */
 
 #if defined(__VMS) && \
     defined(__INITIAL_POINTER_SIZE) && (__INITIAL_POINTER_SIZE == 64)
@@ -477,7 +477,7 @@ Curl_addrinfo *Curl_str2addr(char *address, int port)
       return Curl_ip2addr(AF_INET6, &in6, address, port);
   }
 #endif
-  return NULL; /* bad input format */
+  return nil; /* bad input format */
 }
 
 #if defined(CURLDEBUG) && defined(HAVE_FREEADDRINFO)

@@ -497,16 +497,16 @@ RSInline _RSEncodingConverter *__RSEncodingConverterFromDefinition(const RSStrin
 #define NUM_OF_ENTRIES_CYCLE (10)
     static uint32_t _currentIndex = 0;
     static uint32_t _allocatedSize = 0;
-    static _RSEncodingConverter *_allocatedEntries = NULL;
+    static _RSEncodingConverter *_allocatedEntries = nil;
     _RSEncodingConverter *converter;
     
     
     if ((_currentIndex + 1) >= _allocatedSize) {
         _currentIndex = 0;
         _allocatedSize = 0;
-        _allocatedEntries = NULL;
+        _allocatedEntries = nil;
     }
-    if (_allocatedEntries == NULL) { // Not allocated yet
+    if (_allocatedEntries == nil) { // Not allocated yet
         _allocatedEntries = (_RSEncodingConverter *)__RSAutoReleaseISA(RSAllocatorSystemDefault, RSAllocatorAllocate(RSAllocatorSystemDefault, sizeof(_RSEncodingConverter) * NUM_OF_ENTRIES_CYCLE));
         
         _allocatedSize = NUM_OF_ENTRIES_CYCLE;
@@ -521,9 +521,9 @@ RSInline _RSEncodingConverter *__RSEncodingConverterFromDefinition(const RSStrin
     
     switch (definition->encodingClass) {
         case RSStringEncodingConverterStandard:
-            converter->toBytes = NULL;
-            converter->toUnicode = NULL;
-            converter->toCanonicalUnicode = NULL;
+            converter->toBytes = nil;
+            converter->toUnicode = nil;
+            converter->toCanonicalUnicode = nil;
             break;
             
         case RSStringEncodingConverterCheapEightBit:
@@ -554,7 +554,7 @@ RSInline _RSEncodingConverter *__RSEncodingConverterFromDefinition(const RSStrin
             break;
             
         default: // Shouln't be here
-            return NULL;
+            return nil;
     }
     
     converter->toBytesFallback = (definition->toBytesFallback ? definition->toBytesFallback : __RSDefaultToBytesFallbackProc);
@@ -590,8 +590,8 @@ RSInline const RSStringEncodingConverter *__RSStringEncodingConverterGetDefiniti
     }
 }
 
-static RSMutableDictionaryRef mappingTable = NULL;
-static _RSEncodingConverter *mappingTableCommonConverters[3] = {NULL, NULL, NULL}; // UTF8, MacRoman/WinLatin1, and the default encoding*
+static RSMutableDictionaryRef mappingTable = nil;
+static _RSEncodingConverter *mappingTableCommonConverters[3] = {nil, nil, nil}; // UTF8, MacRoman/WinLatin1, and the default encoding*
 static RSSpinLock mappingTableGetConverterLock = RSSpinLockInit;
 
 static void __RSEncodingMappingTableReleaseRoutine(RSNotificationRef notification)
@@ -609,8 +609,8 @@ static void __RSEncodingMappingTableRegister(RSDictionaryRef dict)
 
 static const _RSEncodingConverter *__RSGetConverter(uint32_t encoding)
 {
-    const _RSEncodingConverter *converter = NULL;
-    const _RSEncodingConverter **commonConverterSlot = NULL;
+    const _RSEncodingConverter *converter = nil;
+    const _RSEncodingConverter **commonConverterSlot = nil;
     
     switch (encoding)
     {
@@ -630,27 +630,27 @@ static const _RSEncodingConverter *__RSGetConverter(uint32_t encoding)
     }
     
     RSSpinLockLock(&mappingTableGetConverterLock);
-    converter = ((NULL == commonConverterSlot) ? ((NULL == mappingTable) ? NULL : (const _RSEncodingConverter *)RSDictionaryGetValue(mappingTable, (const void *)(uintptr_t)encoding)) : *commonConverterSlot);
+    converter = ((nil == commonConverterSlot) ? ((nil == mappingTable) ? nil : (const _RSEncodingConverter *)RSDictionaryGetValue(mappingTable, (const void *)(uintptr_t)encoding)) : *commonConverterSlot);
     RSSpinLockUnlock(&mappingTableGetConverterLock);
     
-    if (NULL == converter)
+    if (nil == converter)
     {
         const RSStringEncodingConverter *definition = __RSStringEncodingConverterGetDefinition(encoding);
         
-        if (NULL != definition)
+        if (nil != definition)
         {
             RSSpinLockLock(&mappingTableGetConverterLock);
-            converter = ((NULL == commonConverterSlot) ? ((NULL == mappingTable) ? NULL : (const _RSEncodingConverter *)RSDictionaryGetValue(mappingTable, (const void *)(uintptr_t)encoding)) : *commonConverterSlot);
+            converter = ((nil == commonConverterSlot) ? ((nil == mappingTable) ? nil : (const _RSEncodingConverter *)RSDictionaryGetValue(mappingTable, (const void *)(uintptr_t)encoding)) : *commonConverterSlot);
             
-            if (NULL == converter)
+            if (nil == converter)
             {
                 converter = __RSEncodingConverterFromDefinition(definition, encoding);
                 
-                if (NULL == commonConverterSlot)
+                if (nil == commonConverterSlot)
                 {
-                    if (NULL == mappingTable)
+                    if (nil == mappingTable)
                     {
-                        mappingTable = RSDictionaryCreateMutable(NULL, 0, NULL);
+                        mappingTable = RSDictionaryCreateMutable(nil, 0, nil);
 //                        RSAutorelease(mappingTable);
                         __RSEncodingMappingTableRegister(mappingTable);
                     }
@@ -673,7 +673,7 @@ static const _RSEncodingConverter *__RSGetConverter(uint32_t encoding)
  */
 uint32_t RSStringEncodingUnicodeToBytes(uint32_t encoding, uint32_t flags, const UniChar *characters, RSIndex numChars, RSIndex *usedCharLen, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen) {
     if (encoding == RSStringEncodingUTF8) {
-        static RSStringEncodingToBytesProc __RSToUTF8 = NULL;
+        static RSStringEncodingToBytesProc __RSToUTF8 = nil;
         RSIndex convertedCharLen;
         RSIndex usedLen;
         
@@ -707,8 +707,8 @@ uint32_t RSStringEncodingUnicodeToBytes(uint32_t encoding, uint32_t flags, const
         RSIndex localUsedByteLen;
         RSIndex theUsedByteLen = 0;
         uint32_t theResult = RSStringEncodingConversionSuccess;
-        RSStringEncodingToBytesPrecomposeProc toBytesPrecompose = NULL;
-        RSStringEncodingIsValidCombiningCharacterProc isValidCombiningChar = NULL;
+        RSStringEncodingToBytesPrecomposeProc toBytesPrecompose = nil;
+        RSStringEncodingIsValidCombiningCharacterProc isValidCombiningChar = nil;
         
         if (!converter) return RSStringEncodingConverterUnavailable;
         
@@ -740,7 +740,7 @@ uint32_t RSStringEncodingUnicodeToBytes(uint32_t encoding, uint32_t flags, const
                         while (isValidCombiningChar(characters[--usedLen]));
                         theUsedByteLen += localUsedByteLen;
                         if (converter->definition->maxBytesPerChar > 1) {
-                            TO_BYTE(converter, flags, characters + usedLen, localUsedLen - usedLen, NULL, 0, &localUsedByteLen);
+                            TO_BYTE(converter, flags, characters + usedLen, localUsedLen - usedLen, nil, 0, &localUsedByteLen);
                             theUsedByteLen -= localUsedByteLen;
                         } else {
                             theUsedByteLen--;
@@ -767,7 +767,7 @@ uint32_t RSStringEncodingUnicodeToBytes(uint32_t encoding, uint32_t flags, const
                             theResult = RSStringEncodingInvalidInputStream;
                             break;
                         }
-                    } else if (maxByteLen && ((maxByteLen == theUsedByteLen + localUsedByteLen) || TO_BYTE(converter, flags, characters + usedLen, numChars - usedLen, NULL, 0, &dummy))) { // buffer was filled up
+                    } else if (maxByteLen && ((maxByteLen == theUsedByteLen + localUsedByteLen) || TO_BYTE(converter, flags, characters + usedLen, numChars - usedLen, nil, 0, &dummy))) { // buffer was filled up
                         theUsedByteLen += localUsedByteLen;
                         theResult = RSStringEncodingInsufficientOutputBufferLength;
                         break;
@@ -785,14 +785,14 @@ uint32_t RSStringEncodingUnicodeToBytes(uint32_t encoding, uint32_t flags, const
                             usedLen += TO_BYTE_FALLBACK(converter, characters + usedLen, numChars - usedLen, bytes + theUsedByteLen, (maxByteLen ? maxByteLen - theUsedByteLen : 0), &localUsedByteLen);
                         }
                     }
-                } else if (maxByteLen && ((maxByteLen == theUsedByteLen + localUsedByteLen) || TO_BYTE(converter, flags, characters + usedLen, numChars - usedLen, NULL, 0, &dummy))) { // buffer was filled up
+                } else if (maxByteLen && ((maxByteLen == theUsedByteLen + localUsedByteLen) || TO_BYTE(converter, flags, characters + usedLen, numChars - usedLen, nil, 0, &dummy))) { // buffer was filled up
                     theUsedByteLen += localUsedByteLen;
                     
                     if (flags & RSStringEncodingAllowLossyConversion && !RSStringEncodingMaskToLossyByte(flags)) {
                         RSIndex localUsedLen;
                         
                         localUsedByteLen = 0;
-                        while ((usedLen < numChars) && !localUsedByteLen && (localUsedLen = TO_BYTE_FALLBACK(converter, characters + usedLen, numChars - usedLen, NULL, 0, &localUsedByteLen))) usedLen += localUsedLen;
+                        while ((usedLen < numChars) && !localUsedByteLen && (localUsedLen = TO_BYTE_FALLBACK(converter, characters + usedLen, numChars - usedLen, nil, 0, &localUsedByteLen))) usedLen += localUsedLen;
                     }
                     if (usedLen < numChars) theResult = RSStringEncodingInsufficientOutputBufferLength;
                     break;
@@ -821,7 +821,7 @@ uint32_t RSStringEncodingUnicodeToBytes(uint32_t encoding, uint32_t flags, const
                 RSIndex localUsedLen;
                 
                 localUsedByteLen = 0;
-                while ((usedLen < numChars) && !localUsedByteLen && (localUsedLen = TO_BYTE_FALLBACK(converter, characters + usedLen, numChars - usedLen, NULL, 0, &localUsedByteLen))) usedLen += localUsedLen;
+                while ((usedLen < numChars) && !localUsedByteLen && (localUsedLen = TO_BYTE_FALLBACK(converter, characters + usedLen, numChars - usedLen, nil, 0, &localUsedByteLen))) usedLen += localUsedLen;
             }
             if (usedLen < numChars) theResult = RSStringEncodingInsufficientOutputBufferLength;
         }
@@ -852,7 +852,7 @@ uint32_t RSStringEncodingBytesToUnicode(uint32_t encoding, uint32_t flags, const
         if ((usedLen += TO_UNICODE(converter, flags, bytes + usedLen, numBytes - usedLen, characters + theUsedCharLen, (maxCharLen ? maxCharLen - theUsedCharLen : 0), &localUsedCharLen)) < numBytes) {
             RSIndex tempUsedCharLen;
             
-            if (maxCharLen && ((maxCharLen == theUsedCharLen + localUsedCharLen) || (((flags & (RSStringEncodingUseCanonical|RSStringEncodingUseHFSPlusCanonical)) || (maxCharLen == theUsedCharLen + localUsedCharLen + 1)) && TO_UNICODE(converter, flags, bytes + usedLen, numBytes - usedLen, NULL, 0, &tempUsedCharLen)))) { // buffer was filled up
+            if (maxCharLen && ((maxCharLen == theUsedCharLen + localUsedCharLen) || (((flags & (RSStringEncodingUseCanonical|RSStringEncodingUseHFSPlusCanonical)) || (maxCharLen == theUsedCharLen + localUsedCharLen + 1)) && TO_UNICODE(converter, flags, bytes + usedLen, numBytes - usedLen, nil, 0, &tempUsedCharLen)))) { // buffer was filled up
                 theUsedCharLen += localUsedCharLen;
                 theResult = RSStringEncodingInsufficientOutputBufferLength;
                 break;
@@ -893,13 +893,13 @@ RSPrivate RSIndex RSStringEncodingCharLengthForBytes(uint32_t encoding, uint32_t
         
         if (1 == converter->definition->maxBytesPerChar) return numBytes;
         
-        if (NULL == converter->definition->toUnicodeLen) {
+        if (nil == converter->definition->toUnicodeLen) {
             RSIndex usedByteLen = 0;
             RSIndex totalLength = 0;
             RSIndex usedCharLen;
             
             while (numBytes > 0) {
-                usedByteLen = TO_UNICODE(converter, flags, bytes, numBytes, NULL, 0, &usedCharLen);
+                usedByteLen = TO_UNICODE(converter, flags, bytes, numBytes, nil, 0, &usedCharLen);
                 
                 bytes += usedByteLen;
                 numBytes -= usedByteLen;
@@ -908,7 +908,7 @@ RSPrivate RSIndex RSStringEncodingCharLengthForBytes(uint32_t encoding, uint32_t
                 if (numBytes > 0) {
                     if (0 == (flags & RSStringEncodingAllowLossyConversion)) return 0;
                     
-                    usedByteLen = TO_UNICODE_FALLBACK(converter, bytes, numBytes, NULL, 0, &usedCharLen);
+                    usedByteLen = TO_UNICODE_FALLBACK(converter, bytes, numBytes, nil, 0, &usedCharLen);
                     
                     bytes += usedByteLen;
                     numBytes -= usedByteLen;
@@ -938,10 +938,10 @@ RSPrivate RSIndex RSStringEncodingByteLengthForCharacters(uint32_t encoding, uin
         
         if (1 == converter->definition->maxBytesPerChar) return numChars;
         
-        if (NULL == converter->definition->toBytesLen) {
+        if (nil == converter->definition->toBytesLen) {
             RSIndex usedByteLen;
             
-            return ((RSStringEncodingConversionSuccess == RSStringEncodingUnicodeToBytes(encoding, flags, characters, numChars, NULL, NULL, 0, &usedByteLen)) ? usedByteLen : 0);
+            return ((RSStringEncodingConversionSuccess == RSStringEncodingUnicodeToBytes(encoding, flags, characters, numChars, nil, nil, 0, &usedByteLen)) ? usedByteLen : 0);
         } else {
             return converter->definition->toBytesLen(flags, characters, numChars);
         }
@@ -953,18 +953,18 @@ RSPrivate RSIndex RSStringEncodingByteLengthForCharacters(uint32_t encoding, uin
 RSPrivate void RSStringEncodingRegisterFallbackProcedures(uint32_t encoding, RSStringEncodingToBytesFallbackProc toBytes, RSStringEncodingToUnicodeFallbackProc toUnicode) {
     _RSEncodingConverter *converter = (_RSEncodingConverter *)__RSGetConverter(encoding);
     
-    if (NULL != converter) {
+    if (nil != converter) {
         const RSStringEncodingConverter *body = RSStringEncodingGetConverter(encoding);
         
-        converter->toBytesFallback = ((NULL == toBytes) ? ((NULL == body) ? __RSDefaultToBytesFallbackProc : body->toBytesFallback) : toBytes);
-        converter->toUnicodeFallback = ((NULL == toUnicode) ? ((NULL == body) ? __RSDefaultToUnicodeFallbackProc : body->toUnicodeFallback) : toUnicode);
+        converter->toBytesFallback = ((nil == toBytes) ? ((nil == body) ? __RSDefaultToBytesFallbackProc : body->toBytesFallback) : toBytes);
+        converter->toUnicodeFallback = ((nil == toUnicode) ? ((nil == body) ? __RSDefaultToUnicodeFallbackProc : body->toUnicodeFallback) : toUnicode);
     }
 }
 
 RSPrivate const RSStringEncodingConverter *RSStringEncodingGetConverter(uint32_t encoding) {
     const _RSEncodingConverter *converter = __RSGetConverter(encoding);
     
-    return ((NULL == converter) ? NULL : converter->definition);
+    return ((nil == converter) ? nil : converter->definition);
 }
 
 static const RSStringEncoding __RSBuiltinEncodings[] = {
@@ -1010,40 +1010,40 @@ static void __RSStringEncodingFliterDupes(RSStringEncoding *encodings, RSIndex n
 }
 
 RSPrivate const RSStringEncoding *RSStringEncodingListOfAvailableEncodings(void) {
-    static const RSStringEncoding *encodings = NULL;
+    static const RSStringEncoding *encodings = nil;
     
-    if (NULL == encodings) {
+    if (nil == encodings) {
         RSStringEncoding *list = (RSStringEncoding *)__RSBuiltinEncodings;
         RSIndex numICUConverters = 0, numPlatformConverters = 0;
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
-        RSStringEncoding *icuConverters = __RSStringEncodingCreateICUEncodings(NULL, &numICUConverters);
+        RSStringEncoding *icuConverters = __RSStringEncodingCreateICUEncodings(nil, &numICUConverters);
 #else
-        RSStringEncoding *icuConverters = NULL;
+        RSStringEncoding *icuConverters = nil;
 #endif
-        RSStringEncoding *platformConverters = __RSStringEncodingCreateListOfAvailablePlatformConverters(NULL, &numPlatformConverters);
+        RSStringEncoding *platformConverters = __RSStringEncodingCreateListOfAvailablePlatformConverters(nil, &numPlatformConverters);
         
-        if ((NULL != icuConverters) || (NULL != platformConverters)) {
+        if ((nil != icuConverters) || (nil != platformConverters)) {
             RSIndex numSlots = (sizeof(__RSBuiltinEncodings) / sizeof(*__RSBuiltinEncodings)) + numICUConverters + numPlatformConverters;
             
-            list = (RSStringEncoding *)RSAllocatorAllocate(NULL, sizeof(RSStringEncoding) * numSlots);
+            list = (RSStringEncoding *)RSAllocatorAllocate(nil, sizeof(RSStringEncoding) * numSlots);
             
             memcpy(list, __RSBuiltinEncodings, sizeof(__RSBuiltinEncodings));
             
-            if (NULL != icuConverters) {
+            if (nil != icuConverters) {
                 memcpy(list + (sizeof(__RSBuiltinEncodings) / sizeof(*__RSBuiltinEncodings)), icuConverters, sizeof(RSStringEncoding) * numICUConverters);
-                RSAllocatorDeallocate(NULL, icuConverters);
+                RSAllocatorDeallocate(nil, icuConverters);
             }
             
-            if (NULL != platformConverters) {
+            if (nil != platformConverters) {
                 memcpy(list + (sizeof(__RSBuiltinEncodings) / sizeof(*__RSBuiltinEncodings)) + numICUConverters, platformConverters, sizeof(RSStringEncoding) * numPlatformConverters);
-                RSAllocatorDeallocate(NULL, platformConverters);
+                RSAllocatorDeallocate(nil, platformConverters);
             }
 //            extern void RSQSortArray(void **list, RSIndex count, RSIndex elementSize, RSComparatorFunction comparator, BOOL ascending);
             RSSortArray((void **)&list, numSlots, sizeof(RSStringEncoding), RSOrderedDescending, (RSComparatorFunction)__RSStringEncodingComparator, nil);
 
             __RSStringEncodingFliterDupes(list, numSlots);
         }
-        if (!OSAtomicCompareAndSwapPtrBarrier(NULL, list, (void * volatile *)&encodings) && (list != __RSBuiltinEncodings)) RSAllocatorDeallocate(NULL, list);
+        if (!OSAtomicCompareAndSwapPtrBarrier(nil, list, (void * volatile *)&encodings) && (list != __RSBuiltinEncodings)) RSAllocatorDeallocate(nil, list);
         __RSAutoReleaseISA(nil, (ISA)encodings);
     }
     
@@ -1109,17 +1109,17 @@ RSInline BOOL __RSIsPlatformConverterAvailable(int encoding) {
 }
 
 static const RSStringEncodingConverter __RSICUBootstrap = {
-    NULL /* toBytes */, NULL /* toUnicode */, 6 /* maxBytesPerChar */, 4 /* maxDecomposedCharLen */,
+    nil /* toBytes */, nil /* toUnicode */, 6 /* maxBytesPerChar */, 4 /* maxDecomposedCharLen */,
     RSStringEncodingConverterICU /* encodingClass */,
-    NULL /* toBytesLen */, NULL /* toUnicodeLen */, NULL /* toBytesFallback */,
-    NULL /* toUnicodeFallback */, NULL /* toBytesPrecompose */, NULL, /* isValidCombiningChar */
+    nil /* toBytesLen */, nil /* toUnicodeLen */, nil /* toBytesFallback */,
+    nil /* toUnicodeFallback */, nil /* toBytesPrecompose */, nil, /* isValidCombiningChar */
 };
 
 static const RSStringEncodingConverter __RSPlatformBootstrap = {
-    NULL /* toBytes */, NULL /* toUnicode */, 6 /* maxBytesPerChar */, 4 /* maxDecomposedCharLen */,
+    nil /* toBytes */, nil /* toUnicode */, 6 /* maxBytesPerChar */, 4 /* maxDecomposedCharLen */,
     RSStringEncodingConverterPlatformSpecific /* encodingClass */,
-    NULL /* toBytesLen */, NULL /* toUnicodeLen */, NULL /* toBytesFallback */,
-    NULL /* toUnicodeFallback */, NULL /* toBytesPrecompose */, NULL, /* isValidCombiningChar */
+    nil /* toBytesLen */, nil /* toUnicodeLen */, nil /* toBytesFallback */,
+    nil /* toUnicodeFallback */, nil /* toBytesPrecompose */, nil, /* isValidCombiningChar */
 };
 
 RSPrivate const RSStringEncodingConverter *__RSStringEncodingGetExternalConverter(uint32_t encoding) {
@@ -1133,24 +1133,24 @@ RSPrivate const RSStringEncodingConverter *__RSStringEncodingGetExternalConverte
             return &__RSICUBootstrap;
         }
 #endif
-        return NULL;
+        return nil;
     }
 }
 
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED
 RSPrivate RSStringEncoding *__RSStringEncodingCreateListOfAvailablePlatformConverters(RSAllocatorRef allocator, RSIndex *numberOfConverters) {
     
-    return NULL;
+    return nil;
 }
 #elif DEPLOYMENT_TARGET_WINDOWS
 
 #include <tchar.h>
 
 static uint32_t __RSWin32EncodingIndex = 0;
-static RSStringEncoding *__RSWin32EncodingList = NULL;
+static RSStringEncoding *__RSWin32EncodingList = nil;
 
 static char CALLBACK __RSWin32EnumCodePageProc(LPTSTR string) {
-    uint32_t encoding = RSStringConvertWindowsCodepageToEncoding(_tcstoul(string, NULL, 10));
+    uint32_t encoding = RSStringConvertWindowsCodepageToEncoding(_tcstoul(string, nil, 10));
     RSIndex idx;
     
     if (encoding != RSStringEncodingInvalidId) { // We list only encodings we know
@@ -1175,12 +1175,12 @@ RSPrivate RSStringEncoding *__RSStringEncodingCreateListOfAvailablePlatformConve
     encodings = __RSWin32EncodingList;
     
     __RSWin32EncodingIndex = 0;
-    __RSWin32EncodingList = NULL;
+    __RSWin32EncodingList = nil;
     
     return encodings;
 }
 #else
-RSPrivate RSStringEncoding *__RSStringEncodingCreateListOfAvailablePlatformConverters(RSAllocatorRef allocator, RSIndex *numberOfConverters) { return NULL; }
+RSPrivate RSStringEncoding *__RSStringEncodingCreateListOfAvailablePlatformConverters(RSAllocatorRef allocator, RSIndex *numberOfConverters) { return nil; }
 #endif
 
 RSPrivate RSIndex __RSStringEncodingPlatformUnicodeToBytes(uint32_t encoding, uint32_t flags, const UniChar *characters, RSIndex numChars, RSIndex *usedCharLen, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen) {
@@ -1195,7 +1195,7 @@ RSPrivate RSIndex __RSStringEncodingPlatformUnicodeToBytes(uint32_t encoding, ui
         dwFlags |= (flags & RSStringEncodingIgnoreCombinings ? WC_DISCARDNS : 0);
     }
     
-    if ((usedLen = WideCharToMultiByte(RSStringConvertEncodingToWindowsCodepage(encoding), dwFlags, (LPCWSTR)characters, numChars, (LPSTR)bytes, maxByteLen, NULL, NULL)) == 0) {
+    if ((usedLen = WideCharToMultiByte(RSStringConvertEncodingToWindowsCodepage(encoding), dwFlags, (LPCWSTR)characters, numChars, (LPSTR)bytes, maxByteLen, nil, nil)) == 0) {
         if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
             CPINFO cpInfo;
             
@@ -1205,17 +1205,17 @@ RSPrivate RSIndex __RSStringEncodingPlatformUnicodeToBytes(uint32_t encoding, ui
             if (cpInfo.MaxCharSize == 1) {
                 numChars = maxByteLen;
             } else {
-                usedLen = WideCharToMultiByte(RSStringConvertEncodingToWindowsCodepage(encoding), dwFlags, (LPCWSTR)characters, numChars, NULL, 0, NULL, NULL);
+                usedLen = WideCharToMultiByte(RSStringConvertEncodingToWindowsCodepage(encoding), dwFlags, (LPCWSTR)characters, numChars, nil, 0, nil, nil);
                 usedLen -= maxByteLen;
                 numChars = (numChars > usedLen ? numChars - usedLen : 1);
             }
-            if (WideCharToMultiByte(RSStringConvertEncodingToWindowsCodepage(encoding), dwFlags, (LPCWSTR)characters, numChars, (LPSTR)bytes, maxByteLen, NULL, NULL) == 0) {
+            if (WideCharToMultiByte(RSStringConvertEncodingToWindowsCodepage(encoding), dwFlags, (LPCWSTR)characters, numChars, (LPSTR)bytes, maxByteLen, nil, nil) == 0) {
                 if (usedCharLen) *usedCharLen = 0;
                 if (usedByteLen) *usedByteLen = 0;
             } else {
                 RSIndex lastUsedLen = 0;
                 
-                while ((usedLen = WideCharToMultiByte(RSStringConvertEncodingToWindowsCodepage(encoding), dwFlags, (LPCWSTR)characters, ++numChars, (LPSTR)bytes, maxByteLen, NULL, NULL))) lastUsedLen = usedLen;
+                while ((usedLen = WideCharToMultiByte(RSStringConvertEncodingToWindowsCodepage(encoding), dwFlags, (LPCWSTR)characters, ++numChars, (LPSTR)bytes, maxByteLen, nil, nil))) lastUsedLen = usedLen;
                 if (usedCharLen) *usedCharLen = (numChars - 1);
                 if (usedByteLen) *usedByteLen = lastUsedLen;
             }
@@ -1281,12 +1281,12 @@ RSPrivate RSIndex __RSStringEncodingPlatformBytesToUnicode(uint32_t encoding, ui
 
 RSPrivate RSIndex __RSStringEncodingPlatformCharLengthForBytes(uint32_t encoding, uint32_t flags, const uint8_t *bytes, RSIndex numBytes) {
     RSIndex usedCharLen;
-    return (__RSStringEncodingPlatformBytesToUnicode(encoding, flags, bytes, numBytes, NULL, NULL, 0, &usedCharLen) == RSStringEncodingConversionSuccess ? usedCharLen : 0);
+    return (__RSStringEncodingPlatformBytesToUnicode(encoding, flags, bytes, numBytes, nil, nil, 0, &usedCharLen) == RSStringEncodingConversionSuccess ? usedCharLen : 0);
 }
 
 RSPrivate RSIndex __RSStringEncodingPlatformByteLengthForCharacters(uint32_t encoding, uint32_t flags, const UniChar *characters, RSIndex numChars) {
     RSIndex usedByteLen;
-    return (__RSStringEncodingPlatformUnicodeToBytes(encoding, flags, characters, numChars, NULL, NULL, 0, &usedByteLen) == RSStringEncodingConversionSuccess ? usedByteLen : 0);
+    return (__RSStringEncodingPlatformUnicodeToBytes(encoding, flags, characters, numChars, nil, nil, 0, &usedByteLen) == RSStringEncodingConversionSuccess ? usedByteLen : 0);
 }
 
 #undef __RSCarbonCore_GetTextEncodingBase0

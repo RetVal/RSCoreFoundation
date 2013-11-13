@@ -126,8 +126,8 @@ CURLdigest Curl_input_digest(struct connectdata *conn,
                              const char *header) /* rest of the *-authenticate:
                                                     header */
 {
-  char *token = NULL;
-  char *tmp = NULL;
+  char *token = nil;
+  char *tmp = nil;
   bool foundAuth = FALSE;
   bool foundAuthInt = FALSE;
   struct SessionHandle *data=conn->data;
@@ -193,14 +193,14 @@ CURLdigest Curl_input_digest(struct connectdata *conn,
           if(!tmp)
             return CURLDIGEST_NOMEM;
           token = strtok_r(tmp, ",", &tok_buf);
-          while(token != NULL) {
+          while(token != nil) {
             if(Curl_raw_equal(token, "auth")) {
               foundAuth = TRUE;
             }
             else if(Curl_raw_equal(token, "auth-int")) {
               foundAuthInt = TRUE;
             }
-            token = strtok_r(NULL, ",", &tok_buf);
+            token = strtok_r(nil, ",", &tok_buf);
           }
           free(tmp);
           /*select only auth o auth-int. Otherwise, ignore*/
@@ -280,9 +280,9 @@ CURLcode Curl_output_digest(struct connectdata *conn,
   unsigned char *ha1;
   unsigned char ha2[33];/* 32 digits and 1 zero byte */
   char cnoncebuf[7];
-  char *cnonce = NULL;
+  char *cnonce = nil;
   size_t cnonce_sz = 0;
-  char *tmp = NULL;
+  char *tmp = nil;
   struct timeval now;
 
   char **allocuserpwd;
@@ -321,7 +321,7 @@ CURLcode Curl_output_digest(struct connectdata *conn,
 
   if(*allocuserpwd) {
     Curl_safefree(*allocuserpwd);
-    *allocuserpwd = NULL;
+    *allocuserpwd = nil;
   }
 
   /* not set means empty */
@@ -414,7 +414,7 @@ CURLcode Curl_output_digest(struct connectdata *conn,
      Further details on Digest implementation differences:
      http://www.fngtps.com/2006/09/http-authentication
   */
-  if(authp->iestyle && ((tmp = strchr((char *)uripath, '?')) != NULL)) {
+  if(authp->iestyle && ((tmp = strchr((char *)uripath, '?')) != nil)) {
     md5this = (unsigned char *)aprintf("%s:%.*s", request,
                                        (int)(tmp - (char *)uripath), uripath);
   }
@@ -543,27 +543,27 @@ static void digest_cleanup_one(struct digestdata *d)
 {
   if(d->nonce)
     free(d->nonce);
-  d->nonce = NULL;
+  d->nonce = nil;
 
   if(d->cnonce)
     free(d->cnonce);
-  d->cnonce = NULL;
+  d->cnonce = nil;
 
   if(d->realm)
     free(d->realm);
-  d->realm = NULL;
+  d->realm = nil;
 
   if(d->opaque)
     free(d->opaque);
-  d->opaque = NULL;
+  d->opaque = nil;
 
   if(d->qop)
     free(d->qop);
-  d->qop = NULL;
+  d->qop = nil;
 
   if(d->algorithm)
     free(d->algorithm);
-  d->algorithm = NULL;
+  d->algorithm = nil;
 
   d->nc = 0;
   d->algo = CURLDIGESTALGO_MD5; /* default algorithm */

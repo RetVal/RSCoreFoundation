@@ -222,20 +222,20 @@ struct _rs_malloc_zone_t {
     void 	(*destroy)(struct _rs_malloc_zone_t *zone); /* zone is destroyed and all memory reclaimed */
     const char	*zone_name;
     
-    /* Optional batch callbacks; these may be NULL */
+    /* Optional batch callbacks; these may be nil */
     unsigned	(*batch_malloc)(struct _rs_malloc_zone_t *zone, size_t size, void **results, unsigned num_requested); /* given a size, returns pointers capable of holding that size; returns the number of pointers allocated (maybe 0 or less than num_requested) */
     void	(*batch_free)(struct _rs_malloc_zone_t *zone, void **to_be_freed, unsigned num_to_be_freed); /* frees all the pointers in to_be_freed; note that to_be_freed may be overwritten during the process */
     
     struct rs_malloc_introspection_t	*introspect;
     unsigned	version;
     
-    /* aligned memory allocation. The callback may be NULL. Present in version >= 5. */
+    /* aligned memory allocation. The callback may be nil. Present in version >= 5. */
     void *(*memalign)(struct _rs_malloc_zone_t *zone, size_t alignment, size_t size);
     
-    /* free a pointer known to be in zone and known to have the given size. The callback may be NULL. Present in version >= 6.*/
+    /* free a pointer known to be in zone and known to have the given size. The callback may be nil. Present in version >= 6.*/
     void (*free_definite_size)(struct _rs_malloc_zone_t *zone, void *ptr, size_t size);
     
-    /* Empty out caches in the face of memory pressure. The callback may be NULL. Present in version >= 8. */
+    /* Empty out caches in the face of memory pressure. The callback may be nil. Present in version >= 8. */
     size_t 	(*pressure_relief)(struct _rs_malloc_zone_t *zone, size_t goal);
 };
 
@@ -262,7 +262,7 @@ static void rs_malloc_zone_free(rs_malloc_zone_t *zone, void *ptr)
     if (zone == nil || ptr == nil) return;
     return zone->free(zone, ptr);
 }
-/* Frees pointer in zone; zone must be non-NULL */
+/* Frees pointer in zone; zone must be non-nil */
 
 static void *rs_malloc_zone_realloc(rs_malloc_zone_t *zone, void *ptr, size_t size)
 {
@@ -281,8 +281,8 @@ static const char *rs_malloc_zone_name(rs_malloc_zone_t *zone)
     if (!zone) return nil;
     return zone->zone_name;
 }
-/* Enlarges block if necessary; zone must be non-NULL */
-/* Returns the zone for a pointer, or NULL if not in any zone.
+/* Enlarges block if necessary; zone must be non-nil */
+/* Returns the zone for a pointer, or nil if not in any zone.
  The ptr must have been returned from a malloc or realloc call. */
 
 static size_t rs_malloc_good_size(size_t size)
@@ -374,20 +374,20 @@ typedef struct __RSAllocator
     void 	(*destroy)(struct _malloc_zone_t *zone); /* zone is destroyed and all memory reclaimed */
     const char	*zone_name;
     
-    /* Optional batch callbacks; these may be NULL */
+    /* Optional batch callbacks; these may be nil */
     unsigned	(*batch_malloc)(struct _malloc_zone_t *zone, size_t size, void **results, unsigned num_requested); /* given a size, returns pointers capable of holding that size; returns the number of pointers allocated (maybe 0 or less than num_requested) */
     void	(*batch_free)(struct _malloc_zone_t *zone, void **to_be_freed, unsigned num_to_be_freed); /* frees all the pointers in to_be_freed; note that to_be_freed may be overwritten during the process */
     
     struct malloc_introspection_t	*introspect;
     unsigned	version;
     
-    /* aligned memory allocation. The callback may be NULL. Present in version >= 5. */
+    /* aligned memory allocation. The callback may be nil. Present in version >= 5. */
     void *(*memalign)(struct _malloc_zone_t *zone, size_t alignment, size_t size);
     
-    /* free a pointer known to be in zone and known to have the given size. The callback may be NULL. Present in version >= 6.*/
+    /* free a pointer known to be in zone and known to have the given size. The callback may be nil. Present in version >= 6.*/
     void (*free_definite_size)(struct _malloc_zone_t *zone, void *ptr, size_t size);
     
-    /* Empty out caches in the face of memory pressure. The callback may be NULL. Present in version >= 8. */
+    /* Empty out caches in the face of memory pressure. The callback may be nil. Present in version >= 8. */
     size_t 	(*pressure_relief)(struct _malloc_zone_t *zone, size_t goal);
     
     void * info;
@@ -494,8 +494,18 @@ static void __RSAllocatorCustomDestroy(malloc_zone_t *zone) {
 static void __RSAllocatorNullDestroy(malloc_zone_t *zone) {
 }
 
-static struct __RSAllocator __RSAllocatorDefault = {
-    RSRuntimeBaseDefault(),
+static const struct __RSRuntimeBase __RSRuntimeClassBase = (const struct __RSRuntimeBase){
+    ._rsisa = 0,
+    ._rc = 1,
+    ._rsinfo._reserved = 0,
+    ._rsinfo._special = 1,
+    ._rsinfo._objId = 0,
+    ._rsinfo._rsinfo1 = 0,
+    ._rsinfo._rsinfo = (1 << 1) | (1 << 3)
+};
+
+static struct __RSAllocator __RSAllocatorDefault = (const struct __RSAllocator){
+    {0},
     __RSAllocatorCustomSize,
     __RSAllocatorCustomMalloc,
     __RSAllocatorCustomCalloc,
@@ -504,16 +514,16 @@ static struct __RSAllocator __RSAllocatorDefault = {
     __RSAllocatorCustomRealloc,
     __RSAllocatorNullDestroy,
     "RSAllocatorDefault",
-    NULL,
-    NULL,
+    nil,
+    nil,
     &__RSAllocatorZoneIntrospect,
     6,
-    NULL,
-    NULL,
+    nil,
+    nil,
 };
 
 static struct __RSAllocator __RSAllocatorSystemDefault = {
-    RSRuntimeBaseDefault(),
+    {0},
     __RSAllocatorCustomSize,
     __RSAllocatorCustomMalloc,
     __RSAllocatorCustomCalloc,
@@ -522,12 +532,12 @@ static struct __RSAllocator __RSAllocatorSystemDefault = {
     __RSAllocatorCustomRealloc,
     __RSAllocatorNullDestroy,
     "RSAllocatorSystemDefault",
-    NULL,
-    NULL,
+    nil,
+    nil,
     &__RSAllocatorZoneIntrospect,
     6,
-    NULL,
-    NULL,
+    nil,
+    nil,
 };
 
 RSAllocatorRef RSAllocatorDefault = &__RSAllocatorDefault;
@@ -638,11 +648,11 @@ static RSRuntimeClass __RSAllocatorClass =
 {
     _RSRuntimeScannedObject,
     "RSAllocator",
-    NULL,
-    NULL,
+    nil,
+    nil,
     __RSAllocatorClassDeallocate,
-    NULL,
-    NULL,
+    nil,
+    nil,
     __RSAllocatorClassDescription,
 };
 

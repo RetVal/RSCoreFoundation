@@ -98,14 +98,14 @@ static const uintptr_t __RSBasicHashPrimitiveRoots[64] =
 RSInline void *__RSBasicHashAllocateMemory(RSConstBasicHashRef ht, RSIndex count, RSIndex elem_size, BOOL strong, BOOL compactable)
 {
     RSAllocatorRef allocator = RSGetAllocator(ht);//RSAllocatorGetDefault(ht);
-    void *new_mem = NULL;
+    void *new_mem = nil;
     new_mem = RSAllocatorAllocate(allocator, count * elem_size);
     return new_mem;
 }
 
 RSInline void *__RSBasicHashAllocateMemory2(RSAllocatorRef allocator, RSIndex count, RSIndex elem_size, BOOL strong, BOOL compactable)
 {
-    void *new_mem = NULL;
+    void *new_mem = nil;
     new_mem = RSAllocatorAllocate(allocator, count * elem_size);
     return new_mem;
 }
@@ -957,23 +957,23 @@ static void __RSBasicHashDrain(RSBasicHashRef ht, BOOL forFinalization) {
     RSAllocatorRef allocator = RSGetAllocator(ht);
     BOOL nullify = (!forFinalization || !0);//RS_IS_COLLECTABLE_ALLOCATOR(allocator));
     
-    RSBasicHashValue *old_values = NULL, *old_keys = NULL;
-    void *old_counts = NULL;
-    uintptr_t *old_hashes = NULL;
+    RSBasicHashValue *old_values = nil, *old_keys = nil;
+    void *old_counts = nil;
+    uintptr_t *old_hashes = nil;
     
     old_values = __RSBasicHashGetValues(ht);
-    if (nullify) __RSBasicHashSetValues(ht, NULL);
+    if (nullify) __RSBasicHashSetValues(ht, nil);
     if (ht->bits.keys_offset) {
         old_keys = __RSBasicHashGetKeys(ht);
-        if (nullify) __RSBasicHashSetKeys(ht, NULL);
+        if (nullify) __RSBasicHashSetKeys(ht, nil);
     }
     if (ht->bits.counts_offset) {
         old_counts = __RSBasicHashGetCounts(ht);
-        if (nullify) __RSBasicHashSetCounts(ht, NULL);
+        if (nullify) __RSBasicHashSetCounts(ht, nil);
     }
     if (__RSBasicHashHasHashCache(ht)) {
         old_hashes = __RSBasicHashGetHashes(ht);
-        if (nullify) __RSBasicHashSetHashes(ht, NULL);
+        if (nullify) __RSBasicHashSetHashes(ht, nil);
     }
     
     if (nullify) {
@@ -1040,9 +1040,9 @@ static void __RSBasicHashRehash(RSBasicHashRef ht, RSIndex newItemCount) {
     RSIndex new_num_buckets = __RSBasicHashTableSizes[new_num_buckets_idx];
     RSIndex old_num_buckets = __RSBasicHashTableSizes[ht->bits.num_buckets_idx];
     
-    RSBasicHashValue *new_values = NULL, *new_keys = NULL;
-    void *new_counts = NULL;
-    uintptr_t *new_hashes = NULL;
+    RSBasicHashValue *new_values = nil, *new_keys = nil;
+    void *new_counts = nil;
+    uintptr_t *new_hashes = nil;
     
     if (0 < new_num_buckets) {
         new_values = (RSBasicHashValue *)__RSBasicHashAllocateMemory(ht, new_num_buckets, sizeof(RSBasicHashValue), RSBasicHashHasStrongValues(ht), __RSBasicHashHasCompactableValues(ht));
@@ -1072,9 +1072,9 @@ static void __RSBasicHashRehash(RSBasicHashRef ht, RSIndex newItemCount) {
     ht->bits.num_buckets_idx = new_num_buckets_idx;
     ht->bits.deleted = 0;
     
-    RSBasicHashValue *old_values = NULL, *old_keys = NULL;
-    void *old_counts = NULL;
-    uintptr_t *old_hashes = NULL;
+    RSBasicHashValue *old_values = nil, *old_keys = nil;
+    void *old_counts = nil;
+    uintptr_t *old_hashes = nil;
     
     old_values = __RSBasicHashGetValues(ht);
     __RSBasicHashSetValues(ht, new_values);
@@ -1388,11 +1388,11 @@ RSPrivate RSStringRef RSBasicHashDescription(RSConstBasicHashRef ht, BOOL detail
         RSStringAppendStringWithFormat(result, RSSTR("%Rnum bucket index = %d, num buckets = %ld, capacity = %d, num buckets used = %u,\n"), prefix, ht->bits.num_buckets_idx, RSBasicHashGetNumBuckets(ht), RSBasicHashGetCapacity(ht), ht->bits.used_buckets);
         RSStringAppendStringWithFormat(result, RSSTR("%Rcounts width = %d, finalized = %s,\n"), prefix,((ht->bits.counts_offset) ? (1 << ht->bits.counts_width) : 0), (ht->bits.finalized ? "yes" : "no"));
         RSStringAppendStringWithFormat(result, RSSTR("%Rnum mutations = %ld, num deleted = %ld, size = %ld, total size = %ld,\n"), prefix, ht->bits.mutations, ht->bits.deleted, RSBasicHashGetSize(ht, NO), RSBasicHashGetSize(ht, YES));
-        RSStringAppendStringWithFormat(result, RSSTR("%Rvalues ptr = %p, keys ptr = %p, counts ptr = %p, hashes ptr = %p,\n"), prefix, __RSBasicHashGetValues(ht), ((ht->bits.keys_offset) ? __RSBasicHashGetKeys(ht) : NULL), ((ht->bits.counts_offset) ? __RSBasicHashGetCounts(ht) : NULL), (__RSBasicHashHasHashCache(ht) ? __RSBasicHashGetHashes(ht) : NULL));
+        RSStringAppendStringWithFormat(result, RSSTR("%Rvalues ptr = %p, keys ptr = %p, counts ptr = %p, hashes ptr = %p,\n"), prefix, __RSBasicHashGetValues(ht), ((ht->bits.keys_offset) ? __RSBasicHashGetKeys(ht) : nil), ((ht->bits.counts_offset) ? __RSBasicHashGetCounts(ht) : nil), (__RSBasicHashHasHashCache(ht) ? __RSBasicHashGetHashes(ht) : nil));
     }
     RSStringAppendStringWithFormat(result, RSSTR("%Rentries =>\n"), prefix);
     RSBasicHashApply(ht, ^(RSBasicHashBucket bkt) {
-        RSStringRef vDesc = NULL, kDesc = NULL;
+        RSStringRef vDesc = nil, kDesc = nil;
         if (!describeElements) {
             vDesc = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<%p>"), (void *)bkt.weak_value);
             if (ht->bits.keys_offset) {
@@ -1465,14 +1465,14 @@ static RSTypeID __RSBasicHashTypeID = _RSRuntimeNotATypeID;
 static const RSRuntimeClass __RSBasicHashClass = {
     _RSRuntimeScannedObject,
     "RSBasicHash",
-    NULL,        // init
-    NULL,        // copy
+    nil,        // init
+    nil,        // copy
     __RSBasicHashDeallocate,
     __RSBasicHashEqual,
     __RSBasicHashHash,
     __RSBasicHashDescription,        //
-    NULL,
-    NULL,
+    nil,
+    nil,
 };
 
 RSPrivate void __RSBasicHashInitialize()
@@ -1492,7 +1492,7 @@ RSBasicHashRef RSBasicHashCreate(RSAllocatorRef allocator, RSOptionFlags flags, 
     if (flags & RSBasicHashHasCounts) size += sizeof(void *); // counts
     if (flags & RSBasicHashHasHashCache) size += sizeof(uintptr_t *); // hashes
     RSBasicHashRef ht = (RSBasicHashRef)__RSRuntimeCreateInstance(allocator, RSBasicHashGetTypeID(), size);
-    if (NULL == ht) return NULL;
+    if (nil == ht) return nil;
     
     ht->bits.finalized = 0;
     ht->bits.hash_style = (flags >> 13) & 0x3;
@@ -1540,7 +1540,7 @@ RSBasicHashRef RSBasicHashCreate(RSAllocatorRef allocator, RSOptionFlags flags, 
     
     __AssignWithWriteBarrier(&ht->callbacks, cb);
     for (RSIndex idx = 0; idx < offset; idx++) {
-        ht->pointers[idx] = NULL;
+        ht->pointers[idx] = nil;
     }
     
 #if ENABLE_MEMORY_COUNTERS
@@ -1553,45 +1553,45 @@ RSBasicHashRef RSBasicHashCreate(RSAllocatorRef allocator, RSOptionFlags flags, 
     
     return ht;
 }
-//#define RS_IS_COLLECTABLE_ALLOCATOR(allocator) (nil && (NULL == (allocator) || RSAllocatorSystemDefault == (allocator) || NO))
+//#define RS_IS_COLLECTABLE_ALLOCATOR(allocator) (nil && (nil == (allocator) || RSAllocatorSystemDefault == (allocator) || NO))
 RSBasicHashRef RSBasicHashCreateCopy(RSAllocatorRef allocator, RSConstBasicHashRef src_ht) {
     size_t size = RSBasicHashGetSize(src_ht, NO) - sizeof(RSRuntimeBase);
     RSBasicHashCallbacks *newcb = src_ht->callbacks->copyCallbacks(src_ht, allocator, src_ht->callbacks);
-    if (NULL == newcb) {
-        return NULL;
+    if (nil == newcb) {
+        return nil;
     }
     
     RSIndex new_num_buckets = __RSBasicHashTableSizes[src_ht->bits.num_buckets_idx];
-    RSBasicHashValue *new_values = NULL, *new_keys = NULL;
-    void *new_counts = NULL;
-    uintptr_t *new_hashes = NULL;
+    RSBasicHashValue *new_values = nil, *new_keys = nil;
+    void *new_counts = nil;
+    uintptr_t *new_hashes = nil;
     
     if (0 < new_num_buckets) {
         BOOL strongValues = RSBasicHashHasStrongValues(src_ht) && !(nil && !RS_IS_COLLECTABLE_ALLOCATOR(allocator));
         BOOL strongKeys = RSBasicHashHasStrongKeys(src_ht) && !(nil && !RS_IS_COLLECTABLE_ALLOCATOR(allocator));
         BOOL compactableValues = __RSBasicHashHasCompactableValues(src_ht) && !(nil && !RS_IS_COLLECTABLE_ALLOCATOR(allocator));
         new_values = (RSBasicHashValue *)__RSBasicHashAllocateMemory2(allocator, new_num_buckets, sizeof(RSBasicHashValue), strongValues, compactableValues);
-        if (!new_values) return NULL; // in this unusual circumstance, leak previously allocated blocks for now
+        if (!new_values) return nil; // in this unusual circumstance, leak previously allocated blocks for now
         //__SetLastAllocationEventName(new_values, "RSBasicHash (value-store)");
         if (src_ht->bits.keys_offset) {
             new_keys = (RSBasicHashValue *)__RSBasicHashAllocateMemory2(allocator, new_num_buckets, sizeof(RSBasicHashValue), strongKeys, NO);
-            if (!new_keys) return NULL; // in this unusual circumstance, leak previously allocated blocks for now
+            if (!new_keys) return nil; // in this unusual circumstance, leak previously allocated blocks for now
             //__SetLastAllocationEventName(new_keys, "RSBasicHash (key-store)");
         }
         if (src_ht->bits.counts_offset) {
             new_counts = (uintptr_t *)__RSBasicHashAllocateMemory2(allocator, new_num_buckets, (1 << src_ht->bits.counts_width), NO, NO);
-            if (!new_counts) return NULL; // in this unusual circumstance, leak previously allocated blocks for now
+            if (!new_counts) return nil; // in this unusual circumstance, leak previously allocated blocks for now
             //__SetLastAllocationEventName(new_counts, "RSBasicHash (count-store)");
         }
         if (__RSBasicHashHasHashCache(src_ht)) {
             new_hashes = (uintptr_t *)__RSBasicHashAllocateMemory2(allocator, new_num_buckets, sizeof(uintptr_t), NO, NO);
-            if (!new_hashes) return NULL; // in this unusual circumstance, leak previously allocated blocks for now
+            if (!new_hashes) return nil; // in this unusual circumstance, leak previously allocated blocks for now
             //__SetLastAllocationEventName(new_hashes, "RSBasicHash (hash-store)");
         }
     }
     
     RSBasicHashRef ht = (RSBasicHashRef)__RSRuntimeCreateInstance(allocator, RSBasicHashGetTypeID(), size);
-    if (NULL == ht) return NULL; // in this unusual circumstance, leak previously allocated blocks for now
+    if (nil == ht) return nil; // in this unusual circumstance, leak previously allocated blocks for now
     
     memmove((uint8_t *)ht + sizeof(RSRuntimeBase), (uint8_t *)src_ht + sizeof(RSRuntimeBase), sizeof(ht->bits));
     if (nil && !RS_IS_COLLECTABLE_ALLOCATOR(allocator)) {
@@ -1615,9 +1615,9 @@ RSBasicHashRef RSBasicHashCreateCopy(RSAllocatorRef allocator, RSConstBasicHashR
         return ht;
     }
     
-    RSBasicHashValue *old_values = NULL, *old_keys = NULL;
-    void *old_counts = NULL;
-    uintptr_t *old_hashes = NULL;
+    RSBasicHashValue *old_values = nil, *old_keys = nil;
+    void *old_counts = nil;
+    uintptr_t *old_hashes = nil;
     
     old_values = __RSBasicHashGetValues(src_ht);
     if (src_ht->bits.keys_offset) {
@@ -1944,13 +1944,13 @@ static const uintptr_t __RSBasicHashPrimitiveRoots[64] = {
 
 RSInline void *__RSBasicHashAllocateMemory(RSConstBasicHashRef ht, RSIndex count, RSIndex elem_size, BOOL strong, BOOL compactable) {
     RSAllocatorRef allocator = RSGetAllocator(ht);
-    void *new_mem = NULL;
+    void *new_mem = nil;
     new_mem = RSAllocatorAllocate(allocator, count * elem_size);
     return new_mem;
 }
 
 RSInline void *__RSBasicHashAllocateMemory2(RSAllocatorRef allocator, RSIndex count, RSIndex elem_size, BOOL strong, BOOL compactable) {
-    void *new_mem = NULL;
+    void *new_mem = nil;
     new_mem = RSAllocatorAllocate(allocator, count * elem_size);
     return new_mem;
 }
@@ -2007,14 +2007,14 @@ static int32_t RSBasicHashCallBackPtrsCount = 0;
 static int32_t RSBasicHashGetPtrIndex(void *ptr) {
     static dispatch_once_t once;
     dispatch_once(&once, ^{
-        RSBasicHashCallBackPtrs[0] = NULL;
+        RSBasicHashCallBackPtrs[0] = nil;
         RSBasicHashCallBackPtrs[1] = (void *)RSDescription;
         RSBasicHashCallBackPtrs[2] = (void *)__RSTypeCollectionRelease;
         RSBasicHashCallBackPtrs[3] = (void *)__RSTypeCollectionRetain;
         RSBasicHashCallBackPtrs[4] = (void *)RSEqual;
         RSBasicHashCallBackPtrs[5] = (void *)RSHash;
         RSBasicHashCallBackPtrs[6] = (void *)__RSStringCollectionCopy;
-        RSBasicHashCallBackPtrs[7] = NULL;
+        RSBasicHashCallBackPtrs[7] = nil;
         RSBasicHashCallBackPtrsCount = 8;
     });
     
@@ -2744,23 +2744,23 @@ static void __RSBasicHashDrain(RSBasicHashRef ht, BOOL forFinalization) {
     RSAllocatorRef allocator = RSGetAllocator(ht);
     BOOL nullify = (!forFinalization || !RS_IS_COLLECTABLE_ALLOCATOR(allocator));
     
-    RSBasicHashValue *old_values = NULL, *old_keys = NULL;
-    void *old_counts = NULL;
-    uintptr_t *old_hashes = NULL;
+    RSBasicHashValue *old_values = nil, *old_keys = nil;
+    void *old_counts = nil;
+    uintptr_t *old_hashes = nil;
     
     old_values = __RSBasicHashGetValues(ht);
-    if (nullify) __RSBasicHashSetValues(ht, NULL);
+    if (nullify) __RSBasicHashSetValues(ht, nil);
     if (ht->bits.keys_offset) {
         old_keys = __RSBasicHashGetKeys(ht);
-        if (nullify) __RSBasicHashSetKeys(ht, NULL);
+        if (nullify) __RSBasicHashSetKeys(ht, nil);
     }
     if (ht->bits.counts_offset) {
         old_counts = __RSBasicHashGetCounts(ht);
-        if (nullify) __RSBasicHashSetCounts(ht, NULL);
+        if (nullify) __RSBasicHashSetCounts(ht, nil);
     }
     if (__RSBasicHashHasHashCache(ht)) {
         old_hashes = __RSBasicHashGetHashes(ht);
-        if (nullify) __RSBasicHashSetHashes(ht, NULL);
+        if (nullify) __RSBasicHashSetHashes(ht, nil);
     }
     
     if (nullify) {
@@ -2820,9 +2820,9 @@ static void __RSBasicHashRehash(RSBasicHashRef ht, RSIndex newItemCount) {
     RSIndex new_num_buckets = __RSBasicHashTableSizes[new_num_buckets_idx];
     RSIndex old_num_buckets = __RSBasicHashTableSizes[ht->bits.num_buckets_idx];
     
-    RSBasicHashValue *new_values = NULL, *new_keys = NULL;
-    void *new_counts = NULL;
-    uintptr_t *new_hashes = NULL;
+    RSBasicHashValue *new_values = nil, *new_keys = nil;
+    void *new_counts = nil;
+    uintptr_t *new_hashes = nil;
     
     if (0 < new_num_buckets) {
         new_values = (RSBasicHashValue *)__RSBasicHashAllocateMemory(ht, new_num_buckets, sizeof(RSBasicHashValue), RSBasicHashHasStrongValues(ht), 0);
@@ -2852,9 +2852,9 @@ static void __RSBasicHashRehash(RSBasicHashRef ht, RSIndex newItemCount) {
     ht->bits.num_buckets_idx = new_num_buckets_idx;
     ht->bits.deleted = 0;
     
-    RSBasicHashValue *old_values = NULL, *old_keys = NULL;
-    void *old_counts = NULL;
-    uintptr_t *old_hashes = NULL;
+    RSBasicHashValue *old_values = nil, *old_keys = nil;
+    void *old_counts = nil;
+    uintptr_t *old_hashes = nil;
     
     old_values = __RSBasicHashGetValues(ht);
     __RSBasicHashSetValues(ht, new_values);
@@ -3165,11 +3165,11 @@ RSPrivate RSStringRef RSBasicHashDescription(RSConstBasicHashRef ht, BOOL detail
         RSStringAppendStringWithFormat(result, RSSTR("%rnum bucket index = %d, num buckets = %ld, capacity = %ld, num buckets used = %u,\n"), prefix, ht->bits.num_buckets_idx, RSBasicHashGetNumBuckets(ht), (long)RSBasicHashGetCapacity(ht), ht->bits.used_buckets);
         RSStringAppendStringWithFormat(result, RSSTR("%rcounts width = %d, finalized = %s,\n"), prefix,((ht->bits.counts_offset) ? (1 << ht->bits.counts_width) : 0), (ht->bits.finalized ? "yes" : "no"));
         RSStringAppendStringWithFormat(result, RSSTR("%rnum mutations = %ld, num deleted = %ld, size = %ld, total size = %ld,\n"), prefix, (long)ht->bits.mutations, (long)ht->bits.deleted, RSBasicHashGetSize(ht, false), RSBasicHashGetSize(ht, true));
-        RSStringAppendStringWithFormat(result, RSSTR("%rvalues ptr = %p, keys ptr = %p, counts ptr = %p, hashes ptr = %p,\n"), prefix, __RSBasicHashGetValues(ht), ((ht->bits.keys_offset) ? __RSBasicHashGetKeys(ht) : NULL), ((ht->bits.counts_offset) ? __RSBasicHashGetCounts(ht) : NULL), (__RSBasicHashHasHashCache(ht) ? __RSBasicHashGetHashes(ht) : NULL));
+        RSStringAppendStringWithFormat(result, RSSTR("%rvalues ptr = %p, keys ptr = %p, counts ptr = %p, hashes ptr = %p,\n"), prefix, __RSBasicHashGetValues(ht), ((ht->bits.keys_offset) ? __RSBasicHashGetKeys(ht) : nil), ((ht->bits.counts_offset) ? __RSBasicHashGetCounts(ht) : nil), (__RSBasicHashHasHashCache(ht) ? __RSBasicHashGetHashes(ht) : nil));
     }
     RSStringAppendStringWithFormat(result, RSSTR("%rentries =>\n"), prefix);
     RSBasicHashApply(ht, ^(RSBasicHashBucket bkt) {
-        RSStringRef vDesc = NULL, kDesc = NULL;
+        RSStringRef vDesc = nil, kDesc = nil;
         if (!describeElements) {
             vDesc = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<%p>"), (void *)bkt.weak_value);
             if (ht->bits.keys_offset) {
@@ -3240,14 +3240,14 @@ static RSTypeID __RSBasicHashTypeID = _RSRuntimeNotATypeID;
 static const RSRuntimeClass __RSBasicHashClass = {
     _RSRuntimeScannedObject,
     "RSBasicHash",
-    NULL,        // init
-    NULL,        // copy
+    nil,        // init
+    nil,        // copy
     __RSBasicHashDeallocate,
     __RSBasicHashEqual,
     __RSBasicHashHash,
     __RSBasicHashDescription,
-    NULL,
-    NULL
+    nil,
+    nil
 };
 
 RSPrivate void __RSBasicHashInitialize()
@@ -3267,7 +3267,7 @@ RSPrivate RSBasicHashRef RSBasicHashCreate(RSAllocatorRef allocator, RSOptionFla
     if (flags & RSBasicHashHasCounts) size += sizeof(void *); // counts
     if (flags & RSBasicHashHasHashCache) size += sizeof(uintptr_t *); // hashes
     RSBasicHashRef ht = (RSBasicHashRef)__RSRuntimeCreateInstance(allocator, RSBasicHashGetTypeID(), size);
-    if (NULL == ht) return NULL;
+    if (nil == ht) return nil;
     
     ht->bits.finalized = 0;
     ht->bits.hash_style = (flags >> 13) & 0x3;
@@ -3320,7 +3320,7 @@ RSPrivate RSBasicHashRef RSBasicHashCreate(RSAllocatorRef allocator, RSOptionFla
     ht->bits.__kget = RSBasicHashGetPtrIndex((void *)cb->getIndirectKey);
     
     for (RSIndex idx = 0; idx < offset; idx++) {
-        ht->pointers[idx] = NULL;
+        ht->pointers[idx] = nil;
     }
     
 #if ENABLE_MEMORY_COUNTERS
@@ -3337,35 +3337,35 @@ RSPrivate RSBasicHashRef RSBasicHashCreate(RSAllocatorRef allocator, RSOptionFla
 RSPrivate RSBasicHashRef RSBasicHashCreateCopy(RSAllocatorRef allocator, RSConstBasicHashRef src_ht) {
     size_t size = RSBasicHashGetSize(src_ht, false) - sizeof(RSRuntimeBase);
     RSIndex new_num_buckets = __RSBasicHashTableSizes[src_ht->bits.num_buckets_idx];
-    RSBasicHashValue *new_values = NULL, *new_keys = NULL;
-    void *new_counts = NULL;
-    uintptr_t *new_hashes = NULL;
+    RSBasicHashValue *new_values = nil, *new_keys = nil;
+    void *new_counts = nil;
+    uintptr_t *new_hashes = nil;
     
     if (0 < new_num_buckets) {
         BOOL strongValues = RSBasicHashHasStrongValues(src_ht) && !(RSUseCollectableAllocator && !RS_IS_COLLECTABLE_ALLOCATOR(allocator));
         BOOL strongKeys = RSBasicHashHasStrongKeys(src_ht) && !(RSUseCollectableAllocator && !RS_IS_COLLECTABLE_ALLOCATOR(allocator));
         new_values = (RSBasicHashValue *)__RSBasicHashAllocateMemory2(allocator, new_num_buckets, sizeof(RSBasicHashValue), strongValues, 0);
-        if (!new_values) return NULL; // in this unusual circumstance, leak previously allocated blocks for now
+        if (!new_values) return nil; // in this unusual circumstance, leak previously allocated blocks for now
         __SetLastAllocationEventName(new_values, "RSBasicHash (value-store)");
         if (src_ht->bits.keys_offset) {
             new_keys = (RSBasicHashValue *)__RSBasicHashAllocateMemory2(allocator, new_num_buckets, sizeof(RSBasicHashValue), strongKeys, false);
-            if (!new_keys) return NULL; // in this unusual circumstance, leak previously allocated blocks for now
+            if (!new_keys) return nil; // in this unusual circumstance, leak previously allocated blocks for now
             __SetLastAllocationEventName(new_keys, "RSBasicHash (key-store)");
         }
         if (src_ht->bits.counts_offset) {
             new_counts = (uintptr_t *)__RSBasicHashAllocateMemory2(allocator, new_num_buckets, (1 << src_ht->bits.counts_width), false, false);
-            if (!new_counts) return NULL; // in this unusual circumstance, leak previously allocated blocks for now
+            if (!new_counts) return nil; // in this unusual circumstance, leak previously allocated blocks for now
             __SetLastAllocationEventName(new_counts, "RSBasicHash (count-store)");
         }
         if (__RSBasicHashHasHashCache(src_ht)) {
             new_hashes = (uintptr_t *)__RSBasicHashAllocateMemory2(allocator, new_num_buckets, sizeof(uintptr_t), false, false);
-            if (!new_hashes) return NULL; // in this unusual circumstance, leak previously allocated blocks for now
+            if (!new_hashes) return nil; // in this unusual circumstance, leak previously allocated blocks for now
             __SetLastAllocationEventName(new_hashes, "RSBasicHash (hash-store)");
         }
     }
     
     RSBasicHashRef ht = (RSBasicHashRef)__RSRuntimeCreateInstance(allocator, RSBasicHashGetTypeID(), size);
-    if (NULL == ht) return NULL; // in this unusual circumstance, leak previously allocated blocks for now
+    if (nil == ht) return nil; // in this unusual circumstance, leak previously allocated blocks for now
     
     memmove((uint8_t *)ht + sizeof(RSRuntimeBase), (uint8_t *)src_ht + sizeof(RSRuntimeBase), sizeof(ht->bits));
     if (RSUseCollectableAllocator && !RS_IS_COLLECTABLE_ALLOCATOR(allocator)) {
@@ -3388,9 +3388,9 @@ RSPrivate RSBasicHashRef RSBasicHashCreateCopy(RSAllocatorRef allocator, RSConst
         return ht;
     }
     
-    RSBasicHashValue *old_values = NULL, *old_keys = NULL;
-    void *old_counts = NULL;
-    uintptr_t *old_hashes = NULL;
+    RSBasicHashValue *old_values = nil, *old_keys = nil;
+    void *old_counts = nil;
+    uintptr_t *old_hashes = nil;
     
     old_values = __RSBasicHashGetValues(src_ht);
     if (src_ht->bits.keys_offset) {

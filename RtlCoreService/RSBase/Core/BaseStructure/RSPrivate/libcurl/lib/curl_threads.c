@@ -71,7 +71,7 @@ curl_thread_t Curl_thread_create(unsigned int (*func) (void*), void *arg)
   ac->func = func;
   ac->arg = arg;
 
-  if(pthread_create(&t, NULL, curl_thread_create_thunk, ac) != 0) {
+  if(pthread_create(&t, nil, curl_thread_create_thunk, ac) != 0) {
     free(ac);
     return curl_thread_t_null;
   }
@@ -87,7 +87,7 @@ void Curl_thread_destroy(curl_thread_t hnd)
 
 int Curl_thread_join(curl_thread_t *hnd)
 {
-  int ret = (pthread_join(*hnd, NULL) == 0);
+  int ret = (pthread_join(*hnd, nil) == 0);
 
   *hnd = curl_thread_t_null;
 
@@ -100,10 +100,10 @@ curl_thread_t Curl_thread_create(unsigned int (CURL_STDCALL *func) (void*),
                                  void *arg)
 {
 #ifdef _WIN32_WCE
-  return CreateThread(NULL, 0, func, arg, 0, NULL);
+  return CreateThread(nil, 0, func, arg, 0, nil);
 #else
   curl_thread_t t;
-  t = (curl_thread_t)_beginthreadex(NULL, 0, func, arg, 0, NULL);
+  t = (curl_thread_t)_beginthreadex(nil, 0, func, arg, 0, nil);
   if((t == 0) || (t == (curl_thread_t)-1L))
     return curl_thread_t_null;
   return t;

@@ -52,7 +52,7 @@ RSExport RSCharacterSetRef RSCharacterSetGetPredefined(RSCharacterSetPredefinedS
  Creates a new immutable character set with the values from the given range.
  @param alloc The RSAllocator which should be used to allocate
  memory for the array and its storage for values. This
- parameter may be NULL in which case the current default
+ parameter may be nil in which case the current default
  RSAllocator is used. If this reference is not a valid
  RSAllocator, the behavior is undefined.
  @param theRange The RSRange which should be used to specify the
@@ -70,7 +70,7 @@ RSExport RSCharacterSetRef RSCharacterSetCreateWithCharactersInRange(RSAllocator
  Creates a new immutable character set with the values in the given string.
  @param alloc The RSAllocator which should be used to allocate
  memory for the array and its storage for values. This
- parameter may be NULL in which case the current default
+ parameter may be nil in which case the current default
  RSAllocator is used. If this reference is not a valid
  RSAllocator, the behavior is undefined.
  @param theString The RSString which should be used to specify
@@ -86,7 +86,7 @@ RSExport RSCharacterSetRef RSCharacterSetCreateWithCharactersInString(RSAllocato
  Creates a new immutable character set with the bitmap representtion in the given data.
  @param alloc The RSAllocator which should be used to allocate
  memory for the array and its storage for values. This
- parameter may be NULL in which case the current default
+ parameter may be nil in which case the current default
  RSAllocator is used. If this reference is not a valid
  RSAllocator, the behavior is undefined.
  @param theData The RSData which should be used to specify the
@@ -113,7 +113,7 @@ RSExport RSCharacterSetRef RSCharacterSetCreateWithBitmapRepresentation(RSAlloca
  Creates a new immutable character set that is the invert of the specified character set.
  @param alloc The RSAllocator which should be used to allocate
  memory for the array and its storage for values. This
- parameter may be NULL in which case the current default
+ parameter may be nil in which case the current default
  RSAllocator is used. If this reference is not a valid
  RSAllocator, the behavior is undefined.
  @param theSet The RSCharacterSet which is to be inverted.  If this
@@ -149,7 +149,7 @@ RSExport BOOL RSCharacterSetHasMemberInPlane(RSCharacterSetRef theSet, RSIndex t
  Creates a new empty mutable character set.
  @param allocator The RSAllocator which should be used to allocate
  memory for the array and its storage for values. This
- parameter may be NULL in which case the current default
+ parameter may be nil in which case the current default
  RSAllocator is used. If this reference is not a valid
  RSAllocator, the behavior is undefined.
  @result A reference to the new mutable RSCharacterSet.
@@ -161,7 +161,7 @@ RSExport RSMutableCharacterSetRef RSCharacterSetCreateMutable(RSAllocatorRef all
  Creates a new character set with the values from the given character set.  This function tries to compact the backing store where applicable.
  @param allocator The RSAllocator which should be used to allocate
  memory for the array and its storage for values. This
- parameter may be NULL in which case the current default
+ parameter may be nil in which case the current default
  RSAllocator is used. If this reference is not a valid
  RSAllocator, the behavior is undefined.
  @param theSet The RSCharacterSet which is to be copied.  If this
@@ -176,7 +176,7 @@ RSExport RSCharacterSetRef RSCharacterSetCreateCopy(RSAllocatorRef alloc, RSChar
  Creates a new mutable character set with the values from the given character set.
  @param allocator The RSAllocator which should be used to allocate
  memory for the array and its storage for values. This
- parameter may be NULL in which case the current default
+ parameter may be nil in which case the current default
  RSAllocator is used. If this reference is not a valid
  RSAllocator, the behavior is undefined.
  @param theSet The RSCharacterSet which is to be copied.  If this
@@ -215,7 +215,7 @@ RSExport BOOL RSCharacterSetIsLongCharacterMember(RSCharacterSetRef theSet, UTF3
  Creates a new immutable data with the bitmap representation from the given character set.
  @param allocator The RSAllocator which should be used to allocate
  memory for the array and its storage for values. This
- parameter may be NULL in which case the current default
+ parameter may be nil in which case the current default
  RSAllocator is used. If this reference is not a valid
  RSAllocator, the behavior is undefined.
  @param theSet The RSCharacterSet which is to be used create the

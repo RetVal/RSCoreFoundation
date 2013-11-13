@@ -115,7 +115,7 @@ static CURLcode gopher_do(struct connectdata *conn, bool *done)
   curl_off_t *bytecount = &data->req.bytecount;
   char *path = data->state.path;
   char *sel;
-  char *sel_org = NULL;
+  char *sel_org = nil;
   ssize_t amount, k;
 
   *done = TRUE; /* unconditionally */
@@ -193,7 +193,7 @@ static CURLcode gopher_do(struct connectdata *conn, bool *done)
     return result;
 
   Curl_setup_transfer(conn, FIRSTSOCKET, -1, FALSE, bytecount,
-                      -1, NULL); /* no upload */
+                      -1, nil); /* no upload */
   return CURLE_OK;
 }
 #endif /*CURL_DISABLE_GOPHER*/

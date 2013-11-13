@@ -34,7 +34,7 @@ RSPrivate void *__RSStartSimpleThread(void *func, void *arg)
     args->func = func;
     args->arg = arg;
     /* The thread is created suspended, because otherwise there would be a race between the assignment below of the handle field, and it's possible use in the thread func above. */
-    args->handle = (HANDLE)_beginthreadex(NULL, 0, func, args, CREATE_SUSPENDED, &tid);
+    args->handle = (HANDLE)_beginthreadex(nil, 0, func, args, CREATE_SUSPENDED, &tid);
     handle = args->handle;
     ResumeThread(handle);
     return handle;
@@ -59,7 +59,7 @@ static void __e_pop_exception_handler(_exception_handler_block handler)
 #pragma mark -
 #pragma mark Thread Local Data
 
-// If slot >= RS_TSD_MAX_SLOTS, the SPI functions will crash at NULL + slot address.
+// If slot >= RS_TSD_MAX_SLOTS, the SPI functions will crash at nil + slot address.
 // If thread data has been torn down, these functions should crash on RS_TSD_BAD_PTR + slot address.
 #define RS_TSD_MAX_SLOTS 70
 
@@ -119,7 +119,7 @@ static void __RSTSDFinalize(void *arg) {
     for (int32_t i = 0; i < RS_TSD_MAX_SLOTS; i++) {
         if (table->data[i] && table->destructors[i]) {
             uintptr_t old = table->data[i];
-            table->data[i] = (uintptr_t)NULL;
+            table->data[i] = (uintptr_t)nil;
             table->destructors[i]((void *)(old));
         }
     }
@@ -146,7 +146,7 @@ static __RSTSDTable *__RSTSDGetTable() {
     __RSTSDTable *table = (__RSTSDTable *)__RSTSDGetSpecific();
     // Make sure we're not setting data again after destruction.
     if (table == RS_TSD_BAD_PTR) {
-        return NULL;
+        return nil;
     }
     // Create table on demand
     if (!table) {
@@ -175,7 +175,7 @@ RSExport void *_RSGetTSD(uint32_t slot) {
     if (!table) {
         // Someone is getting TSD during thread destruction. The table is gone, so we can't get any data anymore.
 //        _RSLogSimple(kRSLogLevelWarning, "Warning: TSD slot %d retrieved but the thread data has already been torn down.", slot);
-        return NULL;
+        return nil;
     }
     uintptr_t *slots = (uintptr_t *)(table->data);
     return (void *)slots[slot];
@@ -191,7 +191,7 @@ RSExport void *_RSSetTSD(uint32_t slot, void *newVal, tsdDestructor destructor) 
     if (!table) {
         // Someone is setting TSD during thread destruction. The table is gone, so we can't get any data anymore.
 //        _RSLogSimple(kRSLogLevelWarning, "Warning: TSD slot %d set but the thread data has already been torn down.", slot);
-        return NULL;
+        return nil;
     }
     
     void *oldVal = (void *)table->data[slot];

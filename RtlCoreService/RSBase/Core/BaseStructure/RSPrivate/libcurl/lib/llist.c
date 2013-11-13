@@ -36,8 +36,8 @@ llist_init(struct curl_llist *l, curl_llist_dtor dtor)
 {
   l->size = 0;
   l->dtor = dtor;
-  l->head = NULL;
-  l->tail = NULL;
+  l->head = nil;
+  l->tail = nil;
 }
 
 struct curl_llist *
@@ -47,7 +47,7 @@ Curl_llist_alloc(curl_llist_dtor dtor)
 
   list = malloc(sizeof(struct curl_llist));
   if(!list)
-    return NULL;
+    return nil;
 
   llist_init(list, dtor);
 
@@ -58,7 +58,7 @@ Curl_llist_alloc(curl_llist_dtor dtor)
  * Curl_llist_insert_next()
  *
  * Inserts a new list element after the given one 'e'. If the given existing
- * entry is NULL and the list already has elements, the new one will be
+ * entry is nil and the list already has elements, the new one will be
  * inserted first in the list.
  *
  * Returns: 1 on success and 0 on failure.
@@ -76,12 +76,12 @@ Curl_llist_insert_next(struct curl_llist *list, struct curl_llist_element *e,
   ne->ptr = (void *) p;
   if(list->size == 0) {
     list->head = ne;
-    list->head->prev = NULL;
-    list->head->next = NULL;
+    list->head->prev = nil;
+    list->head->next = nil;
     list->tail = ne;
   }
   else {
-    /* if 'e' is NULL here, we insert the new element first in the list */
+    /* if 'e' is nil here, we insert the new element first in the list */
     ne->next = e?e->next:list->head;
     ne->prev = e;
     if(!e) {
@@ -110,16 +110,16 @@ int
 Curl_llist_remove(struct curl_llist *list, struct curl_llist_element *e,
                   void *user)
 {
-  if(e == NULL || list->size == 0)
+  if(e == nil || list->size == 0)
     return 1;
 
   if(e == list->head) {
     list->head = e->next;
 
-    if(list->head == NULL)
-      list->tail = NULL;
+    if(list->head == nil)
+      list->tail = nil;
     else
-      e->next->prev = NULL;
+      e->next->prev = nil;
   }
   else {
     e->prev->next = e->next;
@@ -131,9 +131,9 @@ Curl_llist_remove(struct curl_llist *list, struct curl_llist_element *e,
 
   list->dtor(user, e->ptr);
 
-  e->ptr  = NULL;
-  e->prev = NULL;
-  e->next = NULL;
+  e->ptr  = nil;
+  e->prev = nil;
+  e->next = nil;
 
   free(e);
   --list->size;
@@ -166,16 +166,16 @@ int Curl_llist_move(struct curl_llist *list, struct curl_llist_element *e,
                     struct curl_llist_element *to_e)
 {
   /* Remove element from list */
-  if(e == NULL || list->size == 0)
+  if(e == nil || list->size == 0)
     return 0;
 
   if(e == list->head) {
     list->head = e->next;
 
-    if(list->head == NULL)
-      list->tail = NULL;
+    if(list->head == nil)
+      list->tail = nil;
     else
-      e->next->prev = NULL;
+      e->next->prev = nil;
   }
   else {
     e->prev->next = e->next;
@@ -190,8 +190,8 @@ int Curl_llist_move(struct curl_llist *list, struct curl_llist_element *e,
   /* Add element to to_list after to_e */
   if(to_list->size == 0) {
     to_list->head = e;
-    to_list->head->prev = NULL;
-    to_list->head->next = NULL;
+    to_list->head->prev = nil;
+    to_list->head->next = nil;
     to_list->tail = e;
   }
   else {

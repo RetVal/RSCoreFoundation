@@ -144,7 +144,7 @@ RSExport RSUUIDRef RSUUIDCreate(RSAllocatorRef allocator)
         {
             const char *value = getenv("CFUUIDVersionNumber");
             if (value) {
-                if (1 == strtoul_l(value, NULL, 0, NULL)) useV1UUIDs = YES;
+                if (1 == strtoul_l(value, nil, 0, nil)) useV1UUIDs = YES;
             }
             checked = YES;
         }
@@ -153,7 +153,7 @@ RSExport RSUUIDRef RSUUIDCreate(RSAllocatorRef allocator)
 #else
         retval = 1;
 #endif
-    return (retval == 0) ? __RSUUIDCreateWithBytesPrimitive(allocator, bytes, NO) : NULL;
+    return (retval == 0) ? __RSUUIDCreateWithBytesPrimitive(allocator, bytes, NO) : nil;
 }
 
 RSExport RSUUIDRef RSUUIDCreateWithBytes(RSAllocatorRef allocator,
@@ -193,7 +193,7 @@ RSExport RSUUIDRef RSUUIDCreateWithString(RSAllocatorRef allocator, RSStringRef 
     }
     else if (len == 0)
     {
-        return NULL;
+        return nil;
     }
     RSStringGetCharacters(uuidString, RSMakeRange(0, len), chars);
     memset((void *)&bytes, 0, sizeof(bytes));

@@ -191,7 +191,7 @@ RSPrivate BOOL __RSStringScanDouble(RSStringInlineBuffer *buf, RSTypeRef locale,
     SInt32 capacity = STACK_BUFFER_SIZE;	// in chars
     double result;
     UniChar ch;
-    RSAllocatorRef tmpAlloc = NULL;
+    RSAllocatorRef tmpAlloc = nil;
 
     ch = __RSStringGetFirstNonSpaceCharacterFromInlineBuffer(buf, indexPtr);
     // At this point indexPtr points at the first non-space char
@@ -238,7 +238,7 @@ RSPrivate BOOL __RSStringScanDouble(RSStringInlineBuffer *buf, RSTypeRef locale,
     while ((ch < 128) && (__RSNumberSet[ch >> 3] & (1 << (ch & 7)))) {
         if (numChars >= capacity - 1) {
 	    capacity += ALLOC_CHUNK_SIZE;
-	    if (tmpAlloc == NULL) tmpAlloc = RSAllocatorGetDefault();
+	    if (tmpAlloc == nil) tmpAlloc = RSAllocatorGetDefault();
 	    if (charPtr == localCharBuffer) {
 		charPtr = (char *)RSAllocatorAllocate(tmpAlloc, capacity * sizeof(char));
 		memmove(charPtr, localCharBuffer, numChars * sizeof(char));
@@ -251,7 +251,7 @@ RSPrivate BOOL __RSStringScanDouble(RSStringInlineBuffer *buf, RSTypeRef locale,
     };
     charPtr[numChars] = 0;	// Null byte for strtod
 
-    result = strtod_l(charPtr, &endCharPtr, NULL);
+    result = strtod_l(charPtr, &endCharPtr, nil);
 
     if (tmpAlloc) RSAllocatorDeallocate(tmpAlloc, charPtr);
     if (charPtr == endCharPtr) return NO;

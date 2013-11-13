@@ -686,14 +686,14 @@ static RSStringRef __RSNumberClassDescription(RSTypeRef obj)
 static  RSRuntimeClass __RSNumberClass = {
     _RSRuntimeScannedObject,
     "RSNumber",
-    NULL,
+    nil,
     __RSNumberClassCopy,
     __RSNumberClassDeallocate,
     __RSNumberClassEqual,
     __RSNumberClassHash,
     __RSNumberClassDescription,
-    NULL,
-    NULL,
+    nil,
+    nil,
 };
 
 RSTypeID    RSNumberGetTypeID()

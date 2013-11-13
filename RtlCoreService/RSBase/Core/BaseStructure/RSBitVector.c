@@ -403,7 +403,7 @@ static void __RSBitVectorGrow(RSMutableBitVectorRef bv, RSIndex numNewValues) {
 //    __RSBitVectorSetNumBuckets(bv, __RSBitVectorNumBucketsForCapacity(capacity));
     __RSAssignWithWriteBarrier((void **)&bv->_buckets, RSAllocatorReallocate(allocator, bv->_buckets, __RSBitVectorNumBuckets(bv) * sizeof(__RSBitVectorBucket)));
 //    if (__RSOASafe) __RSSetLastAllocationEventName(bv->_buckets, "RSBitVector (store)");
-    if (NULL == bv->_buckets) HALTWithError(RSGenericException, "");
+    if (nil == bv->_buckets) HALTWithError(RSGenericException, "");
 }
 
 static __RSBitVectorBucket __RSBitVectorZeroBits(__RSBitVectorBucket bucketValue, __RSBitVectorBucket bucketValueMask, void *context) {
@@ -433,7 +433,7 @@ RSExport void RSBitVectorSetCount(RSMutableBitVectorRef bv, RSIndex count)
     }
     if (cnt < count) {
         RSRange range = RSMakeRange(cnt, count - cnt);
-        __RSBitVectorInternalMap(bv, range, __RSBitVectorZeroBits, NULL);
+        __RSBitVectorInternalMap(bv, range, __RSBitVectorZeroBits, nil);
     }
     __RSBitVectorSetNumBucketsUsed(bv, count / __RS_BITS_PER_BUCKET + 1);
     __RSBitVectorSetCount(bv, count);
@@ -458,7 +458,7 @@ RSExport void RSBitVectorFlipBits(RSMutableBitVectorRef bv, RSRange range)
     __RSBitVectorValidateRange(bv, range, __PRETTY_FUNCTION__);
 //    RSAssert1(__RSBitVectorMutableVariety(bv) == RSBitVectorMutable, __kRSLogAssertion, "%s(): bit vector is immutable", __PRETTY_FUNCTION__);
     if (0 == range.length) return;
-    __RSBitVectorInternalMap(bv, range, __RSBitVectorFlipBits, NULL);
+    __RSBitVectorInternalMap(bv, range, __RSBitVectorFlipBits, nil);
 }
 
 RSExport void RSBitVectorSetBitAtIndex(RSMutableBitVectorRef bv, RSIndex idx, RSBit value)
@@ -477,11 +477,11 @@ RSExport void RSBitVectorSetBits(RSMutableBitVectorRef bv, RSRange range, RSBit 
     if (0 == range.length) return;
     if (value)
     {
-        __RSBitVectorInternalMap(bv, range, __RSBitVectorOneBits, NULL);
+        __RSBitVectorInternalMap(bv, range, __RSBitVectorOneBits, nil);
     }
     else
     {
-        __RSBitVectorInternalMap(bv, range, __RSBitVectorZeroBits, NULL);
+        __RSBitVectorInternalMap(bv, range, __RSBitVectorZeroBits, nil);
     }
 }
 
@@ -497,11 +497,11 @@ RSExport void RSBitVectorSetAllBits(RSMutableBitVectorRef bv, RSBit value)
         RSRange range = RSMakeRange(nBuckets * __RS_BITS_PER_BUCKET, leftover);
         if (value)
         {
-            __RSBitVectorInternalMap(bv, range, __RSBitVectorOneBits, NULL);
+            __RSBitVectorInternalMap(bv, range, __RSBitVectorOneBits, nil);
         }
         else
         {
-            __RSBitVectorInternalMap(bv, range, __RSBitVectorZeroBits, NULL);
+            __RSBitVectorInternalMap(bv, range, __RSBitVectorZeroBits, nil);
         }
     }
     memset(bv->_buckets, (value ? ~0 : 0), nBuckets);

@@ -143,7 +143,7 @@ static void __RSTimerClassDeallocate(RSTypeRef rs)
 //            __dps_timer_invalid(timer->_dps_timer);
             if (__RSTimerIsSuspend(timer))
             {
-                RSExceptionCreateAndRaise(RSAllocatorSystemDefault, RSGenericException, RSSTR("BUG: RSTimer want to invalidate a suspend timer"), RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, timer, RSExceptionObject, NULL)));
+                RSExceptionCreateAndRaise(RSAllocatorSystemDefault, RSGenericException, RSSTR("BUG: RSTimer want to invalidate a suspend timer"), RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, timer, RSExceptionObject, nil)));
                 return;
             }
             __dps_timer_release(timer->_dps_timer);
@@ -257,7 +257,7 @@ RSExport void RSTimerFire(RSTimerRef timer)
     }
     else
     {
-        RSExceptionCreateAndRaise(RSAllocatorSystemDefault, RSGenericException, RSSTR("BUG: RSTimer over fire"), RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, timer, RSExceptionObject, NULL)));
+        RSExceptionCreateAndRaise(RSAllocatorSystemDefault, RSGenericException, RSSTR("BUG: RSTimer over fire"), RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, timer, RSExceptionObject, nil)));
     }
 }
 
@@ -273,7 +273,7 @@ RSExport void RSTimerInvalidate(RSTimerRef timer)
     }
     else
     {
-        RSExceptionCreateAndRaise(RSAllocatorSystemDefault, RSGenericException, RSSTR("BUG: RSTimer over invalidate or invalidate a suspend timer"), RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, timer, RSExceptionObject, NULL)));
+        RSExceptionCreateAndRaise(RSAllocatorSystemDefault, RSGenericException, RSSTR("BUG: RSTimer over invalidate or invalidate a suspend timer"), RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, timer, RSExceptionObject, nil)));
     }
 }
 
@@ -288,7 +288,7 @@ RSExport void RSTimerSuspend(RSTimerRef timer)
     }
     else
     {
-        RSExceptionCreateAndRaise(RSAllocatorSystemDefault, RSGenericException, RSSTR("BUG: RSTimer over invalidate or over suspend"), RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, timer, RSExceptionObject, NULL)));
+        RSExceptionCreateAndRaise(RSAllocatorSystemDefault, RSGenericException, RSSTR("BUG: RSTimer over invalidate or over suspend"), RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, timer, RSExceptionObject, nil)));
     }
 }
 

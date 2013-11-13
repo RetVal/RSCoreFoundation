@@ -177,14 +177,14 @@ Curl_axtls_connect(struct connectdata *conn,
     
     /* Allocate an SSL_CTX struct */
     ssl_ctx = ssl_ctx_new(client_option, SSL_DEFAULT_CLNT_SESS);
-    if(ssl_ctx == NULL) {
+    if(ssl_ctx == nil) {
         failf(data, "unable to create client SSL context");
         return CURLE_SSL_CONNECT_ERROR;
     }
     
     /* Load the trusted CA cert bundle file */
     if(data->set.ssl.CAfile) {
-        if(ssl_obj_load(ssl_ctx, SSL_OBJ_X509_CACERT, data->set.ssl.CAfile, NULL)
+        if(ssl_obj_load(ssl_ctx, SSL_OBJ_X509_CACERT, data->set.ssl.CAfile, nil)
            != SSL_OK) {
             infof(data, "error reading ca cert file %s \n",
                   data->set.ssl.CAfile);
@@ -211,7 +211,7 @@ Curl_axtls_connect(struct connectdata *conn,
         /* Instead of trying to analyze cert type here, let axTLS try them all. */
         while(cert_types[i] != 0) {
             ssl_fcn_return = ssl_obj_load(ssl_ctx, cert_types[i],
-                                          data->set.str[STRING_CERT], NULL);
+                                          data->set.str[STRING_CERT], nil);
             if(ssl_fcn_return == SSL_OK) {
                 infof(data, "successfully read cert file %s \n",
                       data->set.str[STRING_CERT]);
@@ -236,7 +236,7 @@ Curl_axtls_connect(struct connectdata *conn,
         /* Instead of trying to analyze key type here, let axTLS try them all. */
         while(key_types[i] != 0) {
             ssl_fcn_return = ssl_obj_load(ssl_ctx, key_types[i],
-                                          data->set.str[STRING_KEY], NULL);
+                                          data->set.str[STRING_KEY], nil);
             if(ssl_fcn_return == SSL_OK) {
                 infof(data, "successfully read key file %s \n",
                       data->set.str[STRING_KEY]);
@@ -267,7 +267,7 @@ Curl_axtls_connect(struct connectdata *conn,
                              ssl_sessionid, (uint8_t)ssl_idsize);
     }
     else
-        ssl = ssl_client_new(ssl_ctx, conn->sock[sockindex], NULL, 0);
+        ssl = ssl_client_new(ssl_ctx, conn->sock[sockindex], nil, 0);
     
     /* Check to make sure handshake was ok. */
     ssl_fcn_return = ssl_handshake_status(ssl);
@@ -298,7 +298,7 @@ Curl_axtls_connect(struct connectdata *conn,
     
     /* See if common name was set in server certificate */
     x509 = ssl_get_cert_dn(ssl, SSL_X509_CERT_COMMON_NAME);
-    if(x509 == NULL)
+    if(x509 == nil)
         infof(data, "error fetching CN from cert\n");
     
     /* Here, gtls.c does the following
@@ -368,11 +368,11 @@ void Curl_axtls_close(struct connectdata *conn, int sockindex)
          SSL_set_connect_state(connssl->handle); */
         
         ssl_free (connssl->ssl);
-        connssl->ssl = NULL;
+        connssl->ssl = nil;
     }
     if(connssl->ssl_ctx) {
         ssl_ctx_free (connssl->ssl_ctx);
-        connssl->ssl_ctx = NULL;
+        connssl->ssl_ctx = nil;
     }
 }
 
@@ -429,7 +429,7 @@ int Curl_axtls_shutdown(struct connectdata *conn, int sockindex)
         }
         
         ssl_free (connssl->ssl);
-        connssl->ssl = NULL;
+        connssl->ssl = nil;
     }
     return retval;
 }

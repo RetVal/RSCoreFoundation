@@ -35,8 +35,8 @@
 #define TZZONELINK	TZDEFAULT
 #define TZZONEINFO	TZDIR "/"
 #elif DEPLOYMENT_TARGET_WINDOWS
-static RSStringRef __tzZoneInfo = NULL;
-static char *__tzDir = NULL;
+static RSStringRef __tzZoneInfo = nil;
+static char *__tzDir = nil;
 static void __InitTZStrings(void);
 #else
 #error Unknown or unspecified DEPLOYMENT_TARGET
@@ -126,10 +126,10 @@ static struct __RSRuntimeClass __RSTimeZoneClass =
     __RSTimeZoneClassCopy,
     __RSTimeZoneClassDeallocate,
     __RSTimeZoneClassEqual,
-    NULL,
+    nil,
     __RSTimeZoneClassDescription,
-    NULL,
-    NULL
+    nil,
+    nil
 };
 
 static RSTypeID _RSTimeZoneTypeID = _RSRuntimeNotATypeID;

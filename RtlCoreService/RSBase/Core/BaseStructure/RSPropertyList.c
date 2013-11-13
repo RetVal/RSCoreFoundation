@@ -117,8 +117,8 @@ static void _plistAppendCharacters(RSMutableDataRef xmlData, const UniChar* char
     } while (curLoc < length && (characters[curLoc] < 128));	// We will exit out of here when we run out of chars or hit a non-ASCII char
     
     if (curLoc < length) {	// Now deal with non-ASCII chars
-        RSDataRef data = NULL;
-        RSStringRef str = NULL;
+        RSDataRef data = nil;
+        RSStringRef str = nil;
         if ((str = RSStringCreateWithCharactersNoCopy(RSAllocatorSystemDefault, characters + curLoc, length - curLoc, RSAllocatorNull))) {
             if ((data = RSStringCreateExternalRepresentation(RSAllocatorSystemDefault, str, RSStringEncodingUTF8, 0))) {
                 RSDataAppendBytes (xmlData, RSDataGetBytesPtr(data), RSDataGetLength(data));
@@ -175,7 +175,7 @@ static void _appendIndents(RSIndex numIndents, RSMutableDataRef str)
 static void _XMLPlistAppendDataUsingBase64(RSMutableDataRef mData, RSDataRef inputData, RSIndex indent) {
     static const char __RSPLDataEncodeTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 #define MAXLINELEN 76
-    char buf[MAXLINELEN + 4 + 2];	// For the slop and carriage return and terminating NULL
+    char buf[MAXLINELEN + 4 + 2];	// For the slop and carriage return and terminating nil
     
     const uint8_t *bytes = RSDataGetBytesPtr(inputData);
     RSIndex length = RSDataGetLength(inputData);
@@ -419,7 +419,7 @@ static RSErrorCode __RSAppendXML0(RSTypeRef object, RSBitU32 indentation, RSMuta
         _plistAppendUTF8CString(xmlString, ">\n");
         new_rstype_array(keys, count);
         //RSArrayRef keys = RSDictionaryAllKeys(object);
-        RSDictionaryGetKeysAndValues((RSDictionaryRef)object, keys, NULL);
+        RSDictionaryGetKeysAndValues((RSDictionaryRef)object, keys, nil);
 //        keyArray = RSArrayCreateWithObjects(RSAllocatorSystemDefault, keys, count);
         keyArray = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
         for (RSUInteger idx = 0; idx < count; idx++) {
@@ -475,7 +475,7 @@ static RSErrorCode __RSAppendXML0(RSTypeRef object, RSBitU32 indentation, RSMuta
         // YYYY '-' MM '-' DD 'T' hh ':' mm ':' ss 'Z'
 //        RSBit32 y = 0, M = 0, d = 0, H = 0, m = 0, s = 0;
 
-        RSGregorianDate date = RSAbsoluteTimeGetGregorianDate(RSDateGetAbsoluteTime((RSDateRef)object), NULL);
+        RSGregorianDate date = RSAbsoluteTimeGetGregorianDate(RSDateGetAbsoluteTime((RSDateRef)object), nil);
 //        y = date.year;
 //        M = date.month;
 //        d = date.day;
@@ -978,7 +978,7 @@ RSErrorRef __RSPropertyListCreateError(RSErrorCode errorCode, RSStringRef descri
     va_start(ap, descriptionFormat);
     RSStringRef description = RSStringCreateWithFormatAndArguments(RSAllocatorSystemDefault, 0, descriptionFormat, ap);
     va_end(ap);
-    RSDictionaryRef userInfo = RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, description, RSErrorDebugDescriptionKey, NULL);
+    RSDictionaryRef userInfo = RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, description, RSErrorDebugDescriptionKey, nil);
     RSRelease(description);
     RSErrorRef error = RSErrorCreate(RSAllocatorSystemDefault, RSErrorDomainRSCoreFoundation, errorCode, userInfo);
     RSRelease(userInfo);
@@ -1436,7 +1436,7 @@ static BOOL parseIntegerTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
         }
         if (pInfo->skip)
         {
-            *out = NULL;
+            *out = nil;
         }
         else
         {
@@ -1521,7 +1521,7 @@ static BOOL parseIntegerTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
     
     if (pInfo->skip)
     {
-        *out = NULL;
+        *out = nil;
     }
     else
     {
@@ -1553,15 +1553,15 @@ static void __RSPListRelease(RSTypeRef obj, RSAllocatorRef allocator)
 
 static BOOL parsePListTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
 {
-    RSTypeRef result = NULL;
-    if (!getContentObject(pInfo, NULL, &result))
+    RSTypeRef result = nil;
+    if (!getContentObject(pInfo, nil, &result))
     {
         if (!pInfo->error) pInfo->error = __RSPropertyListCreateError(RSPropertyListReadCorruptError, RSSTR("Encountered empty plist tag"));
         return NO;
     }
     const char *save = pInfo->curr; // Save this in case the next step fails
-    RSTypeRef tmp = NULL;
-    if (getContentObject(pInfo, NULL, &tmp))
+    RSTypeRef tmp = nil;
+    if (getContentObject(pInfo, nil, &tmp))
     {
         // Got an extra object
         __RSPListRelease(tmp, pInfo->allocator);
@@ -1589,20 +1589,20 @@ static int allowImmutableCollections = -1;
 
 static void checkImmutableCollections(void)
 {
-    allowImmutableCollections = (NULL == __RSRuntimeGetEnvironment("RSPropertyListAllowImmutableCollections")) ? 0 : 1;
+    allowImmutableCollections = (nil == __RSRuntimeGetEnvironment("RSPropertyListAllowImmutableCollections")) ? 0 : 1;
 }
 
 static BOOL parseArrayTag(__RSPlistParserInfo *pInfo, RSTypeRef *out) {
-    RSTypeRef tmp = NULL;
+    RSTypeRef tmp = nil;
     
     if (pInfo->skip) {
-        BOOL result = getContentObject(pInfo, NULL, &tmp);
+        BOOL result = getContentObject(pInfo, nil, &tmp);
         while (result) {
             if (tmp) {
                 // Shouldn't happen (if skipping, all content values should be null), but just in case
                 __RSPListRelease(tmp, pInfo->allocator);
             }
-            result = getContentObject(pInfo, NULL, &tmp);
+            result = getContentObject(pInfo, nil, &tmp);
         }
         
         if (pInfo->error) {
@@ -1612,7 +1612,7 @@ static BOOL parseArrayTag(__RSPlistParserInfo *pInfo, RSTypeRef *out) {
         if (!checkForCloseTag(pInfo, RSXMLPlistTags[ARRAY_IX], ARRAY_TAG_LENGTH)) {
             return NO;
         } else {
-            *out = NULL;
+            *out = nil;
             return YES;
         }
     }
@@ -1627,13 +1627,13 @@ static BOOL parseArrayTag(__RSPlistParserInfo *pInfo, RSTypeRef *out) {
 //    
 //    if (keys)
 //    {
-//        RSStringRef countString = RSStringCreateWithFormat(pInfo->allocator, NULL, RSSTR("%ld"), count);
+//        RSStringRef countString = RSStringCreateWithFormat(pInfo->allocator, nil, RSSTR("%ld"), count);
 //        if (!RSSetContainsValue(keys, countString)) pInfo->skip = YES;
 //        __RSPListRelease(countString, pInfo->allocator);
 //        count++;
 //        pInfo->keyPaths = newKeyPaths;
 //    }
-    result = getContentObject(pInfo, NULL, &tmp);
+    result = getContentObject(pInfo, nil, &tmp);
 //    if (keys)
 //    {
 //        pInfo->keyPaths = oldKeyPaths;
@@ -1651,13 +1651,13 @@ static BOOL parseArrayTag(__RSPlistParserInfo *pInfo, RSTypeRef *out) {
 //        if (keys)
 //        {
 //            // prep for getting next object
-//            RSStringRef countString = RSStringCreateWithFormat(pInfo->allocator, NULL, RSSTR("%ld"), count);
+//            RSStringRef countString = RSStringCreateWithFormat(pInfo->allocator, nil, RSSTR("%ld"), count);
 //            if (!RSSetContainsValue(keys, countString)) pInfo->skip = YES;
 //            __RSPListRelease(countString, pInfo->allocator);
 //            count++;
 //            pInfo->keyPaths = newKeyPaths;
 //        }
-        result = getContentObject(pInfo, NULL, &tmp);
+        result = getContentObject(pInfo, nil, &tmp);
 //        if (keys)
 //        {
 //            // reset after getting object
@@ -1702,7 +1702,7 @@ static BOOL parseDictTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
 {
     BOOL gotKey;
     BOOL result;
-    RSTypeRef key = NULL, value = NULL;
+    RSTypeRef key = nil, value = nil;
     
     if (pInfo->skip)
     {
@@ -1714,7 +1714,7 @@ static BOOL parseDictTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
                 if (!pInfo->error) pInfo->error = __RSPropertyListCreateError(RSPropertyListReadCorruptError, RSSTR("Found non-key inside <dict> at line %d"), lineNumber(pInfo));
                 return NO;
             }
-            result = getContentObject(pInfo, NULL, &value);
+            result = getContentObject(pInfo, nil, &value);
             if (!result)
             {
                 if (!pInfo->error) pInfo->error = __RSPropertyListCreateError(RSPropertyListReadCorruptError, RSSTR("Value missing for key inside <dict> at line %d"), lineNumber(pInfo));
@@ -1722,14 +1722,14 @@ static BOOL parseDictTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
             }
             // key and value should be null, but we'll release just in case here
             __RSPListRelease(key, pInfo->allocator);
-            key = NULL;
+            key = nil;
             __RSPListRelease(value, pInfo->allocator);
-            value = NULL;
+            value = nil;
             result = getContentObject(pInfo, &gotKey, &key);
         }
         if (checkForCloseTag(pInfo, RSXMLPlistTags[DICT_IX], DICT_TAG_LENGTH))
         {
-            *out = NULL;
+            *out = nil;
             return YES;
         }
         else
@@ -1742,7 +1742,7 @@ static BOOL parseDictTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
 //    RSSetRef nextKeyPaths, theseKeyPaths;
 //    __RSPropertyListCreateSplitKeypaths(pInfo->allocator, pInfo->keyPaths, &theseKeyPaths, &nextKeyPaths);
 //    
-    RSMutableDictionaryRef dict = NULL;
+    RSMutableDictionaryRef dict = nil;
     
     result = getContentObject(pInfo, &gotKey, &key);
     while (result && key)
@@ -1762,7 +1762,7 @@ static BOOL parseDictTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
 //            if (!RSSetContainsValue(theseKeyPaths, key)) pInfo->skip = YES;
 //            pInfo->keyPaths = nextKeyPaths;
 //        }
-        result = getContentObject(pInfo, NULL, &value);
+        result = getContentObject(pInfo, nil, &value);
 //        if (theseKeyPaths)
 //        {
 //            pInfo->keyPaths = oldKeyPaths;
@@ -1781,7 +1781,7 @@ static BOOL parseDictTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
         
         if (key && value)
         {
-            if (NULL == dict)
+            if (nil == dict)
             {
                 dict = RSDictionaryCreateMutable(pInfo->allocator, 0, RSDictionaryRSTypeContext);
             }
@@ -1789,9 +1789,9 @@ static BOOL parseDictTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
         }
         
         __RSPListRelease(key, pInfo->allocator);
-        key = NULL;
+        key = nil;
         __RSPListRelease(value, pInfo->allocator);
-        value = NULL;
+        value = nil;
         
         result = getContentObject(pInfo, &gotKey, &key);
     }
@@ -1801,11 +1801,11 @@ static BOOL parseDictTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
     
     if (checkForCloseTag(pInfo, RSXMLPlistTags[DICT_IX], DICT_TAG_LENGTH))
     {
-        if (NULL == dict)
+        if (nil == dict)
         {
             if (pInfo->mutabilityOption == RSPropertyListImmutable)
             {
-                dict = (RSMutableDictionaryRef)RSDictionaryCreate(pInfo->allocator, NULL, NULL, 0, RSDictionaryRSTypeContext);
+                dict = (RSMutableDictionaryRef)RSDictionaryCreate(pInfo->allocator, nil, nil, 0, RSDictionaryRSTypeContext);
             }
             else
             {
@@ -1872,7 +1872,7 @@ static BOOL parseDataTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
     
     int tmpbufpos = 0;
     int tmpbuflen = 256;
-    uint8_t *tmpbuf = pInfo->skip ? NULL : (uint8_t *)RSAllocatorAllocate(pInfo->allocator, tmpbuflen);
+    uint8_t *tmpbuf = pInfo->skip ? nil : (uint8_t *)RSAllocatorAllocate(pInfo->allocator, tmpbuflen);
     int numeq = 0;
     int acc = 0;
     int cntr = 0;
@@ -1920,7 +1920,7 @@ static BOOL parseDataTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
         }
     }
     
-    RSDataRef result = NULL;
+    RSDataRef result = nil;
     if (!pInfo->skip)
     {
         if (pInfo->mutabilityOption == RSPropertyListMutableContainersAndLeaves)
@@ -1955,14 +1955,14 @@ static BOOL parseDataTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
 
 static BOOL parseRealTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
 {
-    RSStringRef str = NULL;
+    RSStringRef str = nil;
     if (!parseStringTag(pInfo, &str))
     {
         if (!pInfo->error) pInfo->error = __RSPropertyListCreateError(RSPropertyListReadCorruptError, RSSTR("Encountered empty <real> on line %d"), lineNumber(pInfo));
         return NO;
     }
     
-    RSNumberRef result = NULL;
+    RSNumberRef result = nil;
     
     if (!pInfo->skip)
     {
@@ -1985,7 +1985,7 @@ static BOOL parseRealTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
 //            RSStringInitInlineBuffer(str, &buf, RSRangeMake(0, len));
 //            SInt32 idx = 0;
 //            double val;
-//            if (!__RSStringScanDouble(&buf, NULL, &idx, &val) || idx != len)
+//            if (!__RSStringScanDouble(&buf, nil, &idx, &val) || idx != len)
 //            {
 //                __RSPListRelease(str, pInfo->allocator);
 //                pInfo->error = __RSPropertyListCreateError(RSPropertyListReadCorruptError, RSSTR("Encountered misformatted real on line %d"), lineNumber(pInfo));
@@ -2103,7 +2103,7 @@ static BOOL parseDateTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
     RSAbsoluteTime at = 0.0;
 #if 1
     RSGregorianDate date = {yearIsNegative ? -year : year, month, day, hour, minute, second};
-    at = RSGregorianDateGetAbsoluteTime(date, NULL);
+    at = RSGregorianDateGetAbsoluteTime(date, nil);
 #else
     // this doesn't work
     RSCalendarRef calendar = RSCalendarCreateWithIdentifier(RSAllocatorSystemDefault, RSCalendarIdentifierGregorian);
@@ -2115,7 +2115,7 @@ static BOOL parseDateTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
 #endif
     if (pInfo->skip)
     {
-        *out = NULL;
+        *out = nil;
     }
     else
     {
@@ -2297,7 +2297,7 @@ static RSStringRef _uniqueStringForUTF8Bytes(__RSPlistParserInfo *pInfo, const c
     if (length == 0)
         return RSSTR("");
     
-    RSStringRef result = NULL;
+    RSStringRef result = nil;
 //    RSIndex payload = 0;
 //    BOOL uniqued = RSBurstTrieContainsUTF8String(pInfo->stringTrie, (UInt8 *)base, length, &payload);
 //    if (uniqued)
@@ -2308,7 +2308,7 @@ static RSStringRef _uniqueStringForUTF8Bytes(__RSPlistParserInfo *pInfo, const c
 //    else
 //    {
 //        result = RSStringCreateWithBytes(pInfo->allocator, (const UInt8 *)base, length, RSStringEncodingUTF8, NO);
-//        if (!result) return NULL;
+//        if (!result) return nil;
 //        payload = RSArrayGetCount(pInfo->stringCache);
 //        RSArrayAppendValue(pInfo->stringCache, result);
 //        //RSBurstTrieAddUTF8String(pInfo->stringTrie, (UInt8 *)base, length, payload);
@@ -2320,7 +2320,7 @@ static RSStringRef _uniqueStringForUTF8Bytes(__RSPlistParserInfo *pInfo, const c
 static BOOL parseStringTag(__RSPlistParserInfo *pInfo, RSStringRef *out)
 {
     const char *mark = pInfo->curr;
-    RSMutableDataRef stringData = NULL;
+    RSMutableDataRef stringData = nil;
     while (!pInfo->error && pInfo->curr < pInfo->end)
     {
         char ch = *(pInfo->curr);
@@ -2357,7 +2357,7 @@ static BOOL parseStringTag(__RSPlistParserInfo *pInfo, RSStringRef *out)
     {
         if (pInfo->skip)
         {
-            *out = NULL;
+            *out = nil;
         }
         else
         {
@@ -2389,7 +2389,7 @@ static BOOL parseStringTag(__RSPlistParserInfo *pInfo, RSStringRef *out)
     {
         if (pInfo->skip)
         {
-            *out = NULL;
+            *out = nil;
         }
         else
         {
@@ -2523,7 +2523,7 @@ static BOOL parseXMLElement(__RSPlistParserInfo *pInfo, BOOL *isKey, RSTypeRef *
             {
                 if (pInfo->skip)
                 {
-                    *out = NULL;
+                    *out = nil;
                 }
                 else
                 {
@@ -2547,13 +2547,13 @@ static BOOL parseXMLElement(__RSPlistParserInfo *pInfo, BOOL *isKey, RSTypeRef *
             {
                 if (pInfo->skip)
                 {
-                    *out = NULL;
+                    *out = nil;
                 }
                 else
                 {
                     if (pInfo->mutabilityOption == RSPropertyListImmutable)
                     {
-                        *out = RSDictionaryCreate(pInfo->allocator, NULL, NULL, 0, RSDictionaryRSTypeContext);
+                        *out = RSDictionaryCreate(pInfo->allocator, nil, nil, 0, RSDictionaryRSTypeContext);
                     }
                     else
                     {
@@ -2574,7 +2574,7 @@ static BOOL parseXMLElement(__RSPlistParserInfo *pInfo, BOOL *isKey, RSTypeRef *
             {
                 if (pInfo->skip)
                 {
-                    *out = NULL;
+                    *out = nil;
                 }
                 else
                 {
@@ -2584,7 +2584,7 @@ static BOOL parseXMLElement(__RSPlistParserInfo *pInfo, BOOL *isKey, RSTypeRef *
                     }
                     else
                     {
-                        *out = RSStringCreateWithCharacters(pInfo->allocator, NULL, 0);
+                        *out = RSStringCreateWithCharacters(pInfo->allocator, nil, 0);
                     }
                 }
                 return YES;
@@ -2634,7 +2634,7 @@ static BOOL parseXMLElement(__RSPlistParserInfo *pInfo, BOOL *isKey, RSTypeRef *
             }
             if (pInfo->skip)
             {
-                *out = NULL;
+                *out = nil;
             }
             else
             {
@@ -2652,7 +2652,7 @@ static BOOL parseXMLElement(__RSPlistParserInfo *pInfo, BOOL *isKey, RSTypeRef *
             }
             if (pInfo->skip)
             {
-                *out = NULL;
+                *out = nil;
             }
             else
             {
@@ -2731,7 +2731,7 @@ static BOOL parseXMLPropertyList(__RSPlistParserInfo *pInfo, RSTypeRef *out)
         else
         {
             // Tag or malformed
-            return parseXMLElement(pInfo, NULL, out);
+            return parseXMLElement(pInfo, nil, out);
             // Note we do not verify that there was only one element, so a file that has garbage after the first element will nonetheless successfully parse
         }
     }
@@ -2941,7 +2941,7 @@ static RSTypeRef __RSPropertyListCore1(RSDataRef plistData, RSIndex* offset,__RS
                             switch (currentTagID)
                             {
                                 case DICT_IX:
-                                    value = RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, NULL);
+                                    value = RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, nil);
                                     break;
                                 case ARRAY_IX:
                                     value = RSArrayCreateWithObject(RSAllocatorSystemDefault, nil);
@@ -3379,7 +3379,7 @@ RSPrivate RSTypeRef __RSPropertyListParser(RSAllocatorRef allocator, RSDataRef p
     pInfo->end = buf+length;
     pInfo->curr = buf;
     pInfo->allocator = allocator;
-    pInfo->error = NULL;
+    pInfo->error = nil;
     //_createStringMap(pInfo);
     pInfo->mutabilityOption = RSPropertyListMutableContainersAndLeaves;
     pInfo->allowNewTypes = YES;

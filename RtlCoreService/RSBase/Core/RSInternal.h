@@ -136,21 +136,60 @@ RSInline void __RSAssignWithWriteBarrier(void **location, void *value) {
 
 #if __LP64__
 //#define RS_CONST_STRING_DECL(S, V) static const struct __RSString ___##S = (const struct __RSString){{0,{10,0,1,12,1,7},1},sizeof(V) - 1,sizeof(V), sizeof(V) - 1, RSStringEncodingUTF8, V}; static const RSStringRef S = &___##S;
-#define RS_CONST_STRING_DECL(S, V) static const struct __RSString ___##S = (const struct __RSString){{0,{10,0,1,72,0,7},1}, ._variants._notInlineImmutable1._buffer = V, ._variants._notInlineImmutable1._length = sizeof(V) - 1}; static const RSStringRef S = &___##S;
+#define RS_CONST_STRING_DECL(S, V) static const struct __RSString ___##S = (const struct __RSString){\
+    ._base._rsisa = 0,\
+    ._base._rc = 1,\
+    ._base._rsinfo._reserved = 0,\
+    ._base._rsinfo._special = 1,\
+    ._base._rsinfo._objId = 7,\
+    ._base._rsinfo._rsinfo1 = 72,\
+    ._base._rsinfo._rsinfo = (1 << 1) | (1 << 3),\
+    ._variants._notInlineImmutable1._buffer = V,\
+    ._variants._notInlineImmutable1._length = sizeof(V) - 1};\
+    static const RSStringRef S = &___##S;
 #else
 //#define RS_CONST_STRING_DECL(S, V) static const struct __RSString ___##S = (const struct __RSString){{0,{1,10,0,1,12,1,7}},sizeof(V) - 1,sizeof(V), sizeof(V) - 1, RSStringEncodingUTF8, V}; static const RSStringRef S = &___##S;
-#define RS_CONST_STRING_DECL(S, V) static const struct __RSString ___##S = (const struct __RSString){{0,{1,10,0,1,72,0,7}}, ._variants._notInlineImmutable1._length = sizeof(V) - 1, ._notInlineImmutable1._inline2._buffer = V}; static const RSStringRef S = &___##S;
+#define RS_CONST_STRING_DECL(S, V) static const struct __RSString ___##S = (const struct __RSString){\
+    ._base._rsisa = 0,\
+    ._base._rsinfo._rc = 1,\
+    ._base._rsinfo._reserved = 0,\
+    ._base._rsinfo._special = 1,\
+    ._base._rsinfo._objId = 7,\
+    ._base._rsinfo._rsinfo1 = 72,\
+    ._base._rsinfo._rsinfo = (1 << 1) | (1 << 3),\
+    ._variants._notInlineImmutable1._buffer = V,\
+    ._variants._notInlineImmutable1._length = sizeof(V) - 1};\
+    static const RSStringRef S = &___##S;
 #endif
 
 #if __LP64__
 
 //#define RS_PUBLIC_CONST_STRING_DECL(S, V) static const struct __RSString ___##S = (const struct __RSString){{0,{10,0,1,12,1,7},1},sizeof(V) - 1,sizeof(V), sizeof(V) - 1, RSStringEncodingUTF8, V}; const RSStringRef S = &___##S;
-#define RS_PUBLIC_CONST_STRING_DECL(S, V) const struct __RSString ___##S = (const struct __RSString){{0,{10,0,1,72,0,7},1}, ._variants._notInlineImmutable1._buffer = V, ._variants._notInlineImmutable1._length = sizeof(V) - 1}; const RSStringRef S = &___##S;
+#define RS_PUBLIC_CONST_STRING_DECL(S, V) const struct __RSString ___##S = (const struct __RSString){\
+    ._base._rsisa = 0,\
+    ._base._rc = 1,\
+    ._base._rsinfo._reserved = 0,\
+    ._base._rsinfo._special = 1,\
+    ._base._rsinfo._objId = 7,\
+    ._base._rsinfo._rsinfo1 = 72,\
+    ._base._rsinfo._rsinfo = (1 << 1) | (1 << 3),\
+    ._variants._notInlineImmutable1._buffer = V,\
+    ._variants._notInlineImmutable1._length = sizeof(V) - 1};\
+    const RSStringRef S = &___##S;
 #else
 
 //#define RS_PUBLIC_CONST_STRING_DECL(S, V) static const struct __RSString ___##S = (const struct __RSString){{0,{1,10,0,1,12,1,7}},sizeof(V) - 1,sizeof(V), sizeof(V) - 1, RSStringEncodingUTF8, V}; const RSStringRef S = &___##S;
-#define RS_PUBLIC_CONST_STRING_DECL(S, V) const struct __RSString ___##S = (const struct __RSString){{0,{1,10,0,1,72,0,7}}, ._variants._notInlineImmutable1._length = sizeof(V) - 1, ._notInlineImmutable1._inline2._buffer = V}; const RSStringRef S = &___##S;
-
+#define RS_PUBLIC_CONST_STRING_DECL(S, V) const struct __RSString ___##S = (const struct __RSString){\
+    ._base._rsisa = 0,\
+    ._base._rsinfo._rc = 1,\
+    ._base._rsinfo._reserved = 0,\
+    ._base._rsinfo._special = 1,\
+    ._base._rsinfo._objId = 7,\
+    ._base._rsinfo._rsinfo1 = 72,\
+    ._base._rsinfo._rsinfo = (1 << 1) | (1 << 3),\
+    ._variants._notInlineImmutable1._buffer = V,\
+    ._variants._notInlineImmutable1._length = sizeof(V) - 1};\
+    const RSStringRef S = &___##S;
 #endif
 
 

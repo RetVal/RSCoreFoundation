@@ -341,7 +341,7 @@ void curl_global_cleanup(void)
 
 /*
  * curl_easy_init() is the external interface to alloc, setup and init an
- * easy handle that is returned. If anything goes wrong, NULL is returned.
+ * easy handle that is returned. If anything goes wrong, nil is returned.
  */
 CURL *curl_easy_init(void)
 {
@@ -354,7 +354,7 @@ CURL *curl_easy_init(void)
         if(res) {
             /* something in the global init failed, return nothing */
             DEBUGF(fprintf(stderr, "Error: curl_global_init failed\n"));
-            return NULL;
+            return nil;
         }
     }
     
@@ -362,7 +362,7 @@ CURL *curl_easy_init(void)
     res = Curl_open(&data);
     if(res != CURLE_OK) {
         DEBUGF(fprintf(stderr, "Error: Curl_open failed\n"));
-        return NULL;
+        return nil;
     }
     
     return data;
@@ -503,7 +503,7 @@ CURLcode curl_easy_perform(CURL *curl)
                 /* if the current cache is private, kill it first */
                 Curl_hash_destroy(data->dns.hostcache);
                 data->dns.hostcachetype = HCACHE_NONE;
-                data->dns.hostcache = NULL;
+                data->dns.hostcache = nil;
             }
             
             ptr = Curl_global_host_cache_init();
@@ -559,7 +559,7 @@ void Curl_easy_addmulti(struct SessionHandle *data,
                         void *multi)
 {
     data->multi = multi;
-    if(multi == NULL)
+    if(multi == nil)
     /* the association is cleared, mark the easy handle as not used by an
      interface */
         data->state.used_interface = Curl_if_none;
@@ -599,7 +599,7 @@ CURL *curl_easy_duphandle(CURL *incurl)
     struct SessionHandle *data=(struct SessionHandle *)incurl;
     
     struct SessionHandle *outcurl = calloc(1, sizeof(struct SessionHandle));
-    if(NULL == outcurl)
+    if(nil == outcurl)
         goto fail;
     
     /*
@@ -617,7 +617,7 @@ CURL *curl_easy_duphandle(CURL *incurl)
         goto fail;
     
     /* the connection cache is setup on demand */
-    outcurl->state.connc = NULL;
+    outcurl->state.connc = nil;
     
     outcurl->state.lastconnect = -1;
     
@@ -678,10 +678,10 @@ fail:
         if(outcurl->state.connc &&
            (outcurl->state.connc->type == CONNCACHE_PRIVATE)) {
             Curl_rm_connc(outcurl->state.connc);
-            outcurl->state.connc = NULL;
+            outcurl->state.connc = nil;
         }
         curl_slist_free_all(outcurl->change.cookielist);
-        outcurl->change.cookielist = NULL;
+        outcurl->change.cookielist = nil;
         Curl_safefree(outcurl->state.headerbuff);
         Curl_safefree(outcurl->change.url);
         Curl_safefree(outcurl->change.referer);
@@ -689,7 +689,7 @@ fail:
         free(outcurl);
     }
     
-    return NULL;
+    return nil;
 }
 
 /*
@@ -702,7 +702,7 @@ void curl_easy_reset(CURL *curl)
     
     Curl_safefree(data->state.pathbuffer);
     
-    data->state.path = NULL;
+    data->state.path = nil;
     
     Curl_safefree(data->state.proto.generic);
     
@@ -763,7 +763,7 @@ CURLcode curl_easy_pause(CURL *curl, int action)
         /* clear tempwrite here just to make sure it gets cleared if there's no
          further use of it, and make sure we don't clear it after the function
          invoke as it may have been set to a new value by then */
-        data->state.tempwrite = NULL;
+        data->state.tempwrite = nil;
         
         /* since the write callback API is define to never exceed
          CURL_MAX_WRITE_SIZE bytes in a single call, and since we may in fact
@@ -799,7 +799,7 @@ CURLcode curl_easy_pause(CURL *curl, int action)
                 
                 if(!newptr) {
                     free(data->state.tempwrite); /* free old area */
-                    data->state.tempwrite = NULL;
+                    data->state.tempwrite = nil;
                     result = CURLE_OUT_OF_MEMORY;
                     /* tempwrite will be freed further down */
                     break;
@@ -828,7 +828,7 @@ static CURLcode easy_connection(struct SessionHandle *data,
                                 curl_socket_t *sfd,
                                 struct connectdata **connp)
 {
-    if(data == NULL)
+    if(data == nil)
         return CURLE_BAD_FUNCTION_ARGUMENT;
     
     /* only allow these to be called on handles with CURLOPT_CONNECT_ONLY */
@@ -885,7 +885,7 @@ CURLcode curl_easy_send(CURL *curl, const void *buffer, size_t buflen,
     curl_socket_t sfd;
     CURLcode ret;
     ssize_t n1;
-    struct connectdata *c = NULL;
+    struct connectdata *c = nil;
     struct SessionHandle *data = (struct SessionHandle *)curl;
     
     ret = easy_connection(data, &sfd, &c);

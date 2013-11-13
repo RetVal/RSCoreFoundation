@@ -50,9 +50,9 @@ typedef struct
 } libdata_t;
 
 int         gLibId      = -1;
-void        *gLibHandle = (void *) NULL;
-rtag_t      gAllocTag   = (rtag_t) NULL;
-NXMutex_t   *gLibLock   = (NXMutex_t *) NULL;
+void        *gLibHandle = (void *) nil;
+rtag_t      gAllocTag   = (rtag_t) nil;
+NXMutex_t   *gLibLock   = (NXMutex_t *) nil;
 
 /* internal library function prototypes... */
 int     DisposeLibraryData ( void * );
@@ -161,7 +161,7 @@ int GetOrSetUpData(int id, libdata_t **appData,
   NX_LOCK_INFO_ALLOC(liblock, "Application Data Lock", 0);
 
   err         = 0;
-  thread_data = (libthreaddata_t *) NULL;
+  thread_data = (libthreaddata_t *) nil;
 
 /*
 ** Attempt to get our data for the application calling us. This is where we
@@ -195,7 +195,7 @@ int GetOrSetUpData(int id, libdata_t **appData,
             NXMutexFree(app_data->lock);
 
           free(app_data);
-          app_data = (libdata_t *) NULL;
+          app_data = (libdata_t *) nil;
           err      = ENOMEM;
         }
 
@@ -211,12 +211,12 @@ int GetOrSetUpData(int id, libdata_t **appData,
 
           if(err) {
             free(app_data);
-            app_data = (libdata_t *) NULL;
+            app_data = (libdata_t *) nil;
             err      = ENOMEM;
           }
           else {
             /* create key for thread-specific data... */
-            err = NXKeyCreate(DisposeThreadData, (void *) NULL, &key);
+            err = NXKeyCreate(DisposeThreadData, (void *) nil, &key);
 
             if(err)                /* (no more keys left?) */
               key = -1;
@@ -251,14 +251,14 @@ int GetOrSetUpData(int id, libdata_t **appData,
 
         if(!thread_data->twentybytes) {
           free(thread_data);
-          thread_data = (libthreaddata_t *) NULL;
+          thread_data = (libthreaddata_t *) nil;
           err         = ENOMEM;
         }
 
         if((err = NXKeySetValue(key, thread_data))) {
           free(thread_data->twentybytes);
           free(thread_data);
-          thread_data = (libthreaddata_t *) NULL;
+          thread_data = (libthreaddata_t *) nil;
         }
       }
     }

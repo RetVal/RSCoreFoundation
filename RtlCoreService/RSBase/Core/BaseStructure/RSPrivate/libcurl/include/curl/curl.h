@@ -236,7 +236,7 @@ pointer */
         long int hardlinks;
         
         struct {
-            /* If some of these fields is not NULL, it is a pointer to b_data. */
+            /* If some of these fields is not nil, it is a pointer to b_data. */
             char *time;
             char *perm;
             char *user;
@@ -1776,7 +1776,7 @@ versions that your system allows */
      * DESCRIPTION
      *
      * Escapes URL strings (converts all letters consider illegal in URLs to their
-     * %XX versions). This function returns a new allocated string or NULL if an
+     * %XX versions). This function returns a new allocated string or nil if an
      * error occurred.
      */
     CURL_EXTERN char *curl_easy_escape(CURL *handle,
@@ -1794,7 +1794,7 @@ versions that your system allows */
      * DESCRIPTION
      *
      * Unescapes URL encoding in strings (converts all %XX codes to their 8bit
-     * versions). This function returns a new allocated string or NULL if an error
+     * versions). This function returns a new allocated string or nil if an error
      * occurred.
      * Conversion Note: On non-ASCII platforms the ASCII %XX codes are
      * converted into the host encoding.
@@ -1893,7 +1893,7 @@ versions that your system allows */
      *
      * Returns the time, in seconds since 1 Jan 1970 of the time string given in
      * the first argument. The time argument in the second parameter is unused
-     * and should be set to NULL.
+     * and should be set to nil.
      */
     CURL_EXTERN time_t curl_getdate(const char *p, const time_t *unused);
     
@@ -2075,7 +2075,7 @@ versions that your system allows */
         const char *ssl_version;  /* human readable string */
         long ssl_version_num;     /* not used anymore, always 0 */
         const char *libz_version; /* human readable string */
-        /* protocols is terminated by an entry with a NULL protoname */
+        /* protocols is terminated by an entry with a nil protoname */
         const char * const *protocols;
         
         /* The fields below this were added in CURLVERSION_SECOND */

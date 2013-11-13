@@ -157,7 +157,7 @@ const struct Curl_handler Curl_handler_https = {
  * checkheaders() checks the linked list of custom HTTP headers for a
  * particular header (prefix).
  *
- * Returns a pointer to the first matching header or NULL if none matched.
+ * Returns a pointer to the first matching header or nil if none matched.
  */
 char *Curl_checkheaders(struct SessionHandle *data, const char *thisheader)
 {
@@ -168,12 +168,12 @@ char *Curl_checkheaders(struct SessionHandle *data, const char *thisheader)
         if(Curl_raw_nequal(head->data, thisheader, thislen))
             return head->data;
     }
-    return NULL;
+    return nil;
 }
 
 /*
  * Strip off leading and trailing whitespace from the value in the
- * given HTTP header line and return a strdupped copy. Returns NULL in
+ * given HTTP header line and return a strdupped copy. Returns nil in
  * case of allocation failure. Returns an empty string if the header value
  * consists entirely of whitespace.
  */
@@ -207,7 +207,7 @@ static char *copy_header_value(const char *h)
     if(!end)
         end = strchr(start, '\0');
     if(!end)
-        return NULL;
+        return nil;
     
     /* skip all trailing space letters */
     while((end > start) && ISSPACE(*end))
@@ -218,7 +218,7 @@ static char *copy_header_value(const char *h)
     
     value = malloc(len + 1);
     if(!value)
-        return NULL;
+        return nil;
     
     memcpy(value, start, len);
     value[len] = 0; /* zero terminate */
@@ -235,7 +235,7 @@ static char *copy_header_value(const char *h)
 static CURLcode http_output_basic(struct connectdata *conn, bool proxy)
 {
     size_t size = 0;
-    char *authorization = NULL;
+    char *authorization = nil;
     struct SessionHandle *data = conn->data;
     char **userp;
     const char *user;
@@ -339,7 +339,7 @@ static CURLcode http_perhapsrewind(struct connectdata *conn)
     curl_off_t expectsend = -1; /* default is unknown */
     
     if(!http)
-    /* If this is still NULL, we have not reach very far and we can safely
+    /* If this is still nil, we have not reach very far and we can safely
      skip this rewinding stuff */
         return CURLE_OK;
     
@@ -514,7 +514,7 @@ output_auth_headers(struct connectdata *conn,
                     bool proxy)
 {
     struct SessionHandle *data = conn->data;
-    const char *auth=NULL;
+    const char *auth=nil;
     CURLcode result = CURLE_OK;
 #ifdef USE_HTTP_NEGOTIATE
     struct negotiatedata *negdata = proxy?
@@ -794,7 +794,7 @@ CURLcode Curl_http_input_auth(struct connectdata *conn,
                                 while(*start && ISSPACE(*start))
                                     start++;
                                 if(*start)
-                                    if((conn->challenge_header = strdup(start)) == NULL)
+                                    if((conn->challenge_header = strdup(start)) == nil)
                                         return CURLE_OUT_OF_MEMORY;
                             }
                         }
@@ -1441,7 +1441,7 @@ CURLcode Curl_http_done(struct connectdata *conn,
     conn->seek_func = data->set.seek_func; /* restore */
     conn->seek_client = data->set.seek_client; /* restore */
     
-    if(http == NULL)
+    if(http == nil)
         return CURLE_OK;
     
     if(http->send_buffer) {
@@ -1449,7 +1449,7 @@ CURLcode Curl_http_done(struct connectdata *conn,
         
         free(buff->buffer);
         free(buff);
-        http->send_buffer = NULL; /* clear the pointer */
+        http->send_buffer = nil; /* clear the pointer */
     }
     
     if(HTTPREQ_POST_FORM == data->set.httpreq) {
@@ -1459,7 +1459,7 @@ CURLcode Curl_http_done(struct connectdata *conn,
         if(http->form.fp) {
             /* a file being uploaded was left opened, close it! */
             fclose(http->form.fp);
-            http->form.fp = NULL;
+            http->form.fp = nil;
         }
     }
     else if(HTTPREQ_PUT == data->set.httpreq)
@@ -1672,7 +1672,7 @@ CURLcode Curl_http(struct connectdata *conn, bool *done)
     const char *ptr;
     const char *request;
     Curl_HttpReq httpreq = data->set.httpreq;
-    char *addcookies = NULL;
+    char *addcookies = nil;
     curl_off_t included_body = 0;
     const char *httpstring;
     Curl_send_buffer *req_buffer;
@@ -1749,7 +1749,7 @@ CURLcode Curl_http(struct connectdata *conn, bool *done)
      here. */
     if(Curl_checkheaders(data, "User-Agent:") && conn->allocptr.uagent) {
         free(conn->allocptr.uagent);
-        conn->allocptr.uagent=NULL;
+        conn->allocptr.uagent=nil;
     }
     
     /* setup the authentication headers */
@@ -1771,7 +1771,7 @@ CURLcode Curl_http(struct connectdata *conn, bool *done)
     if(data->change.referer && !Curl_checkheaders(data, "Referer:"))
         conn->allocptr.ref = aprintf("Referer: %s\r\n", data->change.referer);
     else
-        conn->allocptr.ref = NULL;
+        conn->allocptr.ref = nil;
     
     if(data->set.str[STRING_COOKIE] && !Curl_checkheaders(data, "Cookie:"))
         addcookies = data->set.str[STRING_COOKIE];
@@ -1865,7 +1865,7 @@ CURLcode Curl_http(struct connectdata *conn, bool *done)
         }
 #endif
         
-        conn->allocptr.host = NULL;
+        conn->allocptr.host = nil;
     }
     else {
         /* When building Host: headers, we must put the host name within
@@ -1948,7 +1948,7 @@ CURLcode Curl_http(struct connectdata *conn, bool *done)
                         case 'I':
                             break;
                         default:
-                            type = NULL;
+                            type = nil;
                     }
                 }
                 if(!type) {
@@ -1978,7 +1978,7 @@ CURLcode Curl_http(struct connectdata *conn, bool *done)
             return result;
     }
     
-    http->p_accept = Curl_checkheaders(data, "Accept:")?NULL:"Accept: */*\r\n";
+    http->p_accept = Curl_checkheaders(data, "Accept:")?nil:"Accept: */*\r\n";
     
     if(( (HTTPREQ_POST == httpreq) ||
         (HTTPREQ_POST_FORM == httpreq) ||
@@ -2180,14 +2180,14 @@ CURLcode Curl_http(struct connectdata *conn, bool *done)
      */
     
     Curl_safefree (conn->allocptr.userpwd);
-    conn->allocptr.userpwd = NULL;
+    conn->allocptr.userpwd = nil;
     
     if(result)
         return result;
     
 #if !defined(CURL_DISABLE_COOKIES)
     if(data->cookies || addcookies) {
-        struct Cookie *co=NULL; /* no cookies from start */
+        struct Cookie *co=nil; /* no cookies from start */
         int count=0;
         
         if(data->cookies) {
@@ -2249,7 +2249,7 @@ CURLcode Curl_http(struct connectdata *conn, bool *done)
     if(result)
         return result;
     
-    http->postdata = NULL;  /* nothing to post at this point */
+    http->postdata = nil;  /* nothing to post at this point */
     Curl_pgrsSetUploadSize(data, 0); /* upload size is 0 atm */
     
     /* If 'authdone' is FALSE, we must not set the write socket index to the
@@ -2272,7 +2272,7 @@ CURLcode Curl_http(struct connectdata *conn, bool *done)
                 else
                 /* setup variables for the upcoming transfer */
                     Curl_setup_transfer(conn, FIRSTSOCKET, -1, TRUE, &http->readbytecount,
-                                        -1, NULL);
+                                        -1, nil);
                 break;
             }
             
@@ -2396,7 +2396,7 @@ CURLcode Curl_http(struct connectdata *conn, bool *done)
             /* prepare for transfer */
                 Curl_setup_transfer(conn, FIRSTSOCKET, -1, TRUE,
                                     &http->readbytecount, postsize?FIRSTSOCKET:-1,
-                                    postsize?&http->writebytecount:NULL);
+                                    postsize?&http->writebytecount:nil);
             if(result)
                 return result;
             break;
@@ -2547,7 +2547,7 @@ CURLcode Curl_http(struct connectdata *conn, bool *done)
             else
                 Curl_setup_transfer(conn, FIRSTSOCKET, -1, TRUE,
                                     &http->readbytecount, http->postdata?FIRSTSOCKET:-1,
-                                    http->postdata?&http->writebytecount:NULL);
+                                    http->postdata?&http->writebytecount:nil);
             break;
             
         default:
@@ -2565,7 +2565,7 @@ CURLcode Curl_http(struct connectdata *conn, bool *done)
             /* HTTP GET/HEAD download: */
                 Curl_setup_transfer(conn, FIRSTSOCKET, -1, TRUE, &http->readbytecount,
                                     http->postdata?FIRSTSOCKET:-1,
-                                    http->postdata?&http->writebytecount:NULL);
+                                    http->postdata?&http->writebytecount:nil);
     }
     if(result)
         return result;
@@ -2606,7 +2606,7 @@ checkhttpprefix(struct SessionHandle *data,
 #ifdef CURL_DOES_CONVERSIONS
     /* convert from the network encoding using a scratch area */
     char *scratch = strdup(s);
-    if(NULL == scratch) {
+    if(nil == scratch) {
         failf (data, "Failed to allocate memory for conversion!");
         return FALSE; /* can't return CURLE_OUT_OF_MEMORY so return FALSE */
     }
@@ -2644,7 +2644,7 @@ checkrtspprefix(struct SessionHandle *data,
 #ifdef CURL_DOES_CONVERSIONS
     /* convert from the network encoding using a scratch area */
     char *scratch = strdup(s);
-    if(NULL == scratch) {
+    if(nil == scratch) {
         failf (data, "Failed to allocate memory for conversion!");
         return FALSE; /* can't return CURLE_OUT_OF_MEMORY so return FALSE */
     }
@@ -3170,7 +3170,7 @@ CURLcode Curl_http_readwrite_headers(struct SessionHandle *data,
         /* Check for Content-Length: header lines to get size */
         if(!k->ignorecl && !data->set.ignorecl &&
            checkprefix("Content-Length:", k->p)) {
-            curl_off_t contentlength = curlx_strtoofft(k->p+15, NULL, 10);
+            curl_off_t contentlength = curlx_strtoofft(k->p+15, nil, 10);
             if(data->set.max_filesize &&
                contentlength > data->set.max_filesize) {
                 failf(data, "Maximum file size exceeded");
@@ -3360,7 +3360,7 @@ CURLcode Curl_http_readwrite_headers(struct SessionHandle *data,
             while(*ptr && !ISDIGIT(*ptr))
                 ptr++;
             
-            k->offset = curlx_strtoofft(ptr, NULL, 10);
+            k->offset = curlx_strtoofft(ptr, nil, 10);
             
             if(data->state.resume_from == k->offset)
             /* we asked for a resume and we got it */
@@ -3383,7 +3383,7 @@ CURLcode Curl_http_readwrite_headers(struct SessionHandle *data,
 #endif
         else if(checkprefix("Last-Modified:", k->p) &&
                 (data->set.timecondition || data->set.get_filetime) ) {
-            time_t secs=time(NULL);
+            time_t secs=time(nil);
             k->timeofdoc = curl_getdate(k->p+strlen("Last-Modified:"),
                                         &secs);
             if(data->set.get_filetime)

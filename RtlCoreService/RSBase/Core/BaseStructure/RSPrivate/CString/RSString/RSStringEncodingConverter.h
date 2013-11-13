@@ -56,7 +56,7 @@ RSExport const RSStringEncoding *RSStringEncodingListOfAvailableEncodings(void);
 RSExport RSIndex RSStringEncodingCharLengthForBytes(uint32_t encoding, uint32_t flags, const uint8_t *bytes, RSIndex numBytes);
 RSExport RSIndex RSStringEncodingByteLengthForCharacters(uint32_t encoding, uint32_t flags, const UniChar *characters, RSIndex numChars);
 
-/* Can register functions used for lossy conversion.  Reregisters default procs if NULL
+/* Can register functions used for lossy conversion.  Reregisters default procs if nil
  */
 RSExport void RSStringEncodingRegisterFallbackProcedures(uint32_t encoding, RSStringEncodingToBytesFallbackProc toBytes, RSStringEncodingToUnicodeFallbackProc toUnicode);
 

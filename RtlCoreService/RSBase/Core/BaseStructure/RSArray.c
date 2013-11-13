@@ -331,11 +331,11 @@ static RSRuntimeClass __RSArrayClass =
     __RSArrayClassInit,
     __RSArrayClassCopy,
     __RSArrayClassDeallocate,
-    NULL,
-    NULL,
+    nil,
+    nil,
     __RSArrayClassDescription,
-    NULL,
-    NULL,// the runtime will do it for RSArray
+    nil,
+    nil,// the runtime will do it for RSArray
 };
 static RSTypeID _RSArrayTypeID = _RSRuntimeNotATypeID;
 
@@ -860,7 +860,7 @@ RSExport void       RSArrayRemoveObjectAtIndex(RSMutableArrayRef array, RSIndex 
 
 RSExport RSArrayRef RSArrayCreateWithObject(RSAllocatorRef allocator, RSTypeRef obj)
 {
-    if (obj == nil) return RSArrayCreate(allocator, NULL);
+    if (obj == nil) return RSArrayCreate(allocator, nil);
     RSArrayRef array = __RSArrayCreateInstance(allocator, (&obj), 1, 1, sizeof(ISA), YES, NO, YES);
     return array;
 }

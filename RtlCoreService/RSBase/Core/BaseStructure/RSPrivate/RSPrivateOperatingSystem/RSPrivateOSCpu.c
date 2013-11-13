@@ -24,7 +24,7 @@ RSPrivate RSUInteger __RSActiveProcessorCount()
 #elif DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
     int32_t mib[] = {CTL_HW, HW_AVAILCPU};
     size_t len = sizeof(pcnt);
-    int32_t result = sysctl(mib, sizeof(mib) / sizeof(int32_t), &pcnt, &len, NULL, 0);
+    int32_t result = sysctl(mib, sizeof(mib) / sizeof(int32_t), &pcnt, &len, nil, 0);
     if (result != 0) {
         pcnt = 0;
     }
@@ -43,7 +43,7 @@ RSPrivate RSIndex __RSActiveProcessorFrequency()
 #elif DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
     int32_t mib[] = {CTL_HW, HW_CPU_FREQ};
     size_t len = sizeof(pcnt);
-    int32_t result = sysctl(mib, sizeof(mib) / sizeof(int32_t), &pcnt, &len, NULL, 0);
+    int32_t result = sysctl(mib, sizeof(mib) / sizeof(int32_t), &pcnt, &len, nil, 0);
     if (result != 0) {
         pcnt = 0;
     }
@@ -66,7 +66,7 @@ RSPrivate RSIndex __RSPhysicalMemory()
     size_t size = sizeof(int);
     //int32_t results;
     int mib[2] = {CTL_HW, HW_PHYSMEM};
-    sysctl(mib, 2, &pmc, &size, NULL, 0);
+    sysctl(mib, 2, &pmc, &size, nil, 0);
     
 #else
     // Assume the worst

@@ -56,7 +56,7 @@ static RSErrorRef __RSJSONCreateError(RSErrorCode errorCode, RSStringRef descrip
     va_start(ap, descriptionFormat);
     RSStringRef description = RSStringCreateWithFormatAndArguments(RSAllocatorSystemDefault, 0, descriptionFormat, ap);
     va_end(ap);
-    RSDictionaryRef userInfo = RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, description, RSErrorDebugDescriptionKey, NULL);
+    RSDictionaryRef userInfo = RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorSystemDefault, description, RSErrorDebugDescriptionKey, nil);
     RSRelease(description);
     RSErrorRef error = RSErrorCreate(RSAllocatorSystemDefault, RSErrorDomainRSCoreFoundation, errorCode, userInfo);
     RSRelease(userInfo);
@@ -127,8 +127,8 @@ static void _jsonAppendCharacters(RSMutableDataRef xmlData, const UniChar* chara
     if (curLoc < length)
     {
         // Now deal with non-ASCII chars
-        RSDataRef data = NULL;
-        RSStringRef str = NULL;
+        RSDataRef data = nil;
+        RSStringRef str = nil;
         if ((str = RSStringCreateWithCharactersNoCopy(RSAllocatorSystemDefault, characters + curLoc, length - curLoc, RSAllocatorNull)))
         {
             if ((data = RSStringCreateExternalRepresentation(RSAllocatorSystemDefault, str, RSStringEncodingUTF8, 0))) {
@@ -282,7 +282,7 @@ static RSErrorCode __RSAppendJSON0(RSTypeRef object, RSBitU32 indentation, RSMut
     {
         // YYYY '-' MM '-' DD 'T' hh ':' mm ':' ss 'Z'
         //        RSBit32 y = 0, M = 0, d = 0, H = 0, m = 0, s = 0;
-        RSGregorianDate date = RSAbsoluteTimeGetGregorianDate(RSDateGetAbsoluteTime((RSDateRef)object), NULL);
+        RSGregorianDate date = RSAbsoluteTimeGetGregorianDate(RSDateGetAbsoluteTime((RSDateRef)object), nil);
         _jsonAppendFormat(jsonString, RSSTR("\"%04d-%02d-%02dT%02d:%02d:%02dZ\""), date.year, date.month, date.day, date.hour, date.minute, (int32_t)date.second);
         return kSuccess;    // date is translated to string.
     }
@@ -530,7 +530,7 @@ static RSStringRef _uniqueStringForUTF8Bytes(__RSJSONParserContext *pInfo, const
 {
     if (length == 0) return RSSTR("");
     
-    RSStringRef result = NULL;
+    RSStringRef result = nil;
     //    RSIndex payload = 0;
     //    BOOL uniqued = RSBurstTrieContainsUTF8String(pInfo->stringTrie, (UInt8 *)base, length, &payload);
     //    if (uniqued)
@@ -541,7 +541,7 @@ static RSStringRef _uniqueStringForUTF8Bytes(__RSJSONParserContext *pInfo, const
     //    else
     //    {
     //        result = RSStringCreateWithBytes(pInfo->allocator, (const UInt8 *)base, length, RSStringEncodingUTF8, NO);
-    //        if (!result) return NULL;
+    //        if (!result) return nil;
     //        payload = RSArrayGetCount(pInfo->stringCache);
     //        RSArrayAppendValue(pInfo->stringCache, result);
     //        //RSBurstTrieAddUTF8String(pInfo->stringTrie, (UInt8 *)base, length, payload);

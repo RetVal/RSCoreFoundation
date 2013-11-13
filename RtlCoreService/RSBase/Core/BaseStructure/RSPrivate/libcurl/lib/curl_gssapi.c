@@ -60,10 +60,10 @@ OM_uint32 Curl_gss_init_sec_context(
                               0, /* time_req */
                               input_chan_bindings,
                               input_token,
-                              NULL, /* actual_mech_type */
+                              nil, /* actual_mech_type */
                               output_token,
                               ret_flags,
-                              NULL /* time_rec */);
+                              nil /* time_rec */);
 }
 
 #endif /* HAVE_GSSAPI */

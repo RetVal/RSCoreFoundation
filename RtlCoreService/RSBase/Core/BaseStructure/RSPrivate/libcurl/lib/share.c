@@ -76,7 +76,7 @@ curl_share_setopt(CURLSH *sh, CURLSHoption option, ...)
     case CURL_LOCK_DATA_COOKIE:
 #if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_COOKIES)
       if(!share->cookies) {
-        share->cookies = Curl_cookie_init(NULL, NULL, NULL, TRUE );
+        share->cookies = Curl_cookie_init(nil, nil, nil, TRUE );
         if(!share->cookies)
           return CURLSHE_NOMEM;
       }
@@ -115,7 +115,7 @@ curl_share_setopt(CURLSH *sh, CURLSHoption option, ...)
     case CURL_LOCK_DATA_DNS:
       if(share->hostcache) {
         Curl_hash_destroy(share->hostcache);
-        share->hostcache = NULL;
+        share->hostcache = nil;
       }
       break;
 
@@ -123,7 +123,7 @@ curl_share_setopt(CURLSH *sh, CURLSHoption option, ...)
 #if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_COOKIES)
       if(share->cookies) {
         Curl_cookie_cleanup(share->cookies);
-        share->cookies = NULL;
+        share->cookies = nil;
       }
       break;
 #else   /* CURL_DISABLE_HTTP */
@@ -173,22 +173,22 @@ curl_share_cleanup(CURLSH *sh)
 {
   struct Curl_share *share = (struct Curl_share *)sh;
 
-  if(share == NULL)
+  if(share == nil)
     return CURLSHE_INVALID;
 
   if(share->lockfunc)
-    share->lockfunc(NULL, CURL_LOCK_DATA_SHARE, CURL_LOCK_ACCESS_SINGLE,
+    share->lockfunc(nil, CURL_LOCK_DATA_SHARE, CURL_LOCK_ACCESS_SINGLE,
                     share->clientdata);
 
   if(share->dirty) {
     if(share->unlockfunc)
-      share->unlockfunc(NULL, CURL_LOCK_DATA_SHARE, share->clientdata);
+      share->unlockfunc(nil, CURL_LOCK_DATA_SHARE, share->clientdata);
     return CURLSHE_IN_USE;
   }
 
   if(share->hostcache) {
     Curl_hash_destroy(share->hostcache);
-    share->hostcache = NULL;
+    share->hostcache = nil;
   }
 
 #if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_COOKIES)
@@ -206,7 +206,7 @@ curl_share_cleanup(CURLSH *sh)
 #endif
 
   if(share->unlockfunc)
-    share->unlockfunc(NULL, CURL_LOCK_DATA_SHARE, share->clientdata);
+    share->unlockfunc(nil, CURL_LOCK_DATA_SHARE, share->clientdata);
   free(share);
 
   return CURLSHE_OK;
@@ -219,7 +219,7 @@ Curl_share_lock(struct SessionHandle *data, curl_lock_data type,
 {
   struct Curl_share *share = data->share;
 
-  if(share == NULL)
+  if(share == nil)
     return CURLSHE_INVALID;
 
   if(share->specifier & (1<<type)) {
@@ -236,7 +236,7 @@ Curl_share_unlock(struct SessionHandle *data, curl_lock_data type)
 {
   struct Curl_share *share = data->share;
 
-  if(share == NULL)
+  if(share == nil)
     return CURLSHE_INVALID;
 
   if(share->specifier & (1<<type)) {

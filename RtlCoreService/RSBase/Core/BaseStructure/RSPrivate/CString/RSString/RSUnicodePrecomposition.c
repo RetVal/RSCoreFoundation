@@ -15,13 +15,13 @@
 #include "RSUniCharPrivate.h"
 
 // Canonical Precomposition
-static UTF32Char *__RSUniCharPrecompSourceTable = NULL;
+static UTF32Char *__RSUniCharPrecompSourceTable = nil;
 static uint32_t __RSUniCharPrecompositionTableLength = 0;
-static uint16_t *__RSUniCharBMPPrecompDestinationTable = NULL;
-static uint32_t *__RSUniCharNonBMPPrecompDestinationTable = NULL;
+static uint16_t *__RSUniCharBMPPrecompDestinationTable = nil;
+static uint32_t *__RSUniCharNonBMPPrecompDestinationTable = nil;
 
-static const uint8_t *__RSUniCharNonBaseBitmapForBMP_P = NULL; // Adding _P so the symbol name is different from the one in RSUnicodeDecomposition.c
-static const uint8_t *__RSUniCharCombiningClassForBMP = NULL;
+static const uint8_t *__RSUniCharNonBaseBitmapForBMP_P = nil; // Adding _P so the symbol name is different from the one in RSUnicodeDecomposition.c
+static const uint8_t *__RSUniCharCombiningClassForBMP = nil;
 
 static RSSpinLock __RSUniCharPrecompositionTableLock = RSSpinLockInit;
 
@@ -29,11 +29,11 @@ static void __RSUniCharLoadPrecompositionTable(void) {
     
     RSSpinLockLock(&__RSUniCharPrecompositionTableLock);
     
-    if (NULL == __RSUniCharPrecompSourceTable) {
+    if (nil == __RSUniCharPrecompSourceTable) {
         const uint32_t *bytes = (const uint32_t *)RSUniCharGetMappingData(RSUniCharCanonicalPrecompMapping);
         uint32_t bmpMappingLength;
         
-        if (NULL == bytes) {
+        if (nil == bytes) {
             RSSpinLockUnlock(&__RSUniCharPrecompositionTableLock);
             return;
         }
@@ -105,7 +105,7 @@ __private_extern__
 UTF32Char RSUniCharPrecomposeCharacter(UTF32Char base, UTF32Char combining) {
     uint32_t value;
     
-    if (NULL == __RSUniCharPrecompSourceTable) __RSUniCharLoadPrecompositionTable();
+    if (nil == __RSUniCharPrecompSourceTable) __RSUniCharLoadPrecompositionTable();
     
     if (!(value = __RSUniCharGetMappedValue_P((const __RSUniCharPrecomposeMappings *)__RSUniCharPrecompSourceTable, __RSUniCharPrecompositionTableLength, combining))) return 0xFFFD;
     
@@ -146,7 +146,7 @@ BOOL RSUniCharPrecompose(const UTF16Char *characters, RSIndex length, RSIndex *c
     BOOL currentBaseIsBMP = YES;
     BOOL isPrecomposed;
     
-    if (NULL == __RSUniCharPrecompSourceTable) __RSUniCharLoadPrecompositionTable();
+    if (nil == __RSUniCharPrecompSourceTable) __RSUniCharLoadPrecompositionTable();
     
     while (length > 0) {
         currentChar = *(characters++);

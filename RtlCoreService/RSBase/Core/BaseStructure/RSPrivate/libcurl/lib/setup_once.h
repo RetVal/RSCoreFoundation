@@ -509,7 +509,7 @@ defined(__INITIAL_POINTER_SIZE) && (__INITIAL_POINTER_SIZE == 64)
 
 /*
  * We use this ZERO_NULL to avoid picky compiler warnings,
- * when assigning a NULL pointer to a function pointer var.
+ * when assigning a nil pointer to a function pointer var.
  */
 
 #define ZERO_NULL 0

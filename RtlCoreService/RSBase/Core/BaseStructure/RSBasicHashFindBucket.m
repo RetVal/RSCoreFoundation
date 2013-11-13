@@ -77,7 +77,7 @@ FIND_BUCKET_NAME (RSConstBasicHashRef ht, uintptr_t stack_key
     COCOA_HASHTABLE_PROBING_START(ht, num_buckets);
     RSBasicHashValue *keys = (ht->bits.keys_offset) ? __RSBasicHashGetKeys(ht) : __RSBasicHashGetValues(ht);
 #if !FIND_BUCKET_FOR_REHASH
-    uintptr_t *hashes = (__RSBasicHashHasHashCache(ht)) ? __RSBasicHashGetHashes(ht) : NULL;
+    uintptr_t *hashes = (__RSBasicHashHasHashCache(ht)) ? __RSBasicHashGetHashes(ht) : nil;
 #endif
     RSIndex deleted_idx = RSNotFound;
     uintptr_t probe = h1;
@@ -274,7 +274,7 @@ FIND_BUCKET_NAME (RSConstBasicHashRef ht, uintptr_t stack_key
     COCOA_HASHTABLE_PROBING_START(ht, num_buckets);
     RSBasicHashValue *keys = (ht->bits.keys_offset) ? __RSBasicHashGetKeys(ht) : __RSBasicHashGetValues(ht);
 #if !FIND_BUCKET_FOR_REHASH
-    uintptr_t *hashes = (__RSBasicHashHasHashCache(ht)) ? __RSBasicHashGetHashes(ht) : NULL;
+    uintptr_t *hashes = (__RSBasicHashHasHashCache(ht)) ? __RSBasicHashGetHashes(ht) : nil;
 #endif
     RSIndex deleted_idx = RSNotFound;
     uintptr_t probe = h1;

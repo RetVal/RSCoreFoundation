@@ -13,7 +13,7 @@ void rbtree_container_init(rbtree_container *tree, size_t key_length, RSKeyCompa
 #ifdef _C99
 	tree->root = RB_ROOT;
 #else
-	tree->root.rb_node = NULL;
+	tree->root.rb_node = nil;
 #endif
 	tree->compare = key_compare_function;
 	//tree->klen = key_length;
@@ -36,13 +36,13 @@ rbtree_container_node *rbtree_container_search(rbtree_container *tree, RSTypeRef
 		else
 			return cur;
 	}
-	return NULL;
+	return nil;
 }
 
 int rbtree_container_insert(rbtree_container *tree, rbtree_container_node *cont)
 {
 	struct rb_node **new = &(tree->root.rb_node); 
-	struct rb_node  *parent = NULL;
+	struct rb_node  *parent = nil;
 	
 	while (*new) 
 	{
@@ -70,7 +70,7 @@ rbtree_container_node *rbtree_container_delete(rbtree_container *tree, RSTypeRef
 {
 	rbtree_container_node *find = rbtree_container_search(tree, key);
 	if (!find)
-		return NULL;
+		return nil;
 	rb_erase(&find->rb_node, &(tree->root));
 	return find;
 }
@@ -79,7 +79,7 @@ rbtree_container_node *rbtree_container_replace(rbtree_container *tree, rbtree_c
 {
 	rbtree_container_node *find = rbtree_container_search(tree, cont->key);
 	if (!find)
-		return NULL;
+		return nil;
 	rb_replace_node(&(find->rb_node), &(cont->rb_node), &(tree->root));
 	return find;
 }
@@ -88,7 +88,7 @@ rbtree_container_node *rbtree_container_first(rbtree_container *tree)
 {
 	struct rb_node *node = rb_first(&(tree->root));
 	if (!node)
-		return NULL;
+		return nil;
 	return rb_entry(node, rbtree_container_node, rb_node);
 }
 
@@ -96,7 +96,7 @@ rbtree_container_node *rbtree_container_last(rbtree_container *tree)
 {
 	struct rb_node *node = rb_last(&(tree->root));
 	if (!node)
-		return NULL;
+		return nil;
 	return rb_entry(node, rbtree_container_node, rb_node);
 }
 
@@ -104,7 +104,7 @@ rbtree_container_node *rbtree_container_next(rbtree_container_node *cont)
 {
 	struct rb_node *node = rb_next(&(cont->rb_node));
 	if (!node)
-		return NULL;
+		return nil;
 	return rb_entry(node, rbtree_container_node, rb_node);
 }
 
@@ -112,7 +112,7 @@ rbtree_container_node *rbtree_container_prev(rbtree_container_node *cont)
 {
 	struct rb_node *node = rb_prev(&(cont->rb_node));
 	if (!node)
-		return NULL;
+		return nil;
 	return rb_entry(node, rbtree_container_node, rb_node);
 }
 

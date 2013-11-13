@@ -85,7 +85,7 @@ static RSRuntimeClass __RSNilClass = {
     __RSNilClassCopy,
     __RSNilClassDeallocate,
     __RSNilClassEqual,
-    NULL,
+    nil,
     __RSNilClassDescription,
     __RSNilClassReclaim,
     __RSNilClassRefcount,

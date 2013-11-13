@@ -298,23 +298,23 @@ RSExport RSStringRef const RSDateFormatterCalendarName __attribute__((alias ("RS
 
 // Note string members start with an extra &, and are fixed up at init time
 static struct key_table __RSLocaleKeyTable[__RSLocaleKeyTableCount] = {
-    {(RSStringRef)&RSLocaleIdentifierKey, __RSLocaleCopyLocaleID, __RSLocaleSetNOP, __RSLocaleFullName, NULL},
+    {(RSStringRef)&RSLocaleIdentifierKey, __RSLocaleCopyLocaleID, __RSLocaleSetNOP, __RSLocaleFullName, nil},
     {(RSStringRef)&RSLocaleLanguageCodeKey, __RSLocaleCopyCodes, __RSLocaleSetNOP, __RSLocaleLanguageName, (RSStringRef)&RSLocaleLanguageCodeKey},
     {(RSStringRef)&RSLocaleCountryCodeKey, __RSLocaleCopyCodes, __RSLocaleSetNOP, __RSLocaleCountryName, (RSStringRef)&RSLocaleCountryCodeKey},
     {(RSStringRef)&RSLocaleScriptCodeKey, __RSLocaleCopyCodes, __RSLocaleSetNOP, __RSLocaleScriptName, (RSStringRef)&RSLocaleScriptCodeKey},
     {(RSStringRef)&RSLocaleVariantCodeKey, __RSLocaleCopyCodes, __RSLocaleSetNOP, __RSLocaleVariantName, (RSStringRef)&RSLocaleVariantCodeKey},
-    {(RSStringRef)&RSLocaleExemplarCharacterSetKey, __RSLocaleCopyExemplarCharSet, __RSLocaleSetNOP, __RSLocaleNoName, NULL},
-    {(RSStringRef)&RSLocaleCalendarIdentifierKey, __RSLocaleCopyCalendarID, __RSLocaleSetNOP, __RSLocaleCalendarName, NULL},
-    {(RSStringRef)&RSLocaleCalendarKey, __RSLocaleCopyCalendar, __RSLocaleSetNOP, __RSLocaleNoName, NULL},
-    {(RSStringRef)&RSLocaleCollationIdentifierKey, __RSLocaleCopyCollationID, __RSLocaleSetNOP, __RSLocaleCollationName, NULL},
-    {(RSStringRef)&RSLocaleUsesMetricSystemKey, __RSLocaleCopyUsesMetric, __RSLocaleSetNOP, __RSLocaleNoName, NULL},
-    {(RSStringRef)&RSLocaleMeasurementSystemKey, __RSLocaleCopyMeasurementSystem, __RSLocaleSetNOP, __RSLocaleNoName, NULL},
+    {(RSStringRef)&RSLocaleExemplarCharacterSetKey, __RSLocaleCopyExemplarCharSet, __RSLocaleSetNOP, __RSLocaleNoName, nil},
+    {(RSStringRef)&RSLocaleCalendarIdentifierKey, __RSLocaleCopyCalendarID, __RSLocaleSetNOP, __RSLocaleCalendarName, nil},
+    {(RSStringRef)&RSLocaleCalendarKey, __RSLocaleCopyCalendar, __RSLocaleSetNOP, __RSLocaleNoName, nil},
+    {(RSStringRef)&RSLocaleCollationIdentifierKey, __RSLocaleCopyCollationID, __RSLocaleSetNOP, __RSLocaleCollationName, nil},
+    {(RSStringRef)&RSLocaleUsesMetricSystemKey, __RSLocaleCopyUsesMetric, __RSLocaleSetNOP, __RSLocaleNoName, nil},
+    {(RSStringRef)&RSLocaleMeasurementSystemKey, __RSLocaleCopyMeasurementSystem, __RSLocaleSetNOP, __RSLocaleNoName, nil},
     {(RSStringRef)&RSLocaleDecimalSeparatorKey, __RSLocaleCopyNumberFormat, __RSLocaleSetNOP, __RSLocaleNoName, (RSStringRef)&RSNumberFormatterDecimalSeparatorKey},
     {(RSStringRef)&RSLocaleGroupingSeparatorKey, __RSLocaleCopyNumberFormat, __RSLocaleSetNOP, __RSLocaleNoName, (RSStringRef)&RSNumberFormatterGroupingSeparatorKey},
     {(RSStringRef)&RSLocaleCurrencySymbolKey, __RSLocaleCopyNumberFormat2, __RSLocaleSetNOP, __RSLocaleCurrencyShortName, (RSStringRef)&RSNumberFormatterCurrencySymbolKey},
     {(RSStringRef)&RSLocaleCurrencyCodeKey, __RSLocaleCopyNumberFormat2, __RSLocaleSetNOP, __RSLocaleCurrencyFullName, (RSStringRef)&RSNumberFormatterCurrencyCodeKey},
-    {(RSStringRef)&RSLocaleCollatorIdentifierKey, __RSLocaleCopyCollatorID, __RSLocaleSetNOP, __RSLocaleNoName, NULL},
-    {(RSStringRef)&__RSLocaleCollatorID, __RSLocaleCopyCollatorID, __RSLocaleSetNOP, __RSLocaleNoName, NULL},
+    {(RSStringRef)&RSLocaleCollatorIdentifierKey, __RSLocaleCopyCollatorID, __RSLocaleSetNOP, __RSLocaleNoName, nil},
+    {(RSStringRef)&__RSLocaleCollatorID, __RSLocaleCopyCollatorID, __RSLocaleSetNOP, __RSLocaleNoName, nil},
     {(RSStringRef)&RSLocaleQuotationBeginDelimiterKey, __RSLocaleCopyDelimiter, __RSLocaleSetNOP, __RSLocaleNoName, (RSStringRef)&RSLocaleQuotationBeginDelimiterKey},
     {(RSStringRef)&RSLocaleQuotationEndDelimiterKey, __RSLocaleCopyDelimiter, __RSLocaleSetNOP, __RSLocaleNoName, (RSStringRef)&RSLocaleQuotationEndDelimiterKey},
     {(RSStringRef)&RSLocaleAlternateQuotationBeginDelimiterKey, __RSLocaleCopyDelimiter, __RSLocaleSetNOP, __RSLocaleNoName, (RSStringRef)&RSLocaleAlternateQuotationBeginDelimiterKey},
@@ -386,7 +386,7 @@ static const char * const regionCodeToLocaleString[] = {
     "tr_TR",        //  35 verTurkishModified;   17 langTurkish;    * one-way mapping
     "it_CH",        //  36 verItalianSwiss;       3 langItalian;
     "en_001",       //  37 verInternational;      0 langEnglish; ASCII only             # "en"
-    NULL,           //  38 *unassigned;          -1 none;           * one-way mapping   # ""
+    nil,           //  38 *unassigned;          -1 none;           * one-way mapping   # ""
     "ro_RO",        //  39 verRomania;           37 langRomanian;
     "grc",          //  40 verGreekAncient;     148 langGreekAncient -Grek-poly;        # "el_GR"
     "lt_LT",        //  41 verLithuania;         24 langLithuanian;
@@ -411,13 +411,13 @@ static const char * const regionCodeToLocaleString[] = {
     "bn",           //  60 verBengali;           67 langBengali;    _IN or _BD? guess generic
     "be_BY",        //  61 verBelarus;           46 langBelorussian;
     "uk_UA",        //  62 verUkraine;           45 langUkrainian;
-    NULL,           //  63 *unused;              -1 none;           * one-way mapping   # ""
+    nil,           //  63 *unused;              -1 none;           * one-way mapping   # ""
     "el_GR",        //  64 verGreeceAlt;         14 langGreek (modern)-Grek-mono;   * one-way mapping
     "sr_RS",        //  65 verSerbian;           42 langSerbian -Cyrl;								// <1.18>
     "sl_SI",        //  66 verSlovenian;         40 langSlovenian;
     "mk_MK",        //  67 verMacedonian;        43 langMacedonian;
     "hr_HR",        //  68 verCroatia;           18 langCroatian;
-    NULL,           //  69 *unused;              -1 none;           * one-way mapping   # ""
+    nil,           //  69 *unused;              -1 none;           * one-way mapping   # ""
     "de-1996",      //  70 verGermanReformed;     2 langGerman;     1996 orthogr.       # "de_DE"
     "pt_BR",        //  71 verBrazil;             8 langPortuguese;
     "bg_BG",        //  72 verBulgaria;          44 langBulgarian;
@@ -562,9 +562,9 @@ static const char * const langCodeToLocaleString[] = {
     "ny",       //  92 langNyanja/Chewa -Latn;      no region codes # ""
     "mg",       //  93 langMalagasy -Latn;          no region codes
     "eo",       //  94 langEsperanto -Latn;
-    NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL, //  95 to 105 (gap)
-    NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL, // 106 to 116 (gap)
-    NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL, // 107 to 117 (gap)
+    nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil, //  95 to 105 (gap)
+    nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil, // 106 to 116 (gap)
+    nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil, // 107 to 117 (gap)
     "cy",       // 128 langWelsh -Latn;
     "eu",       // 129 langBasque -Latn;            no region codes
     "ca",       // 130 langCatalan -Latn;
@@ -973,16 +973,16 @@ static const SpecialCaseUpdates specialCases[] = {
     // hr; if there is a region tag of (now) RS we use sr; else we do not change it (not enough info).
     // c) There are other codes that have been updated without these issues (eg. TP to TL), plus among the
     // "exceptionally reserved" codes some are just alternates for standard codes (eg. UK for GB).
-    {   NULL,   "-UK",  "GB",   NULL,   NULL    },  // always change UK to GB (UK is "exceptionally reserved" to mean GB)
-    {   NULL,   "-TP",  "TL",   NULL,   NULL    },  // always change TP to TL (East Timor, code changed 2002-05)
-    {   "cs",   "-CS",  "CZ",   NULL,   NULL    },  // if language is cs, change CS (pre-1993 Czechoslovakia) to CZ (Czech Republic)
-    {   "sk",   "-CS",  "SK",   NULL,   NULL    },  // if language is sk, change CS (pre-1993 Czechoslovakia) to SK (Slovakia)
-    {   NULL,   "-CS",  "RS",   NULL,   NULL    },  // otherwise map CS (assume Serbia+Montenegro) to RS (Serbia)
-    {   NULL,   "-YU",  "RS",   NULL,   NULL    },  // also map old YU (assume Serbia+Montenegro) to RS (Serbia)
+    {   nil,   "-UK",  "GB",   nil,   nil    },  // always change UK to GB (UK is "exceptionally reserved" to mean GB)
+    {   nil,   "-TP",  "TL",   nil,   nil    },  // always change TP to TL (East Timor, code changed 2002-05)
+    {   "cs",   "-CS",  "CZ",   nil,   nil    },  // if language is cs, change CS (pre-1993 Czechoslovakia) to CZ (Czech Republic)
+    {   "sk",   "-CS",  "SK",   nil,   nil    },  // if language is sk, change CS (pre-1993 Czechoslovakia) to SK (Slovakia)
+    {   nil,   "-CS",  "RS",   nil,   nil    },  // otherwise map CS (assume Serbia+Montenegro) to RS (Serbia)
+    {   nil,   "-YU",  "RS",   nil,   nil    },  // also map old YU (assume Serbia+Montenegro) to RS (Serbia)
     {   "sh",   "-HR",  "hr",   "-RS",  "sr"    },  // then if language is old 'sh' (SerboCroatian), change it to 'hr' (Croatian)
     // if we find HR (Croatia) or to 'sr' (Serbian) if we find RS (Serbia).
     // Note: Do this after changing YU/CS toRS as above.
-    {   NULL,   NULL,   NULL,   NULL,   NULL    }   // terminator
+    {   nil,   nil,   nil,   nil,   nil    }   // terminator
 };
 
 
@@ -1454,7 +1454,7 @@ static void _DeleteCharsAtPointer(char *stringPtr, int length) {
 
 // _CopyReplacementAtPointer
 // (Local function for RSLocaleCreateCanonicalLocaleIdentifierFromString)
-// Copy replacement string (*excluding* terminating NULL byte) to the place indicated by stringPtr
+// Copy replacement string (*excluding* terminating nil byte) to the place indicated by stringPtr
 static void _CopyReplacementAtPointer(char *stringPtr, const char *replacementPtr) {
     while (*replacementPtr != 0) {
         *stringPtr++ = *replacementPtr++;
@@ -1491,7 +1491,7 @@ static void _ReplacePrefix(char locString[], int locStringMaxLen, int oldPrefixL
             }
         } else {
             // no room, can't do substitution
-            newPrefix = NULL;
+            newPrefix = nil;
         }
     }
     
@@ -1516,9 +1516,9 @@ static void _UpdateFullLocaleString(char inLocaleString[], int locStringMaxLen,
     const SpecialCaseUpdates *  specialCasePtr;
     char *      inLocalePtr;
     char *      subtagPtr;
-    char *      langRegSubtag = NULL;
-    char *      regionTag = NULL;
-    char *		variantTag = NULL;
+    char *      langRegSubtag = nil;
+    char *      regionTag = nil;
+    char *		variantTag = nil;
     BOOL     subtagHasDigits, pastPrimarySubtag, hadRegion;
     
     // 1. First replace any non-canonical prefix (case insensitive) with canonical
@@ -1549,7 +1549,7 @@ static void _UpdateFullLocaleString(char inLocaleString[], int locStringMaxLen,
         } else {
             
             if (!pastPrimarySubtag) {
-                // may have a NULL primary subtag
+                // may have a nil primary subtag
                 if (subtagHasDigits) {
                     break;
                 }
@@ -1566,7 +1566,7 @@ static void _UpdateFullLocaleString(char inLocaleString[], int locStringMaxLen,
 						hadRegion = YES;
 						subtagPtr[1] = toupper(subtagPtr[1]);
 						subtagPtr[2] = toupper(subtagPtr[2]);
-					} else if (langRegSubtag == NULL) {
+					} else if (langRegSubtag == nil) {
 						langRegSubtag = subtagPtr;
 						subtagPtr[1] = toupper(subtagPtr[1]);
 						subtagPtr[2] = toupper(subtagPtr[2]);
@@ -1576,7 +1576,7 @@ static void _UpdateFullLocaleString(char inLocaleString[], int locStringMaxLen,
 					if (*subtagPtr == '_') {
 						regionTag = subtagPtr;
 						hadRegion = YES;
-					} else if (langRegSubtag == NULL) {
+					} else if (langRegSubtag == nil) {
 						langRegSubtag = subtagPtr;
 					}
 				} else if (subtagLength == 5 && !subtagHasDigits) {
@@ -1642,8 +1642,8 @@ static void _UpdateFullLocaleString(char inLocaleString[], int locStringMaxLen,
     
     // 4. Handle special cases of updating region codes, or updating language codes based on
     // region code.
-    for (specialCasePtr = specialCases; specialCasePtr->reg1 != NULL; specialCasePtr++) {
-        if ( specialCasePtr->lang == NULL || _CheckForTag(inLocaleString, specialCasePtr->lang, 2) ) {
+    for (specialCasePtr = specialCases; specialCasePtr->reg1 != nil; specialCasePtr++) {
+        if ( specialCasePtr->lang == nil || _CheckForTag(inLocaleString, specialCasePtr->lang, 2) ) {
             // OK, we matched any language specified. Now what needs updating?
             char * foundTag;
             
@@ -1670,10 +1670,10 @@ static void _UpdateFullLocaleString(char inLocaleString[], int locStringMaxLen,
     }
     
     // 5. return pointers if requested.
-    if (langRegSubtagRef != NULL) {
+    if (langRegSubtagRef != nil) {
         *langRegSubtagRef = langRegSubtag;
     }
-    if (regionTagRef != NULL) {
+    if (regionTagRef != nil) {
         *regionTagRef = regionTag;
     }
 }
@@ -1740,13 +1740,13 @@ static void _AppendKeyValueString(char inLocaleString[], int locStringMaxLen, ch
 	if (keyValueString[0] != 0) {
 		UErrorCode		uerr = U_ZERO_ERROR;
 		UEnumeration *	uenum = uloc_openKeywords(keyValueString, &uerr);
-		if ( uenum != NULL ) {
+		if ( uenum != nil ) {
 			const char *	keyword;
 			int32_t			length;
 			char			value[ULOC_KEYWORDS_CAPACITY];	// use as max for keyword value
 			while ( U_SUCCESS(uerr) ) {
 				keyword = uenum_next(uenum, &length, &uerr);
-				if ( keyword == NULL ) {
+				if ( keyword == nil ) {
 					break;
 				}
 				length = uloc_getKeywordValue( keyValueString, keyword, value, sizeof(value), &uerr );
@@ -1763,7 +1763,7 @@ extern RSStringRef  RSStringCreateWithCString(RSAllocatorRef alloc, const char *
 
 RSStringRef RSLocaleCreateCanonicalLanguageIdentifierFromString(RSAllocatorRef allocator, RSStringRef localeIdentifier) {
     char            inLocaleString[kLocaleIdentifierCStringMax];
-    RSStringRef     outStringRef = NULL;
+    RSStringRef     outStringRef = nil;
     
     if ( localeIdentifier && 0 <= RSStringGetCString(localeIdentifier, inLocaleString,  sizeof(inLocaleString), RSStringEncodingASCII) ) {
         KeyStringToResultString     testEntry;
@@ -1772,7 +1772,7 @@ RSStringRef RSLocaleCreateCanonicalLanguageIdentifierFromString(RSAllocatorRef a
         char						varKeyValueString[sizeof(inLocaleString)];			// <1.17>
         
         _GetKeyValueString(inLocaleString, keyValueString);								// <1.10>
-        testEntry.result = NULL;
+        testEntry.result = nil;
         
         // A. First check if input string matches an old-style string that has a replacement
         // (do this before case normalization)
@@ -1784,8 +1784,8 @@ RSStringRef RSLocaleCreateCanonicalLanguageIdentifierFromString(RSAllocatorRef a
             strlcpy(inLocaleString, foundEntry->result, sizeof(inLocaleString));
             varKeyValueString[0] = 0;
         } else {
-            char *      langRegSubtag = NULL;
-            char *      regionTag = NULL;
+            char *      langRegSubtag = nil;
+            char *      regionTag = nil;
             
             // B. No match with an old-style string, use input string but update codes, normalize case, etc.
             _UpdateFullLocaleString(inLocaleString, sizeof(inLocaleString), &langRegSubtag, &regionTag, varKeyValueString);   // <1.10><1.17><1.19>
@@ -1854,7 +1854,7 @@ RSStringRef RSLocaleCreateCanonicalLanguageIdentifierFromString(RSAllocatorRef a
 
 RSStringRef RSLocaleCreateCanonicalLocaleIdentifierFromString(RSAllocatorRef allocator, RSStringRef localeIdentifier) {
     char            inLocaleString[kLocaleIdentifierCStringMax];
-    RSStringRef     outStringRef = NULL;
+    RSStringRef     outStringRef = nil;
     
     if ( localeIdentifier && 0 <= RSStringGetCString(localeIdentifier, inLocaleString,  sizeof(inLocaleString), RSStringEncodingASCII) ) {
         KeyStringToResultString     testEntry;
@@ -1863,7 +1863,7 @@ RSStringRef RSLocaleCreateCanonicalLocaleIdentifierFromString(RSAllocatorRef all
         char			    		varKeyValueString[sizeof(inLocaleString)];			// <1.17>
         
         _GetKeyValueString(inLocaleString, keyValueString);								// <1.10>
-        testEntry.result = NULL;
+        testEntry.result = nil;
         
         // A. First check if input string matches an old-style Apple string that has a replacement
         // (do this before case normalization)
@@ -1875,8 +1875,8 @@ RSStringRef RSLocaleCreateCanonicalLocaleIdentifierFromString(RSAllocatorRef all
             strlcpy(inLocaleString, foundEntry->result, sizeof(inLocaleString));
             varKeyValueString[0] = 0;
         } else {
-            char *      langRegSubtag = NULL;
-            char *      regionTag = NULL;
+            char *      langRegSubtag = nil;
+            char *      regionTag = nil;
             
             // B. No match with an old-style string, use input string but update codes, normalize case, etc.
             _UpdateFullLocaleString(inLocaleString, sizeof(inLocaleString), &langRegSubtag, &regionTag, varKeyValueString);   // <1.10><1.17>
@@ -1927,17 +1927,17 @@ RSStringRef RSLocaleCreateCanonicalLocaleIdentifierFromString(RSAllocatorRef all
 // the first part of the SPI RSBundleCopyLocalizationForLocalizationInfo in RSBundle_Resources.c
 extern RSStringRef  RSStringCreateWithCStringNoCopy(RSAllocatorRef alloc, const char *cStr, RSStringEncoding encoding, RSAllocatorRef contentsDeallocator);
 RSStringRef RSLocaleCreateCanonicalLocaleIdentifierFromScriptManagerCodes(RSAllocatorRef allocator, LangCode lcode, RegionCode rcode) {
-    RSStringRef result = NULL;
+    RSStringRef result = nil;
     if (0 <= rcode && rcode < kNumRegionCodeToLocaleString) {
         const char *localeString = regionCodeToLocaleString[rcode];
-        if (localeString != NULL && *localeString != '\0') {
+        if (localeString != nil && *localeString != '\0') {
             result = RSStringCreateWithCStringNoCopy(allocator, localeString, RSStringEncodingASCII, nil);
         }
     }
     if (result) return result;
     if (0 <= lcode && lcode < kNumLangCodeToLocaleString) {
         const char *localeString = langCodeToLocaleString[lcode];
-        if (localeString != NULL && *localeString != '\0') {
+        if (localeString != nil && *localeString != '\0') {
             result = RSStringCreateWithCStringNoCopy(allocator, localeString, RSStringEncodingASCII, nil);
         }
     }
@@ -1952,8 +1952,8 @@ RSStringRef RSLocaleCreateCanonicalLocaleIdentifierFromScriptManagerCodes(RSAllo
  otherwise may set *langCode and/or *regCode to -1 if there is no appropriate legacy value for the locale.
  This is a replacement for the RSBundle SPI RSBundleGetLocalizationInfoForLocalization (which was intended to be temporary and transitional);
  this function is more up-to-date in its handling of locale strings, and is in RSLocale where this functionality should belong. Compared
- to RSBundleGetLocalizationInfoForLocalization, this function does not spcially interpret a NULL localeIdentifier to mean use the single most
- preferred localization in the current context (this function returns NO for a NULL localeIdentifier); and in this function
+ to RSBundleGetLocalizationInfoForLocalization, this function does not spcially interpret a nil localeIdentifier to mean use the single most
+ preferred localization in the current context (this function returns NO for a nil localeIdentifier); and in this function
  langCode, regCode, and scriptCode are all SInt16* (not SInt32* like the equivalent parameters in RSBundleGetLocalizationInfoForLocalization).
  */
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
@@ -1963,7 +1963,7 @@ static int CompareLocaleToLegacyCodesEntries( const void *entry1, const void *en
 BOOL RSLocaleGetLanguageRegionEncodingForLocaleIdentifier(RSStringRef localeIdentifier, LangCode *langCode, RegionCode *regCode, ScriptCode *scriptCode, RSStringEncoding *stringEncoding) {
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
 	BOOL		returnValue = NO;
-	RSStringRef	canonicalIdentifier = RSLocaleCreateCanonicalLocaleIdentifierFromString(NULL, localeIdentifier);
+	RSStringRef	canonicalIdentifier = RSLocaleCreateCanonicalLocaleIdentifierFromString(nil, localeIdentifier);
 	if (canonicalIdentifier)
     {
     	char	localeCString[kLocaleIdentifierCStringMax];
@@ -2009,7 +2009,7 @@ BOOL RSLocaleGetLanguageRegionEncodingForLocaleIdentifier(RSStringRef localeIden
 				
 				// Search
 				foundEntryPtr = (const LocaleToLegacyCodes *)bsearch( &searchEntry, localeToLegacyCodes, kNumLocaleToLegacyCodes, sizeof(LocaleToLegacyCodes), CompareLocaleToLegacyCodesEntries );
-				if (foundEntryPtr == NULL && (int32_t) strlen(searchString) > languagelength)
+				if (foundEntryPtr == nil && (int32_t) strlen(searchString) > languagelength)
                 {
 					// truncate to language al;one and try again
 					searchString[languagelength] = 0;
@@ -2117,7 +2117,7 @@ RSDictionaryRef RSLocaleCreateComponentsFromLocaleIdentifier(RSAllocatorRef allo
     
     // Now get the keywords; open an enumerator on them
     UEnumeration *iter = uloc_openKeywords(cLocaleID, &icuStatus);
-    const char *locKey = NULL;
+    const char *locKey = nil;
     int32_t locKeyLen = 0;
     while ((locKey = uenum_next(iter, &locKeyLen, &icuStatus)) && U_SUCCESS(icuStatus))
     {
@@ -2148,10 +2148,10 @@ out:;
 }
 
 static char *__CStringFromString(RSStringRef str) {
-    if (!str) return NULL;
+    if (!str) return nil;
     RSRange rg = RSMakeRange(0, RSStringGetLength(str));
     RSIndex neededLength = 0;
-    RSStringGetBytes(str, rg, RSStringEncodingASCII, (UInt8)'?', NO, NULL, 0, &neededLength);
+    RSStringGetBytes(str, rg, RSStringEncodingASCII, (UInt8)'?', NO, nil, 0, &neededLength);
     char *buf = (char *)malloc(neededLength + 1);
     RSStringGetBytes(str, rg, RSStringEncodingASCII, (UInt8)'?', NO, (uint8_t *)buf, neededLength, &neededLength);
     buf[neededLength] = '\0';
@@ -2159,31 +2159,31 @@ static char *__CStringFromString(RSStringRef str) {
 }
 
 RSStringRef RSLocaleCreateLocaleIdentifierFromComponents(RSAllocatorRef allocator, RSDictionaryRef dictionary) {
-    if (!dictionary) return NULL;
+    if (!dictionary) return nil;
     
     RSIndex cnt = RSDictionaryGetCount(dictionary);
     STACK_BUFFER_DECL(RSStringRef, values, cnt);
     STACK_BUFFER_DECL(RSStringRef, keys, cnt);
     RSDictionaryGetKeysAndValues(dictionary, (const void **)&keys, (const void **)&values);
     
-    char *language = NULL, *script = NULL, *country = NULL, *variant = NULL;
+    char *language = nil, *script = nil, *country = nil, *variant = nil;
     for (RSIndex idx = 0; idx < cnt; idx++) {
         if (RSEqual(RSLocaleLanguageCodeKey, keys[idx])) {
             language = __CStringFromString(values[idx]);
-            keys[idx] = NULL;
+            keys[idx] = nil;
         } else if (RSEqual(RSLocaleScriptCodeKey, keys[idx])) {
             script = __CStringFromString(values[idx]);
-            keys[idx] = NULL;
+            keys[idx] = nil;
         } else if (RSEqual(RSLocaleCountryCodeKey, keys[idx])) {
             country = __CStringFromString(values[idx]);
-            keys[idx] = NULL;
+            keys[idx] = nil;
         } else if (RSEqual(RSLocaleVariantCodeKey, keys[idx])) {
             variant = __CStringFromString(values[idx]);
-            keys[idx] = NULL;
+            keys[idx] = nil;
         }
     }
     
-    char *buf1 = NULL;	// (|L)(|_S)(|_C|_C_V|__V)
+    char *buf1 = nil;	// (|L)(|_S)(|_C|_C_V|__V)
     asprintf(&buf1, "%s%s%s%s%s%s%s", language ? language : "", script ? "_" : "", script ? script : "", (country || variant ? "_" : ""), country ? country : "", variant ? "_" : "", variant ? variant : "");
     
     char cLocaleID[2 * ULOC_FULLNAME_CAPACITY + 2 * ULOC_KEYWORD_AND_VALUES_CAPACITY];
@@ -2224,8 +2224,8 @@ RSStringRef RSLocaleCreateLocaleIdentifierFromComponents(RSAllocatorRef allocato
 }
 
 
-static RSLocaleRef __RSLocaleSystemId = NULL;
-static RSMutableDictionaryRef __RSLocaleCache = NULL;
+static RSLocaleRef __RSLocaleSystemId = nil;
+static RSMutableDictionaryRef __RSLocaleCache = nil;
 static RSSpinLock __RSLocaleGlobalLock = RSSpinLockInit;
 
 struct __RSLocale
@@ -2297,9 +2297,9 @@ static void __RSLocaleClassDeallocate(RSTypeRef rs)
 {
     __RSLocaleRef locale = (__RSLocaleRef)rs;
     RSRelease(locale->_identifier);
-    if (NULL != locale->_cache) RSRelease(locale->_cache);
-    if (NULL != locale->_overrides) RSRelease(locale->_overrides);
-    if (NULL != locale->_prefs) RSRelease(locale->_prefs);}
+    if (nil != locale->_cache) RSRelease(locale->_cache);
+    if (nil != locale->_overrides) RSRelease(locale->_overrides);
+    if (nil != locale->_prefs) RSRelease(locale->_prefs);}
 
 static BOOL __RSLocaleClassEqual(RSTypeRef rs1, RSTypeRef rs2)
 {
@@ -2320,14 +2320,14 @@ static RSHashCode __RSLocaleClassHash(RSTypeRef rs)
 static RSStringRef __RSLocaleClassDescription(RSTypeRef rs)
 {
     RSLocaleRef locale = (RSLocaleRef)rs;
-    const char *type = NULL;
+    const char *type = nil;
     switch (__RSLocaleGetType(locale)) {
         case __RSLocaleOrdinary: type = "ordinary"; break;
         case __RSLocaleSystem: type = "system"; break;
         case __RSLocaleUser: type = "user"; break;
         case __RSLocaleCustom: type = "custom"; break;
     }
-    return RSStringCreateWithFormat(RSGetAllocator(locale), NULL, RSSTR("<RSLocale %p [%p]>{type = %s, identifier = '%r'}"), rs, RSGetAllocator(locale), type, locale->_identifier);
+    return RSStringCreateWithFormat(RSGetAllocator(locale), nil, RSSTR("<RSLocale %p [%p]>{type = %s, identifier = '%r'}"), rs, RSGetAllocator(locale), type, locale->_identifier);
 }
 
 static RSRuntimeClass __RSLocaleClass =
@@ -2350,9 +2350,9 @@ static BOOL __RSLocaleEqual(RSTypeRef cf1, RSTypeRef cf2) {
     // a user locale and a locale created with an ident are not the same even if their contents are
     if (__RSLocaleGetType(locale1) != __RSLocaleGetType(locale2)) return NO;
     if (!RSEqual(locale1->_identifier, locale2->_identifier)) return NO;
-    if (NULL == locale1->_overrides && NULL != locale2->_overrides) return NO;
-    if (NULL != locale1->_overrides && NULL == locale2->_overrides) return NO;
-    if (NULL != locale1->_overrides && !RSEqual(locale1->_overrides, locale2->_overrides)) return NO;
+    if (nil == locale1->_overrides && nil != locale2->_overrides) return NO;
+    if (nil != locale1->_overrides && nil == locale2->_overrides) return NO;
+    if (nil != locale1->_overrides && !RSEqual(locale1->_overrides, locale2->_overrides)) return NO;
     if (__RSLocaleUser == __RSLocaleGetType(locale1)) {
         return RSEqual(locale1->_prefs, locale2->_prefs);
     }
@@ -2372,7 +2372,7 @@ static void __RSLocaleInitialize(void) {
     for (idx = 0; idx < __RSLocaleKeyTableCount; idx++) {
         // table fixup to workaround compiler/language limitations
         __RSLocaleKeyTable[idx].key = *((RSStringRef *)__RSLocaleKeyTable[idx].key);
-        if (NULL != __RSLocaleKeyTable[idx].context) {
+        if (nil != __RSLocaleKeyTable[idx].context) {
             __RSLocaleKeyTable[idx].context = *((RSStringRef *)__RSLocaleKeyTable[idx].context);
         }
     }
@@ -2403,26 +2403,26 @@ static RSLocaleRef __RSLocaleCreateInstance(RSAllocatorRef allocator, RSStringRe
 RSLocaleRef RSLocaleGetSystem(void) {
     RSLocaleRef locale;
     __RSLocaleLockGlobal();
-    if (NULL == __RSLocaleSystemId) {
+    if (nil == __RSLocaleSystemId) {
         __RSLocaleUnlockGlobal();
         locale = RSLocaleCreate(RSAllocatorSystemDefault, RSSTR(""));
-        if (!locale) return NULL;
+        if (!locale) return nil;
         __RSLocaleSetType(locale, __RSLocaleSystem);
         __RSLocaleLockGlobal();
-        if (NULL == __RSLocaleSystemId) {
+        if (nil == __RSLocaleSystemId) {
             __RSLocaleSystemId = locale;
         } else {
             if (locale) RSRelease(locale);
         }
     }
-    locale = __RSLocaleSystem ? (RSLocaleRef)RSRetain(__RSLocaleSystem) : NULL;
+    locale = __RSLocaleSystem ? (RSLocaleRef)RSRetain(__RSLocaleSystem) : nil;
     __RSLocaleUnlockGlobal();
     return locale;
 }
 
 extern RSDictionaryRef __RSXPreferencesCopyCurrentApplicationState(void);
 
-static RSLocaleRef __RSLocaleCurrent = NULL;
+static RSLocaleRef __RSLocaleCurrent = nil;
 
 
 #if DEPLOYMENT_TARGET_MACOSX
@@ -2436,7 +2436,7 @@ static RSLocaleRef __RSLocaleCurrent = NULL;
 RSLocaleRef RSLocaleCopyCurrent(void)
 {
     
-    RSStringRef name = NULL, ident = NULL;
+    RSStringRef name = nil, ident = nil;
     // We cannot be helpful here, because it causes performance problems,
     // even though the preference lookup is relatively quick, as there are
     // things which call this function thousands or millions of times in
@@ -2448,14 +2448,14 @@ RSLocaleRef RSLocaleCopyCurrent(void)
         ident = RSLocaleCreateCanonicalLocaleIdentifierFromString(RSAllocatorSystemDefault, name);
     }
     if (name) RSRelease(name);
-    RSLocaleRef oldLocale = NULL;
+    RSLocaleRef oldLocale = nil;
     __RSLocaleLockGlobal();
     if (__RSLocaleCurrent)
     {
         if (ident && !RSEqual(__RSLocaleCurrent->_identifier, ident))
         {
             oldLocale = __RSLocaleCurrent;
-            __RSLocaleCurrent = NULL;
+            __RSLocaleCurrent = nil;
         }
         else
         {
@@ -2472,28 +2472,28 @@ RSLocaleRef RSLocaleCopyCurrent(void)
     // We could *probably* re-use ident down below, but that would't
     // get us out of querying RSPrefs for the current application state.
     
-    RSDictionaryRef prefs = NULL;
-    RSStringRef identifier = NULL;
+    RSDictionaryRef prefs = nil;
+    RSStringRef identifier = nil;
     
     struct __RSLocale *locale;
     uint32_t size = sizeof(struct __RSLocale) - sizeof(RSRuntimeBase);
     locale = (struct __RSLocale *)__RSRuntimeCreateInstance(RSAllocatorSystemDefault, RSLocaleGetTypeID(), size);
-    if (NULL == locale) {
+    if (nil == locale) {
         if (prefs) RSRelease(prefs);
         if (identifier) RSRelease(identifier);
-        return NULL;
+        return nil;
     }
     __RSLocaleSetType(locale, __RSLocaleUser);
-    if (NULL == identifier) identifier = (RSStringRef)RSRetain(FALLBACK_LOCALE_NAME);
+    if (nil == identifier) identifier = (RSStringRef)RSRetain(FALLBACK_LOCALE_NAME);
     locale->_identifier = identifier;
     locale->_cache = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
-    locale->_overrides = NULL;
+    locale->_overrides = nil;
     locale->_prefs = prefs;
     locale->_lock = RSSpinLockInit;
     locale->_nullLocale = NO;
     
     __RSLocaleLockGlobal();
-    if (NULL == __RSLocaleCurrent) {
+    if (nil == __RSLocaleCurrent) {
         __RSLocaleCurrent = locale;
     } else {
         RSRelease(locale);
@@ -2513,11 +2513,11 @@ RSExport RSLocaleRef RSLocaleCreate(RSAllocatorRef allocator, RSStringRef identi
     
     __RSGenericValidInstance(allocator, RSAllocatorGetTypeID());
     __RSGenericValidInstance(identifier, RSStringGetTypeID());
-    RSStringRef localeIdentifier = NULL;
+    RSStringRef localeIdentifier = nil;
     if (identifier) {
         localeIdentifier = RSLocaleCreateCanonicalLocaleIdentifierFromString(allocator, identifier);
     }
-    if (NULL == localeIdentifier) return NULL;
+    if (nil == localeIdentifier) return nil;
     RSStringRef old = localeIdentifier;
     localeIdentifier = (RSStringRef)RSCopy(allocator, localeIdentifier);
     RSRelease(old);
@@ -2535,20 +2535,20 @@ RSExport RSLocaleRef RSLocaleCreate(RSAllocatorRef allocator, RSStringRef identi
             return locale;
         }
     }
-    struct __RSLocale *locale = NULL;
+    struct __RSLocale *locale = nil;
     uint32_t size = sizeof(struct __RSLocale) - sizeof(RSRuntimeBase);
     locale = (struct __RSLocale *)__RSRuntimeCreateInstance(allocator, RSLocaleGetTypeID(), size);
-    if (NULL == locale) {
-        return NULL;
+    if (nil == locale) {
+        return nil;
     }
     __RSLocaleSetType(locale, __RSLocaleOrdinary);
     locale->_identifier = localeIdentifier;
     locale->_cache = RSDictionaryCreateMutable(allocator, 0, RSDictionaryRSTypeContext);// key context may be nil
-    locale->_overrides = NULL;
-    locale->_prefs = NULL;
+    locale->_overrides = nil;
+    locale->_prefs = nil;
     locale->_lock = RSSpinLockInit;
     if (canCache) {
-        if (NULL == __RSLocaleCache) {
+        if (nil == __RSLocaleCache) {
             __RSLocaleCache = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
         }
         RSDictionarySetValue(__RSLocaleCache, localeIdentifier, locale);
@@ -2584,7 +2584,7 @@ RSExport RSTypeRef RSLocaleGetValue(RSLocaleRef locale, RSStringRef key) {
             break;
         }
     }
-    if (-1 == slot && NULL != key) {
+    if (-1 == slot && nil != key) {
         for (idx = 0; idx < __RSLocaleKeyTableCount; idx++) {
             if (RSEqual(__RSLocaleKeyTable[idx].key, key)) {
                 slot = idx;
@@ -2593,10 +2593,10 @@ RSExport RSTypeRef RSLocaleGetValue(RSLocaleRef locale, RSStringRef key) {
         }
     }
     if (-1 == slot) {
-        return NULL;
+        return nil;
     }
     RSTypeRef value;
-    if (NULL != locale->_overrides && (value = RSDictionaryGetValue(locale->_overrides, __RSLocaleKeyTable[slot].key))) {
+    if (nil != locale->_overrides && (value = RSDictionaryGetValue(locale->_overrides, __RSLocaleKeyTable[slot].key))) {
         return value;
     }
     __RSLocaleLock(locale);
@@ -2617,7 +2617,7 @@ RSExport RSTypeRef RSLocaleGetValue(RSLocaleRef locale, RSStringRef key) {
         return value;
     }
     __RSLocaleUnlock(locale);
-    return NULL;
+    return nil;
 }
 
 RSStringRef RSLocaleCopyDisplayNameForPropertyValue(RSLocaleRef displayLocale, RSStringRef key, RSStringRef value) {
@@ -2629,7 +2629,7 @@ RSStringRef RSLocaleCopyDisplayNameForPropertyValue(RSLocaleRef displayLocale, R
             break;
         }
     }
-    if (-1 == slot && NULL != key) {
+    if (-1 == slot && nil != key) {
         for (idx = 0; idx < __RSLocaleKeyTableCount; idx++) {
             if (RSEqual(__RSLocaleKeyTable[idx].key, key)) {
                 slot = idx;
@@ -2638,7 +2638,7 @@ RSStringRef RSLocaleCopyDisplayNameForPropertyValue(RSLocaleRef displayLocale, R
         }
     }
     if (-1 == slot || !value) {
-        return NULL;
+        return nil;
     }
     // Get the locale ID as a C string
     char localeID[ULOC_FULLNAME_CAPACITY+ULOC_KEYWORD_AND_VALUES_CAPACITY];
@@ -2646,12 +2646,12 @@ RSStringRef RSLocaleCopyDisplayNameForPropertyValue(RSLocaleRef displayLocale, R
     if (0 <= RSStringGetCString(displayLocale->_identifier, localeID, sizeof(localeID)/sizeof(localeID[0]), RSStringEncodingASCII) && 0 <= RSStringGetCString(value, cValue, sizeof(cValue)/sizeof(char), RSStringEncodingASCII))
     {
         RSStringRef result;
-        if ((NULL == displayLocale->_prefs) && __RSLocaleKeyTable[slot].name(localeID, cValue, &result)) {
+        if ((nil == displayLocale->_prefs) && __RSLocaleKeyTable[slot].name(localeID, cValue, &result)) {
             return result;
         }
         
         // We could not find a result using the requested language. Fall back through all preferred languages.
-        RSArrayRef langPref = NULL;
+        RSArrayRef langPref = nil;
         if (displayLocale->_prefs) {
             langPref = (RSArrayRef)RSDictionaryGetValue(displayLocale->_prefs, RSSTR("AppleLanguages"));
             if (langPref) RSRetain(langPref);
@@ -2660,7 +2660,7 @@ RSStringRef RSLocaleCopyDisplayNameForPropertyValue(RSLocaleRef displayLocale, R
 //            langPref = (RSArrayRef)RSPreferencesCopyAppValue(RSSTR("AppleLanguages"), RSPreferencesCurrentApplication);
 #endif
         }
-        if (langPref != NULL) {
+        if (langPref != nil) {
             RSIndex count = RSArrayGetCount(langPref);
             RSIndex i;
             bool success = NO;
@@ -2677,7 +2677,7 @@ RSStringRef RSLocaleCopyDisplayNameForPropertyValue(RSLocaleRef displayLocale, R
                 return result;
         }
     }
-    return NULL;
+    return nil;
 }
 
 RSArrayRef RSLocaleCopyAvailableLocaleIdentifiers(void) {
@@ -2698,7 +2698,7 @@ RSArrayRef RSLocaleCopyAvailableLocaleIdentifiers(void) {
     RSRelease(working);
     return result;
 #else
-    return RSArrayCreate(RSAllocatorSystemDefault, NULL, 0, &RSTypeArrayCallBacks);
+    return RSArrayCreate(RSAllocatorSystemDefault, nil, 0, &RSTypeArrayCallBacks);
 #endif
 }
 
@@ -2716,9 +2716,9 @@ static RSArrayRef __RSLocaleCopyCStringsAsArray(const char* const* p) {
 }
 
 static RSArrayRef __RSLocaleCopyUEnumerationAsArray(UEnumeration *enumer, UErrorCode *icuErr) {
-    const UChar *next = NULL;
+    const UChar *next = nil;
     int32_t len = 0;
-    RSMutableArrayRef working = NULL;
+    RSMutableArrayRef working = nil;
     if (U_SUCCESS(*icuErr)) {
         working = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
     }
@@ -2730,11 +2730,11 @@ static RSArrayRef __RSLocaleCopyUEnumerationAsArray(UEnumeration *enumer, UError
     if (*icuErr == U_INDEX_OUTOFBOUNDS_ERROR) {
         *icuErr = U_ZERO_ERROR;      // Temp: Work around bug (ICU 5220) in ucurr enumerator
     }
-    RSArrayRef result = NULL;
+    RSArrayRef result = nil;
     if (U_SUCCESS(*icuErr)) {
         result = RSArrayCreateCopy(RSAllocatorSystemDefault, working);
     }
-    if (working != NULL) {
+    if (working != nil) {
         RSRelease(working);
     }
     return result;
@@ -2746,7 +2746,7 @@ RSArrayRef RSLocaleCopyISOLanguageCodes(void) {
     const char* const* p = uloc_getISOLanguages();
     return __RSLocaleCopyCStringsAsArray(p);
 #else
-    return RSArrayCreate(RSAllocatorSystemDefault, NULL, 0, &RSTypeArrayCallBacks);
+    return RSArrayCreate(RSAllocatorSystemDefault, nil, 0, &RSTypeArrayCallBacks);
 #endif
 }
 
@@ -2755,7 +2755,7 @@ RSArrayRef RSLocaleCopyISOCountryCodes(void) {
     const char* const* p = uloc_getISOCountries();
     return __RSLocaleCopyCStringsAsArray(p);
 #else
-    return RSArrayCreate(RSAllocatorSystemDefault, NULL, 0, &RSTypeArrayCallBacks);
+    return RSArrayCreate(RSAllocatorSystemDefault, nil, 0, &RSTypeArrayCallBacks);
 #endif
 }
 
@@ -2766,7 +2766,7 @@ RSArrayRef RSLocaleCopyISOCurrencyCodes(void) {
     RSArrayRef result = __RSLocaleCopyUEnumerationAsArray(enumer, &icuStatus);
     uenum_close(enumer);
 #else
-    RSArrayRef result = RSArrayCreate(RSAllocatorSystemDefault, NULL, 0, &RSTypeArrayCallBacks);
+    RSArrayRef result = RSArrayCreate(RSAllocatorSystemDefault, nil, 0, &RSTypeArrayCallBacks);
 #endif
     return result;
 }
@@ -2778,7 +2778,7 @@ RSArrayRef RSLocaleCopyCommonISOCurrencyCodes(void) {
     RSArrayRef result = __RSLocaleCopyUEnumerationAsArray(enumer, &icuStatus);
     uenum_close(enumer);
 #else
-    RSArrayRef result = RSArrayCreate(RSAllocatorSystemDefault, NULL, 0, &RSTypeArrayCallBacks);
+    RSArrayRef result = RSArrayCreate(RSAllocatorSystemDefault, nil, 0, &RSTypeArrayCallBacks);
 #endif
     return result;
 }
@@ -2788,7 +2788,7 @@ RSStringRef RSLocaleCreateLocaleIdentifierFromWindowsLocaleCode(RSAllocatorRef a
     char buffer[kMaxICUNameSize];
     UErrorCode status = U_ZERO_ERROR;
     int32_t ret = uloc_getLocaleForLCID(lcid, buffer, kMaxICUNameSize, &status);
-    if (U_FAILURE(status) || kMaxICUNameSize <= ret) return NULL;
+    if (U_FAILURE(status) || kMaxICUNameSize <= ret) return nil;
     RSStringRef str = RSStringCreateWithCString(RSAllocatorSystemDefault, buffer, RSStringEncodingASCII);
     RSStringRef ident = RSLocaleCreateCanonicalLocaleIdentifierFromString(RSAllocatorSystemDefault, str);
     RSRelease(str);
@@ -2889,7 +2889,7 @@ static bool __RSLocaleCopyLocaleID(RSLocaleRef locale, bool user, RSTypeRef *cf,
 
 
 static bool __RSLocaleCopyCodes(RSLocaleRef locale, bool user, RSTypeRef *cf, RSStringRef context) {
-    RSDictionaryRef codes = NULL;
+    RSDictionaryRef codes = nil;
     // this access of _cache is protected by the lock in RSLocaleGetValue()
     if (!(codes = RSDictionaryGetValue(locale->_cache, RSSTR("__RSLocaleCodes"))))
     {
@@ -2910,12 +2910,12 @@ static bool __RSLocaleCopyCodes(RSLocaleRef locale, bool user, RSTypeRef *cf, RS
 RSCharacterSetRef _RSCreateCharacterSetFromUSet(USet *set)
 {
     UErrorCode icuErr = U_ZERO_ERROR;
-    RSMutableCharacterSetRef working = RSCharacterSetCreateMutable(NULL);
+    RSMutableCharacterSetRef working = RSCharacterSetCreateMutable(nil);
     UChar   buffer[2048];   // Suitable for most small sets
     int32_t stringLen;
     
-    if (working == NULL)
-        return NULL;
+    if (working == nil)
+        return nil;
     
     int32_t itemCount = uset_getItemCount(set);
     int32_t i;
@@ -2932,7 +2932,7 @@ RSCharacterSetRef _RSCreateCharacterSetFromUSet(USet *set)
             if (!string)
             {
                 RSRelease(working);
-                return NULL;
+                return nil;
             }
             icuErr = U_ZERO_ERROR;
             (void) uset_getItem(set, i, &start, &end, string, stringLen+1, &icuErr);
@@ -2942,7 +2942,7 @@ RSCharacterSetRef _RSCreateCharacterSetFromUSet(USet *set)
             if (string != buffer)
                 free(string);
             RSRelease(working);
-            return NULL;
+            return nil;
         }
         if (stringLen <= 0)
             RSCharacterSetAddCharactersInRange(working, RSMakeRange(start, end-start+1));
@@ -2969,7 +2969,7 @@ static bool __RSLocaleCopyExemplarCharSet(RSLocaleRef locale, bool user, RSTypeR
     if (RSStringGetCString(locale->_identifier, localeID, sizeof(localeID)/sizeof(char), RSStringEncodingASCII) >= 0) {
         UErrorCode icuStatus = U_ZERO_ERROR;
         ULocaleData* uld = ulocdata_open(localeID, &icuStatus);
-        USet *set = ulocdata_getExemplarSet(uld, NULL, USET_ADD_CASE_MAPPINGS, ULOCDATA_ES_STANDARD, &icuStatus);
+        USet *set = ulocdata_getExemplarSet(uld, nil, USET_ADD_CASE_MAPPINGS, ULOCDATA_ES_STANDARD, &icuStatus);
         ulocdata_close(uld);
         if (U_FAILURE(icuStatus))
             return NO;
@@ -2977,7 +2977,7 @@ static bool __RSLocaleCopyExemplarCharSet(RSLocaleRef locale, bool user, RSTypeR
             uset_clear(set);
         *cf = (RSTypeRef) _RSCreateCharacterSetFromUSet(set);
         uset_close(set);
-        return (*cf != NULL);
+        return (*cf != nil);
     }
 #endif
     return NO;
@@ -2998,7 +2998,7 @@ static bool __RSLocaleCopyICUKeyword(RSLocaleRef locale, bool user, RSTypeRef *c
         }
     }
 #endif
-    *cf = NULL;
+    *cf = nil;
     return NO;
 }
 
@@ -3018,7 +3018,7 @@ static bool __RSLocaleCopyICUCalendarID(RSLocaleRef locale, bool user, RSTypeRef
         uenum_close(en);
     }
 #endif
-    *cf = NULL;
+    *cf = nil;
     return NO;
 }
 
@@ -3072,7 +3072,7 @@ static bool __RSLocaleCopyCalendarID(RSLocaleRef locale, bool user, RSTypeRef *c
             *cf = RSRetain(RSCalendarIdentifierEthiopicAmeteAlem);
         } else {
             RSRelease(*cf);
-            *cf = NULL;
+            *cf = nil;
             return NO;
         }
     } else {
@@ -3088,21 +3088,21 @@ static bool __RSLocaleCopyCalendar(RSLocaleRef locale, bool user, RSTypeRef *rs,
 //        RSCalendarRef calendar = RSCalendarCreateWithIdentifier(RSAllocatorSystemDefault, (RSStringRef)*rs);
 //        RSCalendarSetLocale(calendar, locale);
         RSDictionaryRef prefs = __RSLocaleGetPrefs(locale);
-        RSTypeRef metapref = prefs ? RSDictionaryGetValue(prefs, RSSTR("AppleFirstWeekday")) : NULL;
-        if (NULL != metapref && RSGetTypeID(metapref) == RSDictionaryGetTypeID()) {
+        RSTypeRef metapref = prefs ? RSDictionaryGetValue(prefs, RSSTR("AppleFirstWeekday")) : nil;
+        if (nil != metapref && RSGetTypeID(metapref) == RSDictionaryGetTypeID()) {
             metapref = (RSNumberRef)RSDictionaryGetValue((RSDictionaryRef)metapref, *rs);
         }
-        if (NULL != metapref && RSGetTypeID(metapref) == RSNumberGetTypeID()) {
+        if (nil != metapref && RSGetTypeID(metapref) == RSNumberGetTypeID()) {
             RSIndex wkdy;
             if (RSNumberGetValue((RSNumberRef)metapref, &wkdy)) {
 //                RSCalendarSetFirstWeekday(calendar, wkdy);
             }
         }
-        metapref = prefs ? RSDictionaryGetValue(prefs, RSSTR("AppleMinDaysInFirstWeek")) : NULL;
-        if (NULL != metapref && RSGetTypeID(metapref) == RSDictionaryGetTypeID()) {
+        metapref = prefs ? RSDictionaryGetValue(prefs, RSSTR("AppleMinDaysInFirstWeek")) : nil;
+        if (nil != metapref && RSGetTypeID(metapref) == RSDictionaryGetTypeID()) {
             metapref = (RSNumberRef)RSDictionaryGetValue((RSDictionaryRef)metapref, *rs);
         }
-        if (NULL != metapref && RSGetTypeID(metapref) == RSNumberGetTypeID()) {
+        if (nil != metapref && RSGetTypeID(metapref) == RSNumberGetTypeID()) {
             RSIndex mwd;
             if (RSNumberGetValue((RSNumberRef)metapref, &mwd)) {
 //                RSCalendarSetMinimumDaysInFirstWeek(calendar, mwd);
@@ -3146,7 +3146,7 @@ static bool __RSLocaleCopyDelimiter(RSLocaleRef locale, bool user, RSTypeRef *cf
     }
     
     *cf = RSStringCreateWithCharacters(RSAllocatorSystemDefault, (UniChar *)buffer, len);
-    return (*cf != NULL);
+    return (*cf != nil);
 #else
     if (context == RSLocaleQuotationBeginDelimiterKey || context == RSLocaleQuotationEndDelimiterKey || context == RSLocaleAlternateQuotationBeginDelimiterKey || context == RSLocaleAlternateQuotationEndDelimiterKey) {
         *cf = RSRetain(RSSTR("\""));
@@ -3162,7 +3162,7 @@ static bool __RSLocaleCopyCollationID(RSLocaleRef locale, bool user, RSTypeRef *
 }
 
 static bool __RSLocaleCopyCollatorID(RSLocaleRef locale, bool user, RSTypeRef *cf, RSStringRef context) {
-    RSStringRef canonLocaleRSStr = NULL;
+    RSStringRef canonLocaleRSStr = nil;
     if (user && locale->_prefs) {
         RSStringRef pref = (RSStringRef)RSDictionaryGetValue(locale->_prefs, RSSTR("AppleCollationOrder"));
         if (pref) {
@@ -3240,10 +3240,10 @@ static bool __RSLocaleCopyMeasurementSystem(RSLocaleRef locale, bool user, RSTyp
 }
 
 static bool __RSLocaleCopyNumberFormat(RSLocaleRef locale, bool user, RSTypeRef *cf, RSStringRef context) {
-    RSStringRef str = NULL;
+    RSStringRef str = nil;
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
 //    RSNumberFormatterRef nf = RSNumberFormatterCreate(RSAllocatorSystemDefault, locale, RSNumberFormatterDecimalStyle);
-//    str = nf ? (RSStringRef)RSNumberFormatterCopyProperty(nf, context) : NULL;
+//    str = nf ? (RSStringRef)RSNumberFormatterCopyProperty(nf, context) : nil;
 //    if (nf) RSRelease(nf);
 #endif
     if (str) {
@@ -3256,10 +3256,10 @@ static bool __RSLocaleCopyNumberFormat(RSLocaleRef locale, bool user, RSTypeRef 
 // ICU does not reliably set up currency info for other than Currency-type formatters,
 // so we have to have another routine here which creates a Currency number formatter.
 static bool __RSLocaleCopyNumberFormat2(RSLocaleRef locale, bool user, RSTypeRef *cf, RSStringRef context) {
-    RSStringRef str = NULL;
+    RSStringRef str = nil;
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
 //    RSNumberFormatterRef nf = RSNumberFormatterCreate(RSAllocatorSystemDefault, locale, RSNumberFormatterCurrencyStyle);
-//    str = nf ? (RSStringRef)RSNumberFormatterCopyProperty(nf, context) : NULL;
+//    str = nf ? (RSStringRef)RSNumberFormatterCopyProperty(nf, context) : nil;
 //    if (nf) RSRelease(nf);
 #endif
     if (str) {
@@ -3280,7 +3280,7 @@ static bool __RSLocaleICUName(const char *locale, const char *valLocale, RSStrin
     size = (*icu)(valLocale, locale, name, kMaxICUNameSize, &icuStatus);
     if (U_SUCCESS(icuStatus) && size > 0 && icuStatus != U_USING_DEFAULT_WARNING) {
         *out = RSStringCreateWithCharacters(RSAllocatorSystemDefault, (UniChar *)name, size);
-        return (*out != NULL);
+        return (*out != nil);
     }
     return NO;
 }
@@ -3299,7 +3299,7 @@ static bool __RSLocaleICUKeywordValueName(const char *locale, const char *value,
         size = uloc_getDisplayKeywordValue(lid, keyword, locale, name, kMaxICUNameSize, &icuStatus);
         if (U_SUCCESS(icuStatus) && size > 0 && icuStatus != U_USING_DEFAULT_WARNING) {
             *out = RSStringCreateWithCharacters(RSAllocatorSystemDefault, (UniChar *)name, size);
-            return (*out != NULL);
+            return (*out != nil);
         }
     }
     return NO;
@@ -3323,7 +3323,7 @@ static bool __RSLocaleICUCurrencyName(const char *locale, const char *value, UCu
     if (isChoice)
     {
         UChar pattern[kMaxICUNameSize];
-        RSStringRef patternRef = RSStringCreateWithFormat(RSAllocatorSystemDefault, NULL, RSSTR("{0,choice,%S}"), name);
+        RSStringRef patternRef = RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("{0,choice,%S}"), name);
         RSIndex pattlen = RSStringGetLength(patternRef);
         RSStringGetCharacters(patternRef, RSMakeRange(0, pattlen), (UniChar *)pattern);
         RSRelease(patternRef);
@@ -3336,7 +3336,7 @@ static bool __RSLocaleICUCurrencyName(const char *locale, const char *value, UCu
         
     }
     *out = RSStringCreateWithCharacters(RSAllocatorSystemDefault, (UniChar *)name, size);
-    return (*out != NULL);
+    return (*out != nil);
 }
 #endif
 
@@ -3366,7 +3366,7 @@ static bool __RSLocaleFullName(const char *locale, const char *value, RSStringRe
     
     // This locale is OK, so use the result.
     *out = RSStringCreateWithCharacters(RSAllocatorSystemDefault, (UniChar *)name, size);
-    return (*out != NULL);
+    return (*out != nil);
 #else
     *out = RSRetain(RSSTR("(none)"));
     return YES;

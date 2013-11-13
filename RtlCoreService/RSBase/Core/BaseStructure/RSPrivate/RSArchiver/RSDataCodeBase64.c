@@ -37,7 +37,7 @@ extern char *encode_base64(const void *src, size_t n)
     char *dst = malloc((full_blocks + 1) * BLOCK_CHAR + 1);
     
     if (!dst)
-        return NULL;
+        return nil;
     
     const uint8_t *bytes = src;
     size_t k;
@@ -68,7 +68,7 @@ extern void *decode_base64(const char *src, size_t *n)
     size_t len = strlen(src);
     
     if (len % BLOCK_CHAR)
-        return NULL; // Invalid number of base-64 characters
+        return nil; // Invalid number of base-64 characters
     
     // There will never be more bytes than base-64 characters by definition
     uint8_t *dst = malloc(len + 1);
@@ -79,7 +79,7 @@ extern void *decode_base64(const char *src, size_t *n)
             
             if (*src != '\n') {
                 free(dst);
-                return NULL; // Unmatched CR
+                return nil; // Unmatched CR
             }
             
             ++src; // Skip the LF part of CRLF
@@ -96,7 +96,7 @@ extern void *decode_base64(const char *src, size_t *n)
         for (size_t i = 0; i < sizeof encoded / sizeof *encoded; ++i) {
             if (encoded[i] == (size_t)-1) {
                 free(dst);
-                return NULL;
+                return nil;
             }
         }
         

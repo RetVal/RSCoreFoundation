@@ -172,15 +172,15 @@ static CURLcode Curl_ldap(struct connectdata *conn, bool *done)
 {
   CURLcode status = CURLE_OK;
   int rc = 0;
-  LDAP *server = NULL;
-  LDAPURLDesc *ludp = NULL;
-  LDAPMessage *result = NULL;
+  LDAP *server = nil;
+  LDAPURLDesc *ludp = nil;
+  LDAPMessage *result = nil;
   LDAPMessage *entryIterator;
   int num = 0;
   struct SessionHandle *data=conn->data;
   int ldap_proto = LDAP_VERSION3;
   int ldap_ssl = 0;
-  char *val_b64 = NULL;
+  char *val_b64 = nil;
   size_t val_b64_sz = 0;
   curl_off_t dlsize = 0;
 #ifdef LDAP_OPT_NETWORK_TIMEOUT
@@ -193,7 +193,7 @@ static CURLcode Curl_ldap(struct connectdata *conn, bool *done)
   infof(data, "LDAP local: %s\n", data->change.url);
 
 #ifdef HAVE_LDAP_URL_PARSE
-  if (ldap_url_parse == NULL) {
+  if (ldap_url_parse == nil) {
     failf(data, "LDAP library not found");
     status = CURLE_UNSUPPORTED_PROTOCOL;
     goto quit;
@@ -215,9 +215,9 @@ static CURLcode Curl_ldap(struct connectdata *conn, bool *done)
           ldap_ssl ? "encrypted" : "cleartext");
 
 #ifdef LDAP_OPT_NETWORK_TIMEOUT
-  ldap_set_option(NULL, LDAP_OPT_NETWORK_TIMEOUT, &ldap_timeout);
+  ldap_set_option(nil, LDAP_OPT_NETWORK_TIMEOUT, &ldap_timeout);
 #endif
-  ldap_set_option(NULL, LDAP_OPT_PROTOCOL_VERSION, &ldap_proto);
+  ldap_set_option(nil, LDAP_OPT_PROTOCOL_VERSION, &ldap_proto);
 
   if(ldap_ssl) {
 #ifdef HAVE_LDAP_SSL
@@ -229,7 +229,7 @@ static CURLcode Curl_ldap(struct connectdata *conn, bool *done)
     int ldap_option;
     char* ldap_ca = data->set.str[STRING_SSL_CAFILE];
 #if defined(CURL_HAS_NOVELL_LDAPSDK)
-    rc = ldapssl_client_init(NULL, NULL);
+    rc = ldapssl_client_init(nil, nil);
     if(rc != LDAP_SUCCESS) {
       failf(data, "LDAP local: ldapssl_client_init %s", ldap_err2string(rc));
       status = CURLE_SSL_CERTPROBLEM;
@@ -270,7 +270,7 @@ static CURLcode Curl_ldap(struct connectdata *conn, bool *done)
       goto quit;
     }
     server = ldapssl_init(conn->host.name, (int)conn->port, 1);
-    if(server == NULL) {
+    if(server == nil) {
       failf(data, "LDAP local: Cannot connect to %s:%hu",
               conn->host.name, conn->port);
       status = CURLE_COULDNT_CONNECT;
@@ -291,7 +291,7 @@ static CURLcode Curl_ldap(struct connectdata *conn, bool *done)
         goto quit;
       }
       infof(data, "LDAP local: using PEM CA cert: %s\n", ldap_ca);
-      rc = ldap_set_option(NULL, LDAP_OPT_X_TLS_CACERTFILE, ldap_ca);
+      rc = ldap_set_option(nil, LDAP_OPT_X_TLS_CACERTFILE, ldap_ca);
       if(rc != LDAP_SUCCESS) {
         failf(data, "LDAP local: ERROR setting PEM CA cert: %s",
                 ldap_err2string(rc));
@@ -303,7 +303,7 @@ static CURLcode Curl_ldap(struct connectdata *conn, bool *done)
     else
       ldap_option = LDAP_OPT_X_TLS_NEVER;
 
-    rc = ldap_set_option(NULL, LDAP_OPT_X_TLS_REQUIRE_CERT, &ldap_option);
+    rc = ldap_set_option(nil, LDAP_OPT_X_TLS_REQUIRE_CERT, &ldap_option);
     if(rc != LDAP_SUCCESS) {
       failf(data, "LDAP local: ERROR setting cert verify mode: %s",
               ldap_err2string(rc));
@@ -311,7 +311,7 @@ static CURLcode Curl_ldap(struct connectdata *conn, bool *done)
       goto quit;
     }
     server = ldap_init(conn->host.name, (int)conn->port);
-    if(server == NULL) {
+    if(server == nil) {
       failf(data, "LDAP local: Cannot connect to %s:%hu",
               conn->host.name, conn->port);
       status = CURLE_COULDNT_CONNECT;
@@ -326,7 +326,7 @@ static CURLcode Curl_ldap(struct connectdata *conn, bool *done)
       goto quit;
     }
 /*
-    rc = ldap_start_tls_s(server, NULL, NULL);
+    rc = ldap_start_tls_s(server, nil, nil);
     if(rc != LDAP_SUCCESS) {
       failf(data, "LDAP local: ERROR starting SSL/TLS mode: %s",
               ldap_err2string(rc));
@@ -347,7 +347,7 @@ static CURLcode Curl_ldap(struct connectdata *conn, bool *done)
   }
   else {
     server = ldap_init(conn->host.name, (int)conn->port);
-    if(server == NULL) {
+    if(server == nil) {
       failf(data, "LDAP local: Cannot connect to %s:%hu",
               conn->host.name, conn->port);
       status = CURLE_COULDNT_CONNECT;
@@ -359,14 +359,14 @@ static CURLcode Curl_ldap(struct connectdata *conn, bool *done)
 #endif
 
   rc = ldap_simple_bind_s(server,
-                          conn->bits.user_passwd ? conn->user : NULL,
-                          conn->bits.user_passwd ? conn->passwd : NULL);
+                          conn->bits.user_passwd ? conn->user : nil,
+                          conn->bits.user_passwd ? conn->passwd : nil);
   if(!ldap_ssl && rc != 0) {
     ldap_proto = LDAP_VERSION2;
     ldap_set_option(server, LDAP_OPT_PROTOCOL_VERSION, &ldap_proto);
     rc = ldap_simple_bind_s(server,
-                            conn->bits.user_passwd ? conn->user : NULL,
-                            conn->bits.user_passwd ? conn->passwd : NULL);
+                            conn->bits.user_passwd ? conn->user : nil,
+                            conn->bits.user_passwd ? conn->passwd : nil);
   }
   if(rc != 0) {
     failf(data, "LDAP local: ldap_simple_bind_s %s", ldap_err2string(rc));
@@ -386,7 +386,7 @@ static CURLcode Curl_ldap(struct connectdata *conn, bool *done)
   for(num = 0, entryIterator = ldap_first_entry(server, result);
       entryIterator;
       entryIterator = ldap_next_entry(server, entryIterator), num++) {
-    BerElement *ber = NULL;
+    BerElement *ber = nil;
     char  *attribute;       /*! suspicious that this isn't 'const' */
     char  *dn = ldap_get_dn(server, entryIterator);
     int i;
@@ -402,8 +402,8 @@ static CURLcode Curl_ldap(struct connectdata *conn, bool *done)
         attribute = ldap_next_attribute(server, entryIterator, ber)) {
       BerValue **vals = ldap_get_values_len(server, entryIterator, attribute);
 
-      if(vals != NULL) {
-        for(i = 0; (vals[i] != NULL); i++) {
+      if(vals != nil) {
+        for(i = 0; (vals[i] != nil); i++) {
           Curl_client_write(conn, CLIENTWRITE_BODY, (char *)"\t", 1);
           Curl_client_write(conn, CLIENTWRITE_BODY, (char *) attribute, 0);
           Curl_client_write(conn, CLIENTWRITE_BODY, (char *)": ", 2);
@@ -473,7 +473,7 @@ quit:
 #endif /* HAVE_LDAP_SSL && CURL_HAS_NOVELL_LDAPSDK */
 
   /* no data to transfer */
-  Curl_setup_transfer(conn, -1, -1, FALSE, NULL, -1, NULL);
+  Curl_setup_transfer(conn, -1, -1, FALSE, nil, -1, nil);
   conn->bits.close = TRUE;
 
   return status;
@@ -487,7 +487,7 @@ static void _ldap_trace (const char *fmt, ...)
 
   if(do_trace == -1) {
     const char *env = getenv("CURL_TRACE");
-    do_trace = (env && strtol(env, NULL, 10) > 0);
+    do_trace = (env && strtol(env, nil, 10) > 0);
   }
   if(!do_trace)
     return;
@@ -532,10 +532,10 @@ static char **split_str (char *str)
 
   res = calloc(i, sizeof(char*));
   if(!res)
-    return NULL;
+    return nil;
 
   for(i = 0, s = strtok_r(str, ",", &lasts); s;
-      s = strtok_r(NULL, ",", &lasts), i++)
+      s = strtok_r(nil, ",", &lasts), i++)
     res[i] = s;
   return res;
 }
@@ -548,26 +548,26 @@ static bool unescape_elements (void *data, LDAPURLDesc *ludp)
   int i;
 
   if(ludp->lud_filter) {
-    ludp->lud_filter = curl_easy_unescape(data, ludp->lud_filter, 0, NULL);
+    ludp->lud_filter = curl_easy_unescape(data, ludp->lud_filter, 0, nil);
     if(!ludp->lud_filter)
        return (FALSE);
   }
 
   for(i = 0; ludp->lud_attrs && ludp->lud_attrs[i]; i++) {
-    ludp->lud_attrs[i] = curl_easy_unescape(data, ludp->lud_attrs[i], 0, NULL);
+    ludp->lud_attrs[i] = curl_easy_unescape(data, ludp->lud_attrs[i], 0, nil);
     if(!ludp->lud_attrs[i])
       return (FALSE);
   }
 
   for(i = 0; ludp->lud_exts && ludp->lud_exts[i]; i++) {
-    ludp->lud_exts[i] = curl_easy_unescape(data, ludp->lud_exts[i], 0, NULL);
+    ludp->lud_exts[i] = curl_easy_unescape(data, ludp->lud_exts[i], 0, nil);
     if(!ludp->lud_exts[i])
       return (FALSE);
   }
 
   if(ludp->lud_dn) {
     char *dn = ludp->lud_dn;
-    char *new_dn = curl_easy_unescape(data, dn, 0, NULL);
+    char *new_dn = curl_easy_unescape(data, dn, 0, nil);
 
     free(dn);
     ludp->lud_dn = new_dn;
@@ -693,14 +693,14 @@ static int _ldap_url_parse (const struct connectdata *conn,
   LDAPURLDesc *ludp = calloc(1, sizeof(*ludp));
   int rc;
 
-  *ludpp = NULL;
+  *ludpp = nil;
   if(!ludp)
      return LDAP_NO_MEMORY;
 
   rc = _ldap_url_parse2 (conn, ludp);
   if(rc != LDAP_SUCCESS) {
     _ldap_free_urldesc(ludp);
-    ludp = NULL;
+    ludp = nil;
   }
   *ludpp = ludp;
   return (rc);

@@ -404,15 +404,15 @@ RSInline void __RSCSetBitmapRemoveCharactersInRange(uint8_t *bitmap, UniChar fir
 #define __RSCSetAnnexBitmapGetPlane(bitmap,plane)	((bitmap) & (1 << (plane)))
 
 RSInline void __RSCSetAllocateAnnexForPlane(RSCharacterSetRef cset, int plane) {
-    if (cset->_annex == NULL) {
+    if (cset->_annex == nil) {
         ((RSMutableCharacterSetRef)cset)->_annex = (RSCharSetAnnexStruct *)RSAllocatorAllocate(RSGetAllocator(cset), sizeof(RSCharSetAnnexStruct));
         cset->_annex->_numOfAllocEntries = plane;
         cset->_annex->_isAnnexInverted = NO;
         cset->_annex->_validEntriesBitmap = 0;
-        cset->_annex->_nonBMPPlanes = ((plane > 0) ? (RSCharacterSetRef*)RSAllocatorAllocate(RSGetAllocator(cset), sizeof(RSCharacterSetRef) * plane) : NULL);
+        cset->_annex->_nonBMPPlanes = ((plane > 0) ? (RSCharacterSetRef*)RSAllocatorAllocate(RSGetAllocator(cset), sizeof(RSCharacterSetRef) * plane) : nil);
     } else if (cset->_annex->_numOfAllocEntries < plane) {
         cset->_annex->_numOfAllocEntries = plane;
-        if (NULL == cset->_annex->_nonBMPPlanes) {
+        if (nil == cset->_annex->_nonBMPPlanes) {
             cset->_annex->_nonBMPPlanes = (RSCharacterSetRef*)RSAllocatorAllocate(RSGetAllocator(cset), sizeof(RSCharacterSetRef) * plane);
         } else {
             cset->_annex->_nonBMPPlanes = (RSCharacterSetRef*)RSAllocatorReallocate(RSGetAllocator(cset), (void *)cset->_annex->_nonBMPPlanes, sizeof(RSCharacterSetRef) * plane);
@@ -446,7 +446,7 @@ RSInline RSCharacterSetRef __RSCSetGetAnnexPlaneCharacterSet(RSCharacterSetRef c
 }
 
 RSInline RSCharacterSetRef __RSCSetGetAnnexPlaneCharacterSetNoAlloc(RSCharacterSetRef cset, int plane) {
-    return (cset->_annex && __RSCSetAnnexBitmapGetPlane(cset->_annex->_validEntriesBitmap, plane) ? cset->_annex->_nonBMPPlanes[plane - 1] : NULL);
+    return (cset->_annex && __RSCSetAnnexBitmapGetPlane(cset->_annex->_validEntriesBitmap, plane) ? cset->_annex->_nonBMPPlanes[plane - 1] : nil);
 }
 
 RSInline void __RSCSetDeallocateAnnexPlane(RSCharacterSetRef cset) {
@@ -460,7 +460,7 @@ RSInline void __RSCSetDeallocateAnnexPlane(RSCharacterSetRef cset) {
         }
         RSAllocatorDeallocate(RSGetAllocator(cset), cset->_annex->_nonBMPPlanes);
         RSAllocatorDeallocate(RSGetAllocator(cset), cset->_annex);
-        ((RSMutableCharacterSetRef)cset)->_annex = NULL;
+        ((RSMutableCharacterSetRef)cset)->_annex = nil;
     }
 }
 
@@ -540,7 +540,7 @@ static void __RSCheckForExpandedSet(RSCharacterSetRef cset) {
     
     if (0 > __RSNumberOfPlanesForLogging) {
         const char *envVar = __RSRuntimeGetEnvironment("RSCharacterSetCheckForExpandedSet");
-        long value = (envVar ? strtol_l(envVar, NULL, 0, NULL) : 0);
+        long value = (envVar ? strtol_l(envVar, nil, 0, nil) : 0);
         __RSNumberOfPlanesForLogging = (int8_t)(((value > 0) && (value <= 16)) ? value : 0);
     }
     
@@ -643,9 +643,9 @@ static BOOL __RSCSetIsEqualAnnex(RSCharacterSetRef cf1, RSCharacterSetRef cf2) {
             subSet1 = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(cf1, idx);
             subSet2 = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(cf2, idx);
             
-            if (subSet1 == NULL && subSet2 == NULL) {
+            if (subSet1 == nil && subSet2 == nil) {
                 return NO;
-            } else if (subSet1 == NULL) {
+            } else if (subSet1 == nil) {
                 if (__RSCSetIsBitmap(subSet2)) {
                     if (!__RSCSetIsEqualBitmap((const UInt32 *)__RSCSetBitmapBits(subSet2), (const UInt32 *)-1)) {
                         return NO;
@@ -656,7 +656,7 @@ static BOOL __RSCSetIsEqualAnnex(RSCharacterSetRef cf1, RSCharacterSetRef cf2) {
                         return NO;
                     }
                 }
-            } else if (subSet2 == NULL) {
+            } else if (subSet2 == nil) {
                 if (__RSCSetIsBitmap(subSet1)) {
                     if (!__RSCSetIsEqualBitmap((const UInt32 *)__RSCSetBitmapBits(subSet1), (const UInt32 *)-1)) {
                         return NO;
@@ -712,7 +712,7 @@ static uint8_t *__RSCreateCompactBitmap(RSAllocatorRef allocator, const uint8_t 
         header[i] = __RSCSetGetHeaderValue(src, &numPages);
         
         // Allocating more pages is probably not interesting enough to be compact
-        if (numPages > __RSCompactBitmapMaxPages) return NULL;
+        if (numPages > __RSCompactBitmapMaxPages) return nil;
         src += __RSCompactBitmapPageSize;
     }
     
@@ -818,13 +818,13 @@ static void __RSCSetMakeBitmap(RSMutableCharacterSetRef cset) {
             
             if (numPlanes > 1) {
                 RSMutableCharacterSetRef annexSet;
-                uint8_t *annexBitmap = NULL;
+                uint8_t *annexBitmap = nil;
                 int idx;
                 UInt8 result;
                 
                 __RSCSetAllocateAnnexForPlane(cset, (RSBitU32)numPlanes - 1);
                 for (idx = 1;idx < numPlanes;idx++) {
-                    if (NULL == annexBitmap) {
+                    if (nil == annexBitmap) {
                         annexBitmap = (uint8_t *)RSAllocatorAllocate(allocator, __RSBitmapSize);
                     }
                     result = RSUniCharGetBitmapForPlane((RSBitU32)__RSCSetBuiltinType(cset), idx, annexBitmap, NO);
@@ -839,16 +839,16 @@ static void __RSCSetMakeBitmap(RSMutableCharacterSetRef cset) {
                     __RSCSetPutBitmapBits(annexSet, annexBitmap);
                     __RSCSetPutIsInverted(annexSet, NO);
                     __RSCSetPutHasHashValue(annexSet, NO);
-                    annexBitmap = NULL;
+                    annexBitmap = nil;
                 }
                 if (annexBitmap) RSAllocatorDeallocate(allocator, annexBitmap);
             }
         } else if (__RSCSetIsCompactBitmap(cset) && __RSCSetCompactBitmapBits(cset)) {
             RSAllocatorDeallocate(allocator, __RSCSetCompactBitmapBits(cset));
-            __RSCSetPutCompactBitmapBits(cset, NULL);
+            __RSCSetPutCompactBitmapBits(cset, nil);
         } else if (__RSCSetIsString(cset) && __RSCSetStringBuffer(cset)) {
             RSAllocatorDeallocate(allocator, __RSCSetStringBuffer(cset));
-            __RSCSetPutStringBuffer(cset, NULL);
+            __RSCSetPutStringBuffer(cset, nil);
         } else if (__RSCSetIsRange(cset)) { // We may have to allocate annex here
             BOOL needsToInvert = (!__RSCSetHasNonBMPPlane(cset) && __RSCSetIsInverted(cset) ? YES : NO);
             __RSCSetAddNonBMPPlanesInRange(cset, RSMakeRange(__RSCSetRangeFirstChar(cset), __RSCSetRangeLength(cset)));
@@ -865,11 +865,11 @@ RSInline RSMutableCharacterSetRef __RSCSetGenericCreate(RSAllocatorRef allocator
     RSIndex size = sizeof(struct __RSCharacterSet) - sizeof(RSRuntimeBase);
     
     cset = (RSMutableCharacterSetRef)__RSRuntimeCreateInstance(allocator, RSCharacterSetGetTypeID(), size);
-    if (NULL == cset) return NULL;
+    if (nil == cset) return nil;
     
     RSRuntimeClassBaseFiled(cset) |= flags;
     cset->_hashValue = 0;
-    cset->_annex = NULL;
+    cset->_annex = nil;
     
     return cset;
 }
@@ -928,7 +928,7 @@ RSInline BOOL __RSCSetBsearchUniChar(const UniChar *theTable, RSIndex length, Un
 
 /* Array of instantiated builtin set. Note builtin set ID starts with 1 so the array index is ID - 1
  */
-static RSCharacterSetRef *__RSBuiltinSets = NULL;
+static RSCharacterSetRef *__RSBuiltinSets = nil;
 
 /* Global lock for character set
  */
@@ -1003,7 +1003,7 @@ static BOOL __RSCharacterSetEqual(RSTypeRef cf1, RSTypeRef cf2) {
                 __RSCSetGetBitmap(nonEmptySet, bitsBuf);
             }
             
-            if (__RSCSetIsEqualBitmap(NULL, (const UInt32 *)bits)) {
+            if (__RSCSetIsEqualBitmap(nil, (const UInt32 *)bits)) {
                 if (!__RSCSetAnnexIsInverted(nonEmptySet)) return YES;
             } else {
                 return NO;
@@ -1012,7 +1012,7 @@ static BOOL __RSCharacterSetEqual(RSTypeRef cf1, RSTypeRef cf2) {
             // Annex set has to be RSMakeRange(0x10000, 0xfffff)
             for (idx = 1;idx < MAX_ANNEX_PLANE;idx++) {
                 if (__RSCSetIsBitmap(nonEmptySet)) {
-                    if (!__RSCSetIsEqualBitmap((__RSCSetAnnexIsInverted(nonEmptySet) ? NULL : (const UInt32 *)-1), (const UInt32 *)bitsBuf)) return NO;
+                    if (!__RSCSetIsEqualBitmap((__RSCSetAnnexIsInverted(nonEmptySet) ? nil : (const UInt32 *)-1), (const UInt32 *)bitsBuf)) return NO;
                 } else {
                     __RSCSetGetBitmap(__RSCSetGetAnnexPlaneCharacterSetNoAlloc(nonEmptySet, (RSBitU32)idx), bitsBuf);
                     if (!__RSCSetIsEqualBitmap((const UInt32 *)-1, (const UInt32 *)bitsBuf)) return NO;
@@ -1041,7 +1041,7 @@ static BOOL __RSCharacterSetEqual(RSTypeRef cf1, RSTypeRef cf2) {
                     if (result == RSUniCharBitmapAll) {
                         return NO;
                     } else if (result == RSUniCharBitmapFilled) {
-                        if (!__RSCSetIsEqualBitmap(NULL, (const UInt32 *)bitsBuf)) return NO;
+                        if (!__RSCSetIsEqualBitmap(nil, (const UInt32 *)bitsBuf)) return NO;
                     }
                 } else if (idx > firstPlane && idx < lastPlane) {
                     if (result == RSUniCharBitmapEmpty) {
@@ -1085,10 +1085,10 @@ static BOOL __RSCharacterSetEqual(RSTypeRef cf1, RSTypeRef cf2) {
                 }
             } else {
                 if (__RSCSetIsBitmap(nonBuiltinSet)) {
-                    if (!__RSCSetIsEqualBitmap((result == RSUniCharBitmapAll ? (const UInt32*)-1 : NULL), (const UInt32 *)__RSCSetBitmapBits(nonBuiltinSet))) return NO;
+                    if (!__RSCSetIsEqualBitmap((result == RSUniCharBitmapAll ? (const UInt32*)-1 : nil), (const UInt32 *)__RSCSetBitmapBits(nonBuiltinSet))) return NO;
                 } else {
                     __RSCSetGetBitmap(nonBuiltinSet, bitsBuf);
-                    if (!__RSCSetIsEqualBitmap((result == RSUniCharBitmapAll ? (const UInt32*)-1: NULL), (const UInt32 *)bitsBuf)) return NO;
+                    if (!__RSCSetIsEqualBitmap((result == RSUniCharBitmapAll ? (const UInt32*)-1: nil), (const UInt32 *)bitsBuf)) return NO;
                 }
             }
             
@@ -1099,7 +1099,7 @@ static BOOL __RSCharacterSetEqual(RSTypeRef cf1, RSTypeRef cf2) {
                 subSet1 = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(nonBuiltinSet, (RSBitU32)idx);
                 
                 if (result == RSUniCharBitmapFilled) {
-                    if (NULL == subSet1) {
+                    if (nil == subSet1) {
                         return NO;
                     } else if (__RSCSetIsBitmap(subSet1)) {
                         if (!__RSCSetIsEqualBitmap((const UInt32*)bitsBuf, (const UInt32*)__RSCSetBitmapBits(subSet1))) {
@@ -1113,17 +1113,17 @@ static BOOL __RSCharacterSetEqual(RSTypeRef cf1, RSTypeRef cf2) {
                         }
                     }
                 } else {
-                    if (NULL == subSet1) {
+                    if (nil == subSet1) {
                         if (result == RSUniCharBitmapAll) {
                             return NO;
                         }
                     } else if (__RSCSetIsBitmap(subSet1)) {
-                        if (!__RSCSetIsEqualBitmap((result == RSUniCharBitmapAll ? (const UInt32*)-1: NULL), (const UInt32*)__RSCSetBitmapBits(subSet1))) {
+                        if (!__RSCSetIsEqualBitmap((result == RSUniCharBitmapAll ? (const UInt32*)-1: nil), (const UInt32*)__RSCSetBitmapBits(subSet1))) {
                             return NO;
                         }
                     } else {
                         __RSCSetGetBitmap(subSet1, bitsBuf);
-                        if (!__RSCSetIsEqualBitmap((result == RSUniCharBitmapAll ? (const UInt32*)-1: NULL), (const UInt32*)bitsBuf)) {
+                        if (!__RSCSetIsEqualBitmap((result == RSUniCharBitmapAll ? (const UInt32*)-1: nil), (const UInt32*)bitsBuf)) {
                             return NO;
                         }
                     }
@@ -1153,7 +1153,7 @@ static BOOL __RSCharacterSetEqual(RSTypeRef cf1, RSTypeRef cf2) {
             firstPlane = 1;
             firstChar = 0;
         } else {
-            if (!__RSCSetIsEqualBitmap((const UInt32*)bits, (isRangeSetInverted ? (const UInt32 *)-1 : NULL))) return NO;
+            if (!__RSCSetIsEqualBitmap((const UInt32*)bits, (isRangeSetInverted ? (const UInt32 *)-1 : nil))) return NO;
             firstChar &= 0xFFFF;
         }
         
@@ -1163,7 +1163,7 @@ static BOOL __RSCharacterSetEqual(RSTypeRef cf1, RSTypeRef cf2) {
         
         for (idx = 1;idx < MAX_ANNEX_PLANE;idx++) {
             subSet1 = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(nonRangeSet, (RSBitU32)idx);
-            if (NULL == subSet1) {
+            if (nil == subSet1) {
                 if (idx < firstPlane || idx > lastPlane) {
                     if (!isAnnexInvertStateIdentical) return NO;
                 } else if (idx > firstPlane && idx < lastPlane) {
@@ -1182,9 +1182,9 @@ static BOOL __RSCharacterSetEqual(RSTypeRef cf1, RSTypeRef cf2) {
                 }
                 
                 if (idx < firstPlane || idx > lastPlane) {
-                    if (!__RSCSetIsEqualBitmap((const UInt32*)bits, (isAnnexInvertStateIdentical ? NULL : (const UInt32 *)-1))) return NO;
+                    if (!__RSCSetIsEqualBitmap((const UInt32*)bits, (isAnnexInvertStateIdentical ? nil : (const UInt32 *)-1))) return NO;
                 } else if (idx > firstPlane && idx < lastPlane) {
-                    if (!__RSCSetIsEqualBitmap((const UInt32*)bits, (isAnnexInvertStateIdentical ? (const UInt32 *)-1 : NULL))) return NO;
+                    if (!__RSCSetIsEqualBitmap((const UInt32*)bits, (isAnnexInvertStateIdentical ? (const UInt32 *)-1 : nil))) return NO;
                 } else if (idx == firstPlane) {
                     if (!__RSCSetIsBitmapEqualToRange((const UInt32*)bits, firstChar, (idx == lastPlane ? lastChar : 0xFFFF), !isAnnexInvertStateIdentical)) return NO;
                 } else if (idx == lastPlane) {
@@ -1290,7 +1290,7 @@ static RSStringRef  __RSCharacterSetCopyDescription(RSTypeRef cf) {
             return (RSStringRef)RSRetain(RSSTR("<RSCharacterSet Bitmap>")); // ??? Should generate description for 8k bitmap ?
     }
     RSAssert1(0, __RSLogAssertion, "%s: Internal inconsistency error: unknown character set type", __PRETTY_FUNCTION__); // We should never come here
-    return NULL;
+    return nil;
 }
 
 static void __RSCharacterSetDeallocate(RSTypeRef cf) {
@@ -1315,8 +1315,8 @@ static RSTypeID __RSCharacterSetTypeID = _RSRuntimeNotATypeID;
 static const RSRuntimeClass __RSCharacterSetClass = {
     0,
     "RSCharacterSet",
-    NULL,      // init
-    NULL,      // copy
+    nil,      // init
+    nil,      // copy
     __RSCharacterSetDeallocate,
     __RSCharacterSetEqual,
     __RSCharacterSetHash,
@@ -1349,12 +1349,12 @@ RSCharacterSetRef RSCharacterSetGetPredefined(RSCharacterSetPredefinedSet theSet
     __RSCSetValidateBuiltinType(theSetIdentifier, __PRETTY_FUNCTION__);
     
     RSSpinLockLock(&__RSCharacterSetLock);
-    cset = ((NULL != __RSBuiltinSets) ? __RSBuiltinSets[theSetIdentifier - 1] : NULL);
+    cset = ((nil != __RSBuiltinSets) ? __RSBuiltinSets[theSetIdentifier - 1] : nil);
     RSSpinLockUnlock(&__RSCharacterSetLock);
     
-    if (NULL != cset) return cset;
+    if (nil != cset) return cset;
     
-    if (!(cset = __RSCSetGenericCreate(RSAllocatorSystemDefault, __RSCharSetClassBuiltin))) return NULL;
+    if (!(cset = __RSCSetGenericCreate(RSAllocatorSystemDefault, __RSCharSetClassBuiltin))) return nil;
     __RSCSetPutBuiltinType((RSMutableCharacterSetRef)cset, theSetIdentifier);
     
     RSSpinLockLock(&__RSCharacterSetLock);
@@ -1375,12 +1375,12 @@ RSCharacterSetRef RSCharacterSetCreateWithCharactersInRange(RSAllocatorRef alloc
     __RSCSetValidateRange(theRange, __PRETTY_FUNCTION__);
     
     if (theRange.length) {
-        if (!(cset = __RSCSetGenericCreate(allocator, __RSCharSetClassRange))) return NULL;
+        if (!(cset = __RSCSetGenericCreate(allocator, __RSCharSetClassRange))) return nil;
         __RSCSetPutRangeFirstChar(cset, (RSBitU32)theRange.location);
         __RSCSetPutRangeLength(cset, theRange.length);
     } else {
-        if (!(cset = __RSCSetGenericCreate(allocator, __RSCharSetClassBitmap))) return NULL;
-        __RSCSetPutBitmapBits(cset, NULL);
+        if (!(cset = __RSCSetGenericCreate(allocator, __RSCharSetClassBitmap))) return nil;
+        __RSCSetPutBitmapBits(cset, nil);
         __RSCSetPutHasHashValue(cset, YES); // _hashValue is 0
     }
     
@@ -1398,7 +1398,7 @@ RSCharacterSetRef RSCharacterSetCreateWithCharactersInString(RSAllocatorRef allo
     if (length < __RSStringCharSetMax) {
         RSMutableCharacterSetRef cset;
         
-        if (!(cset = __RSCSetGenericCreate(allocator, __RSCharSetClassString))) return NULL;
+        if (!(cset = __RSCSetGenericCreate(allocator, __RSCharSetClassString))) return nil;
         __RSCSetPutStringBuffer(cset, (UniChar *)RSAllocatorAllocate(RSGetAllocator(cset), __RSStringCharSetMax * sizeof(UniChar)));
         __RSCSetPutStringLength(cset, length);
         RSStringGetCharacters(theString, RSMakeRange(0, length), __RSCSetStringBuffer(cset));
@@ -1414,14 +1414,14 @@ RSCharacterSetRef RSCharacterSetCreateWithCharactersInString(RSAllocatorRef allo
                 while (characters < charactersLimit) {
                     if (RSStringIsSurrogateHighCharacter(*characters) || RSStringIsSurrogateLowCharacter(*characters)) {
                         RSRelease(cset);
-                        cset = NULL;
+                        cset = nil;
                         break;
                     }
                     ++characters;
                 }
             }
         }
-        if (NULL != cset) return cset;
+        if (nil != cset) return cset;
     }
     
     RSMutableCharacterSetRef mcset = RSCharacterSetCreateMutable(allocator);
@@ -1435,7 +1435,7 @@ RSCharacterSetRef RSCharacterSetCreateWithBitmapRepresentation(RSAllocatorRef al
     RSMutableCharacterSetRef cset;
     RSIndex length;
     
-    if (!(cset = __RSCSetGenericCreate(allocator, __RSCharSetClassBitmap))) return NULL;
+    if (!(cset = __RSCSetGenericCreate(allocator, __RSCharSetClassBitmap))) return nil;
     
     if (theData && (length = RSDataGetLength(theData)) > 0) {
         uint8_t *bitmap;
@@ -1448,7 +1448,7 @@ RSCharacterSetRef RSCharacterSetCreateWithBitmapRepresentation(RSAllocatorRef al
             
             cBitmap = __RSCreateCompactBitmap(allocator, bitmap);
             
-            if (cBitmap == NULL) {
+            if (cBitmap == nil) {
                 __RSCSetPutBitmapBits(cset, bitmap);
             } else {
                 RSAllocatorDeallocate(allocator, bitmap);
@@ -1458,7 +1458,7 @@ RSCharacterSetRef RSCharacterSetCreateWithBitmapRepresentation(RSAllocatorRef al
         } else {
             cBitmap = __RSCreateCompactBitmap(allocator, RSDataGetBytesPtr(theData));
             
-            if (cBitmap == NULL) {
+            if (cBitmap == nil) {
                 bitmap = (uint8_t *)RSAllocatorAllocate(allocator, __RSBitmapSize);
                 memmove(bitmap, RSDataGetBytesPtr(theData), __RSBitmapSize);
                 
@@ -1485,7 +1485,7 @@ RSCharacterSetRef RSCharacterSetCreateWithBitmapRepresentation(RSAllocatorRef al
                         
                         cBitmap = __RSCreateCompactBitmap(allocator, bitmap);
                         
-                        if (cBitmap == NULL) {
+                        if (cBitmap == nil) {
                             __RSCSetPutBitmapBits(annexSet, bitmap);
                         } else {
                             RSAllocatorDeallocate(allocator, bitmap);
@@ -1495,7 +1495,7 @@ RSCharacterSetRef RSCharacterSetCreateWithBitmapRepresentation(RSAllocatorRef al
                     } else {
                         cBitmap = __RSCreateCompactBitmap(allocator, bytes);
                         
-                        if (cBitmap == NULL) {
+                        if (cBitmap == nil) {
                             bitmap = (uint8_t *)RSAllocatorAllocate(allocator, __RSBitmapSize);
                             memmove(bitmap, bytes, __RSBitmapSize);
                             
@@ -1511,7 +1511,7 @@ RSCharacterSetRef RSCharacterSetCreateWithBitmapRepresentation(RSAllocatorRef al
             }
         }
     } else {
-        __RSCSetPutBitmapBits(cset, NULL);
+        __RSCSetPutBitmapBits(cset, nil);
         __RSCSetPutHasHashValue(cset, YES); // Hash value is 0
     }
     
@@ -1535,8 +1535,8 @@ RSCharacterSetRef RSCharacterSetCreateInvertedSet(RSAllocatorRef alloc, RSCharac
 RSMutableCharacterSetRef RSCharacterSetCreateMutable(RSAllocatorRef allocator) {
     RSMutableCharacterSetRef cset;
     
-    if (!(cset = __RSCSetGenericCreate(allocator, __RSCharSetClassBitmap| __RSCharSetIsMutable))) return NULL;
-    __RSCSetPutBitmapBits(cset, NULL);
+    if (!(cset = __RSCSetGenericCreate(allocator, __RSCharSetClassBitmap| __RSCharSetIsMutable))) return nil;
+    __RSCSetPutBitmapBits(cset, nil);
     __RSCSetPutHasHashValue(cset, YES); // Hash value is 0
     
     return cset;
@@ -1579,9 +1579,9 @@ static RSMutableCharacterSetRef __RSCharacterSetCreateCopy(RSAllocatorRef alloc,
             
         case __RSCharSetClassBitmap:
             if (__RSCSetBitmapBits(theSet)) {
-                uint8_t * bitmap = (isMutable ? NULL : __RSCreateCompactBitmap(alloc, __RSCSetBitmapBits(theSet)));
+                uint8_t * bitmap = (isMutable ? nil : __RSCreateCompactBitmap(alloc, __RSCSetBitmapBits(theSet)));
                 
-                if (bitmap == NULL) {
+                if (bitmap == nil) {
                     bitmap = (uint8_t *)RSAllocatorAllocate(alloc, sizeof(uint8_t) * __RSBitmapSize);
                     memmove(bitmap, __RSCSetBitmapBits(theSet), __RSBitmapSize);
                     __RSCSetPutBitmapBits(cset, bitmap);
@@ -1590,7 +1590,7 @@ static RSMutableCharacterSetRef __RSCharacterSetCreateCopy(RSAllocatorRef alloc,
                     __RSCSetPutClassType(cset, __RSCharSetClassCompactBitmap);
                 }
             } else {
-                __RSCSetPutBitmapBits(cset, NULL);
+                __RSCSetPutBitmapBits(cset, nil);
             }
             break;
             
@@ -1700,7 +1700,7 @@ BOOL RSCharacterSetIsLongCharacterMember(RSCharacterSetRef theSet, UTF32Char the
         
         isAnnexInverted = __RSCSetAnnexIsInverted(theSet);
         
-        if ((annexPlane = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(theSet, plane)) == NULL) {
+        if ((annexPlane = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(theSet, plane)) == nil) {
             if (!__RSCSetHasNonBMPPlane(theSet) && __RSCSetIsRange(theSet)) {
                 isInverted = __RSCSetIsInverted(theSet);
                 length = __RSCSetRangeLength(theSet);
@@ -1753,13 +1753,13 @@ BOOL RSCharacterSetIsSurrogatePairMember(RSCharacterSetRef theSet, UniChar surro
 
 static inline RSCharacterSetRef __RSCharacterSetGetExpandedSetForNSCharacterSet(const void *characterSet) {
     RS_OBJC_FUNCDISPATCHV(__RSCharacterSetTypeID, RSCharacterSetRef , (NSCharacterSet *)characterSet, _expandedRSCharacterSet);
-    return NULL;
+    return nil;
 }
 
 BOOL RSCharacterSetIsSupersetOfSet(RSCharacterSetRef theSet, RSCharacterSetRef theOtherSet) {
     RSMutableCharacterSetRef copy;
-    RSCharacterSetRef expandedSet = NULL;
-    RSCharacterSetRef expandedOtherSet = NULL;
+    RSCharacterSetRef expandedSet = nil;
+    RSCharacterSetRef expandedOtherSet = nil;
     BOOL result;
     
     if ((!RS_IS_OBJC(__RSCharacterSetTypeID, theSet) || (expandedSet = __RSCharacterSetGetExpandedSetForNSCharacterSet(theSet))) && (!RS_IS_OBJC(__RSCharacterSetTypeID, theOtherSet) || (expandedOtherSet = __RSCharacterSetGetExpandedSetForNSCharacterSet(theOtherSet)))) { // Really RS, we can do some trick here
@@ -1822,14 +1822,14 @@ BOOL RSCharacterSetIsSupersetOfSet(RSCharacterSetRef theSet, RSCharacterSetRef t
                     
                     for (idx = 1;idx <= 16;idx++) {
                         theSetAnnex = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(theSet, idx);
-                        if (NULL == theSetAnnex) continue; // This case is already handled by the mask above
+                        if (nil == theSetAnnex) continue; // This case is already handled by the mask above
                         
                         theOtherSetAnnex = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(theOtherSet, idx);
                         
-                        if (NULL == theOtherSetAnnex) {
+                        if (nil == theOtherSetAnnex) {
                             if (isTheOtherSetAnnexInverted) {
                                 __RSCSetGetBitmap(theSetAnnex, theSetBuffer);
-                                if (!__RSCSetIsEqualBitmap((const UInt32 *)theSetBuffer, (isTheSetAnnexInverted ? NULL : (const UInt32 *)-1))) return NO;
+                                if (!__RSCSetIsEqualBitmap((const UInt32 *)theSetBuffer, (isTheSetAnnexInverted ? nil : (const UInt32 *)-1))) return NO;
                             }
                         } else {
                             __RSCSetGetBitmap(theSetAnnex, theSetBuffer);
@@ -1997,7 +1997,7 @@ RSDataRef RSCharacterSetCreateBitmapRepresentation(RSAllocatorRef alloc, RSChara
             
             for (idx = 0;idx < numNonBMPPlanes;idx++) {
                 *(bytes++) = planeIndices[idx];
-                if ((subset = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(theSet, planeIndices[idx])) == NULL) {
+                if ((subset = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(theSet, planeIndices[idx])) == nil) {
                     __RSCSetBitmapFastFillWithValue((UInt32 *)bytes, (isAnnexInverted ? 0xFF : 0));
                 } else {
                     __RSCSetGetBitmap(subset, bytes);
@@ -2207,7 +2207,7 @@ void RSCharacterSetRemoveCharactersInRange(RSMutableCharacterSetRef theSet, RSRa
         if (theRange.location + theRange.length > NUMCHARACTERS) theRange.length = NUMCHARACTERS - theRange.location;
         if (theRange.location == 0 && theRange.length == NUMCHARACTERS) { // Remove all
             RSAllocatorDeallocate(RSGetAllocator(theSet), __RSCSetBitmapBits(theSet));
-            __RSCSetPutBitmapBits(theSet, NULL);
+            __RSCSetPutBitmapBits(theSet, nil);
         } else {
             __RSCSetBitmapRemoveCharactersInRange(__RSCSetBitmapBits(theSet), (UniChar)theRange.location, (UniChar)(theRange.location + theRange.length - 1));
         }
@@ -2234,7 +2234,7 @@ void RSCharacterSetAddCharactersInString(RSMutableCharacterSetRef theSet,  RSStr
         if (newLength < __RSStringCharSetMax) {
             buffer = __RSCSetStringBuffer(theSet);
             
-            if (NULL == buffer) {
+            if (nil == buffer) {
                 buffer = (UniChar *)RSAllocatorAllocate(RSGetAllocator(theSet), __RSStringCharSetMax * sizeof(UniChar));
             } else {
                 buffer += __RSCSetStringLength(theSet);
@@ -2260,9 +2260,9 @@ void RSCharacterSetAddCharactersInString(RSMutableCharacterSetRef theSet,  RSStr
             }
             
             if (0 == newLength) {
-                if (NULL == __RSCSetStringBuffer(theSet)) RSAllocatorDeallocate(RSGetAllocator(theSet), buffer);
+                if (nil == __RSCSetStringBuffer(theSet)) RSAllocatorDeallocate(RSGetAllocator(theSet), buffer);
             } else {
-                if (NULL == __RSCSetStringBuffer(theSet)) {
+                if (nil == __RSCSetStringBuffer(theSet)) {
                     __RSCSetPutClassType(theSet, __RSCharSetClassString);
                     __RSCSetPutStringBuffer(theSet, buffer);
                 }
@@ -2318,7 +2318,7 @@ void RSCharacterSetRemoveCharactersInString(RSMutableCharacterSetRef theSet, RSS
         if (newLength < __RSStringCharSetMax) {
             buffer = __RSCSetStringBuffer(theSet);
             
-            if (NULL == buffer) {
+            if (nil == buffer) {
                 buffer = (UniChar *)RSAllocatorAllocate(RSGetAllocator(theSet), __RSStringCharSetMax * sizeof(UniChar));
             } else {
                 buffer += __RSCSetStringLength(theSet);
@@ -2342,7 +2342,7 @@ void RSCharacterSetRemoveCharactersInString(RSMutableCharacterSetRef theSet, RSS
                 newLength -= (length - (charactersLimit - buffer));
             }
             
-            if (NULL == __RSCSetStringBuffer(theSet)) {
+            if (nil == __RSCSetStringBuffer(theSet)) {
                 __RSCSetPutClassType(theSet, __RSCharSetClassString);
                 __RSCSetPutStringBuffer(theSet, buffer);
             }
@@ -2380,7 +2380,7 @@ void RSCharacterSetRemoveCharactersInString(RSMutableCharacterSetRef theSet, RSS
 }
 
 void RSCharacterSetUnion(RSMutableCharacterSetRef theSet, RSCharacterSetRef theOtherSet) {
-    RSCharacterSetRef expandedSet = NULL;
+    RSCharacterSetRef expandedSet = nil;
     
     RS_OBJC_FUNCDISPATCHV(__RSCharacterSetTypeID, void, (NSMutableCharacterSet *)theSet, formUnionWithCharacterSet:(NSCharacterSet *)theOtherSet);
     
@@ -2489,7 +2489,7 @@ void RSCharacterSetUnion(RSMutableCharacterSetRef theSet, RSCharacterSetRef theO
         if (__RSCheckForExapendedSet) __RSCheckForExpandedSet(theSet);
     } else { // It's NSCharacterSet
         RSDataRef bitmapRep = RSCharacterSetCreateBitmapRepresentation(RSAllocatorSystemDefault, theOtherSet);
-        const UInt32 *bitmap2 = (bitmapRep && RSDataGetLength(bitmapRep) ? (const UInt32 *)RSDataGetBytesPtr(bitmapRep) : NULL);
+        const UInt32 *bitmap2 = (bitmapRep && RSDataGetLength(bitmapRep) ? (const UInt32 *)RSDataGetBytesPtr(bitmapRep) : nil);
         if (bitmap2) {
             UInt32 *bitmap1;
             RSIndex length = __RSBitmapSize / sizeof(UInt32);
@@ -2503,7 +2503,7 @@ void RSCharacterSetUnion(RSMutableCharacterSetRef theSet, RSCharacterSetRef theO
 }
 
 void RSCharacterSetIntersect(RSMutableCharacterSetRef theSet, RSCharacterSetRef theOtherSet) {
-    RSCharacterSetRef expandedSet = NULL;
+    RSCharacterSetRef expandedSet = nil;
     
     RS_OBJC_FUNCDISPATCHV(__RSCharacterSetTypeID, void, (NSMutableCharacterSet *)theSet, formIntersectionWithCharacterSet:(NSCharacterSet *)theOtherSet);
     
@@ -2524,7 +2524,7 @@ void RSCharacterSetIntersect(RSMutableCharacterSetRef theSet, RSCharacterSetRef 
                     RSAllocatorDeallocate(RSGetAllocator(theSet), __RSCSetCompactBitmapBits(theSet));
                 }
                 __RSCSetPutClassType(theSet, __RSCharSetClassBitmap);
-                __RSCSetPutBitmapBits(theSet, NULL);
+                __RSCSetPutBitmapBits(theSet, nil);
                 __RSCSetPutIsInverted(theSet, NO);
                 theSet->_hashValue = 0;
                 __RSCSetPutHasHashValue(theSet, YES);
@@ -2608,9 +2608,9 @@ void RSCharacterSetIntersect(RSMutableCharacterSetRef theSet, RSCharacterSetRef 
                     if ((otherSetPlane = (RSMutableCharacterSetRef)__RSCSetGetAnnexPlaneCharacterSetNoAlloc(theOtherSet, idx))) {
                         annexPlane = (RSMutableCharacterSetRef)__RSCSetGetAnnexPlaneCharacterSet(theSet, idx);
                         RSCharacterSetIntersect(annexPlane, otherSetPlane);
-                        if (__RSCSetIsEmpty(annexPlane) && !__RSCSetIsInverted(annexPlane)) __RSCSetPutCharacterSetToAnnexPlane(theSet, NULL, idx);
+                        if (__RSCSetIsEmpty(annexPlane) && !__RSCSetIsInverted(annexPlane)) __RSCSetPutCharacterSetToAnnexPlane(theSet, nil, idx);
                     } else if (__RSCSetGetAnnexPlaneCharacterSetNoAlloc(theSet, idx)) {
-                        __RSCSetPutCharacterSetToAnnexPlane(theSet, NULL, idx);
+                        __RSCSetPutCharacterSetToAnnexPlane(theSet, nil, idx);
                     }
                 }
                 if (!__RSCSetHasNonBMPPlane(theSet)) __RSCSetDeallocateAnnexPlane(theSet);
@@ -2628,7 +2628,7 @@ void RSCharacterSetIntersect(RSMutableCharacterSetRef theSet, RSCharacterSetRef 
                     if (annexPlane) {
                         result = RSUniCharGetBitmapForPlane((RSBitU32)__RSCSetBuiltinType(theOtherSet), planeIndex, bitmapBuffer, NO);
                         if (result == RSUniCharBitmapEmpty) {
-                            __RSCSetPutCharacterSetToAnnexPlane(theSet, NULL, planeIndex);
+                            __RSCSetPutCharacterSetToAnnexPlane(theSet, nil, planeIndex);
                         } else if (result == RSUniCharBitmapFilled) {
                             BOOL isEmpty = YES;
                             
@@ -2640,7 +2640,7 @@ void RSCharacterSetIntersect(RSMutableCharacterSetRef theSet, RSCharacterSetRef 
                             while (length--) {
                                 if ((*bitmap1++ &= *bitmap2++)) isEmpty = NO;
                             }
-                            if (isEmpty) __RSCSetPutCharacterSetToAnnexPlane(theSet, NULL, planeIndex);
+                            if (isEmpty) __RSCSetPutCharacterSetToAnnexPlane(theSet, nil, planeIndex);
                         }
                     }
                 }
@@ -2657,9 +2657,9 @@ void RSCharacterSetIntersect(RSMutableCharacterSetRef theSet, RSCharacterSetRef 
                     if ((otherSetPlane = (RSMutableCharacterSetRef)__RSCSetGetAnnexPlaneCharacterSetNoAlloc(tempOtherSet, idx))) {
                         annexPlane = (RSMutableCharacterSetRef)__RSCSetGetAnnexPlaneCharacterSet(theSet, idx);
                         RSCharacterSetIntersect(annexPlane, otherSetPlane);
-                        if (__RSCSetIsEmpty(annexPlane) && !__RSCSetIsInverted(annexPlane)) __RSCSetPutCharacterSetToAnnexPlane(theSet, NULL, idx);
+                        if (__RSCSetIsEmpty(annexPlane) && !__RSCSetIsInverted(annexPlane)) __RSCSetPutCharacterSetToAnnexPlane(theSet, nil, idx);
                     } else if (__RSCSetGetAnnexPlaneCharacterSetNoAlloc(theSet, idx)) {
-                        __RSCSetPutCharacterSetToAnnexPlane(theSet, NULL, idx);
+                        __RSCSetPutCharacterSetToAnnexPlane(theSet, nil, idx);
                     }
                 }
                 if (!__RSCSetHasNonBMPPlane(theSet)) __RSCSetDeallocateAnnexPlane(theSet);
@@ -2671,7 +2671,7 @@ void RSCharacterSetIntersect(RSMutableCharacterSetRef theSet, RSCharacterSetRef 
         if (__RSCheckForExapendedSet) __RSCheckForExpandedSet(theSet);
     } else { // It's NSCharacterSet
         RSDataRef bitmapRep = RSCharacterSetCreateBitmapRepresentation(RSAllocatorSystemDefault, theOtherSet);
-        const UInt32 *bitmap2 = (bitmapRep && RSDataGetLength(bitmapRep) ? (const UInt32 *)RSDataGetBytesPtr(bitmapRep) : NULL);
+        const UInt32 *bitmap2 = (bitmapRep && RSDataGetLength(bitmapRep) ? (const UInt32 *)RSDataGetBytesPtr(bitmapRep) : nil);
         if (bitmap2) {
             UInt32 *bitmap1;
             RSIndex length = __RSBitmapSize / sizeof(UInt32);
@@ -2697,7 +2697,7 @@ void RSCharacterSetInvert(RSMutableCharacterSetRef theSet) {
         RSIndex count = __RSBitmapSize / sizeof(UInt32);
         UInt32 *bitmap = (UInt32*) __RSCSetBitmapBits(theSet);
         
-        if (NULL == bitmap) {
+        if (nil == bitmap) {
             bitmap =  (UInt32 *)RSAllocatorAllocate(RSGetAllocator(theSet), __RSBitmapSize);
             __RSCSetPutBitmapBits(theSet, (uint8_t *)bitmap);
             for (idx = 0;idx < count;idx++) bitmap[idx] = ((UInt32)0xFFFFFFFF);
@@ -2794,7 +2794,7 @@ void RSCharacterSetInitInlineBuffer(RSCharacterSetRef cset, RSCharacterSetInline
     if (RS_IS_OBJC(__RSCharacterSetTypeID, cset)) {
         RSCharacterSetRef expandedSet = __RSCharacterSetGetExpandedSetForNSCharacterSet(cset);
         
-        if (NULL == expandedSet) {
+        if (nil == expandedSet) {
             buffer->flags = RSCharacterSetNoBitmapAvailable;
             buffer->rangeLimit = 0x110000;
             
@@ -2808,7 +2808,7 @@ void RSCharacterSetInitInlineBuffer(RSCharacterSetRef cset, RSCharacterSetInline
         case __RSCharSetClassBuiltin:
             buffer->bitmap = RSUniCharGetBitmapPtrForPlane((RSBitU32)__RSCSetBuiltinType(cset), 0);
             buffer->rangeLimit = 0x110000;
-            if (NULL == buffer->bitmap) {
+            if (nil == buffer->bitmap) {
                 buffer->flags = RSCharacterSetNoBitmapAvailable;
             } else {
                 if (__RSCSetIsInverted(cset)) buffer->flags = RSCharacterSetIsInverted;
@@ -2845,7 +2845,7 @@ void RSCharacterSetInitInlineBuffer(RSCharacterSetRef cset, RSCharacterSetInline
         case __RSCharSetClassBitmap:
         case __RSCharSetClassCompactBitmap:
             buffer->bitmap = __RSCSetCompactBitmapBits(cset);
-            if (NULL == buffer->bitmap) {
+            if (nil == buffer->bitmap) {
                 buffer->flags = RSCharacterSetIsCompactBitmap;
                 if (__RSCSetIsInverted(cset)) buffer->flags |= RSCharacterSetIsInverted;
             } else {
@@ -2864,7 +2864,7 @@ void RSCharacterSetInitInlineBuffer(RSCharacterSetRef cset, RSCharacterSetInline
         RSIndex index;
         
         for (index = MAX_ANNEX_PLANE;index > 0;index--) {
-            if (NULL != __RSCSetGetAnnexPlaneCharacterSetNoAlloc(cset, (int)index)) {
+            if (nil != __RSCSetGetAnnexPlaneCharacterSetNoAlloc(cset, (int)index)) {
                 buffer->rangeLimit = (RSBitU32)((index + 1) << 16);
                 break;
             }
