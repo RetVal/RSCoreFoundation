@@ -272,6 +272,10 @@
 		418246B316292BFE00750E2A /* RSErrorCode.h in Headers */ = {isa = PBXBuildFile; fileRef = 418246B216292BFE00750E2A /* RSErrorCode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		418AED421813BED60001694B /* RSURL.c in Sources */ = {isa = PBXBuildFile; fileRef = 418AED401813BED60001694B /* RSURL.c */; };
 		418AED431813BED60001694B /* RSURL.h in Headers */ = {isa = PBXBuildFile; fileRef = 418AED411813BED60001694B /* RSURL.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		418C49821833930300D88CB3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 418C49801833930300D88CB3 /* InfoPlist.strings */; };
+		418C499F1833933400D88CB3 /* RSCoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4158D55A1625C4C60070E69F /* RSCoreFoundation.framework */; };
+		418C49A11833936C00D88CB3 /* RSFileMonitor.c in Sources */ = {isa = PBXBuildFile; fileRef = 418C49A01833936C00D88CB3 /* RSFileMonitor.c */; };
+		418C49A21833B48300D88CB3 /* RSFileMonitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 418C49841833930300D88CB3 /* RSFileMonitor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		419C42B0175DB23400C1D41E /* RSDictionary+Extension.c in Sources */ = {isa = PBXBuildFile; fileRef = 419C42AF175DB23300C1D41E /* RSDictionary+Extension.c */; };
 		419C42B2175DB23E00C1D41E /* RSDictionary+Extension.h in Headers */ = {isa = PBXBuildFile; fileRef = 419C42B1175DB23E00C1D41E /* RSDictionary+Extension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		419DF2E61679D53200EF052D /* RSPropertyList.c in Sources */ = {isa = PBXBuildFile; fileRef = 419DF2E51679D53200EF052D /* RSPropertyList.c */; };
@@ -388,7 +392,6 @@
 		41FE75951822B9A600E5E581 /* curl_config.h in Headers */ = {isa = PBXBuildFile; fileRef = 41FE74891822B9A600E5E581 /* curl_config.h */; };
 		41FE75961822B9A600E5E581 /* curl.h in Headers */ = {isa = PBXBuildFile; fileRef = 41FE748C1822B9A600E5E581 /* curl.h */; };
 		41FE75971822B9A600E5E581 /* curlbuild.h in Headers */ = {isa = PBXBuildFile; fileRef = 41FE748D1822B9A600E5E581 /* curlbuild.h */; };
-		41FE75991822B9A600E5E581 /* curlbuild.h.in in Resources */ = {isa = PBXBuildFile; fileRef = 41FE748F1822B9A600E5E581 /* curlbuild.h.in */; };
 		41FE759A1822B9A600E5E581 /* curlrules.h in Headers */ = {isa = PBXBuildFile; fileRef = 41FE74901822B9A600E5E581 /* curlrules.h */; };
 		41FE759B1822B9A600E5E581 /* curlver.h in Headers */ = {isa = PBXBuildFile; fileRef = 41FE74911822B9A600E5E581 /* curlver.h */; };
 		41FE759C1822B9A600E5E581 /* easy.h in Headers */ = {isa = PBXBuildFile; fileRef = 41FE74921822B9A600E5E581 /* easy.h */; };
@@ -514,7 +517,6 @@
 		41FE761D1822B9A600E5E581 /* krb4.h in Headers */ = {isa = PBXBuildFile; fileRef = 41FE75141822B9A600E5E581 /* krb4.h */; };
 		41FE761E1822B9A600E5E581 /* krb5.c in Sources */ = {isa = PBXBuildFile; fileRef = 41FE75151822B9A600E5E581 /* krb5.c */; };
 		41FE761F1822B9A600E5E581 /* ldap.c in Sources */ = {isa = PBXBuildFile; fileRef = 41FE75161822B9A600E5E581 /* ldap.c */; };
-		41FE76211822B9A600E5E581 /* libcurl.plist in Resources */ = {isa = PBXBuildFile; fileRef = 41FE75181822B9A600E5E581 /* libcurl.plist */; };
 		41FE76251822B9A600E5E581 /* llist.c in Sources */ = {isa = PBXBuildFile; fileRef = 41FE751C1822B9A600E5E581 /* llist.c */; };
 		41FE76261822B9A600E5E581 /* llist.h in Headers */ = {isa = PBXBuildFile; fileRef = 41FE751D1822B9A600E5E581 /* llist.h */; };
 		41FE76351822B9A600E5E581 /* md4.c in Sources */ = {isa = PBXBuildFile; fileRef = 41FE752C1822B9A600E5E581 /* md4.c */; };
@@ -962,6 +964,12 @@
 		418246B216292BFE00750E2A /* RSErrorCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSErrorCode.h; path = RSBase/RSErrorCode.h; sourceTree = "<group>"; };
 		418AED401813BED60001694B /* RSURL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSURL.c; sourceTree = "<group>"; };
 		418AED411813BED60001694B /* RSURL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSURL.h; sourceTree = "<group>"; };
+		418C497B1833930300D88CB3 /* RSFileMonitor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RSFileMonitor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		418C497F1833930300D88CB3 /* RSFileMonitor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RSFileMonitor-Info.plist"; sourceTree = "<group>"; };
+		418C49811833930300D88CB3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		418C49831833930300D88CB3 /* RSFileMonitor-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RSFileMonitor-Prefix.pch"; sourceTree = "<group>"; };
+		418C49841833930300D88CB3 /* RSFileMonitor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RSFileMonitor.h; sourceTree = "<group>"; };
+		418C49A01833936C00D88CB3 /* RSFileMonitor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSFileMonitor.c; sourceTree = "<group>"; };
 		419C42AF175DB23300C1D41E /* RSDictionary+Extension.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "RSDictionary+Extension.c"; sourceTree = "<group>"; };
 		419C42B1175DB23E00C1D41E /* RSDictionary+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RSDictionary+Extension.h"; sourceTree = "<group>"; };
 		419DF2E51679D53200EF052D /* RSPropertyList.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSPropertyList.c; sourceTree = "<group>"; };
@@ -1334,6 +1342,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		418C49771833930300D88CB3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				418C499F1833933400D88CB3 /* RSCoreFoundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		41AA721D162A7B0A000473BD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1633,6 +1649,7 @@
 				415A2FE8171C485E0080373A /* libRSCoreFoundationUnitTest.dylib */,
 				41E928F617C32AD3003DB0ED /* RSProcessInfo.dylib */,
 				41B0E3B6182F338200A5E00D /* runloop */,
+				418C497B1833930300D88CB3 /* RSFileMonitor.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1713,6 +1730,7 @@
 		415D57DA17BE265C00FE3E9D /* RSKit */ = {
 			isa = PBXGroup;
 			children = (
+				418C497D1833930300D88CB3 /* RSFileMonitor */,
 				41E928FD17C32BB7003DB0ED /* RSProcessInfo */,
 			);
 			path = RSKit;
@@ -1914,6 +1932,27 @@
 			);
 			name = OperatingSystem;
 			path = RSPrivateOperatingSystem;
+			sourceTree = "<group>";
+		};
+		418C497D1833930300D88CB3 /* RSFileMonitor */ = {
+			isa = PBXGroup;
+			children = (
+				418C49841833930300D88CB3 /* RSFileMonitor.h */,
+				418C49A01833936C00D88CB3 /* RSFileMonitor.c */,
+				418C497E1833930300D88CB3 /* Supporting Files */,
+			);
+			name = RSFileMonitor;
+			path = ../../RSFileMonitor;
+			sourceTree = "<group>";
+		};
+		418C497E1833930300D88CB3 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				418C497F1833930300D88CB3 /* RSFileMonitor-Info.plist */,
+				418C49801833930300D88CB3 /* InfoPlist.strings */,
+				418C49831833930300D88CB3 /* RSFileMonitor-Prefix.pch */,
+			);
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		4193456816DF244700D39D86 /* RSCFGroups */ = {
@@ -2754,6 +2793,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		418C49781833930300D88CB3 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				418C49A21833B48300D88CB3 /* RSFileMonitor.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		41E928F417C32AD3003DB0ED /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -2821,6 +2868,25 @@
 			productName = RSCoreFoundationUnitTest;
 			productReference = 415A2FE8171C485E0080373A /* libRSCoreFoundationUnitTest.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
+		};
+		418C497A1833930300D88CB3 /* RSFileMonitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 418C49991833930400D88CB3 /* Build configuration list for PBXNativeTarget "RSFileMonitor" */;
+			buildPhases = (
+				418C49761833930300D88CB3 /* Sources */,
+				418C49771833930300D88CB3 /* Frameworks */,
+				418C49781833930300D88CB3 /* Headers */,
+				418C49791833930300D88CB3 /* Resources */,
+				418C49A31833B49B00D88CB3 /* Install */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RSFileMonitor;
+			productName = RSFileMonitor;
+			productReference = 418C497B1833930300D88CB3 /* RSFileMonitor.framework */;
+			productType = "com.apple.product-type.framework";
 		};
 		41AA721F162A7B0A000473BD /* RSCoreFoundationLoader */ = {
 			isa = PBXNativeTarget;
@@ -2906,6 +2972,7 @@
 				415A2FE7171C485E0080373A /* RSCoreFoundationUnitTest */,
 				41E928F517C32AD3003DB0ED /* RSProcessInfo */,
 				41B0E3B5182F338200A5E00D /* runloop */,
+				418C497A1833930300D88CB3 /* RSFileMonitor */,
 			);
 		};
 /* End PBXProject section */
@@ -2915,10 +2982,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				41FE76211822B9A600E5E581 /* libcurl.plist in Resources */,
 				4158D5681625C4C60070E69F /* InfoPlist.strings in Resources */,
 				41E9290217C32BB7003DB0ED /* RSProcessInfoKey.plist in Resources */,
-				41FE75991822B9A600E5E581 /* curlbuild.h.in in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		418C49791833930300D88CB3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				418C49821833930300D88CB3 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2963,6 +3036,20 @@
 			shellPath = /bin/sh;
 			shellScript = "cd ${TARGET_BUILD_DIR}/\nrm -rf ~/Library/Frameworks/RSCoreFoundation.framework\ncp -a RSCoreFoundation.framework ~/Library/Frameworks/RSCoreFoundation.framework";
 			showEnvVarsInLog = 0;
+		};
+		418C49A31833B49B00D88CB3 /* Install */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = Install;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ${TARGET_BUILD_DIR}/\nrm -rf ~/Library/Frameworks/RSFileMonitor.framework\ncp -a RSFileMonitor.framework ~/Library/Frameworks/RSFileMonitor.framework";
 		};
 		41E2B29916EF11FA0026A75C /* Install */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -3190,6 +3277,7 @@
 				41667E7D17B7F1D90036DBE8 /* RSUnicodePrecomposition.c in Sources */,
 				41FE766D1822B9A600E5E581 /* share.c in Sources */,
 				41D9376117A53A7C004E5E0F /* RSUnicodeDecomposition.c in Sources */,
+				418C49A11833936C00D88CB3 /* RSFileMonitor.c in Sources */,
 				41FE75AA1822B9A600E5E581 /* asyn-thread.c in Sources */,
 				41A3453F1747602700E49821 /* RSPrivateExceptionHandler.c in Sources */,
 				41B30B54174A5F8000433B7F /* RSPrivateTimer.c in Sources */,
@@ -3221,6 +3309,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				415A2FEE171C48B20080373A /* RSCoreFoundationUnitTest.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		418C49761833930300D88CB3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3280,6 +3375,14 @@
 			isa = PBXVariantGroup;
 			children = (
 				4158D5671625C4C60070E69F /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		418C49801833930300D88CB3 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				418C49811833930300D88CB3 /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -3571,6 +3674,67 @@
 			};
 			name = Release;
 		};
+		418C499A1833930400D88CB3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				COMBINE_HIDPI_IMAGES = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "RSFileMonitor/RSFileMonitor-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = "RSFileMonitor/RSFileMonitor-Info.plist";
+				INSTALL_PATH = "@rpath";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks/ @loader_path/Frameworks/ $(HOME)/Library/Frameworks/ /Library/Frameworks/";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Debug;
+		};
+		418C499B1833930400D88CB3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				COMBINE_HIDPI_IMAGES = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_NS_ASSERTIONS = NO;
+				FRAMEWORK_VERSION = A;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "RSFileMonitor/RSFileMonitor-Prefix.pch";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = "RSFileMonitor/RSFileMonitor-Info.plist";
+				INSTALL_PATH = "@rpath";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks/ @loader_path/Frameworks/ $(HOME)/Library/Frameworks/ /Library/Frameworks/";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Release;
+		};
 		41AA7236162A7B0A000473BD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3747,6 +3911,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		418C49991833930400D88CB3 /* Build configuration list for PBXNativeTarget "RSFileMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				418C499A1833930400D88CB3 /* Debug */,
+				418C499B1833930400D88CB3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		41AA7235162A7B0A000473BD /* Build configuration list for PBXNativeTarget "RSCoreFoundationLoader" */ = {
 			isa = XCConfigurationList;

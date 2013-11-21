@@ -44,6 +44,39 @@ extern RSTimeInterval __RSTSRToTimeInterval(int64_t tsr);
 #define CHECK_FOR_FORK(...)
 #endif
 
+#if (DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_IPHONEOS) && RSCoreFoundationVersionNumber0_4
+#include <malloc/malloc.h>
+// VM Pressure source for malloc <rdar://problem/7805121>
+static dispatch_source_t __runloop_malloc_vm_pressure_source;
+
+RSExport void __runloop_vm_pressure_handler(void *context __unused)
+{
+	malloc_zone_pressure_relief(0,0);
+}
+
+enum {
+	DISPATCH_VM_PRESSURE = 0x80000000,
+};
+
+enum {
+	DISPATCH_MEMORYSTATUS_PRESSURE_NORMAL = 0x01,
+	DISPATCH_MEMORYSTATUS_PRESSURE_WARN = 0x02,
+#if !TARGET_OS_EMBEDDED
+	DISPATCH_MEMORYSTATUS_PRESSURE_CRITICAL = 0x04,
+#endif
+};
+
+static void __runloop_malloc_vm_pressure_setup(void)
+{
+	__runloop_malloc_vm_pressure_source = dispatch_source_create(DISPATCH_SOURCE_TYPE_MEMORYPRESSURE, 0, DISPATCH_MEMORYSTATUS_PRESSURE_NORMAL | DISPATCH_MEMORYSTATUS_PRESSURE_WARN, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 2));
+	dispatch_source_set_event_handler_f(__runloop_malloc_vm_pressure_source,
+                                        __runloop_vm_pressure_handler);
+	dispatch_resume(__runloop_malloc_vm_pressure_source);
+}
+#else
+#define __runloop_malloc_vm_pressure_setup()
+#endif
+
 RSPrivate RSStringRef __RSRunLoopThreadToString(pthread_t t)
 {
     RSStringRef thread = nil;
@@ -1215,123 +1248,6 @@ RSExport void RSPerformFunctionAfterDelay(void (*perform)(void *info), void *inf
         perform(info);
     });
 }
-
-#if RS_BLOCKS_AVAILABLE
-typedef void (^_performBlock) (void);
-struct __block__perform_info
-{
-    _performBlock perform;
-};
-#include <Block.h>
-
-static void __block__perform(void *info)
-{
-    struct __block__perform_info *pbpi = (struct __block__perform_info *)info;
-    pbpi->perform();
-    _Block_release(pbpi->perform);
-    RSAllocatorDeallocate(RSAllocatorSystemDefault, pbpi);
-}
-
-RSExport void RSPerformBlockInBackGround(void (^perform)())
-{
-//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-//        RSAutoreleaseBlock(^{
-//            perform();
-//        });
-//    });
-//    return;
-    struct __block__perform_info *pbpi = RSAllocatorAllocate(RSAllocatorSystemDefault, sizeof(struct __block__perform_info));
-    pbpi->perform = (_performBlock)_Block_copy(^(){
-        RSAutoreleaseBlock(^{
-            perform();
-        });
-    });
-    __RSStartSimpleThread(__block__perform, pbpi);
-}
-
-RSExport void RSPerformBlockInBackGroundWaitUntilDone(void (^perform)())
-{
-    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        RSAutoreleaseBlock(^{
-            perform();
-        });
-        dispatch_semaphore_signal(semaphore);
-    });
-    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-    dispatch_release(semaphore);
-}
-
-RSExport void RSPerformBlockOnMainThread(void (^perform)())
-{
-    if (pthread_main_np())
-    {
-        RSAutoreleaseBlock(^{
-            perform();
-        });
-    }
-    else
-    {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            RSAutoreleaseBlock(^{
-                perform();
-            });
-        });
-    }
-}
-
-RSExport void RSPerformBlockOnMainThreadWaitUntilDone(void (^perform)())
-{
-    if (pthread_main_np())
-    {
-        RSAutoreleaseBlock(^{
-            perform();
-        });
-    }
-    else if (1)
-    {
-        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-        dispatch_async(dispatch_get_main_queue(), ^{
-            RSAutoreleaseBlock(^{
-                perform();
-            });
-            dispatch_semaphore_signal(semaphore);
-        });
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-        dispatch_release(semaphore);
-    }
-}
-
-RSExport void RSPerformBlockAfterDelay(RSTimeInterval timeInterval, void (^perform)())
-{
-    RSTimerRef timer = RSTimerCreateSchedule(RSAllocatorSystemDefault, RSAbsoluteTimeGetCurrent() + timeInterval, 0, NO, nil, ^(RSTimerRef timer) {
-        RSAutoreleaseBlock(^{
-            perform();
-        });
-        RSTimerInvalidate(timer);
-    });
-    RSTimerFire(timer);
-    return;
-    dispatch_after(dispatch_time(0, timeInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        perform();
-    });
-}
-
-RSExport void RSRunLoopPerformBlockInQueue(RSTypeRef queue, void (^perform)(void))
-{
-    dispatch_async((dispatch_queue_t)queue ? : dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        perform();
-    });
-}
-
-RSExport void RSRunLoopPerformBlockInRunLoop(RSRunLoopRef runloop, void (^perform)(void))
-{
-    if (!perform) return;
-    if (!runloop) runloop = RSRunLoopGetCurrent();
-    else __RSGenericValidInstance(runloop, _RSRunLoopTypeID);
-    RSRunLoopPerformBlockInQueue(runloop->_queue, perform);
-}
-#endif
 
 RSExport void RSRunLoopPerformFunctionInRunLoop(RSRunLoopRef runloop, void(*perform)(void* info), void* info, RSStringRef mode)
 {
@@ -5851,6 +5767,16 @@ RSInline void __RSRunLoopUnlock(RSRunLoopRef rl) {
     pthread_mutex_unlock(&(((RSRunLoopRef)rl)->_lock));
 }
 
+RSInline void __RSRunLoopLockInit(pthread_mutex_t *lock) {
+    pthread_mutexattr_t mattr;
+    pthread_mutexattr_init(&mattr);
+    pthread_mutexattr_settype(&mattr, PTHREAD_MUTEX_RECURSIVE);
+    int32_t mret = pthread_mutex_init(lock, &mattr);
+    pthread_mutexattr_destroy(&mattr);
+    if (0 != mret) {
+    }
+}
+
 static RSStringRef __RSRunLoopClassDescription(RSTypeRef rs) {
     RSRunLoopRef rl = (RSRunLoopRef)rs;
     RSMutableStringRef result;
@@ -5865,17 +5791,7 @@ static RSStringRef __RSRunLoopClassDescription(RSTypeRef rs) {
 }
 
 RSPrivate void __RSRunLoopDump() { // __private_extern__ to keep the compiler from discarding it
-    RSShow(RSDescription(RSRunLoopGetCurrent()));
-}
-
-RSInline void __RSRunLoopLockInit(pthread_mutex_t *lock) {
-    pthread_mutexattr_t mattr;
-    pthread_mutexattr_init(&mattr);
-    pthread_mutexattr_settype(&mattr, PTHREAD_MUTEX_RECURSIVE);
-    int32_t mret = pthread_mutex_init(lock, &mattr);
-    pthread_mutexattr_destroy(&mattr);
-    if (0 != mret) {
-    }
+    RSShow(RSAutorelease(RSDescription(RSRunLoopGetCurrent())));
 }
 
 /* call with rl locked, returns mode locked */
@@ -6057,7 +5973,7 @@ void _RSRunLoopSetWindowsMessageQueueHandler(RSRunLoopRef rl, RSStringRef modeNa
 
 /* Bit 3 in the base reserved bits is used for invalid state in run loop objects */
 
-RSInline BOOL __RSRunLoopIsValid3(const void *rs) {
+RSInline BOOL __RSRunLoopIsValid(const void *rs) {
     return (BOOL)__RSBitfieldGetValue(RSRuntimeClassBaseFiled(rs), 3, 3);
 }
 
@@ -6393,7 +6309,7 @@ static void __RSRunLoopClassDeallocate(RSTypeRef rs) {
         item = item->_next;
         RSRelease(curr->_mode);
         Block_release(curr->_block);
-        free(curr);
+        RSAllocatorDeallocate(RSAllocatorSystemDefault, curr);
     }
     if (nil != rl->_commonModeItems) {
         RSRelease(rl->_commonModeItems);
@@ -6445,6 +6361,7 @@ RSPrivate void __RSRunLoopInitialize(void) {
     __RSRuntimeSetClassTypeID(&__RSRunLoopClass, __RSRunLoopTypeID);
     __RSRunLoopModeTypeID = __RSRuntimeRegisterClass(&__RSRunLoopModeClass);    // 42
     __RSRuntimeSetClassTypeID(&__RSRunLoopModeClass, __RSRunLoopModeTypeID);
+    __runloop_malloc_vm_pressure_setup();
 }
 
 RSTypeID RSRunLoopGetTypeID(void) {
@@ -6780,7 +6697,7 @@ static BOOL __RSRunLoopDoBlocks(RSRunLoopRef rl, RSRunLoopModeRef rlm) { // Call
             if (curr == tail) tail = prev;
             void (^block)(void) = curr->_block;
             RSRelease(curr->_mode);
-            free(curr);
+            RSAllocatorDeallocate(RSAllocatorSystemDefault, curr);
             if (doit) {
                 __RSRUNLOOP_IS_CALLING_OUT_TO_A_BLOCK__(block);
                 did = YES;
@@ -6812,7 +6729,7 @@ static void __RSRunLoopDoObservers(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSRunL
     RSIndex obs_cnt = 0;
     for (RSIndex idx = 0; idx < cnt; idx++) {
         RSRunLoopObserverRef rlo = (RSRunLoopObserverRef)RSArrayObjectAtIndex(rlm->_observers, idx);
-        if (0 != (rlo->_activities & activity) && __RSRunLoopIsValid3(rlo) && !__RSRunLoopObserverIsFiring(rlo)) {
+        if (0 != (rlo->_activities & activity) && __RSRunLoopIsValid(rlo) && !__RSRunLoopObserverIsFiring(rlo)) {
             collectedObservers[obs_cnt++] = (RSRunLoopObserverRef)RSRetain(rlo);
         }
     }
@@ -6821,7 +6738,7 @@ static void __RSRunLoopDoObservers(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSRunL
     for (RSIndex idx = 0; idx < obs_cnt; idx++) {
         RSRunLoopObserverRef rlo = collectedObservers[idx];
         __RSRunLoopObserverLock(rlo);
-        if (__RSRunLoopIsValid3(rlo)) {
+        if (__RSRunLoopIsValid(rlo)) {
             BOOL doInvalidate = !__RSRunLoopObserverRepeats(rlo);
             __RSRunLoopObserverSetFiring(rlo);
             __RSRunLoopObserverUnlock(rlo);
@@ -6838,7 +6755,7 @@ static void __RSRunLoopDoObservers(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSRunL
     __RSRunLoopLock(rl);
     __RSRunLoopModeLock(rlm);
     
-    if (collectedObservers != buffer) free(collectedObservers);
+    if (collectedObservers != buffer) RSAllocatorDeallocate(RSAllocatorSystemDefault, collectedObservers);
 }
 
 static RSComparisonResult __RSRunLoopSourceComparator(const void *val1, const void *val2, void *context) {
@@ -6852,7 +6769,7 @@ static RSComparisonResult __RSRunLoopSourceComparator(const void *val1, const vo
 static void __RSRunLoopCollectSources0(const void *value, void *context) {
     RSRunLoopSourceRef rls = (RSRunLoopSourceRef)value;
     RSTypeRef *sources = (RSTypeRef *)context;
-    if (0 == rls->_context.version0.version && __RSRunLoopIsValid3(rls) && __RSRunLoopSourceIsSignaled(rls)) {
+    if (0 == rls->_context.version0.version && __RSRunLoopIsValid(rls) && __RSRunLoopSourceIsSignaled(rls)) {
         if (nil == *sources) {
             *sources = RSRetain(rls);
         } else if (RSGetTypeID(*sources) == __RSRunLoopSourceTypeID) {
@@ -6914,7 +6831,7 @@ static BOOL __RSRunLoopDoSources0(RSRunLoopRef rl, RSRunLoopModeRef rlm, BOOL st
             __RSRunLoopSourceLock(rls);
             if (__RSRunLoopSourceIsSignaled(rls)) {
                 __RSRunLoopSourceUnsetSignaled(rls);
-                if (__RSRunLoopIsValid3(rls)) {
+                if (__RSRunLoopIsValid(rls)) {
                     __RSRunLoopSourceUnlock(rls);
                     __RSRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE0_PERFORM_FUNCTION__(rls->_context.version0.perform, rls->_context.version0.info);
                     CHECK_FOR_FORK();
@@ -6934,7 +6851,7 @@ static BOOL __RSRunLoopDoSources0(RSRunLoopRef rl, RSRunLoopModeRef rlm, BOOL st
                 __RSRunLoopSourceLock(rls);
                 if (__RSRunLoopSourceIsSignaled(rls)) {
                     __RSRunLoopSourceUnsetSignaled(rls);
-                    if (__RSRunLoopIsValid3(rls)) {
+                    if (__RSRunLoopIsValid(rls)) {
                         __RSRunLoopSourceUnlock(rls);
                         __RSRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE0_PERFORM_FUNCTION__(rls->_context.version0.perform, rls->_context.version0.info);
                         CHECK_FOR_FORK();
@@ -6975,7 +6892,7 @@ static BOOL __RSRunLoopDoSource1(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSRunLoo
     __RSRunLoopModeUnlock(rlm);
     __RSRunLoopUnlock(rl);
     __RSRunLoopSourceLock(rls);
-    if (__RSRunLoopIsValid3(rls)) {
+    if (__RSRunLoopIsValid(rls)) {
         __RSRunLoopSourceUnsetSignaled(rls);
         __RSRunLoopSourceUnlock(rls);
         __RSRunLoopDebugInfoForRunLoopSource(rls);
@@ -7165,7 +7082,7 @@ static BOOL __RSRunLoopDoTimer(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSRunLoopT
     RSRetain(rlt);
     __RSRunLoopTimerLock(rlt);
     
-    if (__RSRunLoopIsValid3(rlt) && rlt->_fireTSR <= mach_absolute_time() && !__RSRunLoopTimerIsFiring(rlt) && rlt->_runLoop == rl) {
+    if (__RSRunLoopIsValid(rlt) && rlt->_fireTSR <= mach_absolute_time() && !__RSRunLoopTimerIsFiring(rlt) && rlt->_runLoop == rl) {
         void *context_info = nil;
         void (*context_release)(const void *) = nil;
         if (rlt->_context.retain) {
@@ -7202,7 +7119,7 @@ static BOOL __RSRunLoopDoTimer(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSRunLoopT
         timerHandled = YES;
         __RSRunLoopTimerUnsetFiring(rlt);
     }
-    if (__RSRunLoopIsValid3(rlt) && timerHandled) {
+    if (__RSRunLoopIsValid(rlt) && timerHandled) {
         /* This is just a little bit tricky: we want to support calling
          * RSRunLoopTimerSetNextFireDate() from within the callout and
          * honor that new time here if it is a later date, otherwise
@@ -7291,7 +7208,7 @@ static BOOL __RSRunLoopDoTimers(RSRunLoopRef rl, RSRunLoopModeRef rlm, uint64_t 
     for (RSIndex idx = 0, cnt = rlm->_timers ? RSArrayGetCount(rlm->_timers) : 0; idx < cnt; idx++) {
         RSRunLoopTimerRef rlt = (RSRunLoopTimerRef)RSArrayObjectAtIndex(rlm->_timers, idx);
         
-        if (__RSRunLoopIsValid3(rlt) && !__RSRunLoopTimerIsFiring(rlt)) {
+        if (__RSRunLoopIsValid(rlt) && !__RSRunLoopTimerIsFiring(rlt)) {
             if (rlt->_fireTSR <= limitTSR) {
                 if (!timers) timers = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
                 RSArrayAddObject(timers, rlt);
@@ -7347,7 +7264,7 @@ static BOOL __RSRunLoopServiceMachPort(mach_port_name_t port, mach_msg_header_t 
             return YES;
         }
         if (MACH_RCV_TIMED_OUT == ret) {
-            if (!originalBuffer) free(msg);
+            if (!originalBuffer) RSAllocatorDeallocate(RSAllocatorSystemDefault, msg);
             *buffer = nil;
             *livePort = MACH_PORT_NULL;
             return false;
@@ -7356,7 +7273,7 @@ static BOOL __RSRunLoopServiceMachPort(mach_port_name_t port, mach_msg_header_t 
         buffer_size = round_msg(msg->msgh_size + MAX_TRAILER_SIZE);
         if (originalBuffer) *buffer = nil;
         originalBuffer = false;
-        *buffer = realloc(*buffer, buffer_size);
+        *buffer = RSAllocatorReallocate(RSAllocatorSystemDefault, *buffer, buffer_size);
     }
     HALT;
     return false;
@@ -7429,7 +7346,7 @@ static void __RSRunLoopTimeoutCancel(void *arg) {
     struct __timeout_context *context = (struct __timeout_context *)arg;
     RSRelease(context->rl);
     dispatch_release(context->ds);
-    free(context);
+    RSAllocatorDeallocate(RSAllocatorSystemDefault, context);
 }
 
 static void __RSRunLoopTimeout(void *arg) {
@@ -7492,6 +7409,7 @@ static int32_t __RSRunLoopRun(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSTimeInter
     BOOL didDispatchPortLastTime = YES;
     int32_t retVal = 0;
     do {
+        RSAutoreleasePoolRef pool = RSAutoreleasePoolCreate(RSAllocatorSystemDefault);
         uint8_t msg_buffer[3 * 1024];
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
         mach_msg_header_t *msg = nil;
@@ -7562,7 +7480,7 @@ static int32_t __RSRunLoopRun(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSTimeInter
                     rlm->_timerFired = false;
                     break;
                 } else {
-                    if (msg && msg != (mach_msg_header_t *)msg_buffer) free(msg);
+                    if (msg && msg != (mach_msg_header_t *)msg_buffer) RSAllocatorDeallocate(RSAllocatorSystemDefault, msg);
                 }
             } else {
                 // Go ahead and leave the inner loop.
@@ -7703,7 +7621,7 @@ static int32_t __RSRunLoopRun(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSTimeInter
             }
         }
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
-        if (msg && msg != (mach_msg_header_t *)msg_buffer) free(msg);
+        if (msg && msg != (mach_msg_header_t *)msg_buffer) RSAllocatorDeallocate(RSAllocatorSystemDefault, msg);
 #endif
         
         __RSRunLoopDoBlocks(rl, rlm);
@@ -7722,13 +7640,15 @@ static int32_t __RSRunLoopRun(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSTimeInter
         } else if (__RSRunLoopModeIsEmpty(rl, rlm, previousMode)) {
             retVal = RSRunLoopRunFinished;
         }
+    
+        RSAutoreleasePoolDrain(pool);   // RSAutoreleasePoolDrain will active __runloop_vm_pressure_handler automatically.
     } while (0 == retVal);
     
     if (timeout_timer) {
         dispatch_source_cancel(timeout_timer);
         dispatch_release(timeout_timer);
     } else {
-        free(timeout_context);
+        RSAllocatorDeallocate(RSAllocatorSystemDefault, timeout_context);
     }
     
     return retVal;
@@ -7867,7 +7787,7 @@ void RSRunLoopPerformBlock(RSRunLoopRef rl, RSTypeRef mode, void (^block)(void))
             if (currentMode) __RSRunLoopModeUnlock(currentMode);
         }
         __RSRunLoopUnlock(rl);
-        free(values);
+        RSAllocatorDeallocate(RSAllocatorSystemDefault, values);
     } else if (RSSetGetTypeID() == RSGetTypeID(mode)) {
         RSIndex cnt = RSSetGetCount((RSSetRef)mode);
         const void **values = (const void **)RSAllocatorAllocate(RSAllocatorSystemDefault, sizeof(const void *) * cnt);
@@ -7880,7 +7800,7 @@ void RSRunLoopPerformBlock(RSRunLoopRef rl, RSTypeRef mode, void (^block)(void))
             if (currentMode) __RSRunLoopModeUnlock(currentMode);
         }
         __RSRunLoopUnlock(rl);
-        free(values);
+        RSAllocatorDeallocate(RSAllocatorSystemDefault, values);
     } else {
         mode = nil;
     }
@@ -7927,7 +7847,7 @@ BOOL RSRunLoopContainsSource(RSRunLoopRef rl, RSRunLoopSourceRef rls, RSStringRe
 void RSRunLoopAddSource(RSRunLoopRef rl, RSRunLoopSourceRef rls, RSStringRef modeName) {	/* DOES CALLOUT */
     CHECK_FOR_FORK();
     if (__RSRunLoopIsDeallocating(rl)) return;
-    if (!__RSRunLoopIsValid3(rls)) return;
+    if (!__RSRunLoopIsValid(rls)) return;
     BOOL doVer0Callout = false;
     __RSRunLoopLock(rl);
     if (modeName == RSRunLoopCommonModes) {
@@ -8115,7 +8035,7 @@ void RSRunLoopAddObserver(RSRunLoopRef rl, RSRunLoopObserverRef rlo, RSStringRef
     CHECK_FOR_FORK();
     RSRunLoopModeRef rlm;
     if (__RSRunLoopIsDeallocating(rl)) return;
-    if (!__RSRunLoopIsValid3(rlo) || (nil != rlo->_runLoop && rlo->_runLoop != rl)) return;
+    if (!__RSRunLoopIsValid(rlo) || (nil != rlo->_runLoop && rlo->_runLoop != rl)) return;
     __RSRunLoopLock(rl);
     if (modeName == RSRunLoopCommonModes) {
         RSSetRef set = rl->_commonModes ? RSSetCreateCopy(RSAllocatorSystemDefault, rl->_commonModes) : nil;
@@ -8217,7 +8137,7 @@ BOOL RSRunLoopContainsTimer(RSRunLoopRef rl, RSRunLoopTimerRef rlt, RSStringRef 
 void RSRunLoopAddTimer(RSRunLoopRef rl, RSRunLoopTimerRef rlt, RSStringRef modeName) {
     CHECK_FOR_FORK();
     if (__RSRunLoopIsDeallocating(rl)) return;
-    if (!__RSRunLoopIsValid3(rlt) || (nil != rlt->_runLoop && rlt->_runLoop != rl)) return;
+    if (!__RSRunLoopIsValid(rlt) || (nil != rlt->_runLoop && rlt->_runLoop != rl)) return;
     __RSRunLoopLock(rl);
     if (modeName == RSRunLoopCommonModes) {
         RSSetRef set = rl->_commonModes ? RSSetCreateCopy(RSAllocatorSystemDefault, rl->_commonModes) : nil;
@@ -8317,7 +8237,7 @@ static BOOL __RSRunLoopSourceClassEqual(RSTypeRef rs1, RSTypeRef rs2) {	/* DOES 
     RSRunLoopSourceRef rls1 = (RSRunLoopSourceRef)rs1;
     RSRunLoopSourceRef rls2 = (RSRunLoopSourceRef)rs2;
     if (rls1 == rls2) return YES;
-    if (__RSRunLoopIsValid3(rls1) != __RSRunLoopIsValid3(rls2)) return false;
+    if (__RSRunLoopIsValid(rls1) != __RSRunLoopIsValid(rls2)) return false;
     if (rls1->_order != rls2->_order) return false;
     if (rls1->_context.version0.version != rls2->_context.version0.version) return false;
     if (rls1->_context.version0.hash != rls2->_context.version0.hash) return false;
@@ -8356,7 +8276,7 @@ static RSStringRef __RSRunLoopSourceClassDescription(RSTypeRef rs) {	/* DOES CAL
 #if DEPLOYMENT_TARGET_WINDOWS
     result = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<RSRunLoopSource %p [%p]>{signalled = %s, valid = %s, order = %d, context = %r}"), rs, RSGetAllocator(rls), __RSRunLoopSourceIsSignaled(rls) ? "Yes" : "No", __RSRunLoopIsValid(rls) ? "Yes" : "No", rls->_order, contextDesc);
 #else
-    result = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<RSRunLoopSource %p [%p]>{signalled = %s, valid = %s, order = %ld, context = %r}"), rs, RSGetAllocator(rls), __RSRunLoopSourceIsSignaled(rls) ? "Yes" : "No", __RSRunLoopIsValid3(rls) ? "Yes" : "No", (unsigned long)rls->_order, contextDesc);
+    result = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<RSRunLoopSource %p [%p]>{signalled = %s, valid = %s, order = %ld, context = %r}"), rs, RSGetAllocator(rls), __RSRunLoopSourceIsSignaled(rls) ? "Yes" : "No", __RSRunLoopIsValid(rls) ? "Yes" : "No", (unsigned long)rls->_order, contextDesc);
 #endif
     RSRelease(contextDesc);
     return result;
@@ -8464,7 +8384,7 @@ void RSRunLoopSourceInvalidate(RSRunLoopSourceRef rls) {
     __RSGenericValidInstance(rls, __RSRunLoopSourceTypeID);
     __RSRunLoopSourceLock(rls);
     RSRetain(rls);
-    if (__RSRunLoopIsValid3(rls)) {
+    if (__RSRunLoopIsValid(rls)) {
         RSBagRef rloops = rls->_runLoops;
         __RSRunLoopUnsetValid(rls);
         __RSRunLoopSourceUnsetSignaled(rls);
@@ -8489,7 +8409,7 @@ void RSRunLoopSourceInvalidate(RSRunLoopSourceRef rls) {
 BOOL RSRunLoopSourceIsValid(RSRunLoopSourceRef rls) {
     CHECK_FOR_FORK();
     __RSGenericValidInstance(rls, __RSRunLoopSourceTypeID);
-    return __RSRunLoopIsValid3(rls);
+    return __RSRunLoopIsValid(rls);
 }
 
 void RSRunLoopSourceGetContext(RSRunLoopSourceRef rls, RSRunLoopSourceContext *context) {
@@ -8511,7 +8431,7 @@ void RSRunLoopSourceGetContext(RSRunLoopSourceRef rls, RSRunLoopSourceContext *c
 void RSRunLoopSourceSignal(RSRunLoopSourceRef rls) {
     CHECK_FOR_FORK();
     __RSRunLoopSourceLock(rls);
-    if (__RSRunLoopIsValid3(rls)) {
+    if (__RSRunLoopIsValid(rls)) {
         __RSRunLoopSourceSetSignaled(rls);
     }
     __RSRunLoopSourceUnlock(rls);
@@ -8528,7 +8448,7 @@ BOOL RSRunLoopSourceIsSignalled(RSRunLoopSourceRef rls) {
 RSPrivate void _RSRunLoopSourceWakeUpRunLoops(RSRunLoopSourceRef rls) {
     RSBagRef loops = nil;
     __RSRunLoopSourceLock(rls);
-    if (__RSRunLoopIsValid3(rls) && nil != rls->_runLoops) {
+    if (__RSRunLoopIsValid(rls) && nil != rls->_runLoops) {
         loops = RSBagCreateCopy(RSAllocatorSystemDefault, rls->_runLoops);
     }
     __RSRunLoopSourceUnlock(rls);
@@ -8544,8 +8464,8 @@ static RSStringRef __RSRunLoopObserverClassDescription(RSTypeRef rs) {	/* DOES C
     RSRunLoopObserverRef rlo = (RSRunLoopObserverRef)rs;
     RSStringRef result;
     RSStringRef contextDesc = nil;
-    if (nil != rlo->_context.copyDescription) {
-        contextDesc = rlo->_context.copyDescription(rlo->_context.info);
+    if (nil != rlo->_context.description) {
+        contextDesc = rlo->_context.description(rlo->_context.info);
     }
     if (!contextDesc) {
         contextDesc = RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("<RSRunLoopObserver context %p>"), rlo->_context.info);
@@ -8556,7 +8476,7 @@ static RSStringRef __RSRunLoopObserverClassDescription(RSTypeRef rs) {	/* DOES C
     void *addr = rlo->_callout;
     Dl_info info;
     const char *name = (dladdr(addr, &info) && info.dli_saddr == addr && info.dli_sname) ? info.dli_sname : "???";
-    result = RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("<RSRunLoopObserver %p [%p]>{valid = %s, activities = 0x%lx, repeats = %s, order = %ld, callout = %s (%p), context = %r}"), rs, RSGetAllocator(rlo), __RSRunLoopIsValid3(rlo) ? "Yes" : "No", (long)rlo->_activities, __RSRunLoopObserverRepeats(rlo) ? "Yes" : "No", (long)rlo->_order, name, addr, contextDesc);
+    result = RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("<RSRunLoopObserver %p [%p]>{valid = %s, activities = 0x%lx, repeats = %s, order = %ld, callout = %s (%p), context = %r}"), rs, RSGetAllocator(rlo), __RSRunLoopIsValid(rlo) ? "Yes" : "No", (long)rlo->_activities, __RSRunLoopObserverRepeats(rlo) ? "Yes" : "No", (long)rlo->_order, name, addr, contextDesc);
 #endif
     RSRelease(contextDesc);
     return result;
@@ -8620,12 +8540,12 @@ RSRunLoopObserverRef RSRunLoopObserverCreate(RSAllocatorRef allocator, RSOptionF
         }
         memory->_context.retain = context->retain;
         memory->_context.release = context->release;
-        memory->_context.copyDescription = context->copyDescription;
+        memory->_context.description = context->description;
     } else {
         memory->_context.info = 0;
         memory->_context.retain = 0;
         memory->_context.release = 0;
-        memory->_context.copyDescription = 0;
+        memory->_context.description = 0;
     }
     return memory;
 }
@@ -8643,7 +8563,7 @@ RSRunLoopObserverRef RSRunLoopObserverCreateWithHandler(RSAllocatorRef allocator
     blockContext.info = (void *)block;
     blockContext.retain = (const void *(*)(const void *info))_Block_copy;
     blockContext.release = (void (*)(const void *info))_Block_release;
-    blockContext.copyDescription = nil;
+    blockContext.description = nil;
     return RSRunLoopObserverCreate(allocator, activities, repeats, order, _runLoopObserverWithBlockContext, &blockContext);
 }
 
@@ -8670,7 +8590,7 @@ void RSRunLoopObserverInvalidate(RSRunLoopObserverRef rlo) {    /* DOES CALLOUT 
     __RSGenericValidInstance(rlo, __RSRunLoopObserverTypeID);
     __RSRunLoopObserverLock(rlo);
     RSRetain(rlo);
-    if (__RSRunLoopIsValid3(rlo)) {
+    if (__RSRunLoopIsValid(rlo)) {
         RSRunLoopRef rl = rlo->_runLoop;
         void *info = rlo->_context.info;
         rlo->_context.info = nil;
@@ -8707,7 +8627,7 @@ void RSRunLoopObserverInvalidate(RSRunLoopObserverRef rlo) {    /* DOES CALLOUT 
 
 BOOL RSRunLoopObserverIsValid(RSRunLoopObserverRef rlo) {
     CHECK_FOR_FORK();
-    return __RSRunLoopIsValid3(rlo);
+    return __RSRunLoopIsValid(rlo);
 }
 
 void RSRunLoopObserverGetContext(RSRunLoopObserverRef rlo, RSRunLoopObserverContext *context) {
@@ -8739,7 +8659,7 @@ static RSStringRef __RSRunLoopTimerClassDescription(RSTypeRef rs) {	/* DOES CALL
                                                   RSSTR("<RSRunLoopTimer %p [%p]>{valid = %s, firing = %s, interval = %0.09g, tolerance = %0.09g, next fire date = %0.09g (%0.09g @ %lld), callout = %s (%p / %p) (%s), context = %r}"),
                                                   rs,
                                                   RSGetAllocator(rlt),
-                                                  __RSRunLoopIsValid3(rlt) ? "Yes" : "No",
+                                                  __RSRunLoopIsValid(rlt) ? "Yes" : "No",
                                                   __RSRunLoopTimerIsFiring(rlt) ? "Yes" : "No",
                                                   rlt->_interval,
                                                   rlt->_tolerance,
@@ -8861,7 +8781,7 @@ RSExport RSAbsoluteTime RSRunLoopTimerGetNextFireDate(RSRunLoopTimerRef rlt) {
     RSAbsoluteTime at = 0.0;
     __RSRunLoopTimerLock(rlt);
     __RSRunLoopTimerFireTSRLock();
-    if (__RSRunLoopIsValid3(rlt)) {
+    if (__RSRunLoopIsValid(rlt)) {
         at = rlt->_nextFireDate;
     }
     __RSRunLoopTimerFireTSRUnlock();
@@ -8871,7 +8791,7 @@ RSExport RSAbsoluteTime RSRunLoopTimerGetNextFireDate(RSRunLoopTimerRef rlt) {
 
 RSExport void RSRunLoopTimerSetNextFireDate(RSRunLoopTimerRef rlt, RSAbsoluteTime fireDate) {
     CHECK_FOR_FORK();
-    if (!__RSRunLoopIsValid3(rlt)) return;
+    if (!__RSRunLoopIsValid(rlt)) return;
     if (TIMER_DATE_LIMIT < fireDate) fireDate = TIMER_DATE_LIMIT;
     uint64_t nextFireTSR = 0ULL;
     uint64_t now2 = mach_absolute_time();
@@ -8960,7 +8880,7 @@ RSExport void RSRunLoopTimerInvalidate(RSRunLoopTimerRef rlt) {	/* DOES CALLOUT 
     if (!__RSRunLoopTimerIsDeallocating(rlt)) {
         RSRetain(rlt);
     }
-    if (__RSRunLoopIsValid3(rlt)) {
+    if (__RSRunLoopIsValid(rlt)) {
         RSRunLoopRef rl = rlt->_runLoop;
         void *info = rlt->_context.info;
         rlt->_context.info = nil;
@@ -9007,7 +8927,7 @@ RSExport BOOL RSRunLoopTimerIsValid(RSRunLoopTimerRef rlt) {
     CHECK_FOR_FORK();
     RS_OBJC_FUNCDISPATCHV(__RSRunLoopTimerTypeID, BOOL, (NSTimer *)rlt, isValid);
     __RSGenericValidInstance(rlt, __RSRunLoopTimerTypeID);
-    return __RSRunLoopIsValid3(rlt);
+    return __RSRunLoopIsValid(rlt);
 }
 
 RSExport void RSRunLoopTimerGetContext(RSRunLoopTimerRef rlt, RSRunLoopTimerContext *context) {
@@ -9059,10 +8979,8 @@ RSExport void RSPerformBlockRepeatWithFlags(RSIndex performCount, RSPerformBlock
 {
     if (performCount > 0 && perform)
     {
-        RSAutoreleaseBlock(^{
-            dispatch_apply(performCount, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, (unsigned long)performFlags), ^(size_t idx) {
-                perform(idx);
-            });
+        dispatch_apply(performCount, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, (unsigned long)performFlags), ^(size_t idx) {
+            perform(idx);
         });
     }
 }
@@ -9076,6 +8994,117 @@ RSPrivate void __RSRunLoopDeallocate()
 {
 //    RSDeallocateInstance(RSRunLoopMain);
 }
+
+#if RS_BLOCKS_AVAILABLE
+typedef void (^_performBlock) (void);
+struct __block__perform_info
+{
+    _performBlock perform;
+};
+#include <Block.h>
+
+static void __block__perform(void *info)
+{
+    struct __block__perform_info *pbpi = (struct __block__perform_info *)info;
+    pbpi->perform();
+    _Block_release(pbpi->perform);
+    RSAllocatorDeallocate(RSAllocatorSystemDefault, pbpi);
+}
+
+RSExport void RSPerformBlockInBackGround(void (^perform)())
+{
+    //    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    //        RSAutoreleaseBlock(^{
+    //            perform();
+    //        });
+    //    });
+    //    return;
+    struct __block__perform_info *pbpi = RSAllocatorAllocate(RSAllocatorSystemDefault, sizeof(struct __block__perform_info));
+    pbpi->perform = (_performBlock)_Block_copy(^(){
+        RSAutoreleaseBlock(^{
+            perform();
+        });
+    });
+    __RSStartSimpleThread(__block__perform, pbpi);
+}
+
+RSExport void RSPerformBlockInBackGroundWaitUntilDone(void (^perform)())
+{
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        RSAutoreleaseBlock(^{
+            perform();
+        });
+        dispatch_semaphore_signal(semaphore);
+    });
+    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    dispatch_release(semaphore);
+}
+
+RSExport void RSPerformBlockOnMainThread(void (^perform)())
+{
+    if (pthread_main_np())
+    {
+        RSAutoreleaseBlock(^{
+            perform();
+        });
+    }
+    else
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            RSAutoreleaseBlock(^{
+                perform();
+            });
+        });
+    }
+}
+
+RSExport void RSPerformBlockOnMainThreadWaitUntilDone(void (^perform)())
+{
+    if (pthread_main_np())
+    {
+        RSAutoreleaseBlock(^{
+            perform();
+        });
+    }
+    else if (1)
+    {
+        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            RSAutoreleaseBlock(^{
+                perform();
+            });
+            dispatch_semaphore_signal(semaphore);
+        });
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+        dispatch_release(semaphore);
+    }
+}
+
+RSExport void RSPerformBlockAfterDelay(RSTimeInterval timeInterval, void (^perform)())
+{
+    RSTimerRef timer = RSTimerCreateSchedule(RSAllocatorSystemDefault, RSAbsoluteTimeGetCurrent() + timeInterval, 0, NO, nil, ^(RSTimerRef timer) {
+        RSAutoreleaseBlock(^{
+            perform();
+        });
+        RSTimerInvalidate(timer);
+    });
+    RSTimerFire(timer);
+    return;
+    dispatch_after(dispatch_time(0, timeInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        perform();
+    });
+}
+
+RSExport void RSRunLoopPerformBlockInQueue(RSTypeRef queue, void (^perform)(void))
+{
+    dispatch_async((dispatch_queue_t)queue ? : dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        perform();
+    });
+}
+
+#endif
+
 
 #define RS_TSD_MAX_SLOTS 70
 typedef struct __RSTSDTable {
@@ -9272,18 +9301,6 @@ void RSRunLoopRunEx(void *key)
     memset(&rssrlm, 0, sizeof(struct __RSRunLoopMode));
     __RSRuntimeSetInstanceTypeID(&rssrlm, __RSRunLoopModeTypeID);
     rssrlm._name = key;
-
-//    struct __RSString ss;
-//    
-////    {10,0,1,72,0,7}
-//    ss._base._rsisa = 0;
-//    ss._base._rc = 1;
-//    ss._base._rsinfo._reserved = 0;
-//    ss._base._rsinfo._special = 1;
-//    ss._base._rsinfo._customRef = 0;
-//    ss._base._rsinfo._objId = 7;
-//    ss._base._rsinfo._rsinfo1 = 72;
-//    ss._base._rsinfo._rsinfo = (1 << 1) | (1 << 3);
     
     
 //    CFSetApplyFunction(rs->_modes, applier2, nil);

@@ -21,7 +21,7 @@ RSPrivate void *__RSStartSimpleThread(void *func, void *arg)
     pthread_attr_init(&attr);
     pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    pthread_attr_setstacksize(&attr, 60 * 1024);	// 60K stack for our internal threads is sufficient
+//    pthread_attr_setstacksize(&attr, 60 * 1024);	// 60K stack for our internal threads is sufficient
     OSMemoryBarrier(); // ensure arg is fully initialized and set in memory
     pthread_create(&tid, &attr, func, arg);
     pthread_attr_destroy(&attr);

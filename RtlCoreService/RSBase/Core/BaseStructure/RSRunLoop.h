@@ -148,7 +148,7 @@ typedef struct {
     void *	info;
     const void *(*retain)(const void *info);
     void	(*release)(const void *info);
-    RSStringRef	(*copyDescription)(const void *info);
+    RSStringRef	(*description)(const void *info);
 } RSRunLoopObserverContext RS_AVAILABLE(0_4);
 
 typedef void (*RSRunLoopObserverCallBack)(RSRunLoopObserverRef observer, RSRunLoopActivity activity, void *info) RS_AVAILABLE(0_4);

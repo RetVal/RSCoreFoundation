@@ -191,30 +191,26 @@ RSInline double __RSDoubleMod(double d, int32_t modulus)
 
 RSInline bool isleap(int64_t year)
 {
-    int64_t y = (year + 1) % 400;	/* correct to nearest multiple-of-400 year, then find the remainder */
+    int64_t y = (year + 1) % 400;
     if (y < 0) y = -y;
     return (0 == (y & 3) && 100 != y && 200 != y && 300 != y);
 }
 
-/* year arg is absolute year; Gregorian 2001 == year 0; 2001/1/1 = absolute date 0 */
 RSInline uint8_t __RSDaysInMonth(int8_t month, int64_t year, bool leap)
 {
     return daysInMonth[month] + (2 == month && leap);
 }
 
-/* year arg is absolute year; Gregorian 2001 == year 0; 2001/1/1 = absolute date 0 */
 RSInline uint16_t __RSDaysBeforeMonth(int8_t month, int64_t year, bool leap)
 {
     return daysBeforeMonth[month] + (2 < month && leap);
 }
 
-/* year arg is absolute year; Gregorian 2001 == year 0; 2001/1/1 = absolute date 0 */
 RSInline uint16_t __RSDaysAfterMonth(int8_t month, int64_t year, bool leap)
 {
     return daysAfterMonth[month] + (month < 2 && leap);
 }
 
-/* year arg is absolute year; Gregorian 2001 == year 0; 2001/1/1 = absolute date 0 */
 static void __RSYMDFromAbsolute(int64_t absolute, int64_t *year, int8_t *month, int8_t *day)
 {
     int64_t b = absolute / 146097; // take care of as many multiples of 400 years as possible
@@ -531,4 +527,168 @@ RSExport RSUInteger RSDateGetDayOfWeek(RSDateRef date)
     __RSDateAvailable(date);
     RSGregorianDate gd = RSAbsoluteTimeGetGregorianDate(RSDateGetAbsoluteTime(date), nil);
 	return __RSDateGetDayOfWeek(gd.year, gd.month, gd.day);
+}
+
+RSInline BOOL __dateCheckRange(int date, int min, int max) {
+    if (date < min || date > max) {
+        return NO;
+    }
+    return YES;
+}
+
+static BOOL __checkIfNumberString(const UniChar* numStr, RSUInteger length) {
+    UniChar* str = (UniChar*)numStr;
+    for (int i = 0; i < length; str++, i++) {
+        switch (*str) {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                break;
+            default:
+                return NO;
+        }
+    }
+    return YES;
+}
+//<?xml version="1.0" encoding="UTF-8"?>
+//<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+//<plist version="1.0">
+//<date>2013-11-19T10:57:41Z</date>
+//</plist>
+
+static BOOL __unichar2i(UniChar *ptr, RSUInteger len, RSIndex *n) {
+    if (!ptr || !n || 0 == len) return NO;
+    BOOL sig = 1;
+    *n = 0;
+    RSUInteger idx = 0;
+    if (ptr[0] == '-') {
+        sig = -1;
+        idx = 1;
+    }
+    if (!__checkIfNumberString(ptr + idx, len - idx)) return NO;
+    for (; idx < len; idx++) {
+        *n *= 10;
+        *n += ptr[idx] - '0';
+    }
+    *n *= sig;
+    return YES;
+}
+
+RSExport RSDateRef RSDateCreateWithString(RSAllocatorRef allocator, RSStringRef value) {
+    const int dateLength = 20;
+    
+    RSDateRef _v = nil;
+    //%04d-%02d-%02dT%02d:%02d:%02dZ
+    //4     +1  +2      +1  +2      +1  +2      +1  +2      +1  +2      +1
+    //%04d  -   %02d    -   %02d    T   %02d    :   %02d    :   %02d    Z
+    //5,3,3,3,3,3 = 20
+    if (dateLength == RSStringGetLength(value))
+    {
+        UniChar ptr[6] = {0};
+        ptr[0] = RSStringGetCharacterAtIndex(value, 5 - 1); //-
+        ptr[1] = RSStringGetCharacterAtIndex(value, 8 - 1); //-
+        ptr[2] = RSStringGetCharacterAtIndex(value, 11 - 1);//T
+        ptr[3] = RSStringGetCharacterAtIndex(value, 14 - 1);//:
+        ptr[4] = RSStringGetCharacterAtIndex(value, 17 - 1);//:
+        ptr[5] = RSStringGetCharacterAtIndex(value, 20 - 1);//Z
+        if ((ptr[0] == ptr[1]) &&
+            (ptr[1] == '-') &&
+            (ptr[2] == 'T') &&
+            (ptr[3] == ptr[4]) &&
+            (ptr[4] == ':') &&
+            (ptr[5] == 'Z'))
+        {
+#if 0
+            UTF8Char year[5] = {0};
+            UTF8Char month[3] = {0};
+            UTF8Char day[3] = {0};
+            UTF8Char hour[3] = {0};
+            UTF8Char minute[3] = {0};
+            UTF8Char second[3] = {0};
+            RSStringGetUTF8Characters(value, RSMakeRange(0, 4), year);
+            RSStringGetUTF8Characters(value, RSMakeRange(5, 2), month);
+            RSStringGetUTF8Characters(value, RSMakeRange(8, 2), day);
+            RSStringGetUTF8Characters(value, RSMakeRange(11, 2), hour);
+            RSStringGetUTF8Characters(value, RSMakeRange(14, 2), minute);
+            RSStringGetUTF8Characters(value, RSMakeRange(17, 2), second);
+            
+            RSGregorianDate gd = {0};
+            gd.year = atoi((const char*)year);
+            gd.month= atoi((const char*)month);
+            gd.day  = atoi((const char*)day);
+            gd.hour = atoi((const char*)hour);
+            gd.minute = atoi((const char*)minute);
+            gd.second = atoi((const char*)second);
+#else
+            RSGregorianDate gd = {0};
+            UniChar payload[4] = {0};
+            RSIndex tmp = 0;
+            
+            RSStringGetCharacters(value, RSMakeRange(0, 4), payload);
+            if (!__unichar2i(payload, 4, &tmp)) return nil;
+            gd.year = (RSBitU32)tmp;
+            
+            memset(payload, 0, sizeof(payload));
+            
+            RSStringGetCharacters(value, RSMakeRange(5, 2), payload);
+            if (!__unichar2i(payload, 2, &tmp)) return nil;
+            gd.month = (RSBitU8)tmp;
+            if (__dateCheckRange(gd.month, 1, 12) == NO) return nil;
+            
+            RSStringGetCharacters(value, RSMakeRange(8, 2), payload);
+            if (!__unichar2i(payload, 2, &tmp)) return nil;
+            gd.day = (RSBitU8)tmp;
+            
+            int maxm = 0;
+            switch (gd.month)
+            {
+                case 1:
+                case 3:
+                case 5:
+                case 7:
+                case 8:
+                case 10:
+                case 12:
+                    maxm = 31;
+                    break;
+                case 2:
+                    maxm = 28;
+                    break;
+                default:
+                    maxm = 30;
+                    break;
+            }
+            if ((gd.year % 400 == 0) || ((gd.year % 100 != 0) && (gd.year % 4 == 0)))
+            {
+                maxm++;
+            }
+            if (maxm > 32) HALTWithError(RSInvalidArgumentException, "maxm > 32");
+            if (__dateCheckRange(gd.day, 1, maxm) == NO) return nil;
+            
+            RSStringGetCharacters(value, RSMakeRange(11, 2), payload);
+            if (!__unichar2i(payload, 2, &tmp)) return nil;
+            gd.hour = (RSBitU8)tmp;
+            if (__dateCheckRange(gd.day, 0, 59) == NO) return nil;
+            
+            RSStringGetCharacters(value, RSMakeRange(14, 2), payload);
+            if (!__unichar2i(payload, 2, &tmp)) return nil;
+            gd.minute = (RSBitU8)tmp;
+            if (__dateCheckRange(gd.day, 0, 59) == NO) return nil;
+            
+            RSStringGetCharacters(value, RSMakeRange(17, 2), payload);
+            if (!__unichar2i(payload, 2, &tmp)) return nil;
+            gd.second = (RSBitU8)tmp;
+            if (__dateCheckRange(gd.day, 0, 59) == NO) return nil;
+#endif
+            _v = RSDateCreate(allocator, RSGregorianDateGetAbsoluteTime(gd, RSTimeZoneCopySystem()));
+        }
+    }
+    return _v;
 }

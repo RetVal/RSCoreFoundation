@@ -29,6 +29,7 @@ RSExport RSAbsoluteTime RSGregorianDateGetAbsoluteTime(RSGregorianDate gdate, RS
 RSExport RSGregorianDate RSAbsoluteTimeGetGregorianDate(RSAbsoluteTime at, RSTimeZoneRef tz) RS_AVAILABLE(0_0);
 
 RSExport RSDateRef RSDateCreate(RSAllocatorRef allocator, RSAbsoluteTime time) RS_AVAILABLE(0_0);
+RSExport RSDateRef RSDateCreateWithString(RSAllocatorRef allocator, RSStringRef value) RS_AVAILABLE(0_4);
 RSExport RSDateRef RSDateGetCurrent(RSAllocatorRef allocator) RS_AVAILABLE(0_0);
 RSExport RSAbsoluteTime RSDateGetAbsoluteTime(RSDateRef date) RS_AVAILABLE(0_0);
 RSExport RSTimeInterval RSDateGetTimeIntervalSinceDate(RSDateRef date, RSDateRef otherDate) RS_AVAILABLE(0_0);

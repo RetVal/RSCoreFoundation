@@ -9,9 +9,14 @@
 #ifndef RSCoreFoundation_RSDeploymentAvailability_h
 #define RSCoreFoundation_RSDeploymentAvailability_h
 
-#ifndef DEPLOYMENT_TARGET_MACOSX 
-#define DEPLOYMENT_TARGET_MACOSX 1
-#endif
+#define DEPLOYMENT_TARGET_MACOSX        1
+#define DEPLOYMENT_TARGET_IPHONEOS      0
+#define DEPLOYMENT_TARGET_LINUX         0
+#define DEPLOYMENT_TARGET_WINDOWS       0
+#define DEPLOYMENT_TARGET_EMBEDDED      0
+#define DEPLOYMENT_TARGET_EMBEDDED_MINI 0
+#define DEPLOYMENT_TARGET_SOLARIS       0
+#define DEPLOYMENT_TARGET_FREEBSD       0
 
 #if defined(__GNUC__) && ((__GNUC__ >= 4) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1)))
     #define RS_DEPRECATED_ATTRIBUTE __attribute__((deprecated))

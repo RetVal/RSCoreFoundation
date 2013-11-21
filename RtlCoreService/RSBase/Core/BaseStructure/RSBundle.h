@@ -45,8 +45,6 @@ RSExport RSTypeRef RSBundleGetValueForInfoDictionaryKey(RSBundleRef bundle, RSSt
 RSExport RSStringRef RSBundleGetPath(RSBundleRef bundle) RS_AVAILABLE(0_0);
 
 RSExport BOOL RSBundleLoadExecutableAndReturnError(RSBundleRef bundle, BOOL forceGloable, __autorelease RSErrorRef* error);
-RSExport BOOL RSBundleLoadExecutable(RSBundleRef bundel, BOOL forceGloable);
-RSExport BOOL RSBundleLoadExecutableAndReturnError(RSBundleRef bundle, BOOL forceGloable, __autorelease RSErrorRef* error);
 RSExport BOOL RSBundleLoadExecutable(RSBundleRef bundel, BOOL forceGloable) RS_AVAILABLE(0_0);
 
 RSExport RSBundleRef RSBunleCreateWithPath(RSAllocatorRef allocator, RSStringRef path) RS_AVAILABLE(0_0);
@@ -58,7 +56,9 @@ RSExport BOOL RSBundleIsExecutableLoaded(RSBundleRef bundle) RS_AVAILABLE(0_0);
 RSExport RSDictionaryRef RSBundleGetInfoDict(RSBundleRef bundle) RS_AVAILABLE(0_0);
 RSExport RSBundleRef RSBundleGetWithIdentifier(RSStringRef identifier) RS_AVAILABLE(0_0);
 
-RSExport RSBundleRef RSBundleGetMainBundle();
+RSExport void *RSBundleGetFunctionPointerForName(RSBundleRef bundle, RSStringRef funcName) RS_AVAILABLE(0_4);
+
+RSExport RSBundleRef RSBundleGetMainBundle() RS_AVAILABLE(0_3);
 
 /* Intended for eventual public consumption */
 typedef enum {

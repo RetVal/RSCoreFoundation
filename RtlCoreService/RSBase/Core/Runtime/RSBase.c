@@ -320,7 +320,7 @@ void RSSyncUpdateBlock(RSSpinLock lock, void (^block)(void))
 {
     RSSpinLockLock(&lock);
     block();
-    if (RSSpinLockTry(&lock))
+    if (!RSSpinLockTry(&lock))
         RSSpinLockUnlock(&lock);
     else
         __RSCLog(RSLogLevelWarning, "May be case an dead lock, %s can only be used updating your data synchronized", __func__);

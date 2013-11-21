@@ -6924,6 +6924,7 @@ RSArrayRef RSStringCreateArrayWithFindResults(RSAllocatorRef alloc, RSStringRef 
             if (rangeStorage == nil) rangeStorage = RSDataCreateMutable((alloc), 0);
             capacity = (capacity + 4) * 2;
             RSDataSetLength(rangeStorage, capacity * (sizeof(RSRange) + sizeof(RSDataRef)));
+            capacity = RSDataGetCapacity(rangeStorage) / (sizeof(RSRange) + sizeof(RSDataRef));
             rangeStorageBytes = (uint8_t *)RSDataGetMutableBytesPtr(rangeStorage) + foundCount * (sizeof(RSRange) + sizeof(RSDataRef));
         }
         memmove(rangeStorageBytes, &foundRange, sizeof(RSRange));	// The range

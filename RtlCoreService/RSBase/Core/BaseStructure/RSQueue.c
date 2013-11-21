@@ -122,32 +122,32 @@ static RSQueueRef __RSQueueCreateInstance(RSAllocatorRef allocator, RSIndex capa
     return queue;
 }
 
-static void __RSQueueAddToObject(RSQueueRef queue, RSTypeRef obj)
+RSInline void __RSQueueAddToObject(RSQueueRef queue, RSTypeRef obj)
 {
-    if (isAtom(queue)) RSSpinLockLock(&queue->_lock);
+    BOOL shouldLocked = isAtom(queue);
+    if (shouldLocked) RSSpinLockLock(&queue->_lock);
     if (queue->_capacity == 0)
     {
         RSArrayAddObject(queue->_queueCore, obj);
-        if (isAtom(queue)) RSSpinLockUnlock(&queue->_lock);
+        if (shouldLocked) RSSpinLockUnlock(&queue->_lock);
         return;
     }
     RSIndex cnt = RSArrayGetCount(queue->_queueCore);
     if (cnt < queue->_capacity)
         RSArrayAddObject(queue->_queueCore, obj);
     else
-    {
-        __RSCLog(RSLogLevelNotice, "RSQueue %p is full!\n", queue);
-    }    
-    if (isAtom(queue)) RSSpinLockUnlock(&queue->_lock);
+        __RSCLog(RSLogLevelNotice, "RSQueue %p is full!\n", queue); 
+    if (shouldLocked) RSSpinLockUnlock(&queue->_lock);
 }
 
-static RSTypeRef __RSQueueGetObjectFromQueue(RSQueueRef queue, BOOL remove)
+RSInline RSTypeRef __RSQueueGetObjectFromQueue(RSQueueRef queue, BOOL remove)
 {
-    if (isAtom(queue)) RSSpinLockLock(&queue->_lock);
+    BOOL shouldLocked = isAtom(queue);
+    if (shouldLocked) RSSpinLockLock(&queue->_lock);
     RSIndex cnt = RSArrayGetCount(queue->_queueCore);
     if (cnt == 0)
     {
-        if (isAtom(queue)) RSSpinLockUnlock(&queue->_lock);
+        if (shouldLocked) RSSpinLockUnlock(&queue->_lock);
         return nil;
     }
     RSTypeRef obj = RSArrayObjectAtIndex(queue->_queueCore, 0);
@@ -156,7 +156,7 @@ static RSTypeRef __RSQueueGetObjectFromQueue(RSQueueRef queue, BOOL remove)
         RSRetain(obj);
         RSArrayRemoveObjectAtIndex(queue->_queueCore, 0);
     }
-    if (isAtom(queue)) RSSpinLockUnlock(&queue->_lock);
+    if (shouldLocked) RSSpinLockUnlock(&queue->_lock);
     return obj;
 }
 

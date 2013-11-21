@@ -409,6 +409,10 @@ RSExport RSIndex RSDataGetLength(RSDataRef data)
     return 0;
 }
 
+RSExport RSIndex RSDataGetCapacity(RSDataRef data) {
+    return __RSDataAvailable(data) ? __RSDataCapacity(data) : 0;
+}
+
 RSExport RSDataRef RSDataCreate(RSAllocatorRef allocator, const void* bytes, RSIndex length)
 {
     if (bytes == nil || length == 0) return nil;
@@ -480,19 +484,52 @@ RSExport void RSDataLog(RSDataRef data)
     }
 }
 
-static void __RSDataResizeStore(RSMutableDataRef data, RSIndex newSize)
+#if __LP64__
+#define RSDATA_MAX_SIZE	    ((1ULL << 42) - 1)
+#else
+#define RSDATA_MAX_SIZE	    ((1ULL << 31) - 1)
+#endif
+
+#if __LP64__
+#define CHUNK_SIZE (1ULL << 29)
+#define LOW_THRESHOLD (1ULL << 20)
+#define HIGH_THRESHOLD (1ULL << 32)
+#else
+#define CHUNK_SIZE (1ULL << 26)
+#define LOW_THRESHOLD (1ULL << 20)
+#define HIGH_THRESHOLD (1ULL << 29)
+#endif
+
+RSInline RSIndex __RSDataRoundUpCapacity(RSIndex capacity) {
+    if (capacity < 16) {
+        return 16;
+    } else if (capacity < LOW_THRESHOLD) {
+        /* Up to 4x */
+        long idx = flsl(capacity);
+        return (1L << (long)(idx + ((idx % 2 == 0) ? 0 : 1)));
+    } else if (capacity < HIGH_THRESHOLD) {
+        /* Up to 2x */
+        return (1L << (long)flsl(capacity));
+    } else {
+        /* Round up to next multiple of CHUNK_SIZE */
+        unsigned long newCapacity = CHUNK_SIZE * (1+(capacity >> ((long)flsl(CHUNK_SIZE)-1)));
+        return min(newCapacity, RSDATA_MAX_SIZE);
+    }
+}
+
+RSInline void __RSDataResizeStore(RSMutableDataRef data, RSIndex newSize)
 {
     RSIndex capacity = __RSDataCapacity(data);
     RSAllocatorRef allocator = RSAllocatorSystemDefault;
     if (capacity < newSize)
     {
-        capacity = RSAllocatorSize(allocator, newSize);
+        capacity = RSAllocatorSize(allocator, __RSDataRoundUpCapacity(newSize));
         void* store = __RSDataGetBytesPtr(data);
         void* newStore = store;
         if (newStore) {
-            newStore = RSAllocatorReallocate(allocator, newStore, newSize);
+            newStore = RSAllocatorReallocate(allocator, newStore, capacity);
         }else {
-            newStore = RSAllocatorAllocate(allocator, newSize);
+            newStore = RSAllocatorAllocate(allocator, capacity);
         }
         __RSDataSetStrongBytesPtr(data, newStore, __RSDataLength(data), capacity);
 //        __RSDataCreateAndSetStrongBytesPtr(data, allocator, newStore, __RSDataLength(data), capacity);

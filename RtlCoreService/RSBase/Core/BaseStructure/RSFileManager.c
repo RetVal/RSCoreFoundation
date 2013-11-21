@@ -35,13 +35,6 @@ RSInline void closeAutoFSNoWait(int fd) {
     if (-1 != fd) close(fd);
 }
 
-static BOOL _RSCreateDirectory(const char *path) {
-    int no_hang_fd = openAutoFSNoWait();
-    int ret = ((mkdir(path, 0777) == 0) ? YES : NO);
-    closeAutoFSNoWait(no_hang_fd);
-    return ret;
-}
-
 static BOOL _RSRemoveDirectory(const char *path) {
     int no_hang_fd = openAutoFSNoWait();
     int ret = ((rmdir(path) == 0) ? YES : NO);
@@ -59,6 +52,32 @@ static BOOL _RSRemoveFile(const char *path) {
 static BOOL _RSFileExisting(const char* path) {
     int no_hang_fd = openAutoFSNoWait();
     int ret = (0 == access(path, F_OK));
+    closeAutoFSNoWait(no_hang_fd);
+    return ret;
+}
+
+static int _mkdir(const char *dir) {
+    char tmp[RSBufferSize] = {0};
+    snprintf(tmp, sizeof(tmp), "%s", dir);
+    size_t   i = 1, len = strlen(tmp);
+    if(tmp[len-1]!='/') strcat(tmp, "/");
+    for(; i < len; i++) {
+        if(tmp[i] == '/') {
+            tmp[i] = 0;
+            if(access(tmp, nil)) {
+                if(mkdir(tmp, 0755) == -1) {
+                    return -1;
+                }  
+            }  
+            tmp[i]   =   '/';  
+        }  
+    }
+    return   0;  
+}
+
+static BOOL _RSCreateDirectory(const char *path) {
+    int no_hang_fd = openAutoFSNoWait();
+    int ret = ((_mkdir(path) == 0) ? YES : NO);
     closeAutoFSNoWait(no_hang_fd);
     return ret;
 }
@@ -862,7 +881,13 @@ RSExport RSFileManagerRef RSFileManagerGetDefault()
 
 static RSStringRef __RSFileManagerStandardizingPath(RSStringRef path)
 {
-    if (path == nil || RSStringGetLength(path) == 0) return nil;
+//    if (path == nil || RSStringGetLength(path) == 0 || RSStringGetLength(path) + 64 > RSBufferSize) return nil;
+//    char *buf = RSAllocatorAllocate(RSAllocatorSystemDefault, RSBufferSize / 2 > RSStringGetLength(path) ? RSStringGetLength(path) * 2 + 1: RSBufferSize);
+//    if (realpath(RSStringGetCStringPtr(path, __RSDefaultEightBitStringEncoding), buf)) {
+//        return RSStringCreateWithCStringNoCopy(RSAllocatorSystemDefault, buf, RSStringEncodingUTF8, RSAllocatorSystemDefault);
+//    }
+//    RSAllocatorDeallocate(RSAllocatorSystemDefault, buf);
+//    return nil;
     RSMutableStringRef returnPath = nil;
     if (RSStringHasPrefix(path, _RSFileSystemSymbolRootPath))
     {
@@ -870,7 +895,7 @@ static RSStringRef __RSFileManagerStandardizingPath(RSStringRef path)
     }
     else if (RSStringGetLength(path) >= 2 && RSStringHasPrefix(path, _RSFileSystemSymbolUserPath))
     {
-        RSMutableStringRef _standardizingPath = RSStringCreateMutable(RSAllocatorSystemDefault, 128);
+        RSMutableStringRef _standardizingPath = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
         RSStringAppendCString(_standardizingPath, __RSRuntimeGetEnvironment("HOME"), __RSDefaultEightBitStringEncoding);
         const char *cp = RSStringGetCStringPtr(path, __RSDefaultEightBitStringEncoding);
         RSStringAppendCString(_standardizingPath, cp+1, __RSDefaultEightBitStringEncoding);
@@ -1324,7 +1349,8 @@ RSExport __autorelease RSStringRef RSFileManagerFileName(RSFileManagerRef fmg, R
     RSStringRef extension = RSFileManagerFileExtension(fmg, path);
     if (extension && RSStringGetLength(extension) > 0) {
         RSStringDelete(name, RSMakeRange(RSStringGetLength(name) - RSStringGetLength(extension) - 1, RSStringGetLength(extension) + 1));
-        RSRelease(extension);
+//        BUG : RSFileManagerFileExtension return autorelease object, should not release it 
+//        RSRelease(extension);
     }
     RSIndex numberOfResults = 0;
     RSRange *rangesPtr = RSStringFindAll(name, RSSTR("/"), &numberOfResults);

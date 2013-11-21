@@ -605,10 +605,9 @@ RSPrivate void __RSTypeCollectionRelease(RSAllocatorRef allocator, const void *p
 static RSSpinLock __RSLogSpinlock = RSSpinLockInit;
 void __RSCPrint(int fd, RSCBuffer cStr)
 {
-    //pthread_mutex_lock(&__RSLogMutexLock);
-    RSSpinLockLock(&__RSLogSpinlock);
-    printf("%s", cStr);
-    RSSpinLockUnlock(&__RSLogSpinlock);
+    RSSyncUpdateBlock(__RSLogSpinlock, ^{
+        printf("%s", cStr);
+    });
 }
 
 #ifndef ___RS_C_LOG_PREFIX

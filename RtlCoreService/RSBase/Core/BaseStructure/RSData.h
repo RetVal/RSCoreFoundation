@@ -23,6 +23,7 @@ RSExport const void* RSDataGetBytesPtr(RSDataRef data) RS_AVAILABLE(0_0);
 RSExport void RSDataSetLength(RSMutableDataRef data, RSIndex extraLength) RS_AVAILABLE(0_3);
 RSExport void RSDataIncreaseLength(RSMutableDataRef data, RSIndex extraLength) RS_AVAILABLE(0_3);
 RSExport RSIndex RSDataGetLength(RSDataRef data) RS_AVAILABLE(0_0);
+RSExport RSIndex RSDataGetCapacity(RSDataRef data) RS_AVAILABLE(0_4);
 
 RSExport RSDataRef RSDataCreate(RSAllocatorRef allocator, const void* bytes, RSIndex length) RS_AVAILABLE(0_0);
 RSExport RSDataRef RSDataCreateCopy(RSAllocatorRef allocator, RSDataRef data) RS_AVAILABLE(0_0);

@@ -3499,6 +3499,59 @@ RSPrivate void _RSBundleDlfcnUnload(RSBundleRef bundle)
     }
 }
 
+static void *_RSBundleDlfcnGetSymbolByNameWithSearch(RSBundleRef bundle, RSStringRef symbolName, Boolean globalSearch) {
+    void *result = NULL;
+    char buff[1026];
+    
+    if (RSStringGetCString(symbolName, buff, 1024, RSStringEncodingUTF8)) {
+        result = dlsym(bundle->_handleCookie, buff);
+        if (!result && globalSearch) result = dlsym(RTLD_DEFAULT, buff);
+#if defined(DEBUG)
+        if (!result) __RSLog(RSLogLevelNotice, RSSTR("dlsym cannot find symbol %@ in %@"), symbolName, bundle);
+#endif /* DEBUG */
+#if LOG_BUNDLE_LOAD
+        printf("bundle %p handle %p module %p image %p dlsym returns symbol %p for %s\n", bundle, bundle->_handleCookie, bundle->_moduleCookie, bundle->_imageCookie, result, buff);
+#endif /* LOG_BUNDLE_LOAD */
+    }
+    return result;
+}
+
+RSPrivate void *_RSBundleDlfcnGetSymbolByName(RSBundleRef bundle, RSStringRef symbolName) {
+    return _RSBundleDlfcnGetSymbolByNameWithSearch(bundle, symbolName, false);
+}
+
+RSExport void *RSBundleGetFunctionPointerForName(RSBundleRef bundle, RSStringRef funcName) {
+    void *tvp = NULL;
+    // Load if necessary
+    if (!bundle->_isLoaded) {
+        if (!RSBundleLoadExecutable(bundle, YES)) return NULL;
+    }
+    
+    switch (bundle->_bundleType) {
+#if defined(BINARY_SUPPORT_DYLD)
+        case __RSBundleDYLDBundleBinary:
+        case __RSBundleDYLDFrameworkBinary:
+        case __RSBundleDYLDExecutableBinary:
+#if defined(BINARY_SUPPORT_DLFCN)
+            if (bundle->_handleCookie) return _RSBundleDlfcnGetSymbolByName(bundle, funcName);
+#else /* BINARY_SUPPORT_DLFCN */
+            return _RSBundleDYLDGetSymbolByName(bundle, funcName);
+#endif /* BINARY_SUPPORT_DLFCN */
+            break;
+#endif /* BINARY_SUPPORT_DYLD */
+#if defined(BINARY_SUPPORT_DLL)
+        case __RSBundleDLLBinary:
+            tvp = _RSBundleDLLGetSymbolByName(bundle, funcName);
+            break;
+#endif /* BINARY_SUPPORT_DLL */
+        default:
+#if defined(BINARY_SUPPORT_DLFCN)
+            if (bundle->_handleCookie) return _RSBundleDlfcnGetSymbolByName(bundle, funcName);
+#endif /* BINARY_SUPPORT_DLFCN */
+            break;
+    }
+    return tvp;
+}
 
 static BOOL __RSBundleLoadExecutableAndReturnError(RSBundleRef bundle, BOOL forceGloable, __autorelease RSErrorRef* error)
 {

@@ -26,7 +26,7 @@
 #define RSAllocatorUseJEMalloc      3
 #define RSAllocatorUseFastMalloc    4
 
-#define RSAllocatorMallocSelector   RSAllocatorUseFastMalloc
+#define RSAllocatorMallocSelector   RSAllocatorUseMallocZone
 
 #if RSAllocatorMallocSelector == RSAllocatorUseTCMalloc
 # define ATTRIBUTE_SECTION(name) __attribute__ ((section ("__TEXT, " #name)))
@@ -585,6 +585,7 @@ void  RSAllocatorDeallocate(RSAllocatorRef allocator, const void *ptr)
 #if RSAllocatorMallocSelector == RSAllocatorUseFastMalloc
     free((void*)ptr);
 #else
+    malloc_make_purgeable((void *)ptr);
     malloc_zone_free((malloc_zone_t *)allocator, (void *)ptr);
 #endif
 }
@@ -662,8 +663,8 @@ RSPrivate void __RSAllocatorInitialize()
 {
     __RSAllocatorTypeID = __RSRuntimeRegisterClass(&__RSAllocatorClass);
     
-    __RSAllocatorDefault.info = malloc_default_zone();
-    __RSAllocatorSystemDefault.info = malloc_default_zone();
+    __RSAllocatorDefault.info = malloc_default_purgeable_zone();
+    __RSAllocatorSystemDefault.info = malloc_default_purgeable_zone();
     
     __RSRuntimeSetClassTypeID(&__RSAllocatorClass, __RSAllocatorTypeID);
     

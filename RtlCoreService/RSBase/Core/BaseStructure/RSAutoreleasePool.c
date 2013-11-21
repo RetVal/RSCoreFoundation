@@ -73,7 +73,7 @@ static pthread_key_t const __RSAutoreleasePoolThreadKey = RSAutoreleasePageKey;
 static uint8_t const __RSAutoreleasePoolPageScribble = 0xA3;
 static size_t const __RSAutoreleasePoolPageSize = 4096; //getpagesize() = 4096;
 static size_t const __RSAutoreleasePoolPageCount = __RSAutoreleasePoolPageSize / sizeof(RSTypeRef);
-
+RSExport void __RS_AUTORELEASEPOOL_RELEASE__(RSTypeRef obj) __attribute__((noinline));
 
 struct __RSAutoreleasePool
 {
@@ -254,7 +254,7 @@ RSPrivate void __RSAutoreleasePoolReleaseUntil(RSAutoreleasePoolRef pool, RSType
             }
 #endif
 //            __RSCLog(RSLogLevelNotice, "RSAutoreleasePool release %p [%lld][rc = %lld]\n", obj, RSGetTypeID(obj), RSGetRetainCount(obj));
-            RSRelease(obj);
+            __RS_AUTORELEASEPOOL_RELEASE__(obj);
         }
         else HALTWithError(RSInvalidArgumentException, "RSAutoreleasePool should not have nil!");
     }
@@ -529,6 +529,21 @@ RSExport RSAutoreleasePoolRef RSAutoreleasePoolCreate(RSAllocatorRef allocator)
     return pool;
 }
 
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_IPHONEOS || DEPLOYMENT_TARGET_MINI || DEPLOYMENT_TARGET_EMBEDDED_MINI
+#include <malloc/malloc.h>
+static void __runloop_vm_pressure_handler(void *context __unused)
+{
+	malloc_zone_pressure_relief(0,0);
+//    __RSCLog(RSLogLevelWarning, "%s\n", "RSRuntime reduce memory alloc to handle the memory pressure...");
+}
+#else
+#define __runloop_vm_pressure_handler(context) do {}while(0)
+#endif
+
+RSExport void __RS_AUTORELEASEPOOL_RELEASE__(RSTypeRef obj) {
+    return RSRelease(obj);
+}
+
 RSExport void RSAutoreleasePoolDrain(RSAutoreleasePoolRef pool)
 {
     if (pool == nil) return;
@@ -540,8 +555,9 @@ RSExport void RSAutoreleasePoolDrain(RSAutoreleasePoolRef pool)
     if (!(pool != nil && pool != orginal))
     {
         //
+        releaseAll(pool);
         __RSRuntimeSetInstanceSpecial(pool, NO);
-        RSRelease(pool);
+        __RS_AUTORELEASEPOOL_RELEASE__(pool);
         setHotPool(nil);
         return;
     }
@@ -551,16 +567,18 @@ RSExport void RSAutoreleasePoolDrain(RSAutoreleasePoolRef pool)
         releaseAll(pool);
         pool = pool->_parent;
         __RSRuntimeSetInstanceSpecial(pool->_child, NO);
-        RSRelease(pool->_child);
+        __RS_AUTORELEASEPOOL_RELEASE__(pool->_child);
         pool->_child = nil;
     }
     setHotPool(orginal);
+//    __runloop_vm_pressure_handler(nil);
 }
 
 RSExport void RSAutoreleaseBlock(void (^do_block)())
 {
     if (do_block)
     {
+        
         RSAutoreleasePoolRef p = RSAutoreleasePoolCreate(RSAllocatorSystemDefault);
         do_block();
         RSAutoreleasePoolDrain(p);
