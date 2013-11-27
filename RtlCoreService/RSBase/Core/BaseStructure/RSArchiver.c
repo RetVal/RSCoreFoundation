@@ -755,11 +755,11 @@ static RSDataRef __RSArraySerializeCallBack(RSArchiverRef archiver, RSTypeRef ob
     if (data) return data; // Plist array
     RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorSystemDefault, 0); // RSData
 #if RS_BLOCKS_AVAILABLE
-    RSArrayApplyBlock(object, RSMakeRange(0, RSArrayGetCount(object)), ^(const void *value, void *context) {
+    RSArrayApplyBlock(object, RSMakeRange(0, RSArrayGetCount(object)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
         RSDataRef subData = __RSArchiverContextSerialize(archiver, value);
-        RSArrayAddObject(context, subData);
+        RSArrayAddObject(array, subData);
         RSRelease(subData);
-    }, array);
+    });
 #else
     struct __arrayArchiveContext ctx;
     ctx.archiver = archiver;
@@ -791,11 +791,11 @@ static RSTypeRef __RSArrayDeserializeCallBack(RSUnarchiverRef unarchiver, RSData
         retArray = RSArrayCreateMutable(RSAllocatorSystemDefault, RSDictionaryGetCount(dict));
         array = RSDictionaryGetValue(dict, RSSTR("array"));
 #if RS_BLOCKS_AVAILABLE
-        RSArrayApplyBlock(array, RSMakeRange(0, RSArrayGetCount(array)), ^(const void *value, void *context) {
+        RSArrayApplyBlock(array, RSMakeRange(0, RSArrayGetCount(array)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
             RSTypeRef object = __RSArchiverContextDeserializeObject(unarchiver, value);
-            RSArrayAddObject(context, object);
+            RSArrayAddObject(retArray, object);
             RSRelease(object);
-        }, retArray);
+        });
 #else
         struct __arrayArchiveContext ctx;
         ctx.archiver = archiver;

@@ -1129,7 +1129,7 @@ RSExport RSStringRef RSURLCreateStringByAddingPercentEscapes(RSAllocatorRef allo
     return _addPercentEscapesToString(allocator, originalString, _shouldPercentReplaceChar, nil, encoding, strings);
 }
 
-static BOOL __RSURLEqual(RSTypeRef  rs1, RSTypeRef  rs2) {
+static BOOL __RSURLClassEqual(RSTypeRef  rs1, RSTypeRef  rs2) {
     BOOL result;
     RSURLRef  url1 = (RSURLRef)rs1;
     RSURLRef  url2 = (RSURLRef)rs2;
@@ -1160,7 +1160,7 @@ static BOOL __RSURLEqual(RSTypeRef  rs1, RSTypeRef  rs2) {
     return ( result ) ;
 }
 
-static RSHashCode __RSURLHash(RSTypeRef rs)
+static RSHashCode __RSURLClassHash(RSTypeRef rs)
 {
     RSHashCode result;
     
@@ -1176,7 +1176,7 @@ static RSHashCode __RSURLHash(RSTypeRef rs)
     return ( result );
 }
 
-static RSStringRef  __RSURLCopyFormattingDescription(RSTypeRef  rs, RSDictionaryRef formatOptions) {
+static RSStringRef  __RSURLFormattingDescription(RSTypeRef  rs, RSDictionaryRef formatOptions) {
     RSURLRef  url = (RSURLRef)rs;
     __RSGenericValidInstance(rs, RSURLGetTypeID());
     if (! url->_base) {
@@ -1189,16 +1189,14 @@ static RSStringRef  __RSURLCopyFormattingDescription(RSTypeRef  rs, RSDictionary
 }
 
 
-static RSStringRef __RSURLCopyDescription(RSTypeRef rs) {
+static RSStringRef __RSURLClassDescription(RSTypeRef rs) {
     RSURLRef url = (RSURLRef)rs;
     RSStringRef result;
     RSAllocatorRef alloc = RSGetAllocator(url);
     if ( url->_base) {
-        RSStringRef baseString = RSDescription(url->_base);
-        result = RSStringCreateWithFormat(alloc, RSSTR("<RSURL %p [%p]>{string = %R, encoding = %d\n\tbase = %R}"), rs, alloc, url->_string, url->_encoding, baseString);
-        RSRelease(baseString);
+        result = RSStringCreateWithFormat(alloc, RSSTR("%R"), url->_string);
     } else {
-        result = RSStringCreateWithFormat(alloc, RSSTR("<RSURL %p [%p]>{string = %R, encoding = %d, base = (null)}"), rs, alloc, url->_string, url->_encoding);
+        result = RSStringCreateWithFormat(alloc, RSSTR("%R"), url->_string);
     }
     return result;
 }
@@ -1212,7 +1210,7 @@ extern __attribute((used)) void __RSURLDumpMemRecord(void) {
 }
 #endif
 
-static void __RSURLDeallocate(RSTypeRef  rs) {
+static void __RSURLClassDeallocate(RSTypeRef  rs) {
     RSURLRef  url = (RSURLRef)rs;
     RSAllocatorRef alloc;
     __RSGenericValidInstance(rs, RSURLGetTypeID());
@@ -1236,10 +1234,10 @@ static const RSRuntimeClass __RSURLClass = {
     "RSURL",                            // className
     nil,                               // init
     nil,                               // copy
-    __RSURLDeallocate,                  // finalize
-    __RSURLEqual,                       // equal
-    __RSURLHash,                        // hash
-    __RSURLCopyDescription,             // copyDebugDesc
+    __RSURLClassDeallocate,                  // finalize
+    __RSURLClassEqual,                       // equal
+    __RSURLClassHash,                        // hash
+    __RSURLClassDescription,             // copyDebugDesc
     nil,                               // reclaim
     nil,                               // refcount
 };

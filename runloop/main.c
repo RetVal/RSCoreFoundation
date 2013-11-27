@@ -145,12 +145,34 @@ void callback(struct AMDeviceNotificationCallbackInformation *CallbackInfo)
 }
 
 #include <RSFileMonitor/RSFileMonitor.h>
+RSDataRef RSDataWithURL(RSURLRef URL) {
+    return RSURLConnectionSendSynchronousRequest(RSURLRequestWithURL(URL), nil, nil);
+}
 
 int main (int argc, char **argv)
 {
-    RSShow(RSFileManagerStandardizingPath(RSStringWithFormat(RSSTR("~/Library/Logs/Zank/%d/%d/%d/"), RSAbsoluteTimeGetGregorianDate(RSAbsoluteTimeGetCurrent(), nil).year, RSAbsoluteTimeGetGregorianDate(RSAbsoluteTimeGetCurrent(), nil).month, RSAbsoluteTimeGetGregorianDate(RSAbsoluteTimeGetCurrent(), nil).day)));
-    RSFileManagerCreateDirectoryAtPath(RSFileManagerGetDefault(), RSFileManagerStandardizingPath(RSStringWithFormat(RSSTR("~/Library/Logs/Zank/%d/%d/%d/"), RSAbsoluteTimeGetGregorianDate(RSAbsoluteTimeGetCurrent(), nil).year, RSAbsoluteTimeGetGregorianDate(RSAbsoluteTimeGetCurrent(), nil).month, RSAbsoluteTimeGetGregorianDate(RSAbsoluteTimeGetCurrent(), nil).day)));
-    RSFileManagerFileName(<#RSFileManagerRef fmg#>, <#RSStringRef path#>)
+    RSXMLDocumentRef document = __RSHTML5Parser(RSDataWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/test.html"))), nil);
+    RSRelease(document);
+    return 0;
+    RSPerformBlockAfterDelay(1.0f, ^{
+        RSPerformBlockInBackGround(^{
+            RSShow(RSSTR("background"));
+            RSStringRef content = RSStringWithData(RSDataWithURL(RSURLWithString(RSSTR("http://www.renren.com/340278563"))), RSStringEncodingUTF8);
+            RSShow(content);
+//            RSURLConnectionSendAsynchronousRequest(RSURLRequestWithURL(RSURLWithString(RSSTR("http://www.baidu.com/"))), RSRunLoopGetMain(), ^(RSURLResponseRef response, RSDataRef data, RSErrorRef error) {
+//                RSShow(response);
+//                RSXMLDocumentRef document = RSXMLDocumentCreateWithXMLData(RSAllocatorDefault, data);
+//                RSShow(document);
+//                RSRelease(document);
+//            });
+        });
+    });
+    
+    RSRunLoopRun();
+    return 0;
+    RSAutoreleaseBlock(^{
+        RSShow(RSStringWithData(RSAutorelease(RSURLConnectionSendSynchronousRequest(RSURLRequestWithURL(RSURLWithString(RSSTR("http://www.baidu.com"))), nil, nil)), RSStringEncodingUTF8));
+    });
     return 0;
     RSStringRef str = RSSTR("2013-11-18 16:20:30,948");
     RSShow(RSStringWithSubstring(str, RSMakeRange(11, 8)));

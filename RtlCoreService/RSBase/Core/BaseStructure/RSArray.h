@@ -187,7 +187,7 @@ typedef void (*RSArrayApplierFunction)(const void *value, void *context);
 RSExport void RSArrayApplyFunction(RSArrayRef array, RSRange range, RSArrayApplierFunction function, void* context) RS_AVAILABLE(0_1);
 
 #if RS_BLOCKS_AVAILABLE
-RSExport void RSArrayApplyBlock(RSArrayRef array, RSRange range, void (^block)(const void*value, void *context), void* context) RS_AVAILABLE(0_1);
+RSExport void RSArrayApplyBlock(RSArrayRef array, RSRange range, void (^block)(const void*value, RSUInteger idx, BOOL *isStop)) RS_AVAILABLE(0_1);
 #endif
 
 RSExport BOOL RSArrayContainsObject(RSArrayRef array, RSRange range, const void *value) RS_AVAILABLE(0_3);

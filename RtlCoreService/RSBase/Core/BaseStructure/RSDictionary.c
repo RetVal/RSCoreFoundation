@@ -858,7 +858,7 @@ static RSHashCode __RSDictionaryHash(RSTypeRef rs) {
     return __RSBasicHashHash((RSBasicHashRef)rs);
 }
 
-static RSStringRef __RSDictionaryCopyDescription(RSTypeRef rs) {
+static RSStringRef __RSDictionaryDescription(RSTypeRef rs) {
     return RSBasicHashDescription(rs, NO, RSSTR(""), RSSTR("\t"), YES);
 }
 
@@ -876,7 +876,7 @@ static const RSRuntimeClass __RSDictionaryClass = {
     __RSDictionaryDeallocate,
     __RSDictionaryEqual,
     __RSDictionaryHash,
-    __RSDictionaryCopyDescription
+    __RSDictionaryDescription
 };
 
 RSPrivate void __RSDictionaryInitialize()
@@ -1537,14 +1537,20 @@ RSExport void RSDictionaryApplyFunction(RSHashRef hc, RSDictionaryApplierFunctio
     });
 }
 
-RSExport void RSDictionaryApply(RSHashRef hc, void (^applier)(const void *key, const void* value, void *context), any_pointer_t context) {
+RSExport void RSDictionaryApplyBlock(RSHashRef hc, void (^applier)(const void* key, const void* value, BOOL *stop)) {
     FAULT_CALLBACK((void **)&(applier));
     if (RSDictionary) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSDictionary *)hc, __apply:(void (*)(const void *, const void *, void *))applier context:(void *)context);
     if (RSSet) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSSet *)hc, __applyValues:(void (*)(const void *, void *))applier context:(void *)context);
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
-    RSBasicHashApply((RSBasicHashRef)hc, ^(RSBasicHashBucket bkt) {
-        INVOKE_CALLBACK3(applier, (const_any_pointer_t)bkt.weak_key, (const_any_pointer_t)bkt.weak_value, context);
+    RSBasicHashApplyBlock((RSBasicHashRef)hc, ^BOOL(RSBasicHashBucket bkt, BOOL *stop) {
+        INVOKE_CALLBACK3(applier, (const_any_pointer_t)bkt.weak_key, (const_any_pointer_t)bkt.weak_value, stop);
         return (BOOL)true;
+    });
+}
+
+RSExport void RSDictionaryApply(RSHashRef hc, void (^applier)(const void *key, const void* value, void *context), any_pointer_t context) {
+    RSDictionaryApplyBlock(hc, ^(const void *key, const void *value, BOOL *stop) {
+        applier(key, value, context);
     });
 }
 

@@ -53,6 +53,7 @@
 #include <RSCoreFoundation/RSTimeZone.h>
 #include <RSCoreFoundation/RSURL.h>
 #include <RSCoreFoundation/RSURLRequest.h>
+#include <RSCoreFoundation/RSURLResponse.h>
 #include <RSCoreFoundation/RSURLConnection.h>
 #include <RSCoreFoundation/RSUUID.h>
 #include <RSCoreFoundation/RSXMLParser.h>

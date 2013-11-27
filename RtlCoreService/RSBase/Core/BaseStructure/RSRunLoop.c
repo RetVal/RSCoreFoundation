@@ -727,7 +727,7 @@ dispatch_source_type_vm_init(dispatch_source_t ds,
                              unsigned long mask __unused,
                              dispatch_queue_t q __unused)
 {
-	ds->ds_is_level = false;
+	ds->ds_is_level = NO;
 }
 
 const struct dispatch_source_type_s my_dispatch_source_type_vm = {
@@ -1582,7 +1582,7 @@ typedef struct ___RSPortSet {
 } *__RSPortSet;
 
 RSInline __RSPort __RSPortAllocate(void) {
-    return CreateEventA(nil, YES, false, nil);
+    return CreateEventA(nil, YES, NO, nil);
 }
 
 RSInline void __RSPortFree(__RSPort port) {
@@ -1708,7 +1708,7 @@ static uint32_t __RSSendTrivialMachMessage(mach_port_t port, uint32_t msg_id, RS
 #elif DEPLOYMENT_TARGET_WINDOWS
 
 static HANDLE mk_timer_create(void) {
-    return CreateWaitableTimer(nil, FALSE, nil);
+    return CreateWaitableTimer(nil, NO, nil);
 }
 
 static kern_return_t mk_timer_destroy(HANDLE name) {
@@ -1721,7 +1721,7 @@ static kern_return_t mk_timer_destroy(HANDLE name) {
 }
 
 static kern_return_t mk_timer_arm(HANDLE name, LARGE_INTEGER expire_time) {
-    BOOL res = SetWaitableTimer(name, &expire_time, 0, nil, nil, FALSE);
+    BOOL res = SetWaitableTimer(name, &expire_time, 0, nil, nil, NO);
     if (!res) {
         DWORD err = GetLastError();
         RSLog(RSLogLevelError, RSSTR("RSRunLoop: Unable to set timer: %d"), err);
@@ -1891,7 +1891,7 @@ RSInline void __RSRunLoopPopPerRunData(RSRunLoopRef rl, volatile _per_run_data *
 }
 
 RSInline BOOL __RSRunLoopIsStopped(RSRunLoopRef rl) {
-    return (rl->_perRunData->stopped) ? YES : false;
+    return (rl->_perRunData->stopped) ? YES : NO;
 }
 
 RSInline void __RSRunLoopSetStopped(RSRunLoopRef rl) {
@@ -1903,7 +1903,7 @@ RSInline void __RSRunLoopUnsetStopped(RSRunLoopRef rl) {
 }
 
 RSInline BOOL __RSRunLoopIsIgnoringWakeUps(RSRunLoopRef rl) {
-    return (rl->_perRunData->ignoreWakeUps) ? YES : false;
+    return (rl->_perRunData->ignoreWakeUps) ? YES : NO;
 }
 
 RSInline void __RSRunLoopSetIgnoreWakeUps(RSRunLoopRef rl) {
@@ -1949,9 +1949,9 @@ static RSStringRef __RSRunLoopClassDescription(RSTypeRef rs) {
     RSMutableStringRef result;
     result = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
 #if DEPLOYMENT_TARGET_WINDOWS
-    RSStringAppendFormat(result, nil, RSSTR("<RSRunLoop %p [%p]>{wakeup port = 0x%x, stopped = %s, ignoreWakeUps = %s, \ncurrent mode = %r,\n"), rs, RSGetAllocator(rs), rl->_wakeUpPort, __RSRunLoopIsStopped(rl) ? "YES" : "false", __RSRunLoopIsIgnoringWakeUps(rl) ? "YES" : "false", rl->_currentMode ? rl->_currentMode->_name : RSSTR("(none)"));
+    RSStringAppendFormat(result, nil, RSSTR("<RSRunLoop %p [%p]>{wakeup port = 0x%x, stopped = %s, ignoreWakeUps = %s, \ncurrent mode = %r,\n"), rs, RSGetAllocator(rs), rl->_wakeUpPort, __RSRunLoopIsStopped(rl) ? "YES" : "NO", __RSRunLoopIsIgnoringWakeUps(rl) ? "YES" : "NO", rl->_currentMode ? rl->_currentMode->_name : RSSTR("(none)"));
 #else
-    RSStringAppendStringWithFormat(result, nil, RSSTR("<RSRunLoop %p [%p]>{wakeup port = 0x%x, stopped = %s, ignoreWakeUps = %s, \ncurrent mode = %r,\n"), rs, RSGetAllocator(rs), rl->_wakeUpPort, __RSRunLoopIsStopped(rl) ? "YES" : "false", __RSRunLoopIsIgnoringWakeUps(rl) ? "YES" : "false", rl->_currentMode ? rl->_currentMode->_name : RSSTR("(none)"));
+    RSStringAppendStringWithFormat(result, nil, RSSTR("<RSRunLoop %p [%p]>{wakeup port = 0x%x, stopped = %s, ignoreWakeUps = %s, \ncurrent mode = %r,\n"), rs, RSGetAllocator(rs), rl->_wakeUpPort, __RSRunLoopIsStopped(rl) ? "YES" : "NO", __RSRunLoopIsIgnoringWakeUps(rl) ? "YES" : "NO", rl->_currentMode ? rl->_currentMode->_name : RSSTR("(none)"));
 #endif
     RSStringAppendStringWithFormat(result, nil, RSSTR("common modes = %r,\ncommon mode items = %r,\nmodes = %r}\n"), rl->_commonModes, rl->_commonModeItems, rl->_modes);
     return result;
@@ -1995,7 +1995,7 @@ static RSRunLoopModeRef __RSRunLoopFindMode(RSRunLoopRef rl, RSStringRef modeNam
     }
     __RSRunLoopLockInit(&rlm->_lock);
     rlm->_name = RSStringCreateCopy(RSAllocatorSystemDefault, modeName);
-    rlm->_stopped = false;
+    rlm->_stopped = NO;
     rlm->_portToV1SourceMap = nil;
     rlm->_sources0 = nil;
     rlm->_sources1 = nil;
@@ -2034,24 +2034,24 @@ static BOOL __RSRunLoopModeIsEmpty(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSRunL
     CHECK_FOR_FORK();
     if (nil == rlm) return YES;
 #if DEPLOYMENT_TARGET_WINDOWS
-    if (0 != rlm->_msgQMask) return false;
+    if (0 != rlm->_msgQMask) return NO;
 #endif
     BOOL libdispatchQSafe = pthread_main_np() && ((HANDLE_DISPATCH_ON_BASE_INVOCATION_ONLY && nil == previousMode) || (!HANDLE_DISPATCH_ON_BASE_INVOCATION_ONLY && 0 == _RSGetTSD(__RSTSDKeyIsInGCDMainQ)));
-    if (libdispatchQSafe && (RSRunLoopGetMain() == rl) && RSSetContainsValue(rl->_commonModes, rlm->_name)) return false; // represents the libdispatch main queue
-    if (nil != rlm->_sources0 && 0 < RSSetGetCount(rlm->_sources0)) return false;
-    if (nil != rlm->_sources1 && 0 < RSSetGetCount(rlm->_sources1)) return false;
-    if (nil != rlm->_timers && 0 < RSArrayGetCount(rlm->_timers)) return false;
+    if (libdispatchQSafe && (RSRunLoopGetMain() == rl) && RSSetContainsValue(rl->_commonModes, rlm->_name)) return NO; // represents the libdispatch main queue
+    if (nil != rlm->_sources0 && 0 < RSSetGetCount(rlm->_sources0)) return NO;
+    if (nil != rlm->_sources1 && 0 < RSSetGetCount(rlm->_sources1)) return NO;
+    if (nil != rlm->_timers && 0 < RSArrayGetCount(rlm->_timers)) return NO;
     struct _block_item *item = rl->_blocks_head;
     while (item) {
         struct _block_item *curr = item;
         item = item->_next;
-        BOOL doit = false;
+        BOOL doit = NO;
         if (RSStringGetTypeID() == RSGetTypeID(curr->_mode)) {
             doit = RSEqual(curr->_mode, rlm->_name) || (RSEqual(curr->_mode, RSRunLoopCommonModes) && RSSetContainsValue(rl->_commonModes, rlm->_name));
         } else {
             doit = RSSetContainsValue((RSSetRef)curr->_mode, rlm->_name) || (RSSetContainsValue((RSSetRef)curr->_mode, RSRunLoopCommonModes) && RSSetContainsValue(rl->_commonModes, rlm->_name));
         }
-        if (doit) return false;
+        if (doit) return NO;
     }
     return YES;
 }
@@ -2065,7 +2065,7 @@ uint32_t _RSRunLoopGetWindowsMessageQueueMask(RSRunLoopRef rl, RSStringRef modeN
     }
     DWORD result = 0;
     __RSRunLoopLock(rl);
-    RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, false);
+    RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, NO);
     if (rlm) {
         result = rlm->_msgQMask;
         __RSRunLoopModeUnlock(rlm);
@@ -2101,7 +2101,7 @@ RSWindowsMessageQueueHandler _RSRunLoopGetWindowsMessageQueueHandler(RSRunLoopRe
     }
     void (*result)(void) = nil;
     __RSRunLoopLock(rl);
-    RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, false);
+    RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, NO);
     if (rlm) {
         result = rlm->_msgPump;
         __RSRunLoopModeUnlock(rlm);
@@ -2891,9 +2891,9 @@ static void __RSRUNLOOP_IS_CALLING_OUT_TO_A_BLOCK__(void (^block)(void)) {
 }
 
 static BOOL __RSRunLoopDoBlocks(RSRunLoopRef rl, RSRunLoopModeRef rlm) { // Call with rl and rlm locked
-    if (!rl->_blocks_head) return false;
-    if (!rlm || !rlm->_name) return false;
-    BOOL did = false;
+    if (!rl->_blocks_head) return NO;
+    if (!rlm || !rlm->_name) return NO;
+    BOOL did = NO;
     struct _block_item *head = rl->_blocks_head;
     struct _block_item *tail = rl->_blocks_tail;
     rl->_blocks_head = nil;
@@ -2907,7 +2907,7 @@ static BOOL __RSRunLoopDoBlocks(RSRunLoopRef rl, RSRunLoopModeRef rlm) { // Call
     while (item) {
         struct _block_item *curr = item;
         item = item->_next;
-        BOOL doit = false;
+        BOOL doit = NO;
         if (RSStringGetTypeID() == RSGetTypeID(curr->_mode)) {
             doit = RSEqual(curr->_mode, curMode) || (RSEqual(curr->_mode, RSRunLoopCommonModes) && RSSetContainsValue(commonModes, curMode));
         } else {
@@ -3043,7 +3043,7 @@ static BOOL __RSRunLoopDoSources0(RSRunLoopRef rl, RSRunLoopModeRef rlm, BOOL st
 {	/* DOES CALLOUT */
     CHECK_FOR_FORK();
     RSTypeRef sources = nil;
-    BOOL sourceHandled = false;
+    BOOL sourceHandled = NO;
     
     /* Fire the version 0 sources */
     if (nil != rlm->_sources0 && 0 < RSSetGetCount(rlm->_sources0)) {
@@ -3123,7 +3123,7 @@ static BOOL __RSRunLoopDoSource1(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSRunLoo
 #endif
 ) {	/* DOES CALLOUT */
     CHECK_FOR_FORK();
-    BOOL sourceHandled = false;
+    BOOL sourceHandled = NO;
     
     /* Fire a version 1 source */
     RSRetain(rls);
@@ -3173,7 +3173,7 @@ static RSIndex __RSRunLoopInsertionIndexInTimerArray(RSArrayRef array, RSRunLoop
     BOOL lastTestLEQ;
     do {
         add = add / 2;
-        lastTestLEQ = false;
+        lastTestLEQ = NO;
         RSIndex testIdx = idx + add;
         if (testIdx < cnt) {
             RSRunLoopTimerRef item = (RSRunLoopTimerRef)RSArrayObjectAtIndex(array, testIdx);
@@ -3207,7 +3207,7 @@ static void __RSArmNextTimerInMode(RSRunLoopModeRef rlm) {
 static void __RSRepositionTimerInMode(RSRunLoopModeRef rlm, RSRunLoopTimerRef rlt, BOOL isInArray) __attribute__((noinline));
 static void __RSRepositionTimerInMode(RSRunLoopModeRef rlm, RSRunLoopTimerRef rlt, BOOL isInArray) {
     if (!rlt || !rlm->_timers) return;
-    BOOL found = false;
+    BOOL found = NO;
     if (isInArray) {
         
         RSIndex idx = RSArrayIndexOfObject(rlm->_timers, rlt);
@@ -3227,7 +3227,7 @@ static void __RSRepositionTimerInMode(RSRunLoopModeRef rlm, RSRunLoopTimerRef rl
 void RSRunLoopTimerInvalidate(RSRunLoopTimerRef rlt);
 // mode and rl are locked on entry and exit
 static BOOL __RSRunLoopDoTimer(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSRunLoopTimerRef rlt) {	/* DOES CALLOUT */
-    BOOL timerHandled = false;
+    BOOL timerHandled = NO;
     int64_t oldFireTSR = 0;
     
     /* Fire a timer */
@@ -3317,7 +3317,7 @@ static BOOL __RSRunLoopDoTimer(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSRunLoopT
                 __RSRunLoopTimerUnlock(rlt);
                 for (RSIndex idx = 0; idx < cnt; idx++) {
                     RSStringRef name = (RSStringRef)modes[idx];
-                    modes[idx] = (RSTypeRef)__RSRunLoopFindMode(rlt_rl, name, false);
+                    modes[idx] = (RSTypeRef)__RSRunLoopFindMode(rlt_rl, name, NO);
                     RSRelease(name);
                 }
                 __RSRunLoopTimerFireTSRLock();
@@ -3351,7 +3351,7 @@ static BOOL __RSRunLoopDoTimer(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSRunLoopT
 
 // rl and rlm are locked on entry and exit
 static BOOL __RSRunLoopDoTimers(RSRunLoopRef rl, RSRunLoopModeRef rlm, int64_t limitTSR) {	/* DOES CALLOUT */
-    BOOL timerHandled = false;
+    BOOL timerHandled = NO;
     RSMutableArrayRef timers = nil;
     for (RSIndex idx = 0, cnt = rlm->_timers ? RSArrayGetCount(rlm->_timers) : 0; idx < cnt; idx++) {
         RSRunLoopTimerRef rlt = (RSRunLoopTimerRef)RSArrayObjectAtIndex(rlm->_timers, idx);
@@ -3373,9 +3373,9 @@ static BOOL __RSRunLoopDoTimers(RSRunLoopRef rl, RSRunLoopModeRef rlm, int64_t l
 RSExport BOOL _RSRunLoopFinished(RSRunLoopRef rl, RSStringRef modeName) {
     CHECK_FOR_FORK();
     RSRunLoopModeRef rlm;
-    BOOL result = false;
+    BOOL result = NO;
     __RSRunLoopLock(rl);
-    rlm = __RSRunLoopFindMode(rl, modeName, false);
+    rlm = __RSRunLoopFindMode(rl, modeName, NO);
     if (nil == rlm || __RSRunLoopModeIsEmpty(rl, rlm, nil)) {
         result = YES;
     }
@@ -3404,16 +3404,16 @@ static BOOL __RSRunLoopServiceMachPort(mach_port_name_t port, mach_msg_header_t 
         if (MACH_RCV_TIMED_OUT == ret) {
             if (!originalBuffer) free(msg);
             *buffer = nil;
-            return false;
+            return NO;
         }
         if (MACH_RCV_TOO_LARGE != ret) break;
         buffer_size = round_msg(msg->msgh_size + MAX_TRAILER_SIZE);
         if (originalBuffer) *buffer = nil;
-        originalBuffer = false;
+        originalBuffer = NO;
         *buffer = realloc(*buffer, buffer_size);
     }
     HALT;
-    return false;
+    return NO;
 }
 
 #elif DEPLOYMENT_TARGET_WINDOWS
@@ -3426,8 +3426,8 @@ static BOOL __RSRunLoopWaitForMultipleObjects(__RSPortSet portSet, HANDLE *onePo
     HANDLE handleBuf[MAXIMUM_WAIT_OBJECTS];
     HANDLE *handles = nil;
     uint32_t handleCount = 0;
-    BOOL freeHandles = false;
-    BOOL result = false;
+    BOOL freeHandles = NO;
+    BOOL result = NO;
     
     if (portSet) {
         // copy out the handles to be safe from other threads at work
@@ -3436,7 +3436,7 @@ static BOOL __RSRunLoopWaitForMultipleObjects(__RSPortSet portSet, HANDLE *onePo
     } else {
         handles = onePort;
         handleCount = 1;
-        freeHandles = FALSE;
+        freeHandles = NO;
     }
     
     // The run loop mode and loop are already in proper unlocked state from caller
@@ -3446,7 +3446,7 @@ static BOOL __RSRunLoopWaitForMultipleObjects(__RSPortSet portSet, HANDLE *onePo
     
     if (waitResult == WAIT_TIMEOUT) {
         // do nothing, just return to caller
-        result = false;
+        result = NO;
     } else if (waitResult >= WAIT_OBJECT_0 && waitResult < WAIT_OBJECT_0+handleCount) {
         // a handle was signaled
         if (livePort) *livePort = handles[waitResult-WAIT_OBJECT_0];
@@ -3461,7 +3461,7 @@ static BOOL __RSRunLoopWaitForMultipleObjects(__RSPortSet portSet, HANDLE *onePo
         result = YES;
     } else {
         RSAssert2(waitResult == WAIT_FAILED, __RSLogAssertion, "%s(): unexpected result from MsgWaitForMultipleObjects: %d", __PRETTY_FUNCTION__, waitResult);
-        result = false;
+        result = NO;
     }
     
     if (freeHandles) {
@@ -3501,7 +3501,7 @@ static int32_t __RSRunLoopRun(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSTimeInter
         __RSRunLoopUnsetStopped(rl);
         return RSRunLoopRunStopped;
     } else if (rlm->_stopped) {
-        rlm->_stopped = false;
+        rlm->_stopped = NO;
         return RSRunLoopRunStopped;
     }
     
@@ -3544,7 +3544,7 @@ static int32_t __RSRunLoopRun(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSTimeInter
         mach_msg_header_t *msg = nil;
 #elif DEPLOYMENT_TARGET_WINDOWS
         HANDLE livePort = nil;
-        BOOL windowsMessageReceived = false;
+        BOOL windowsMessageReceived = NO;
 #endif
         __RSPortSet waitSet = rlm->_portSet;
         
@@ -3575,7 +3575,7 @@ static int32_t __RSRunLoopRun(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSTimeInter
 #endif
         }
         
-        didDispatchPortLastTime = false;
+        didDispatchPortLastTime = NO;
         
         if (!poll && (rlm->_observerMask & RSRunLoopBeforeWaiting)) __RSRunLoopDoObservers(rl, rlm, RSRunLoopBeforeWaiting);
         __RSRunLoopSetSleeping(rl);
@@ -3720,7 +3720,7 @@ static int32_t __RSRunLoopRun(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSTimeInter
             __RSRunLoopUnsetStopped(rl);
             retVal = RSRunLoopRunStopped;
         } else if (rlm->_stopped) {
-            rlm->_stopped = false;
+            rlm->_stopped = NO;
             retVal = RSRunLoopRunStopped;
         } else if (__RSRunLoopModeIsEmpty(rl, rlm, previousMode)) {
             retVal = RSRunLoopRunFinished;
@@ -3741,9 +3741,9 @@ SInt32 RSRunLoopRunSpecific(RSRunLoopRef rl, RSStringRef modeName, RSTimeInterva
     CHECK_FOR_FORK();
     if (__RSRunLoopIsDeallocating(rl)) return RSRunLoopRunFinished;
     __RSRunLoopLock(rl);
-    RSRunLoopModeRef currentMode = __RSRunLoopFindMode(rl, modeName, false);
+    RSRunLoopModeRef currentMode = __RSRunLoopFindMode(rl, modeName, NO);
     if (nil == currentMode || __RSRunLoopModeIsEmpty(rl, currentMode, rl->_currentMode)) {
-        BOOL did = false;
+        BOOL did = NO;
         if (currentMode) __RSRunLoopModeUnlock(currentMode);
         __RSRunLoopUnlock(rl);
         return did ? RSRunLoopRunHandledSource : RSRunLoopRunFinished;
@@ -3765,7 +3765,7 @@ SInt32 RSRunLoopRunSpecific(RSRunLoopRef rl, RSStringRef modeName, RSTimeInterva
 void RSRunLoopRun(void) {	/* DOES CALLOUT */
     int32_t result;
     do {
-        result = RSRunLoopRunSpecific(RSRunLoopGetCurrent(), RSRunLoopDefaultMode, 1.0e10, false);
+        result = RSRunLoopRunSpecific(RSRunLoopGetCurrent(), RSRunLoopDefaultMode, 1.0e10, NO);
         CHECK_FOR_FORK();
     } while (RSRunLoopRunStopped != result && RSRunLoopRunFinished != result);
 }
@@ -3780,7 +3780,7 @@ RSAbsoluteTime RSRunLoopTimerGetNextFireDate(RSRunLoopTimerRef rlt);
 RSAbsoluteTime RSRunLoopGetNextTimerFireDate(RSRunLoopRef rl, RSStringRef modeName) {
     CHECK_FOR_FORK();
     __RSRunLoopLock(rl);
-    RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, false);
+    RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, NO);
     RSAbsoluteTime at = 0.0;
     RSRunLoopTimerRef timer = (rlm && rlm->_timers && 0 < RSArrayGetCount(rlm->_timers)) ? (RSRunLoopTimerRef)RSArrayObjectAtIndex(rlm->_timers, 0) : nil;
     if (timer) at = RSRunLoopTimerGetNextFireDate(timer);
@@ -3821,7 +3821,7 @@ void RSRunLoopWakeUp(RSRunLoopRef rl) {
 }
 
 void RSRunLoopStop(RSRunLoopRef rl) {
-    BOOL doWake = false;
+    BOOL doWake = NO;
     CHECK_FOR_FORK();
     __RSRunLoopLock(rl);
     if (rl->_currentMode) {
@@ -3849,7 +3849,7 @@ RSExport void _RSRunLoopStopMode(RSRunLoopRef rl, RSStringRef modeName) {
 
 RSExport BOOL _RSRunLoopModeContainsMode(RSRunLoopRef rl, RSStringRef modeName, RSStringRef candidateContainedName) {
     CHECK_FOR_FORK();
-    return false;
+    return NO;
 }
 
 void RSRunLoopPerformBlock(RSRunLoopRef rl, RSTypeRef mode, void (^block)(void)) {
@@ -3913,16 +3913,16 @@ void RSRunLoopPerformBlock(RSRunLoopRef rl, RSTypeRef mode, void (^block)(void))
 BOOL RSRunLoopContainsSource(RSRunLoopRef rl, RSRunLoopSourceRef rls, RSStringRef modeName) {
     CHECK_FOR_FORK();
     RSRunLoopModeRef rlm;
-    BOOL hasValue = false;
+    BOOL hasValue = NO;
     __RSRunLoopLock(rl);
     if (modeName == RSRunLoopCommonModes) {
         if (nil != rl->_commonModeItems) {
             hasValue = RSSetContainsValue(rl->_commonModeItems, rls);
         }
     } else {
-        rlm = __RSRunLoopFindMode(rl, modeName, false);
+        rlm = __RSRunLoopFindMode(rl, modeName, NO);
         if (nil != rlm) {
-            hasValue = (rlm->_sources0 ? RSSetContainsValue(rlm->_sources0, rls) : false) || (rlm->_sources1 ? RSSetContainsValue(rlm->_sources1, rls) : false);
+            hasValue = (rlm->_sources0 ? RSSetContainsValue(rlm->_sources0, rls) : NO) || (rlm->_sources1 ? RSSetContainsValue(rlm->_sources1, rls) : NO);
             __RSRunLoopModeUnlock(rlm);
         }
     }
@@ -3934,7 +3934,7 @@ void RSRunLoopAddSource(RSRunLoopRef rl, RSRunLoopSourceRef rls, RSStringRef mod
     CHECK_FOR_FORK();
     if (__RSRunLoopIsDeallocating(rl)) return;
     if (!__RSRunLoopIsValid(rls)) return;
-    BOOL doVer0Callout = false;
+    BOOL doVer0Callout = NO;
     __RSRunLoopLock(rl);
     if (modeName == RSRunLoopCommonModes)
     {
@@ -3996,7 +3996,7 @@ void RSRunLoopAddSource(RSRunLoopRef rl, RSRunLoopSourceRef rls, RSStringRef mod
 
 void RSRunLoopRemoveSource(RSRunLoopRef rl, RSRunLoopSourceRef rls, RSStringRef modeName) {	/* DOES CALLOUT */
     CHECK_FOR_FORK();
-    BOOL doVer0Callout = false, doRLSRelease = false;
+    BOOL doVer0Callout = NO, doRLSRelease = NO;
     __RSRunLoopLock(rl);
     if (modeName == RSRunLoopCommonModes) {
         if (nil != rl->_commonModeItems && RSSetContainsValue(rl->_commonModeItems, rls)) {
@@ -4011,7 +4011,7 @@ void RSRunLoopRemoveSource(RSRunLoopRef rl, RSRunLoopSourceRef rls, RSStringRef 
         } else {
         }
     } else {
-        RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, false);
+        RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, NO);
         if (nil != rlm && ((nil != rlm->_sources0 && RSSetContainsValue(rlm->_sources0, rls)) || (nil != rlm->_sources1 && RSSetContainsValue(rlm->_sources1, rls)))) {
             RSRetain(rls);
             if (1 == rls->_context.version0.version) {
@@ -4077,7 +4077,7 @@ static void __RSRunLoopRemoveAllSources(RSRunLoopRef rl, RSStringRef modeName) {
         } else {
         }
     } else {
-        rlm = __RSRunLoopFindMode(rl, modeName, false);
+        rlm = __RSRunLoopFindMode(rl, modeName, NO);
         if (nil != rlm && nil != rlm->_sources0) {
             RSSetRef set = RSSetCreateCopy(RSAllocatorSystemDefault, rlm->_sources0);
             RSTypeRef context[2] = {rl, modeName};
@@ -4100,14 +4100,14 @@ static void __RSRunLoopRemoveAllSources(RSRunLoopRef rl, RSStringRef modeName) {
 BOOL RSRunLoopContainsObserver(RSRunLoopRef rl, RSRunLoopObserverRef rlo, RSStringRef modeName) {
     CHECK_FOR_FORK();
     RSRunLoopModeRef rlm;
-    BOOL hasValue = false;
+    BOOL hasValue = NO;
     __RSRunLoopLock(rl);
     if (modeName == RSRunLoopCommonModes) {
         if (nil != rl->_commonModeItems) {
             hasValue = RSSetContainsValue(rl->_commonModeItems, rlo);
         }
     } else {
-        rlm = __RSRunLoopFindMode(rl, modeName, false);
+        rlm = __RSRunLoopFindMode(rl, modeName, NO);
         if (nil != rlm && nil != rlm->_observers) {
             hasValue = RSArrayContainsObject(rlm->_observers, RSMakeRange(0, RSArrayGetCount(rlm->_observers)), rlo);
         }
@@ -4143,7 +4143,7 @@ void RSRunLoopAddObserver(RSRunLoopRef rl, RSRunLoopObserverRef rlo, RSStringRef
             rlm->_observers = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
         }
         if (nil != rlm && !RSArrayContainsObject(rlm->_observers, RSMakeRange(0, RSArrayGetCount(rlm->_observers)), rlo)) {
-            BOOL inserted = false;
+            BOOL inserted = NO;
             for (RSIndex idx = RSArrayGetCount(rlm->_observers); idx--; ) {
                 RSRunLoopObserverRef obs = (RSRunLoopObserverRef)RSArrayObjectAtIndex(rlm->_observers, idx);
                 if (obs->_order <= rlo->_order) {
@@ -4182,7 +4182,7 @@ void RSRunLoopRemoveObserver(RSRunLoopRef rl, RSRunLoopObserverRef rlo, RSString
         } else {
         }
     } else {
-        rlm = __RSRunLoopFindMode(rl, modeName, false);
+        rlm = __RSRunLoopFindMode(rl, modeName, NO);
         if (nil != rlm && nil != rlm->_observers) {
             RSRetain(rlo);
             RSIndex idx = RSArrayIndexOfObject(rlm->_observers, rlo);
@@ -4201,15 +4201,15 @@ void RSRunLoopRemoveObserver(RSRunLoopRef rl, RSRunLoopObserverRef rlo, RSString
 
 BOOL RSRunLoopContainsTimer(RSRunLoopRef rl, RSRunLoopTimerRef rlt, RSStringRef modeName) {
     CHECK_FOR_FORK();
-    if (nil == rlt->_runLoop || rl != rlt->_runLoop) return false;
-    BOOL hasValue = false;
+    if (nil == rlt->_runLoop || rl != rlt->_runLoop) return NO;
+    BOOL hasValue = NO;
     __RSRunLoopLock(rl);
     if (modeName == RSRunLoopCommonModes) {
         if (nil != rl->_commonModeItems) {
             hasValue = RSSetContainsValue(rl->_commonModeItems, rlt);
         }
     } else {
-        RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, false);
+        RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, NO);
         if (nil != rlm && nil != rlm->_timers) {
             RSIndex idx = RSArrayIndexOfObject(rlm->_timers, rlt);
             hasValue = (RSNotFound != idx);
@@ -4260,7 +4260,7 @@ void RSRunLoopAddTimer(RSRunLoopRef rl, RSRunLoopTimerRef rlt, RSStringRef modeN
             RSSetAddValue(rlt->_rlModes, rlm->_name);
             __RSRunLoopTimerUnlock(rlt);
             __RSRunLoopTimerFireTSRLock();
-            __RSRepositionTimerInMode(rlm, rlt, false);
+            __RSRepositionTimerInMode(rlm, rlt, NO);
             __RSRunLoopTimerFireTSRUnlock();
             if (!_RSExecutableLinkedOnOrAfter(RSSystemVersionLion)) {
                 // Normally we don't do this on behalf of clients, but for
@@ -4291,7 +4291,7 @@ void RSRunLoopRemoveTimer(RSRunLoopRef rl, RSRunLoopTimerRef rlt, RSStringRef mo
         } else {
         }
     } else {
-        RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, false);
+        RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, NO);
         RSIndex idx = RSNotFound;
         if (nil != rlm && nil != rlm->_timers) {
             idx = RSArrayIndexOfObject(rlm->_timers, rlt);
@@ -4324,13 +4324,13 @@ static BOOL __RSRunLoopSourceClassEqual(RSTypeRef rs1, RSTypeRef rs2) {	/* DOES 
     RSRunLoopSourceRef rls1 = (RSRunLoopSourceRef)rs1;
     RSRunLoopSourceRef rls2 = (RSRunLoopSourceRef)rs2;
     if (rls1 == rls2) return YES;
-    if (__RSRunLoopIsValid(rls1) != __RSRunLoopIsValid(rls2)) return false;
-    if (rls1->_order != rls2->_order) return false;
-    if (rls1->_context.version0.version != rls2->_context.version0.version) return false;
-    if (rls1->_context.version0.hash != rls2->_context.version0.hash) return false;
-    if (rls1->_context.version0.equal != rls2->_context.version0.equal) return false;
-    if (0 == rls1->_context.version0.version && rls1->_context.version0.perform != rls2->_context.version0.perform) return false;
-    if (1 == rls1->_context.version0.version && rls1->_context.version1.perform != rls2->_context.version1.perform) return false;
+    if (__RSRunLoopIsValid(rls1) != __RSRunLoopIsValid(rls2)) return NO;
+    if (rls1->_order != rls2->_order) return NO;
+    if (rls1->_context.version0.version != rls2->_context.version0.version) return NO;
+    if (rls1->_context.version0.hash != rls2->_context.version0.hash) return NO;
+    if (rls1->_context.version0.equal != rls2->_context.version0.equal) return NO;
+    if (0 == rls1->_context.version0.version && rls1->_context.version0.perform != rls2->_context.version0.perform) return NO;
+    if (1 == rls1->_context.version0.version && rls1->_context.version1.perform != rls2->_context.version1.perform) return NO;
     if (rls1->_context.version0.equal)
         return rls1->_context.version0.equal(rls1->_context.version0.info, rls2->_context.version0.info);
     return (rls1->_context.version0.info == rls2->_context.version0.info);
@@ -4531,7 +4531,7 @@ void RSRunLoopSourceSignal(RSRunLoopSourceRef rls) {
 BOOL RSRunLoopSourceIsSignalled(RSRunLoopSourceRef rls) {
     CHECK_FOR_FORK();
     __RSRunLoopSourceLock(rls);
-    BOOL ret = __RSRunLoopSourceIsSignaled(rls) ? YES : false;
+    BOOL ret = __RSRunLoopSourceIsSignaled(rls) ? YES : NO;
     __RSRunLoopSourceUnlock(rls);
     return ret;
 }
@@ -4894,7 +4894,7 @@ void RSRunLoopTimerSetNextFireDate(RSRunLoopTimerRef rlt, RSAbsoluteTime fireDat
         __RSRunLoopLock(rl);
         for (RSIndex idx = 0; idx < cnt; idx++) {
             RSStringRef name = (RSStringRef)modes[idx];
-            modes[idx] = __RSRunLoopFindMode(rl, name, false);
+            modes[idx] = __RSRunLoopFindMode(rl, name, NO);
             RSRelease(name);
         }
         __RSRunLoopTimerFireTSRLock();
@@ -5371,7 +5371,7 @@ typedef struct ___RSPortSet {
 } *__RSPortSet;
 
 RSInline __RSPort __RSPortAllocate(void) {
-    return CreateEventA(nil, YES, false, nil);
+    return CreateEventA(nil, YES, NO, nil);
 }
 
 RSInline void __RSPortFree(__RSPort port) {
@@ -5498,7 +5498,7 @@ static uint32_t __RSSendTrivialMachMessage(mach_port_t port, uint32_t msg_id, RS
 #elif DEPLOYMENT_TARGET_WINDOWS
 
 static HANDLE mk_timer_create(void) {
-    return CreateWaitableTimer(nil, FALSE, nil);
+    return CreateWaitableTimer(nil, NO, nil);
 }
 
 static kern_return_t mk_timer_destroy(HANDLE name) {
@@ -5511,7 +5511,7 @@ static kern_return_t mk_timer_destroy(HANDLE name) {
 }
 
 static kern_return_t mk_timer_arm(HANDLE name, LARGE_INTEGER expire_time) {
-    BOOL res = SetWaitableTimer(name, &expire_time, 0, nil, nil, FALSE);
+    BOOL res = SetWaitableTimer(name, &expire_time, 0, nil, nil, NO);
     if (!res) {
         DWORD err = GetLastError();
         RSLog(RSLogLevelError, RSSTR("RSRunLoop: Unable to set timer: %d"), err);
@@ -5692,6 +5692,8 @@ struct __RSRunLoop {
     struct _block_item *_blocks_head;
     struct _block_item *_blocks_tail;
     RSTypeRef _counterpart;
+    
+    dispatch_queue_t _queue;
 };
 
 /* Bit 0 of the base reserved bits is used for stopped state */
@@ -5714,7 +5716,7 @@ RSInline void __RSRunLoopPopPerRunData(RSRunLoopRef rl, volatile _per_run_data *
 }
 
 RSInline BOOL __RSRunLoopIsStopped(RSRunLoopRef rl) {
-    return (rl->_perRunData->stopped) ? YES : false;
+    return (rl->_perRunData->stopped) ? YES : NO;
 }
 
 RSInline void __RSRunLoopSetStopped(RSRunLoopRef rl) {
@@ -5726,7 +5728,7 @@ RSInline void __RSRunLoopUnsetStopped(RSRunLoopRef rl) {
 }
 
 RSInline BOOL __RSRunLoopIsIgnoringWakeUps(RSRunLoopRef rl) {
-    return (rl->_perRunData->ignoreWakeUps) ? YES : false;
+    return (rl->_perRunData->ignoreWakeUps) ? YES : NO;
 }
 
 RSInline void __RSRunLoopSetIgnoreWakeUps(RSRunLoopRef rl) {
@@ -5782,9 +5784,9 @@ static RSStringRef __RSRunLoopClassDescription(RSTypeRef rs) {
     RSMutableStringRef result;
     result = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
 #if DEPLOYMENT_TARGET_WINDOWS
-    RSStringAppendFormat(result, nil, RSSTR("<RSRunLoop %p [%p]>{wakeup port = 0x%x, stopped = %s, ignoreWakeUps = %s, \ncurrent mode = %r,\n"), rs, RSGetAllocator(rs), rl->_wakeUpPort, __RSRunLoopIsStopped(rl) ? "YES" : "false", __RSRunLoopIsIgnoringWakeUps(rl) ? "YES" : "false", rl->_currentMode ? rl->_currentMode->_name : RSSTR("(none)"));
+    RSStringAppendFormat(result, nil, RSSTR("<RSRunLoop %p [%p]>{wakeup port = 0x%x, stopped = %s, ignoreWakeUps = %s, \ncurrent mode = %r,\n"), rs, RSGetAllocator(rs), rl->_wakeUpPort, __RSRunLoopIsStopped(rl) ? "YES" : "NO", __RSRunLoopIsIgnoringWakeUps(rl) ? "YES" : "NO", rl->_currentMode ? rl->_currentMode->_name : RSSTR("(none)"));
 #else
-    RSStringAppendStringWithFormat(result, nil, RSSTR("<RSRunLoop %p [%p]>{wakeup port = 0x%x, stopped = %s, ignoreWakeUps = %s, \ncurrent mode = %r,\n"), rs, RSGetAllocator(rs), rl->_wakeUpPort, __RSRunLoopIsStopped(rl) ? "YES" : "false", __RSRunLoopIsIgnoringWakeUps(rl) ? "YES" : "false", rl->_currentMode ? rl->_currentMode->_name : RSSTR("(none)"));
+    RSStringAppendStringWithFormat(result, nil, RSSTR("<RSRunLoop %p [%p]>{wakeup port = 0x%x, stopped = %s, ignoreWakeUps = %s, \ncurrent mode = %r,\n"), rs, RSGetAllocator(rs), rl->_wakeUpPort, __RSRunLoopIsStopped(rl) ? "YES" : "NO", __RSRunLoopIsIgnoringWakeUps(rl) ? "YES" : "NO", rl->_currentMode ? rl->_currentMode->_name : RSSTR("(none)"));
 #endif
     RSStringAppendStringWithFormat(result, nil, RSSTR("common modes = %r,\ncommon mode items = %r,\nmodes = %r}\n"), rl->_commonModes, rl->_commonModeItems, rl->_modes);
     return result;
@@ -5817,7 +5819,7 @@ static RSRunLoopModeRef __RSRunLoopFindMode(RSRunLoopRef rl, RSStringRef modeNam
     }
     __RSRunLoopLockInit(&rlm->_lock);
     rlm->_name = RSStringCreateCopy(RSAllocatorSystemDefault, modeName);
-    rlm->_stopped = false;
+    rlm->_stopped = NO;
     rlm->_portToV1SourceMap = nil;
     rlm->_sources0 = nil;
     rlm->_sources1 = nil;
@@ -5830,7 +5832,7 @@ static RSRunLoopModeRef __RSRunLoopFindMode(RSRunLoopRef rl, RSStringRef modeNam
     
     kern_return_t ret = KERN_SUCCESS;
 #if USE_DISPATCH_SOURCE_FOR_TIMERS
-    rlm->_timerFired = false;
+    rlm->_timerFired = NO;
     rlm->_queue = _dispatch_runloop_root_queue_create_4CF("Run Loop Mode Queue", 0);
     mach_port_t queuePort = _dispatch_runloop_root_queue_get_port_4CF(rlm->_queue);
     if (queuePort == MACH_PORT_NULL) CRASH("*** Unable to create run loop mode queue port. (%d) ***", -1);
@@ -5874,24 +5876,24 @@ static BOOL __RSRunLoopModeIsEmpty(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSRunL
     CHECK_FOR_FORK();
     if (nil == rlm) return YES;
 #if DEPLOYMENT_TARGET_WINDOWS
-    if (0 != rlm->_msgQMask) return false;
+    if (0 != rlm->_msgQMask) return NO;
 #endif
     BOOL libdispatchQSafe = pthread_main_np() && ((HANDLE_DISPATCH_ON_BASE_INVOCATION_ONLY && nil == previousMode) || (!HANDLE_DISPATCH_ON_BASE_INVOCATION_ONLY && 0 == _RSGetTSD(__RSTSDKeyIsInGCDMainQ)));
-    if (libdispatchQSafe && (RSRunLoopGetMain() == rl) && RSSetContainsValue(rl->_commonModes, rlm->_name)) return false; // represents the libdispatch main queue
-    if (nil != rlm->_sources0 && 0 < RSSetGetCount(rlm->_sources0)) return false;
-    if (nil != rlm->_sources1 && 0 < RSSetGetCount(rlm->_sources1)) return false;
-    if (nil != rlm->_timers && 0 < RSArrayGetCount(rlm->_timers)) return false;
+    if (libdispatchQSafe && (RSRunLoopGetMain() == rl) && RSSetContainsValue(rl->_commonModes, rlm->_name)) return NO; // represents the libdispatch main queue
+    if (nil != rlm->_sources0 && 0 < RSSetGetCount(rlm->_sources0)) return NO;
+    if (nil != rlm->_sources1 && 0 < RSSetGetCount(rlm->_sources1)) return NO;
+    if (nil != rlm->_timers && 0 < RSArrayGetCount(rlm->_timers)) return NO;
     struct _block_item *item = rl->_blocks_head;
     while (item) {
         struct _block_item *curr = item;
         item = item->_next;
-        BOOL doit = false;
+        BOOL doit = NO;
         if (RSStringGetTypeID() == RSGetTypeID(curr->_mode)) {
             doit = RSEqual(curr->_mode, rlm->_name) || (RSEqual(curr->_mode, RSRunLoopCommonModes) && RSSetContainsValue(rl->_commonModes, rlm->_name));
         } else {
             doit = RSSetContainsValue((RSSetRef)curr->_mode, rlm->_name) || (RSSetContainsValue((RSSetRef)curr->_mode, RSRunLoopCommonModes) && RSSetContainsValue(rl->_commonModes, rlm->_name));
         }
-        if (doit) return false;
+        if (doit) return NO;
     }
     return YES;
 }
@@ -5905,7 +5907,7 @@ uint32_t _RSRunLoopGetWindowsMessageQueueMask(RSRunLoopRef rl, RSStringRef modeN
     }
     DWORD result = 0;
     __RSRunLoopLock(rl);
-    RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, false);
+    RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, NO);
     if (rlm) {
         result = rlm->_msgQMask;
         __RSRunLoopModeUnlock(rlm);
@@ -5941,7 +5943,7 @@ RSWindowsMessageQueueHandler _RSRunLoopGetWindowsMessageQueueHandler(RSRunLoopRe
     }
     void (*result)(void) = nil;
     __RSRunLoopLock(rl);
-    RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, false);
+    RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, NO);
     if (rlm) {
         result = rlm->_msgPump;
         __RSRunLoopModeUnlock(rlm);
@@ -6394,6 +6396,7 @@ static RSRunLoopRef __RSRunLoopCreate(pthread_t t) {
     loop->_winthread = GetCurrentThreadId();
 #else
     loop->_winthread = 0;
+    loop->_queue = pthread_main_thread_np() ? dispatch_get_main_queue() : dispatch_get_current_queue();
 #endif
     rlm = __RSRunLoopFindMode(loop, RSRunLoopDefaultMode, YES);
     if (nil != rlm) __RSRunLoopModeUnlock(rlm);
@@ -6668,9 +6671,9 @@ static void __RSRUNLOOP_IS_CALLING_OUT_TO_A_BLOCK__(void (^block)(void)) {
 }
 
 static BOOL __RSRunLoopDoBlocks(RSRunLoopRef rl, RSRunLoopModeRef rlm) { // Call with rl and rlm locked
-    if (!rl->_blocks_head) return false;
-    if (!rlm || !rlm->_name) return false;
-    BOOL did = false;
+    if (!rl->_blocks_head) return NO;
+    if (!rlm || !rlm->_name) return NO;
+    BOOL did = NO;
     struct _block_item *head = rl->_blocks_head;
     struct _block_item *tail = rl->_blocks_tail;
     rl->_blocks_head = nil;
@@ -6684,7 +6687,7 @@ static BOOL __RSRunLoopDoBlocks(RSRunLoopRef rl, RSRunLoopModeRef rlm) { // Call
     while (item) {
         struct _block_item *curr = item;
         item = item->_next;
-        BOOL doit = false;
+        BOOL doit = NO;
         if (RSStringGetTypeID() == RSGetTypeID(curr->_mode)) {
             doit = RSEqual(curr->_mode, curMode) || (RSEqual(curr->_mode, RSRunLoopCommonModes) && RSSetContainsValue(commonModes, curMode));
         } else {
@@ -6816,7 +6819,7 @@ static BOOL __RSRunLoopDoSources0(RSRunLoopRef rl, RSRunLoopModeRef rlm, BOOL st
 static BOOL __RSRunLoopDoSources0(RSRunLoopRef rl, RSRunLoopModeRef rlm, BOOL stopAfterHandle) {	/* DOES CALLOUT */
     CHECK_FOR_FORK();
     RSTypeRef sources = nil;
-    BOOL sourceHandled = false;
+    BOOL sourceHandled = NO;
     
     /* Fire the version 0 sources */
     if (nil != rlm->_sources0 && 0 < RSSetGetCount(rlm->_sources0)) {
@@ -6885,7 +6888,7 @@ static BOOL __RSRunLoopDoSource1(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSRunLoo
 #endif
 ) {	/* DOES CALLOUT */
     CHECK_FOR_FORK();
-    BOOL sourceHandled = false;
+    BOOL sourceHandled = NO;
     
     /* Fire a version 1 source */
     RSRetain(rls);
@@ -6935,7 +6938,7 @@ static RSIndex __RSRunLoopInsertionIndexInTimerArray(RSArrayRef array, RSRunLoop
     BOOL lastTestLEQ;
     do {
         add = add / 2;
-        lastTestLEQ = false;
+        lastTestLEQ = NO;
         RSIndex testIdx = idx + add;
         if (testIdx < cnt) {
             RSRunLoopTimerRef item = (RSRunLoopTimerRef)RSArrayObjectAtIndex(array, testIdx);
@@ -6998,7 +7001,7 @@ static void __RSArmNextTimerInMode(RSRunLoopModeRef rlm, RSRunLoopRef rl) {
                 if (rlm->_mkTimerArmed && rlm->_timerPort) {
                     AbsoluteTime dummy;
                     mk_timer_cancel(rlm->_timerPort, &dummy);
-                    rlm->_mkTimerArmed = false;
+                    rlm->_mkTimerArmed = NO;
                 }
                 
                 // Arm the dispatch timer
@@ -7009,7 +7012,7 @@ static void __RSArmNextTimerInMode(RSRunLoopModeRef rlm, RSRunLoopRef rl) {
                 if (rlm->_dispatchTimerArmed) {
                     // Cancel the dispatch timer
                     _dispatch_source_set_runloop_timer_4CF(rlm->_timerSource, DISPATCH_TIME_FOREVER, DISPATCH_TIME_FOREVER, 888);
-                    rlm->_dispatchTimerArmed = false;
+                    rlm->_dispatchTimerArmed = NO;
                 }
                 
                 // Arm the mk timer
@@ -7032,13 +7035,13 @@ static void __RSArmNextTimerInMode(RSRunLoopModeRef rlm, RSRunLoopRef rl) {
             if (rlm->_mkTimerArmed && rlm->_timerPort) {
                 AbsoluteTime dummy;
                 mk_timer_cancel(rlm->_timerPort, &dummy);
-                rlm->_mkTimerArmed = false;
+                rlm->_mkTimerArmed = NO;
             }
             
 #if USE_DISPATCH_SOURCE_FOR_TIMERS
             if (rlm->_dispatchTimerArmed) {
                 _dispatch_source_set_runloop_timer_4CF(rlm->_timerSource, DISPATCH_TIME_FOREVER, DISPATCH_TIME_FOREVER, 333);
-                rlm->_dispatchTimerArmed = false;
+                rlm->_dispatchTimerArmed = NO;
             }
 #endif
         }
@@ -7054,7 +7057,7 @@ static void __RSRepositionTimerInMode(RSRunLoopModeRef rlm, RSRunLoopTimerRef rl
     
     RSMutableArrayRef timerArray = rlm->_timers;
     if (!timerArray) return;
-    BOOL found = false;
+    BOOL found = NO;
     
     // If we know in advance that the timer is not in the array (just being added now) then we can skip this search
     if (isInArray) {
@@ -7075,7 +7078,7 @@ static void __RSRepositionTimerInMode(RSRunLoopModeRef rlm, RSRunLoopTimerRef rl
 
 // mode and rl are locked on entry and exit
 static BOOL __RSRunLoopDoTimer(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSRunLoopTimerRef rlt) {	/* DOES CALLOUT */
-    BOOL timerHandled = false;
+    BOOL timerHandled = NO;
     uint64_t oldFireTSR = 0;
     
     /* Fire a timer */
@@ -7168,7 +7171,7 @@ static BOOL __RSRunLoopDoTimer(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSRunLoopT
                 __RSRunLoopTimerUnlock(rlt);
                 for (RSIndex idx = 0; idx < cnt; idx++) {
                     RSStringRef name = (RSStringRef)modes[idx];
-                    modes[idx] = (RSTypeRef)__RSRunLoopFindMode(rlt_rl, name, false);
+                    modes[idx] = (RSTypeRef)__RSRunLoopFindMode(rlt_rl, name, NO);
                     RSRelease(name);
                 }
                 __RSRunLoopTimerFireTSRLock();
@@ -7203,7 +7206,7 @@ static BOOL __RSRunLoopDoTimer(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSRunLoopT
 
 // rl and rlm are locked on entry and exit
 static BOOL __RSRunLoopDoTimers(RSRunLoopRef rl, RSRunLoopModeRef rlm, uint64_t limitTSR) {	/* DOES CALLOUT */
-    BOOL timerHandled = false;
+    BOOL timerHandled = NO;
     RSMutableArrayRef timers = nil;
     for (RSIndex idx = 0, cnt = rlm->_timers ? RSArrayGetCount(rlm->_timers) : 0; idx < cnt; idx++) {
         RSRunLoopTimerRef rlt = (RSRunLoopTimerRef)RSArrayObjectAtIndex(rlm->_timers, idx);
@@ -7229,9 +7232,9 @@ static BOOL __RSRunLoopDoTimers(RSRunLoopRef rl, RSRunLoopModeRef rlm, uint64_t 
 RSExport BOOL _RSRunLoopFinished(RSRunLoopRef rl, RSStringRef modeName) {
     CHECK_FOR_FORK();
     RSRunLoopModeRef rlm;
-    BOOL result = false;
+    BOOL result = NO;
     __RSRunLoopLock(rl);
-    rlm = __RSRunLoopFindMode(rl, modeName, false);
+    rlm = __RSRunLoopFindMode(rl, modeName, NO);
     if (nil == rlm || __RSRunLoopModeIsEmpty(rl, rlm, nil)) {
         result = YES;
     }
@@ -7267,16 +7270,16 @@ static BOOL __RSRunLoopServiceMachPort(mach_port_name_t port, mach_msg_header_t 
             if (!originalBuffer) RSAllocatorDeallocate(RSAllocatorSystemDefault, msg);
             *buffer = nil;
             *livePort = MACH_PORT_NULL;
-            return false;
+            return NO;
         }
         if (MACH_RCV_TOO_LARGE != ret) break;
         buffer_size = round_msg(msg->msgh_size + MAX_TRAILER_SIZE);
         if (originalBuffer) *buffer = nil;
-        originalBuffer = false;
+        originalBuffer = NO;
         *buffer = RSAllocatorReallocate(RSAllocatorSystemDefault, *buffer, buffer_size);
     }
     HALT;
-    return false;
+    return NO;
 }
 
 #elif DEPLOYMENT_TARGET_WINDOWS
@@ -7289,8 +7292,8 @@ static BOOL __RSRunLoopWaitForMultipleObjects(__RSPortSet portSet, HANDLE *onePo
     HANDLE handleBuf[MAXIMUM_WAIT_OBJECTS];
     HANDLE *handles = nil;
     uint32_t handleCount = 0;
-    BOOL freeHandles = false;
-    BOOL result = false;
+    BOOL freeHandles = NO;
+    BOOL result = NO;
     
     if (portSet) {
         // copy out the handles to be safe from other threads at work
@@ -7299,7 +7302,7 @@ static BOOL __RSRunLoopWaitForMultipleObjects(__RSPortSet portSet, HANDLE *onePo
     } else {
         handles = onePort;
         handleCount = 1;
-        freeHandles = FALSE;
+        freeHandles = NO;
     }
     
     // The run loop mode and loop are already in proper unlocked state from caller
@@ -7309,7 +7312,7 @@ static BOOL __RSRunLoopWaitForMultipleObjects(__RSPortSet portSet, HANDLE *onePo
     
     if (waitResult == WAIT_TIMEOUT) {
         // do nothing, just return to caller
-        result = false;
+        result = NO;
     } else if (waitResult >= WAIT_OBJECT_0 && waitResult < WAIT_OBJECT_0+handleCount) {
         // a handle was signaled
         if (livePort) *livePort = handles[waitResult-WAIT_OBJECT_0];
@@ -7324,7 +7327,7 @@ static BOOL __RSRunLoopWaitForMultipleObjects(__RSPortSet portSet, HANDLE *onePo
         result = YES;
     } else {
         RSAssert2(waitResult == WAIT_FAILED, __RSLogAssertion, "%s(): unexpected result from MsgWaitForMultipleObjects: %d", __PRETTY_FUNCTION__, waitResult);
-        result = false;
+        result = NO;
     }
     
     if (freeHandles) {
@@ -7365,7 +7368,7 @@ static int32_t __RSRunLoopRun(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSTimeInter
         __RSRunLoopUnsetStopped(rl);
         return RSRunLoopRunStopped;
     } else if (rlm->_stopped) {
-        rlm->_stopped = false;
+        rlm->_stopped = NO;
         return RSRunLoopRunStopped;
     }
     
@@ -7416,7 +7419,7 @@ static int32_t __RSRunLoopRun(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSTimeInter
         mach_port_t livePort = MACH_PORT_NULL;
 #elif DEPLOYMENT_TARGET_WINDOWS
         HANDLE livePort = nil;
-        BOOL windowsMessageReceived = false;
+        BOOL windowsMessageReceived = NO;
 #endif
         __RSPortSet waitSet = rlm->_portSet;
         
@@ -7447,7 +7450,7 @@ static int32_t __RSRunLoopRun(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSTimeInter
 #endif
         }
         
-        didDispatchPortLastTime = false;
+        didDispatchPortLastTime = NO;
         
         if (!poll && (rlm->_observerMask & RSRunLoopBeforeWaiting)) __RSRunLoopDoObservers(rl, rlm, RSRunLoopBeforeWaiting);
         __RSRunLoopSetSleeping(rl);
@@ -7477,7 +7480,7 @@ static int32_t __RSRunLoopRun(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSTimeInter
                 while (_dispatch_runloop_root_queue_perform_4CF(rlm->_queue));
                 if (rlm->_timerFired) {
                     // Leave livePort as the queue port, and service timers below
-                    rlm->_timerFired = false;
+                    rlm->_timerFired = NO;
                     break;
                 } else {
                     if (msg && msg != (mach_msg_header_t *)msg_buffer) RSAllocatorDeallocate(RSAllocatorSystemDefault, msg);
@@ -7635,7 +7638,7 @@ static int32_t __RSRunLoopRun(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSTimeInter
             __RSRunLoopUnsetStopped(rl);
             retVal = RSRunLoopRunStopped;
         } else if (rlm->_stopped) {
-            rlm->_stopped = false;
+            rlm->_stopped = NO;
             retVal = RSRunLoopRunStopped;
         } else if (__RSRunLoopModeIsEmpty(rl, rlm, previousMode)) {
             retVal = RSRunLoopRunFinished;
@@ -7654,13 +7657,13 @@ static int32_t __RSRunLoopRun(RSRunLoopRef rl, RSRunLoopModeRef rlm, RSTimeInter
     return retVal;
 }
 
-RSBit32 RSRunLoopRunSpecific(RSRunLoopRef rl, RSStringRef modeName, RSTimeInterval seconds, BOOL returnAfterSourceHandled) {     /* DOES CALLOUT */
+RSExport RSUInteger RSRunLoopRunSpecific(RSRunLoopRef rl, RSStringRef modeName, RSTimeInterval seconds, BOOL returnAfterSourceHandled) {     /* DOES CALLOUT */
     CHECK_FOR_FORK();
     if (__RSRunLoopIsDeallocating(rl)) return RSRunLoopRunFinished;
     __RSRunLoopLock(rl);
-    RSRunLoopModeRef currentMode = __RSRunLoopFindMode(rl, modeName, false);
+    RSRunLoopModeRef currentMode = __RSRunLoopFindMode(rl, modeName, NO);
     if (nil == currentMode || __RSRunLoopModeIsEmpty(rl, currentMode, rl->_currentMode)) {
-        BOOL did = false;
+        BOOL did = NO;
         if (currentMode) __RSRunLoopModeUnlock(currentMode);
         __RSRunLoopUnlock(rl);
         return did ? RSRunLoopRunHandledSource : RSRunLoopRunFinished;
@@ -7668,7 +7671,7 @@ RSBit32 RSRunLoopRunSpecific(RSRunLoopRef rl, RSStringRef modeName, RSTimeInterv
     volatile _per_run_data *previousPerRun = __RSRunLoopPushPerRunData(rl);
     RSRunLoopModeRef previousMode = rl->_currentMode;
     rl->_currentMode = currentMode;
-    RSBit32 result = RSRunLoopRunFinished;
+    RSUInteger result = RSRunLoopRunFinished;
     
 	if (currentMode->_observerMask & RSRunLoopEntry ) __RSRunLoopDoObservers(rl, currentMode, RSRunLoopEntry);
 	result = __RSRunLoopRun(rl, currentMode, seconds, returnAfterSourceHandled, previousMode);
@@ -7681,15 +7684,15 @@ RSBit32 RSRunLoopRunSpecific(RSRunLoopRef rl, RSStringRef modeName, RSTimeInterv
     return result;
 }
 
-void RSRunLoopRun(void) {	/* DOES CALLOUT */
-    int32_t result;
+RSExport void RSRunLoopRun(void) {	/* DOES CALLOUT */
+    RSUInteger result;
     do {
-        result = RSRunLoopRunSpecific(RSRunLoopGetCurrent(), RSRunLoopDefaultMode, 1.0e10, false);
+        result = RSRunLoopRunSpecific(RSRunLoopGetCurrent(), RSRunLoopDefaultMode, 1.0e10, NO);
         CHECK_FOR_FORK();
     } while (RSRunLoopRunStopped != result && RSRunLoopRunFinished != result);
 }
 
-RSBit32 RSRunLoopRunInMode(RSStringRef modeName, RSTimeInterval seconds, BOOL returnAfterSourceHandled) {     /* DOES CALLOUT */
+RSExport RSUInteger RSRunLoopRunInMode(RSStringRef modeName, RSTimeInterval seconds, BOOL returnAfterSourceHandled) {     /* DOES CALLOUT */
     CHECK_FOR_FORK();
     return RSRunLoopRunSpecific(RSRunLoopGetCurrent(), modeName, seconds, returnAfterSourceHandled);
 }
@@ -7697,7 +7700,7 @@ RSBit32 RSRunLoopRunInMode(RSStringRef modeName, RSTimeInterval seconds, BOOL re
 RSAbsoluteTime RSRunLoopGetNextTimerFireDate(RSRunLoopRef rl, RSStringRef modeName) {
     CHECK_FOR_FORK();
     __RSRunLoopLock(rl);
-    RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, false);
+    RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, NO);
     RSAbsoluteTime at = 0.0;
     RSRunLoopTimerRef nextTimer = (rlm && rlm->_timers && 0 < RSArrayGetCount(rlm->_timers)) ? (RSRunLoopTimerRef)RSArrayObjectAtIndex(rlm->_timers, 0) : nil;
     if (nextTimer) {
@@ -7735,7 +7738,7 @@ void RSRunLoopWakeUp(RSRunLoopRef rl) {
 }
 
 void RSRunLoopStop(RSRunLoopRef rl) {
-    BOOL doWake = false;
+    BOOL doWake = NO;
     CHECK_FOR_FORK();
     __RSRunLoopLock(rl);
     if (rl->_currentMode) {
@@ -7763,7 +7766,7 @@ RSExport void _RSRunLoopStopMode(RSRunLoopRef rl, RSStringRef modeName) {
 
 RSExport BOOL _RSRunLoopModeContainsMode(RSRunLoopRef rl, RSStringRef modeName, RSStringRef candidateContainedName) {
     CHECK_FOR_FORK();
-    return false;
+    return NO;
 }
 
 void RSRunLoopPerformBlock(RSRunLoopRef rl, RSTypeRef mode, void (^block)(void)) {
@@ -7827,16 +7830,16 @@ void RSRunLoopPerformBlock(RSRunLoopRef rl, RSTypeRef mode, void (^block)(void))
 BOOL RSRunLoopContainsSource(RSRunLoopRef rl, RSRunLoopSourceRef rls, RSStringRef modeName) {
     CHECK_FOR_FORK();
     RSRunLoopModeRef rlm;
-    BOOL hasValue = false;
+    BOOL hasValue = NO;
     __RSRunLoopLock(rl);
     if (modeName == RSRunLoopCommonModes) {
         if (nil != rl->_commonModeItems) {
             hasValue = RSSetContainsValue(rl->_commonModeItems, rls);
         }
     } else {
-        rlm = __RSRunLoopFindMode(rl, modeName, false);
+        rlm = __RSRunLoopFindMode(rl, modeName, NO);
         if (nil != rlm) {
-            hasValue = (rlm->_sources0 ? RSSetContainsValue(rlm->_sources0, rls) : false) || (rlm->_sources1 ? RSSetContainsValue(rlm->_sources1, rls) : false);
+            hasValue = (rlm->_sources0 ? RSSetContainsValue(rlm->_sources0, rls) : NO) || (rlm->_sources1 ? RSSetContainsValue(rlm->_sources1, rls) : NO);
             __RSRunLoopModeUnlock(rlm);
         }
     }
@@ -7848,7 +7851,7 @@ void RSRunLoopAddSource(RSRunLoopRef rl, RSRunLoopSourceRef rls, RSStringRef mod
     CHECK_FOR_FORK();
     if (__RSRunLoopIsDeallocating(rl)) return;
     if (!__RSRunLoopIsValid(rls)) return;
-    BOOL doVer0Callout = false;
+    BOOL doVer0Callout = NO;
     __RSRunLoopLock(rl);
     if (modeName == RSRunLoopCommonModes) {
         RSSetRef set = rl->_commonModes ? RSSetCreateCopy(RSAllocatorSystemDefault, rl->_commonModes) : nil;
@@ -7908,7 +7911,7 @@ void RSRunLoopAddSource(RSRunLoopRef rl, RSRunLoopSourceRef rls, RSStringRef mod
 
 void RSRunLoopRemoveSource(RSRunLoopRef rl, RSRunLoopSourceRef rls, RSStringRef modeName) {	/* DOES CALLOUT */
     CHECK_FOR_FORK();
-    BOOL doVer0Callout = false, doRLSRelease = false;
+    BOOL doVer0Callout = NO, doRLSRelease = NO;
     __RSRunLoopLock(rl);
     if (modeName == RSRunLoopCommonModes) {
         if (nil != rl->_commonModeItems && RSSetContainsValue(rl->_commonModeItems, rls)) {
@@ -7923,7 +7926,7 @@ void RSRunLoopRemoveSource(RSRunLoopRef rl, RSRunLoopSourceRef rls, RSStringRef 
         } else {
         }
     } else {
-        RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, false);
+        RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, NO);
         if (nil != rlm && ((nil != rlm->_sources0 && RSSetContainsValue(rlm->_sources0, rls)) || (nil != rlm->_sources1 && RSSetContainsValue(rlm->_sources1, rls)))) {
             RSRetain(rls);
             if (1 == rls->_context.version0.version) {
@@ -7989,7 +7992,7 @@ static void __RSRunLoopRemoveAllSources(RSRunLoopRef rl, RSStringRef modeName) {
         } else {
         }
     } else {
-        rlm = __RSRunLoopFindMode(rl, modeName, false);
+        rlm = __RSRunLoopFindMode(rl, modeName, NO);
         if (nil != rlm && nil != rlm->_sources0) {
             RSSetRef set = RSSetCreateCopy(RSAllocatorSystemDefault, rlm->_sources0);
             RSTypeRef context[2] = {rl, modeName};
@@ -8012,14 +8015,14 @@ static void __RSRunLoopRemoveAllSources(RSRunLoopRef rl, RSStringRef modeName) {
 BOOL RSRunLoopContainsObserver(RSRunLoopRef rl, RSRunLoopObserverRef rlo, RSStringRef modeName) {
     CHECK_FOR_FORK();
     RSRunLoopModeRef rlm;
-    BOOL hasValue = false;
+    BOOL hasValue = NO;
     __RSRunLoopLock(rl);
     if (modeName == RSRunLoopCommonModes) {
         if (nil != rl->_commonModeItems) {
             hasValue = RSSetContainsValue(rl->_commonModeItems, rlo);
         }
     } else {
-        rlm = __RSRunLoopFindMode(rl, modeName, false);
+        rlm = __RSRunLoopFindMode(rl, modeName, NO);
         if (nil != rlm && nil != rlm->_observers) {
             hasValue = RSArrayContainsObject(rlm->_observers, RSMakeRange(0, RSArrayGetCount(rlm->_observers)), rlo);
         }
@@ -8055,7 +8058,7 @@ void RSRunLoopAddObserver(RSRunLoopRef rl, RSRunLoopObserverRef rlo, RSStringRef
             rlm->_observers = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
         }
         if (nil != rlm && !RSArrayContainsObject(rlm->_observers, RSMakeRange(0, RSArrayGetCount(rlm->_observers)), rlo)) {
-            BOOL inserted = false;
+            BOOL inserted = NO;
             for (RSIndex idx = RSArrayGetCount(rlm->_observers); idx--; ) {
                 RSRunLoopObserverRef obs = (RSRunLoopObserverRef)RSArrayObjectAtIndex(rlm->_observers, idx);
                 if (obs->_order <= rlo->_order) {
@@ -8094,7 +8097,7 @@ void RSRunLoopRemoveObserver(RSRunLoopRef rl, RSRunLoopObserverRef rlo, RSString
         } else {
         }
     } else {
-        rlm = __RSRunLoopFindMode(rl, modeName, false);
+        rlm = __RSRunLoopFindMode(rl, modeName, NO);
         if (nil != rlm && nil != rlm->_observers) {
             RSRetain(rlo);
             RSIndex idx = RSArrayIndexOfObject(rlm->_observers, rlo);
@@ -8113,15 +8116,15 @@ void RSRunLoopRemoveObserver(RSRunLoopRef rl, RSRunLoopObserverRef rlo, RSString
 
 BOOL RSRunLoopContainsTimer(RSRunLoopRef rl, RSRunLoopTimerRef rlt, RSStringRef modeName) {
     CHECK_FOR_FORK();
-    if (nil == rlt->_runLoop || rl != rlt->_runLoop) return false;
-    BOOL hasValue = false;
+    if (nil == rlt->_runLoop || rl != rlt->_runLoop) return NO;
+    BOOL hasValue = NO;
     __RSRunLoopLock(rl);
     if (modeName == RSRunLoopCommonModes) {
         if (nil != rl->_commonModeItems) {
             hasValue = RSSetContainsValue(rl->_commonModeItems, rlt);
         }
     } else {
-        RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, false);
+        RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, NO);
         if (nil != rlm) {
             if (nil != rlm->_timers) {
                 RSIndex idx = RSArrayIndexOfObject(rlm->_timers, rlt);
@@ -8174,7 +8177,7 @@ void RSRunLoopAddTimer(RSRunLoopRef rl, RSRunLoopTimerRef rlt, RSStringRef modeN
             RSSetAddValue(rlt->_rlModes, rlm->_name);
             __RSRunLoopTimerUnlock(rlt);
             __RSRunLoopTimerFireTSRLock();
-            __RSRepositionTimerInMode(rlm, rlt, false);
+            __RSRepositionTimerInMode(rlm, rlt, NO);
             __RSRunLoopTimerFireTSRUnlock();
             if (!_RSExecutableLinkedOnOrAfter(RSSystemVersionLion)) {
                 // Normally we don't do this on behalf of clients, but for
@@ -8205,7 +8208,7 @@ void RSRunLoopRemoveTimer(RSRunLoopRef rl, RSRunLoopTimerRef rlt, RSStringRef mo
         } else {
         }
     } else {
-        RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, false);
+        RSRunLoopModeRef rlm = __RSRunLoopFindMode(rl, modeName, NO);
         RSIndex idx = RSNotFound;
         RSMutableArrayRef timerList = nil;
         if (nil != rlm) {
@@ -8237,13 +8240,13 @@ static BOOL __RSRunLoopSourceClassEqual(RSTypeRef rs1, RSTypeRef rs2) {	/* DOES 
     RSRunLoopSourceRef rls1 = (RSRunLoopSourceRef)rs1;
     RSRunLoopSourceRef rls2 = (RSRunLoopSourceRef)rs2;
     if (rls1 == rls2) return YES;
-    if (__RSRunLoopIsValid(rls1) != __RSRunLoopIsValid(rls2)) return false;
-    if (rls1->_order != rls2->_order) return false;
-    if (rls1->_context.version0.version != rls2->_context.version0.version) return false;
-    if (rls1->_context.version0.hash != rls2->_context.version0.hash) return false;
-    if (rls1->_context.version0.equal != rls2->_context.version0.equal) return false;
-    if (0 == rls1->_context.version0.version && rls1->_context.version0.perform != rls2->_context.version0.perform) return false;
-    if (1 == rls1->_context.version0.version && rls1->_context.version1.perform != rls2->_context.version1.perform) return false;
+    if (__RSRunLoopIsValid(rls1) != __RSRunLoopIsValid(rls2)) return NO;
+    if (rls1->_order != rls2->_order) return NO;
+    if (rls1->_context.version0.version != rls2->_context.version0.version) return NO;
+    if (rls1->_context.version0.hash != rls2->_context.version0.hash) return NO;
+    if (rls1->_context.version0.equal != rls2->_context.version0.equal) return NO;
+    if (0 == rls1->_context.version0.version && rls1->_context.version0.perform != rls2->_context.version0.perform) return NO;
+    if (1 == rls1->_context.version0.version && rls1->_context.version1.perform != rls2->_context.version1.perform) return NO;
     if (rls1->_context.version0.equal)
         return rls1->_context.version0.equal(rls1->_context.version0.info, rls2->_context.version0.info);
     return (rls1->_context.version0.info == rls2->_context.version0.info);
@@ -8440,7 +8443,7 @@ void RSRunLoopSourceSignal(RSRunLoopSourceRef rls) {
 BOOL RSRunLoopSourceIsSignalled(RSRunLoopSourceRef rls) {
     CHECK_FOR_FORK();
     __RSRunLoopSourceLock(rls);
-    BOOL ret = __RSRunLoopSourceIsSignaled(rls) ? YES : false;
+    BOOL ret = __RSRunLoopSourceIsSignaled(rls) ? YES : NO;
     __RSRunLoopSourceUnlock(rls);
     return ret;
 }
@@ -8820,7 +8823,7 @@ RSExport void RSRunLoopTimerSetNextFireDate(RSRunLoopTimerRef rlt, RSAbsoluteTim
         __RSRunLoopLock(rl);
         for (RSIndex idx = 0; idx < cnt; idx++) {
             RSStringRef name = (RSStringRef)modes[idx];
-            modes[idx] = __RSRunLoopFindMode(rl, name, false);
+            modes[idx] = __RSRunLoopFindMode(rl, name, NO);
             RSRelease(name);
         }
         __RSRunLoopTimerFireTSRLock();
@@ -8987,7 +8990,7 @@ RSExport void RSPerformBlockRepeatWithFlags(RSIndex performCount, RSPerformBlock
 
 RSPrivate void *__RSRunLoopGetQueue(RSRunLoopRef rl)
 {
-    return dispatch_get_current_queue();
+    return rl->_queue;
 }
 
 RSPrivate void __RSRunLoopDeallocate()
@@ -9083,24 +9086,18 @@ RSExport void RSPerformBlockOnMainThreadWaitUntilDone(void (^perform)())
 
 RSExport void RSPerformBlockAfterDelay(RSTimeInterval timeInterval, void (^perform)())
 {
-    RSTimerRef timer = RSTimerCreateSchedule(RSAllocatorSystemDefault, RSAbsoluteTimeGetCurrent() + timeInterval, 0, NO, nil, ^(RSTimerRef timer) {
-        RSAutoreleaseBlock(^{
-            perform();
-        });
-        RSTimerInvalidate(timer);
-    });
-    RSTimerFire(timer);
-    return;
-    dispatch_after(dispatch_time(0, timeInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    RSRunLoopTimerRef timer = RSRunLoopTimerCreateWithHandler(RSAllocatorSystemDefault, RSAbsoluteTimeGetCurrent() + timeInterval, 0, 0, 0, ^(RSRunLoopTimerRef timer) {
         perform();
     });
+    RSRunLoopAddTimer(RSRunLoopGetCurrent(), timer, RSRunLoopDefaultMode);
+    RSRelease(timer);
+    return;
 }
 
 RSExport void RSRunLoopPerformBlockInQueue(RSTypeRef queue, void (^perform)(void))
 {
-    dispatch_async((dispatch_queue_t)queue ? : dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        perform();
-    });
+    RSRunLoopPerformBlock((RSRunLoopRef)queue, RSRunLoopDefaultMode, perform);
+    return;
 }
 
 #endif
@@ -9191,7 +9188,7 @@ static RSRunLoopModeRef ___RSRunLoopFindMode(RSRunLoopRef rl, RSStringRef modeNa
     }
     __RSRunLoopLockInit(&rlm->_lock);
     rlm->_name = RSStringCreateCopy(RSAllocatorSystemDefault, modeName);
-    rlm->_stopped = false;
+    rlm->_stopped = NO;
     rlm->_portToV1SourceMap = nil;
     rlm->_sources0 = nil;
     rlm->_sources1 = nil;
@@ -9306,7 +9303,7 @@ void RSRunLoopRunEx(void *key)
 //    CFSetApplyFunction(rs->_modes, applier2, nil);
     
     if (YES == CFSetContainsValue(rs->_modes, &srlm)) RSShow(RSSTR("contain return YES"));
-    else RSShow(RSSTR("contain return false"));
+    else RSShow(RSSTR("contain return NO"));
     
     struct __CF_RunLoopMode *rlm = (struct __CF_RunLoopMode *)CFSetGetValue(rs->_modes, &srlm);
     

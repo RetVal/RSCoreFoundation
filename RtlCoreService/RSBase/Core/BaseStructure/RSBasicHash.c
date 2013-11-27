@@ -2676,6 +2676,20 @@ RSPrivate void RSBasicHashApply(RSConstBasicHashRef ht, BOOL (^block)(RSBasicHas
     }
 }
 
+RSPrivate void RSBasicHashApplyBlock(RSConstBasicHashRef ht, BOOL (^block)(RSBasicHashBucket btk, BOOL *stop)) {
+    RSIndex used = (RSIndex)ht->bits.used_buckets, cnt = (RSIndex)__RSBasicHashTableSizes[ht->bits.num_buckets_idx];
+    __block BOOL stop = NO;
+    for (RSIndex idx = 0; !stop && 0 < used && idx < cnt; idx++) {
+        RSBasicHashBucket bkt = RSBasicHashGetBucket(ht, idx);
+        if (0 < bkt.count) {
+            if (!block(bkt, stop)) {
+                return;
+            }
+            used--;
+        }
+    }
+}
+
 RSPrivate void RSBasicHashApplyIndexed(RSConstBasicHashRef ht, RSRange range, BOOL (^block)(RSBasicHashBucket)) {
     if (range.length < 0) HALT;
     if (range.length == 0) return;
@@ -3158,7 +3172,8 @@ RSPrivate size_t RSBasicHashGetSize(RSConstBasicHashRef ht, BOOL total) {
 
 RSPrivate RSStringRef RSBasicHashDescription(RSConstBasicHashRef ht, BOOL detailed, RSStringRef prefix, RSStringRef entryPrefix, BOOL describeElements) {
     RSMutableStringRef result = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
-    RSStringAppendStringWithFormat(result, RSSTR("%r{type = %s %s%s, count = %ld,\n"), prefix, (RSBasicHashIsMutable(ht) ? "mutable" : "immutable"), ((ht->bits.counts_offset) ? "multi" : ""), ((ht->bits.keys_offset) ? "dict" : "set"), RSBasicHashGetCount(ht));
+    RSStringAppendStringWithFormat(result, RSSTR("%r{\n"), prefix);
+//    RSStringAppendStringWithFormat(result, RSSTR("%r{type = %s %s%s, count = %ld,\n"), prefix, (RSBasicHashIsMutable(ht) ? "mutable" : "immutable"), ((ht->bits.counts_offset) ? "multi" : ""), ((ht->bits.keys_offset) ? "dict" : "set"), RSBasicHashGetCount(ht));
     if (detailed) {
         const char *cb_type = "custom";
         RSStringAppendStringWithFormat(result, RSSTR("%rhash cache = %s, strong values = %s, strong keys = %s, cb = %s,\n"), prefix, (__RSBasicHashHasHashCache(ht) ? "yes" : "no"), (RSBasicHashHasStrongValues(ht) ? "yes" : "no"), (RSBasicHashHasStrongKeys(ht) ? "yes" : "no"), cb_type);
@@ -3167,7 +3182,49 @@ RSPrivate RSStringRef RSBasicHashDescription(RSConstBasicHashRef ht, BOOL detail
         RSStringAppendStringWithFormat(result, RSSTR("%rnum mutations = %ld, num deleted = %ld, size = %ld, total size = %ld,\n"), prefix, (long)ht->bits.mutations, (long)ht->bits.deleted, RSBasicHashGetSize(ht, false), RSBasicHashGetSize(ht, true));
         RSStringAppendStringWithFormat(result, RSSTR("%rvalues ptr = %p, keys ptr = %p, counts ptr = %p, hashes ptr = %p,\n"), prefix, __RSBasicHashGetValues(ht), ((ht->bits.keys_offset) ? __RSBasicHashGetKeys(ht) : nil), ((ht->bits.counts_offset) ? __RSBasicHashGetCounts(ht) : nil), (__RSBasicHashHasHashCache(ht) ? __RSBasicHashGetHashes(ht) : nil));
     }
-    RSStringAppendStringWithFormat(result, RSSTR("%rentries =>\n"), prefix);
+//    RSStringAppendStringWithFormat(result, RSSTR("%rentries =>\n"), prefix);
+    
+    __block RSMutableArrayRef keys = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
+    __block RSMutableArrayRef values = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
+    
+    RSBasicHashApplyBlock(ht, ^BOOL(RSBasicHashBucket bkt, BOOL *stop) {
+        RSStringRef kDesc = nil;
+        if (!describeElements) {
+            if (ht->bits.keys_offset) {
+                kDesc = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<%p>"), (void *)bkt.weak_key);
+            }
+        } else {
+            if (ht->bits.keys_offset) {
+                kDesc = __RSBasicHashDescKey(ht, bkt.weak_key);
+            }
+        }
+        
+        RSArrayAddObject(keys, kDesc);
+        
+        if (kDesc) RSRelease(kDesc);
+        return YES;
+    });
+    
+    RSUInteger cnt = RSArrayGetCount(keys);
+
+    RSArraySort(keys, RSOrderedAscending, (RSComparatorFunction)RSStringCompare, nil);
+    
+    RSArrayApplyBlock(keys, RSMakeRange(0, cnt), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+        RSBasicHashBucket bkt = RSBasicHashFindBucket(ht, (uintptr_t)value);
+        RSTypeRef v = (0 < bkt.count ? (RSTypeRef)bkt.weak_value : 0);
+        v = v ? __RSBasicHashDescValue(ht, bkt.weak_value) : RSSTR("Null");
+        RSArrayAddObject(values, v);
+        if (v) RSRelease(v);
+    });
+    
+    for (RSUInteger idx = 0; idx < cnt; idx++) {
+        RSStringAppendStringWithFormat(result, RSSTR("%r%r = %r\n"), entryPrefix, RSArrayObjectAtIndex(keys, idx), RSArrayObjectAtIndex(values, idx));
+    }
+    RSRelease(keys);
+    RSRelease(values);
+    
+    RSStringAppendStringWithFormat(result, RSSTR("%r}"), prefix);
+    return result;
     RSBasicHashApply(ht, ^(RSBasicHashBucket bkt) {
         RSStringRef vDesc = nil, kDesc = nil;
         if (!describeElements) {

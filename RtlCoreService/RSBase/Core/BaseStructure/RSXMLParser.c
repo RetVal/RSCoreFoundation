@@ -7,6 +7,7 @@
 //
 
 #include "RSXMLParser.h"
+#include "RSPrivate/gumbo/gumbo.h"
 
 #include <RSCoreFoundation/RSRuntime.h>
 
@@ -2354,17 +2355,39 @@ static void __xml_parse_entry(RSXMLDocumentRef document, const char *text, RSErr
             return;
         }
     }
-    
 }
 
-static RSXMLDocumentRef __RSXMLParse(RSDataRef xmlData, RSErrorRef *error)
-{
+static void __RSHTML5Translate(RSXMLDocumentRef document, GumboOutput *output, RSErrorRef *error) {
+    GumboNode *node = output->root;
+    const char *nodeName = nil;
+    while (node) {
+        switch (node->type) {
+            case GUMBO_NODE_ELEMENT:
+                nodeName = gumbo_normalized_tagname(node->type);
+                break;
+            case GUMBO_NODE_TEXT:
+                
+                break;
+            case GUMBO_NODE_DOCUMENT:
+                break;
+            case GUMBO_NODE_WHITESPACE:
+            case GUMBO_NODE_COMMENT:
+            case GUMBO_NODE_CDATA:
+            default:
+                break;
+        }
+    }
+}
+
+RSExport RSXMLDocumentRef __RSHTML5Parser(RSDataRef xmlData, RSErrorRef *error) {
     if (!xmlData) return nil;
     RSXMLDocumentRef doc = __RSXMLDocumentCreateInstance(RSAllocatorSystemDefault, nil);
     RSStringRef xmlStr = RSStringCreateWithData(RSAllocatorSystemDefault, xmlData, RSStringEncodingUTF8);
     RSAutoreleaseBlock(^{
         RSErrorRef parseError = nil;
-        __xml_parse_entry(doc, RSStringGetCStringPtr(xmlStr, RSStringEncodingUTF8), &parseError, 0/*flags*/);
+        GumboOutput* output = gumbo_parse(RSStringGetUTF8String(xmlStr));
+        __RSHTML5Translate(doc, output, error);
+        gumbo_destroy_output(&kGumboDefaultOptions, output);
         if (error) *error = (RSErrorRef)RSRetain(parseError);
     });
     RSRelease(xmlStr);
@@ -2372,12 +2395,36 @@ static RSXMLDocumentRef __RSXMLParse(RSDataRef xmlData, RSErrorRef *error)
     return doc;
 }
 
-RSExport RSXMLDocumentRef RSXMLDocumentCreateWithXMLData(RSAllocatorRef allocator, RSDataRef xmlData)
+static RSXMLDocumentRef __RSXMLParser(RSDataRef xmlData, RSErrorRef *error)
+{
+    if (!xmlData) return nil;
+    RSXMLDocumentRef doc = __RSXMLDocumentCreateInstance(RSAllocatorSystemDefault, nil);
+    RSStringRef xmlStr = RSStringCreateWithData(RSAllocatorSystemDefault, xmlData, RSStringEncodingUTF8);
+    RSAutoreleaseBlock(^{
+        RSErrorRef parseError = nil;
+        __xml_parse_entry(doc, RSStringGetUTF8String(xmlStr), &parseError, 0/*flags*/);
+        if (error) *error = (RSErrorRef)RSRetain(parseError);
+    });
+    RSRelease(xmlStr);
+    if (error && *error) RSAutorelease(*error);
+    return doc;
+}
+
+RSExport RSXMLDocumentRef RSXMLDocumentCreateWithXMLData(RSAllocatorRef allocator, RSDataRef xmlData, RSXMLDocumentType documentType)
 {
     if (xmlData)
     {
         RSErrorRef error = nil;
-        RSXMLDocumentRef doc = __RSXMLParse(xmlData, &error);
+        RSXMLDocumentRef doc = nil;
+        switch (documentType) {
+            case RSXMLDocumentTidyHTML:
+//                doc = __RSHTML5Parser(xmlData, &error);
+                break;
+            case RSXMLDocumentTidyXML:
+            default:
+                doc = __RSXMLParser(xmlData, &error);
+                break;
+        }
         if (error) {
             RSRelease(doc);
             doc = nil;
@@ -2388,22 +2435,22 @@ RSExport RSXMLDocumentRef RSXMLDocumentCreateWithXMLData(RSAllocatorRef allocato
     return nil;
 }
 
-RSExport RSXMLDocumentRef RSXMLDocumentCreateWithContentOfFile(RSAllocatorRef allocator, RSStringRef path)
+RSExport RSXMLDocumentRef RSXMLDocumentCreateWithContentOfFile(RSAllocatorRef allocator, RSStringRef path, RSXMLDocumentType documentType)
 {
     RSDataRef xmlData = RSDataCreateWithContentOfPath(allocator, path);
-    RSXMLDocumentRef doc = RSXMLDocumentCreateWithXMLData(allocator, xmlData);
+    RSXMLDocumentRef doc = RSXMLDocumentCreateWithXMLData(allocator, xmlData, documentType);
     RSRelease(xmlData);
     return doc;
 }
 
-RSExport RSXMLDocumentRef RSXMLDocumentWithXMLData(RSDataRef xmlData)
+RSExport RSXMLDocumentRef RSXMLDocumentWithXMLData(RSDataRef xmlData, RSXMLDocumentType documentType)
 {
-    return RSAutorelease(RSXMLDocumentCreateWithXMLData(RSAllocatorSystemDefault, xmlData));
+    return RSAutorelease(RSXMLDocumentCreateWithXMLData(RSAllocatorSystemDefault, xmlData, documentType));
 }
 
-RSExport RSXMLDocumentRef RSXMLDocumentWithContentOfFile(RSStringRef path)
+RSExport RSXMLDocumentRef RSXMLDocumentWithContentOfFile(RSStringRef path, RSXMLDocumentType documentType)
 {
-    return RSAutorelease(RSXMLDocumentCreateWithContentOfFile(RSAllocatorSystemDefault, path));
+    return RSAutorelease(RSXMLDocumentCreateWithContentOfFile(RSAllocatorSystemDefault, path, documentType));
 }
 
 RSInline BOOL __RSXMLIsSubClassOfNode(ISA id)

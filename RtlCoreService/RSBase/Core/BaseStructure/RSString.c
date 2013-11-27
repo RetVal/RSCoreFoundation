@@ -3900,9 +3900,181 @@ RSExport RSStringRef  RSStringCreateWithFormat(RSAllocatorRef allocator, RSStrin
     return result;
 }
 
-static RSStringRef __RSStringCopyDescription(RSTypeRef RS) {
-    if (__RSStrLength(RS))
-        return RSCopy(RSGetAllocator(RS), RS);
+enum {
+	VALID = 1,
+	UNRESERVED = 2,
+	PATHVALID = 4,
+	SCHEME = 8,
+	HEXDIGIT = 16,
+    NONQUOT = 32
+};
+
+static const unsigned char sStringDescriptionValidCharacters[128] = {
+    /* nul   0 */   0,
+    /* soh   1 */   0,
+    /* stx   2 */   0,
+    /* etx   3 */   0,
+    /* eot   4 */   0,
+    /* enq   5 */   0,
+    /* ack   6 */   0,
+    /* bel   7 */   0,
+    /* bs    8 */   0,
+    /* ht    9 */   NONQUOT,
+    /* nl   10 */   0,
+    /* vt   11 */   0,
+    /* np   12 */   0,
+    /* cr   13 */   0,
+    /* so   14 */   0,
+    /* si   15 */   0,
+    /* dle  16 */   0,
+    /* dc1  17 */   0,
+    /* dc2  18 */   0,
+    /* dc3  19 */   0,
+    /* dc4  20 */   0,
+    /* nak  21 */   0,
+    /* syn  22 */   0,
+    /* etb  23 */   0,
+    /* can  24 */   0,
+    /* em   25 */   0,
+    /* sub  26 */   0,
+    /* esc  27 */   0,
+    /* fs   28 */   0,
+    /* gs   29 */   0,
+    /* rs   30 */   0,
+    /* us   31 */   0,
+    /* sp   32 */   0,
+    /* '!'  33 */   VALID | UNRESERVED | PATHVALID ,
+    /* '"'  34 */   NONQUOT,
+    /* '#'  35 */   0,
+    /* '$'  36 */   VALID | PATHVALID ,
+    /* '%'  37 */   0,
+    /* '&'  38 */   VALID | PATHVALID ,
+    /* '''  39 */   VALID | UNRESERVED | PATHVALID | NONQUOT,
+    /* '('  40 */   VALID | UNRESERVED | PATHVALID ,
+    /* ')'  41 */   VALID | UNRESERVED | PATHVALID ,
+    /* '*'  42 */   VALID | UNRESERVED | PATHVALID ,
+    /* '+'  43 */   VALID | SCHEME | PATHVALID ,
+    /* ','  44 */   VALID | PATHVALID ,
+    /* '-'  45 */   VALID | UNRESERVED | SCHEME | PATHVALID ,
+    /* '.'  46 */   VALID | UNRESERVED | SCHEME | PATHVALID ,
+    /* '/'  47 */   VALID | PATHVALID ,
+    /* '0'  48 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT |HEXDIGIT,
+    /* '1'  49 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT |HEXDIGIT,
+    /* '2'  50 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT |HEXDIGIT,
+    /* '3'  51 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT |HEXDIGIT,
+    /* '4'  52 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT |HEXDIGIT,
+    /* '5'  53 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT |HEXDIGIT,
+    /* '6'  54 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT |HEXDIGIT,
+    /* '7'  55 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT |HEXDIGIT,
+    /* '8'  56 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT |HEXDIGIT,
+    /* '9'  57 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT |HEXDIGIT,
+    /* ':'  58 */   VALID ,
+    /* ';'  59 */   VALID ,
+    /* '<'  60 */   0,
+    /* '='  61 */   VALID | PATHVALID ,
+    /* '>'  62 */   0,
+    /* '?'  63 */   VALID ,
+    /* '@'  64 */   VALID ,
+    /* 'A'  65 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT | HEXDIGIT ,
+    /* 'B'  66 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT | HEXDIGIT ,
+    /* 'C'  67 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT | HEXDIGIT ,
+    /* 'D'  68 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT | HEXDIGIT ,
+    /* 'E'  69 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT | HEXDIGIT ,
+    /* 'F'  70 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT | HEXDIGIT ,
+    /* 'G'  71 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'H'  72 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'I'  73 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'J'  74 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'K'  75 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'L'  76 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'M'  77 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'N'  78 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'O'  79 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'P'  80 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'Q'  81 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'R'  82 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'S'  83 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'T'  84 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'U'  85 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'V'  86 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'W'  87 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'X'  88 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'Y'  89 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'Z'  90 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* '['  91 */   0,
+    /* '\'  92 */   0,
+    /* ']'  93 */   0,
+    /* '^'  94 */   0,
+    /* '_'  95 */   VALID | UNRESERVED | PATHVALID ,
+    /* '`'  96 */   0,
+    /* 'a'  97 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT | HEXDIGIT ,
+    /* 'b'  98 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT | HEXDIGIT ,
+    /* 'c'  99 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT | HEXDIGIT ,
+    /* 'd' 100 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT | HEXDIGIT ,
+    /* 'e' 101 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT | HEXDIGIT ,
+    /* 'f' 102 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT | HEXDIGIT ,
+    /* 'g' 103 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'h' 104 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'i' 105 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'j' 106 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'k' 107 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'l' 108 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'm' 109 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'n' 110 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'o' 111 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'p' 112 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'q' 113 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'r' 114 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 's' 115 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 't' 116 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'u' 117 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'v' 118 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'w' 119 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'x' 120 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'y' 121 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* 'z' 122 */   VALID | UNRESERVED | SCHEME | PATHVALID | NONQUOT,
+    /* '{' 123 */   0,
+    /* '|' 124 */   0,
+    /* '}' 125 */   0,
+    /* '~' 126 */   VALID | UNRESERVED | PATHVALID ,
+    /* del 127 */   0,
+};
+
+RSInline BOOL __RSStringDescriptionShouldHasQuotationMask(RSStringRef str) {
+    const uint8_t *bytes = (const uint8_t*)__RSStrContents(str) + __RSStrSkipAnyLengthByte(str);
+    RSIndex len = (RSIndex)__RSStrLength(str);
+    if (bytes[0] == '"' && bytes[len - 1] == '"') return NO;
+    for (RSIndex idx = 0; idx < len; idx++) {
+        if (bytes[idx] < 128) {
+            if ((sStringDescriptionValidCharacters[bytes[idx]] & NONQUOT) == 0) return YES;
+            continue;
+        }
+        return YES;
+    }
+    return NO;
+}
+
+RS_CONST_STRING_DECL(_RSEmptyStringWithQuotationMask, "\"\"");
+RSInline RSStringRef __RSStringDescriptionEx(RSTypeRef rs) {
+    if (__RSStringDescriptionShouldHasQuotationMask(rs))
+    {
+        RSStringRef description = nil;
+        RSMutableStringRef tmp = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
+        RSStringAppendCString(tmp, "\"", RSStringEncodingASCII);
+        RSStringAppendString(tmp, rs);
+        RSStringAppendCString(tmp, "\"", RSStringEncodingASCII);
+        description = RSCopy(RSAllocatorSystemDefault, tmp);
+        RSRelease(tmp);
+        return description;
+    }
+    return RSRetain(_RSEmptyStringWithQuotationMask);
+}
+
+static RSStringRef __RSStringDescription(RSTypeRef rs) {
+    if (__RSStrLength(rs))
+    {
+        return RSCopy(RSAllocatorSystemDefault, rs);
+    }
     return RSRetain(_RSEmptyString);
 }
 
@@ -3922,7 +4094,7 @@ static const RSRuntimeClass __RSStringClass = {
     __RSStringDeallocate,
     __RSStringEqual,
     __RSStringHash,
-    __RSStringCopyDescription
+    __RSStringDescription
 };
 
 RSPrivate void __RSStringInitialize(void) {

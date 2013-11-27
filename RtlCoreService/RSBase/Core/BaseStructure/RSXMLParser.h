@@ -24,12 +24,17 @@ typedef struct __RSXMLDocument *RSXMLDocumentRef;
 
 RSExport RSTypeID RSXMLDocumentGetTypeID();
 
-RSExport RSXMLDocumentRef RSXMLDocumentCreateWithXMLData(RSAllocatorRef allocator, RSDataRef xmlData);
-RSExport RSXMLDocumentRef RSXMLDocumentCreateWithContentOfFile(RSAllocatorRef allocator, RSStringRef path);
+typedef enum RSXMLDocumentType {
+    RSXMLDocumentTidyHTML = 1UL << 9,
+    RSXMLDocumentTidyXML = 1UL << 10,
+}RSXMLDocumentType;
 
-RSExport RSXMLDocumentRef RSXMLDocumentWithXMLData(RSDataRef xmlData);
-RSExport RSXMLDocumentRef RSXMLDocumentWithContentOfFile(RSStringRef path);
+RSExport RSXMLDocumentRef RSXMLDocumentCreateWithXMLData(RSAllocatorRef allocator, RSDataRef xmlData, RSXMLDocumentType documentType);
+RSExport RSXMLDocumentRef RSXMLDocumentCreateWithContentOfFile(RSAllocatorRef allocator, RSStringRef path, RSXMLDocumentType documentType);
 
+RSExport RSXMLDocumentRef RSXMLDocumentWithXMLData(RSDataRef xmlData, RSXMLDocumentType documentType);
+RSExport RSXMLDocumentRef RSXMLDocumentWithContentOfFile(RSStringRef path, RSXMLDocumentType documentType);
+RSExport RSXMLDocumentRef __RSHTML5Parser(RSDataRef xmlData, RSErrorRef *error);
 // RSXMLDocumentRef : RSXMLNodeRef : RSTypeRef
 // RSXMLElementRef  : RSXMLNodeRef : RSTypeRef
 

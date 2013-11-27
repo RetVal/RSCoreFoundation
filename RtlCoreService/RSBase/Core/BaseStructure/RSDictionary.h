@@ -81,5 +81,9 @@ RSExport RSArrayRef RSDictionaryAllValues(RSDictionaryRef dictionary) RS_AVAILAB
 RSExport void RSDictionaryGetKeysAndValues(RSDictionaryRef dictionary, RSTypeRef* keys, RSTypeRef* values) RS_AVAILABLE(0_0);
 
 RSExport void RSDictionaryApplyFunction(RSDictionaryRef dictionary, RSDictionaryApplierFunction apply, void* context) RS_AVAILABLE(0_0);
+
+#if RS_BLOCKS_AVAILABLE
+RSExport void RSDictionaryApplyBlock(RSDictionaryRef dictionary, void (^block)(const void* key, const void* value, BOOL *stop)) RS_AVAILABLE(0_1);
+#endif
 RS_EXTERN_C_END
 #endif

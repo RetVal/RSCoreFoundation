@@ -327,6 +327,7 @@ extern BOOL _RSStringGetFileSystemRepresentation(RSStringRef string, uint8_t *bu
 
 extern BOOL _RSExecutableLinkedOnOrAfter(RSUInteger v);
 
+extern RSUInteger RSRunLoopRunSpecific(RSRunLoopRef rl, RSStringRef modeName, RSTimeInterval seconds, BOOL returnAfterSourceHandled);
 #ifndef __RSNotificationIPCName
 #define __RSNotificationIPCName "com.retval.RSCoreFoundation.RSNotificationCenter"
 #endif

@@ -2491,17 +2491,18 @@ void RSArrayApplyFunction(RSArrayRef array, RSRange range, RSArrayApplierFunctio
 }
 
 #if RS_BLOCKS_AVAILABLE
-RSExport void RSArrayApplyBlock(RSArrayRef array, RSRange range, void (^block)(const void*value, void *context), void* context)
+RSExport void RSArrayApplyBlock(RSArrayRef array, RSRange range, void (^block)(const void*value, RSUInteger idx, BOOL *isStop))
 {
     RSIndex idx;
     FAULT_CALLBACK((void **)&(applier));
     __RSGenericValidInstance(array, __RSArrayTypeID);
     __RSArrayValidateRange(array, range, __PRETTY_FUNCTION__);
     
-    for (idx = 0; idx < range.length; idx++)
+    __block BOOL isStop = NO;
+    for (idx = 0; idx < range.length && !isStop; idx++)
     {
         const void *item = __RSArrayGetBucketAtIndex(array, range.location + idx)->_item;
-        block(item, context);
+        block(item, range.location + idx, &isStop);
     }
 }
 #endif

@@ -69,7 +69,8 @@ static RSHashCode __RSURLRequestClassHash(RSTypeRef rs)
 
 static RSStringRef __RSURLRequestClassDescription(RSTypeRef rs)
 {
-    RSStringRef description = RSStringCreateWithFormat(RSAllocatorDefault, RSSTR("RSURLRequest %p"), rs);
+    RSURLRequestRef request = (RSURLRequestRef)rs;
+    RSStringRef description = RSStringCreateWithFormat(RSAllocatorDefault, RSSTR("<RSURLRequest %p> {URL: %R}"), request, request->_url);
     return description;
 }
 

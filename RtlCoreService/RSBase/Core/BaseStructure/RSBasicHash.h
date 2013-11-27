@@ -137,6 +137,7 @@ RSIndex RSBasicHashGetCountOfKey(RSConstBasicHashRef ht, uintptr_t stack_key) RS
 RSIndex RSBasicHashGetCountOfValue(RSConstBasicHashRef ht, uintptr_t stack_value) RS_AVAILABLE(0_0);
 BOOL RSBasicHashesAreEqual(RSConstBasicHashRef ht1, RSConstBasicHashRef ht2) RS_AVAILABLE(0_0);
 void RSBasicHashApply(RSConstBasicHashRef ht, BOOL (^block)(RSBasicHashBucket)) RS_AVAILABLE(0_0);
+void RSBasicHashApplyBlock(RSConstBasicHashRef ht, BOOL (^block)(RSBasicHashBucket btk, BOOL *stop)) RS_AVAILABLE(0_4);
 void RSBasicHashApplyIndexed(RSConstBasicHashRef ht, RSRange range, BOOL (^block)(RSBasicHashBucket)) RS_AVAILABLE(0_0);
 void RSBasicHashGetElements(RSConstBasicHashRef ht, RSIndex bufferslen, uintptr_t *weak_values, uintptr_t *weak_keys) RS_AVAILABLE(0_0);
 

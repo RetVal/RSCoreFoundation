@@ -36,9 +36,9 @@
 //#define RSAutoMemoryLog     1
 RS_EXTERN_C_BEGIN
 enum {
-    kRuntimeBaseInfoMask = 1 << (0L),
-    kRuntimeBaseResourcefMask = 1 << (2L),
-    kRuntimeBaseCustomerRefMask = 1 << (3L),
+    RuntimeBaseInfoMask = 1 << (0L),
+    RuntimeBaseResourcefMask = 1 << (2L),
+    RuntimeBaseCustomerRefMask = 1 << (3L),
 };//RSInfoBlock
 typedef struct __RSRuntimeBaseInfo
 {

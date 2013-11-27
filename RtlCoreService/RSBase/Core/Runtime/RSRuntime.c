@@ -762,7 +762,7 @@ RSExport void __RSLogArgs(RSIndex logLevel, RSStringRef format, va_list args)
     char BUF[256] = {0};
     if (!buf)
     {
-        buf = logString ? (length < 254 ? shouldReleaseBuf = YES, (char *)RSAllocatorAllocate(RSAllocatorSystemDefault, length) : BUF) : nil;
+        buf = logString ? (length > 254 ? shouldReleaseBuf = YES, (char *)RSAllocatorAllocate(RSAllocatorSystemDefault, length) : BUF) : nil;
         if (buf) converted = RSStringGetCString(logString, (char *)buf, length, RSStringEncodingUTF8);
     }
     else converted = length;
@@ -858,6 +858,9 @@ extern void __RSXMLParserInitialize();
 extern void __RSArchiverInitialize();
 
 extern void __RSURLInitialize();
+extern void __RSURLRequestInitialize();
+extern void __RSURLResponseInitialize();
+extern void __RSURLConnectionInitialize();
 #include <RSCoreFoundation/RSNotificationCenter.h>
 RS_PUBLIC_CONST_STRING_DECL(RSCoreFoundationWillDeallocateNotification, "RSCoreFoundationWillDeallocateNotification")
 RS_PUBLIC_CONST_STRING_DECL(RSCoreFoundationDidFinishLoadingNotification, "RSCoreFoundationDidFinishLoadingNotification")
@@ -921,12 +924,12 @@ RSExport __RS_INIT_ROUTINE(RSRuntimePriority) void RSCoreFoundationInitialize()
     __RSRunLoopObserverInitialize();
     __RSRunLoopTimerInitialize();
     
-    __RSURLInitialize();
-    
-    
     __RSSocketInitialize();
     
-    
+    __RSURLInitialize();
+    __RSURLRequestInitialize();
+    __RSURLResponseInitialize();
+    __RSURLConnectionInitialize();
     
     __RSPropertyListInitializeInitStatics();
     __RSBinaryPropertyListInitStatics();

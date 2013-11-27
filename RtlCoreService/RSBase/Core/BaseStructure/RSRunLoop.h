@@ -95,7 +95,7 @@ RSExport void RSRunLoopAddCommonMode(RSRunLoopRef rl, RSStringRef mode) RS_AVAIL
 RSExport RSAbsoluteTime RSRunLoopGetNextTimerFireDate(RSRunLoopRef rl, RSStringRef mode) RS_AVAILABLE(0_4);
 
 RSExport void RSRunLoopRun(void) RS_AVAILABLE(0_4);
-RSExport RSBit32 RSRunLoopRunInMode(RSStringRef mode, RSTimeInterval seconds, BOOL returnAfterSourceHandled) RS_AVAILABLE(0_4);
+RSExport RSUInteger RSRunLoopRunInMode(RSStringRef mode, RSTimeInterval seconds, BOOL returnAfterSourceHandled) RS_AVAILABLE(0_4);
 RSExport BOOL RSRunLoopIsWaiting(RSRunLoopRef rl) RS_AVAILABLE(0_0);
 RSExport void RSRunLoopWakeUp(RSRunLoopRef rl) RS_AVAILABLE(0_0);
 RSExport void RSRunLoopStop(RSRunLoopRef rl) RS_AVAILABLE(0_0);
