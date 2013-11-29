@@ -2357,42 +2357,86 @@ static void __xml_parse_entry(RSXMLDocumentRef document, const char *text, RSErr
     }
 }
 
-static void __RSHTML5Translate(RSXMLDocumentRef document, GumboOutput *output, RSErrorRef *error) {
-    GumboNode *node = output->root;
-    const char *nodeName = nil;
-    while (node) {
-        switch (node->type) {
-            case GUMBO_NODE_ELEMENT:
-                nodeName = gumbo_normalized_tagname(node->type);
-                break;
-            case GUMBO_NODE_TEXT:
-                
-                break;
-            case GUMBO_NODE_DOCUMENT:
-                break;
-            case GUMBO_NODE_WHITESPACE:
-            case GUMBO_NODE_COMMENT:
-            case GUMBO_NODE_CDATA:
-            default:
-                break;
-        }
+typedef enum {
+    RS_HTML_ELEMENT_START,
+    RS_HTML_ELEMENT_END,
+    RS_HTML_TEXT
+} __RSHtmlGumboType;
+
+static RSArrayRef __RSHTMLArrayOfNodesFromGumboVector(GumboVector *childrenVector, RSXMLNodeRef parent);
+
+static RSXMLNodeRef __RSHTMLNodeFromGumboNode(GumboNode *gumboNode) {
+    RSXMLNodeRef node = nil;
+    if (gumboNode->type == GUMBO_NODE_DOCUMENT) {
+        RSXMLNodeRef document = (RSXMLNodeRef)__RSXMLDocumentCreateInstance(RSAllocatorSystemDefault, nil);
+        const char * cName = gumboNode->v.document.name;
+        const char * cSystemIdentifier = gumboNode->v.document.system_identifier;
+        const char * cPublicIdentifier = gumboNode->v.document.public_identifier;
+        __RSXMLNodeSetName(document, RSStringWithUTF8String(cName));
+        GumboVector * vector = &gumboNode->v.document.children;
+        __RSXMLDocumentSetChildren((RSXMLDocumentRef)document, __RSHTMLArrayOfNodesFromGumboVector(vector, document));
+        node = document;
+    } else if (gumboNode->type == GUMBO_NODE_ELEMENT) {
+        RSXMLElementRef element = __RSXMLElementCreateInstance(RSAllocatorSystemDefault);
+        
     }
+    return node;
+}
+
+static RSArrayRef __RSHTMLArrayOfNodesFromGumboVector(GumboVector *childrenVector, RSXMLNodeRef parent) {
+    RSMutableArrayRef children = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
+    for (RSUInteger idx = 0; idx < childrenVector->length; idx++) {
+        RSXMLNodeRef node = (childrenVector->data[idx]);
+        __RSXMLNodeSetParent(node, parent);
+        RSArrayAddObject(children, node);
+    }
+    return children;
+}
+
+static RSErrorRef __RSHTML5GumboWalkThrough(GumboNode *node, RSErrorRef (^cb)(__RSHtmlGumboType type, GumboNode *node)) {
+    RSErrorRef error = nil;
+    if (node->type == GUMBO_NODE_DOCUMENT || node->type == GUMBO_NODE_ELEMENT) {
+        if ((error = cb(RS_HTML_ELEMENT_START, node))) return error;
+        GumboVector *children = nil;
+        if (node->type == GUMBO_NODE_DOCUMENT) {
+            children = &node->v.document.children;
+        } else {
+            children = &node->v.element.children;
+        }
+        if (children) {
+            for (int i = 0; i < children->length; i++) {
+                if ((error = __RSHTML5GumboWalkThrough(children->data[i], cb))) return error;
+            }
+        }
+        if ((error = cb(RS_HTML_TEXT, node))) return error;
+    } else {
+        if ((error = cb(RS_HTML_ELEMENT_END, node))) return error;
+    }
+    return error;
 }
 
 RSExport RSXMLDocumentRef __RSHTML5Parser(RSDataRef xmlData, RSErrorRef *error) {
     if (!xmlData) return nil;
-    RSXMLDocumentRef doc = __RSXMLDocumentCreateInstance(RSAllocatorSystemDefault, nil);
+    __block RSXMLDocumentRef document = __RSXMLDocumentCreateInstance(RSAllocatorSystemDefault, nil);
     RSStringRef xmlStr = RSStringCreateWithData(RSAllocatorSystemDefault, xmlData, RSStringEncodingUTF8);
     RSAutoreleaseBlock(^{
         RSErrorRef parseError = nil;
         GumboOutput* output = gumbo_parse(RSStringGetUTF8String(xmlStr));
-        __RSHTML5Translate(doc, output, error);
+        
+        __block RSMutableStringRef out = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
+        parseError = __RSHTML5GumboWalkThrough(output->root, ^RSErrorRef(__RSHtmlGumboType type, GumboNode *node) {
+            
+            return nil;
+        });
+        
+        RSShow(out);
+        
         gumbo_destroy_output(&kGumboDefaultOptions, output);
         if (error) *error = (RSErrorRef)RSRetain(parseError);
     });
     RSRelease(xmlStr);
     if (error && *error) RSAutorelease(*error);
-    return doc;
+    return document;
 }
 
 static RSXMLDocumentRef __RSXMLParser(RSDataRef xmlData, RSErrorRef *error)
