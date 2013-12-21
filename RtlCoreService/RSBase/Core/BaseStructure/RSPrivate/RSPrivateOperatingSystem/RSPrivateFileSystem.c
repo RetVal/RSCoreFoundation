@@ -144,6 +144,7 @@ const char *_RSProcessPath(void) {
 #endif
 
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
+#include <mach-o/dyld.h>
 const char *_RSProcessPath(void) {
     if (__RSProcessPath) return __RSProcessPath;
 #if DEPLOYMENT_TARGET_MACOSX
@@ -159,7 +160,6 @@ const char *_RSProcessPath(void) {
 #endif
     uint32_t size = RSMaxPathSize;
     char buffer[size];
-    extern int _NSGetExecutablePath(char *, uint32_t);
     if (0 == _NSGetExecutablePath(buffer, &size)) {
         __RSProcessPath = strdup(buffer);
         __RSprogname = strrchr(__RSProcessPath, PATH_SEP);

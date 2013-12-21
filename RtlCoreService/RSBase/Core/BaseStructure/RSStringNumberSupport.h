@@ -13,7 +13,7 @@
 RS_EXTERN_C_BEGIN
 RSExport int RSStringIntValue(RSStringRef str);
 RSExport RSInteger RSStringIntegerValue(RSStringRef str);
-RSExport unsigned int RSStringUnsigendIntValue(RSStringRef str);
+RSExport unsigned int RSStringUnsignedIntValue(RSStringRef str);
 RSExport RSUInteger RSStringUnsignedIntegerValue(RSStringRef str);
 RSExport long RSStringLongValue(RSStringRef str);
 RSExport unsigned long RSStringUnsignedLongValue(RSStringRef str);

@@ -118,8 +118,20 @@ RSPrivate BOOL __RSRuntimeSetEnvironment(RSCBuffer name, RSCBuffer value)
     return YES;
 }
 
-struct ____RSDebugLogContext
-{
+struct _RSRuntimeLogPreference ___RSDebugLogPreference = {
+    ._RSRuntimeInstanceBZeroBeforeDie                       = __RSRuntimeInstanceBZeroBeforeDie,
+    ._RSRuntimeISABaseOnEmptyField                          = __RSRuntimeISABaseOnEmptyField,
+    ._RSRuntimeInstanceManageWatcher                        = __RSRuntimeInstanceManageWatcher,
+    ._RSRuntimeInstanceRefWatcher                           = __RSRuntimeInstanceRefWatcher,
+    ._RSRuntimeInstanceAllocFreeWatcher                     = __RSRuntimeInstanceAllocFreeWatcher,
+    ._RSRuntimeInstanceARC                                  = __RSRuntimeInstanceARC,
+    ._RSRuntimeCheckAutoreleaseFlag                         = __RSRuntimeCheckAutoreleaseFlag,
+    ._RSStringNoticeWhenConstantStringAddToTable            = __RSStringNoticeWhenConstantStringAddToTable,
+    ._RSPropertyListWarningWhenParseNullKey                 = __RSPropertyListWarningWhenParseNullKey,
+    ._RSPropertyListWarningWhenParseNullValue               = __RSPropertyListWarningWhenParseNullValue,
+};
+
+struct ____RSDebugLogContext {
     RSSpinLock _debugLogLock;
     int _handle;
 	RSBlock _logPath[RSMaxPathSize];
@@ -128,11 +140,17 @@ struct ____RSDebugLogContext
 #include <sys/fcntl.h>
 #include <sys/stat.h>
 static struct ____RSDebugLogContext ____RSRuntimeDebugLevelLogContext = {0};
+
+static void __RSDebugLevelPreferencesInitialize() {
+    RSBlock _preferencesPath[RSMaxPathSize] = {0};
+    
+}
+
 static void __RSDebugLevelInitialize()
 {
     RSBlock _debuglogPrefixPath[RSMaxPathSize] = {0};
     ____RSRuntimeDebugLevelLogContext._debugLogLock = RSSpinLockInit;
-	strcpy(_debuglogPrefixPath, __RSRuntimeGetEnvironment("HOME"));
+	strcpy(_debuglogPrefixPath, __RSRuntimeGetEnvironment("HOME") ? : "");
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_LINUX
     strcat(_debuglogPrefixPath, "/Library/Logs/RSCoreFoundation");
 	mkdir(_debuglogPrefixPath, 0777);
@@ -263,14 +281,11 @@ RSExport RSTypeRef __RSRuntimeCreateInstance(RSAllocatorRef allocator, RSTypeID 
                 init(obj);
             }
             
-#if __RSRuntimeInstanceManageWatcher
-            __RSCLog(RSLogLevelDebug, "%s alloc - <%p>\n", cls->className, obj);
-#endif
+            if (___RSDebugLogPreference._RSRuntimeInstanceManageWatcher)
+                __RSCLog(RSLogLevelDebug, "%s alloc - <%p>\n", cls->className, obj);
+
         }
     }
-#if defined(RSAutoMemoryLog)
-    RSMmLogUnitNumber();
-#endif
     return obj ?:((void*)RSNil);
 }
 
@@ -460,9 +475,6 @@ RSExport RSIndex __RSRuntimeInstanceGetRetainCount(RSTypeRef obj)
 
 RSExport void __RSRuntimeInstanceDeallocate(RSTypeRef obj)
 {
-#if defined(RSAutoMemoryLog)
-    RSMmLogUnitNumber();
-#endif
     RSRuntimeClass* cls = (RSRuntimeClass*)__RSRuntimeGetClassWithTypeID(RSGetTypeID(obj));
     return cls->deallocate(obj);
 }
@@ -563,13 +575,9 @@ RSExport BOOL __RSRuntimeIsInstanceSpecial(RSTypeRef rs)
 RSExport void      __RSRuntimeDeallocate(RSTypeRef obj)
 {
     if (obj == nil) HALTWithError(RSInvalidArgumentException, "the object is nil");
-#if defined(RSAutoMemoryLog)
-    RSMmLogUnitNumber();
-#endif
     RSAllocatorRef allocator = RSGetAllocator(obj);
-#if __RSRuntimeInstanceBZeroBeforeDie
-    memset((RSMutableTypeRef)obj, 0, RSAllocatorInstanceSize(allocator, obj));
-#endif
+    if (___RSDebugLogPreference._RSRuntimeInstanceBZeroBeforeDie)
+        memset((RSMutableTypeRef)obj, 0, RSAllocatorInstanceSize(allocator, obj));
     RSAllocatorDeallocate(allocator, obj);
 }
 RSExport ISA __RSRuntimeRSObject(RSTypeRef obj)
@@ -861,6 +869,8 @@ extern void __RSURLInitialize();
 extern void __RSURLRequestInitialize();
 extern void __RSURLResponseInitialize();
 extern void __RSURLConnectionInitialize();
+extern void __RSHTTPCookieInitialize();
+
 #include <RSCoreFoundation/RSNotificationCenter.h>
 RS_PUBLIC_CONST_STRING_DECL(RSCoreFoundationWillDeallocateNotification, "RSCoreFoundationWillDeallocateNotification")
 RS_PUBLIC_CONST_STRING_DECL(RSCoreFoundationDidFinishLoadingNotification, "RSCoreFoundationDidFinishLoadingNotification")
@@ -924,26 +934,29 @@ RSExport __RS_INIT_ROUTINE(RSRuntimePriority) void RSCoreFoundationInitialize()
     __RSRunLoopObserverInitialize();
     __RSRunLoopTimerInitialize();
     
+    __RSNotificationCenterInitialize();
+    __RSNotificationInitialize();
+    __RSObserverInitialize();
+    
+    __RSPropertyListInitializeInitStatics();
+    __RSBinaryPropertyListInitStatics();
+    __RSPropertyListInitialize();
+    
+    __RSArchiverInitialize();
+    
     __RSSocketInitialize();
     
     __RSURLInitialize();
     __RSURLRequestInitialize();
     __RSURLResponseInitialize();
     __RSURLConnectionInitialize();
+    __RSHTTPCookieInitialize();
     
-    __RSPropertyListInitializeInitStatics();
-    __RSBinaryPropertyListInitStatics();
-    __RSPropertyListInitialize();
     __RSQueueInitialize();
     //__RSMessagePortInitialize();
     
-    __RSNotificationCenterInitialize();
-    __RSNotificationInitialize();
-    __RSObserverInitialize();
-    
     __RSBundleInitialize();
     __RSXMLParserInitialize();
-    __RSArchiverInitialize();
     
     //__RSDistributedNotificationCenterInitialize();
     if (__RSRuntimeClassTableCount < __RSRuntimeClassReservedRangeEnd) __RSRuntimeClassTableCount = __RSRuntimeClassReservedRangeEnd;

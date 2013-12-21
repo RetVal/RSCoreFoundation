@@ -95,15 +95,20 @@ static RSBitU64 __RSAllocatorUpdateUnit(RSBit8 operand)
             break;
         case 1:
             ___RSAllocatorAllocateUnitNumber++;
-#if __RSRuntimeInstanceAllocFreeWatcher
-            __RSCLog(RSLogLevelDebug, "runtime unit - %llu\n", ___RSAllocatorAllocateUnitNumber);
+#if __RSRuntimeDebugPreference
+            if (___RSDebugLogPreference._RSRuntimeInstanceAllocFreeWatcher) {
+                __RSCLog(RSLogLevelDebug, "runtime unit - %llu\n", ___RSAllocatorAllocateUnitNumber);
+            }
+            
 #endif
             result = YES;
             break;
         case -1:
             ___RSAllocatorAllocateUnitNumber--;
-#if __RSRuntimeInstanceAllocFreeWatcher
-            __RSCLog(RSLogLevelDebug, "runtime unit - %llu\n", ___RSAllocatorAllocateUnitNumber);
+#if __RSRuntimeDebugPreference
+            if (___RSDebugLogPreference._RSRuntimeInstanceAllocFreeWatcher) {
+                __RSCLog(RSLogLevelDebug, "runtime unit - %llu\n", ___RSAllocatorAllocateUnitNumber);
+            }
 #endif
             result = YES;
         default:

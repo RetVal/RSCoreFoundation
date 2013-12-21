@@ -778,6 +778,7 @@ static void __RSFileManagerClassDeallocate(RSTypeRef rs)
     
     __RSFileManagerRef fmg = (__RSFileManagerRef)rs;
     
+    if (fmg->_fileSystemName) RSRelease(fmg->_fileSystemName);
     if (fmg->_currentPath) RSRelease(fmg->_currentPath);
     if (fmg->_fds) RSRelease(fmg->_fds);
     if (fmg->_fs) RSRelease(fmg->_fs);
@@ -823,21 +824,18 @@ RSPrivate void __RSFileManagerInitialize()
 
 RSPrivate void __RSFileManagerDeallocate()
 {
-    RSSpinLockLock(&__RSFileManagerDefaultLock);
-    if (_RSTemporaryDirectory) {
-        __RSRuntimeSetInstanceSpecial(_RSTemporaryDirectory, NO);
-        RSAutorelease(_RSTemporaryDirectory); // maybe use in the later deallocate routines, so just autorelease it here (RSAutoreleasePool is the last deallocate routine).
-        _RSTemporaryDirectory = nil;
-    }
-    if (__RSFileManagerDefault == nil)
-    {
-        RSSpinLockUnlock(&__RSFileManagerDefaultLock);
-        return;
-    }
-    __RSRuntimeSetInstanceSpecial(__RSFileManagerDefault, NO);
-    RSRelease(__RSFileManagerDefault);
-    __RSFileManagerDefault = nil;
-    RSSpinLockUnlock(&__RSFileManagerDefaultLock);
+    RSSyncUpdateBlock(__RSFileManagerDefaultLock, ^{
+        if (_RSTemporaryDirectory) {
+            __RSRuntimeSetInstanceSpecial(_RSTemporaryDirectory, NO);
+            RSAutorelease(_RSTemporaryDirectory); // maybe use in the later deallocate routines, so just autorelease it here (RSAutoreleasePool is the last deallocate routine).
+            _RSTemporaryDirectory = nil;
+        }
+        if (__RSFileManagerDefault) {
+            __RSRuntimeSetInstanceSpecial(__RSFileManagerDefault, NO);
+            RSRelease(__RSFileManagerDefault);
+            __RSFileManagerDefault = nil;
+        }
+    });
     return;
 }
 
@@ -861,25 +859,22 @@ RSExport RSTypeID RSFileManagerGetTypeID()
 
 static RSFileManagerRef __RSFileManagerCreateInstance(RSAllocatorRef allocator)
 {
-    RSSpinLockLock(&__RSFileManagerDefaultLock);
-    if (likely(__RSFileManagerDefault != nil))
-    {
-        RSSpinLockUnlock(&__RSFileManagerDefaultLock);
-        return __RSFileManagerDefault;
-    }
     __RSFileManagerDefault = (__RSFileManagerRef)__RSRuntimeCreateInstance(allocator, RSFileManagerGetTypeID(), sizeof(struct __RSFileManager) - sizeof(RSRuntimeBase));
     __RSRuntimeSetInstanceSpecial(__RSFileManagerDefault, YES);
-    RSSpinLockUnlock(&__RSFileManagerDefaultLock);
     return __RSFileManagerDefault;
 }
 
 RSExport RSFileManagerRef RSFileManagerGetDefault()
 {
-    if (likely(__RSFileManagerDefault)) return __RSFileManagerDefault;
-    return __RSFileManagerCreateInstance(RSAllocatorSystemDefault);
+    RSSyncUpdateBlock(__RSFileManagerDefaultLock, ^{
+        if (!__RSFileManagerDefault) {
+           __RSFileManagerCreateInstance(RSAllocatorSystemDefault);
+        }
+    });
+    return __RSFileManagerDefault;
 }
 
-static RSStringRef __RSFileManagerStandardizingPath(RSStringRef path)
+RSExport RSStringRef __RSFileManagerStandardizingPath(RSStringRef path)
 {
 //    if (path == nil || RSStringGetLength(path) == 0 || RSStringGetLength(path) + 64 > RSBufferSize) return nil;
 //    char *buf = RSAllocatorAllocate(RSAllocatorSystemDefault, RSBufferSize / 2 > RSStringGetLength(path) ? RSStringGetLength(path) * 2 + 1: RSBufferSize);

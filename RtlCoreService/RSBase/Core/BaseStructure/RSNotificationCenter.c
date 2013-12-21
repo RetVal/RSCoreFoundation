@@ -625,6 +625,7 @@ static void __RSNotificationCenterPostSchedule(void* info, RSRunLoopRef runloop,
 {
     if (NO == pthread_equal(pthread_self(), _RSMainPThread))
         pthread_setname_np("com.retval.RSNotificationCenter.private");
+//    RSRunLoopSourceSignal(info);
     
 }
 
@@ -687,36 +688,11 @@ static void __RSNotificationCenterPostImmediately(RSNotificationCenterRef notifi
         }
         else
         {
-            RSStringRef mode = RSRunLoopQueue;
-            RSRunLoopSourceContext context = {
-                0,
-                notification,
-                RSRetain,
-                RSRelease,
-                RSDescription,
-                RSEqual,
-                RSHash,
-                __RSNotificationCenterPostSchedule,
-                __RSNotificationCenterPostCancel,
-                __RSNotificationCenterPostPerform,
-            };
-            RSRunLoopSourceRef task = RSRunLoopSourceCreate(RSAllocatorSystemDefault, 0, &context);
-			//            RSDictionaryRef reserved = nil;
-			//            if ((reserved = (RSDictionaryRef)RSNotificationGetObject(notification)))
-			//            {
-			//                RSStringRef runMode = RSDictionaryGetValue(reserved, RSNotificationMode);
-			//                if (runMode) {
-			//                    mode = runMode;
-			//                }
-			//            }
-            RSRunLoopAddSource(RSRunLoopGetCurrent(), task, mode);    // current loop.
             ____RSNotificationCenterProcessInUnlockObservers(notificationCenter);
-            RSRunLoopRun();
-            //RSRelease(__runtimeObserver);
-            RSRelease(mode);
-            RSRelease(task);
+            RSPerformBlockOnMainThread(^{
+                __RSNotificationCenterPostPerform(notification);
+            });
         }
-        
     }
     else
     {

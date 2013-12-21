@@ -21,7 +21,7 @@ RSExport RSTypeID RSURLRequestGetTypeID();
 RSExport RSURLRequestRef RSURLRequestCreateWithURL(RSAllocatorRef allocator, RSURLRef url);
 RSExport RSURLRequestRef RSURLRequestWithURL(RSURLRef url);
 
-RSExport RSMutableURLRequestRef RSURLRequestCreateMutable(RSAllocatorRef allocator);
+RSExport RSMutableURLRequestRef RSURLRequestCreateMutable(RSAllocatorRef allocator, RSURLRef url);
 
 RSExport RSURLRef RSURLRequestGetURL(RSURLRequestRef urlRequest);
 RSExport void RSURLRequestSetURL(RSMutableURLRequestRef urlRequest, RSURLRef url);
@@ -34,7 +34,10 @@ RSExport void RSURLRequestSetHeaderFieldValue(RSMutableURLRequestRef urlRequest,
 RSExport RSTimeInterval RSURLRequestGetTimeoutInterval(RSURLRequestRef urlRequest);
 RSExport void RSURLRequestSetTimeoutInterval(RSMutableURLRequestRef urlRequest, RSTimeInterval timeoutInterval);
 
-RSExport RSDataRef RSURLRequestGetHttpBody(RSURLRequestRef urlRequest);
+RSExport RSDataRef RSURLRequestGetHTTPBody(RSURLRequestRef urlRequest);
 RSExport void RSURLRequestSetHTTPBody(RSMutableURLRequestRef urlRequest, RSDataRef HTTPBody);
+
+RSExport RSStringRef RSURLRequestGetHTTPMethod(RSURLRequestRef urlRequest);
+RSExport void RSURLRequestSetHTTPMethod(RSMutableURLRequestRef urlRequest, RSStringRef method);
 RS_EXTERN_C_END
 #endif 

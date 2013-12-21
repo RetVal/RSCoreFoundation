@@ -17,6 +17,7 @@ struct __RSURLRequest
 {
     RSRuntimeBase _base;
     RSURLRef _url;
+    RSStringRef _HTTPMethod;
     RSDataRef _HTTPBody;
     RSMutableDictionaryRef _headerFields;
     RSUInteger _cacheMode;
@@ -35,12 +36,43 @@ RSInline void __RSURLRequestSetIsMutable(RSURLRequestRef urlRequest, BOOL mutabl
 
 static void __RSURLRequestClassInit(RSTypeRef rs)
 {
-    
+    RSMutableURLRequestRef request = (RSMutableURLRequestRef)rs;
+    request->_HTTPMethod = RSSTR("GET");
 }
 
 static RSTypeRef __RSURLRequestClassCopy(RSAllocatorRef allocator, RSTypeRef rs, BOOL mutableCopy)
 {
-    return RSRetain(rs);
+    if (NO == __RSURLRequestIsMutable(rs) && NO == mutableCopy) return RSRetain(rs);
+    RSURLRequestRef request = (RSURLRequestRef)rs;
+    RSMutableURLRequestRef copy = RSURLRequestCreateMutable(RSAllocatorSystemDefault, nil);
+    
+    RSURLRequestSetTimeoutInterval(copy, RSURLRequestGetTimeoutInterval(request));
+    
+    if (RSURLRequestGetHTTPBody(request)) {
+        RSDataRef bodyCopy = RSCopy(RSAllocatorSystemDefault, RSURLRequestGetHTTPBody(request));
+        RSURLRequestSetHTTPBody(copy, bodyCopy);
+        RSRelease(bodyCopy);
+    }
+    
+    if (RSURLRequestGetHTTPMethod(request)) {
+        RSStringRef stringCopy = RSCopy(RSAllocatorSystemDefault, RSURLRequestGetHTTPMethod(request));
+        RSURLRequestSetHTTPMethod(copy, stringCopy);
+        RSRelease(stringCopy);
+    }
+    
+    if (RSURLRequestGetURL(request)) {
+        RSURLRef url = RSCopy(RSAllocatorSystemDefault, RSURLRequestGetURL(request));
+        RSURLRequestSetURL(copy, url);
+        RSRelease(url);
+    }
+    
+    if (RSURLRequestGetHeaderField(request)) {
+        RSDictionaryApplyBlock(RSURLRequestGetHeaderField(request), ^(const void *key, const void *value, BOOL *stop) {
+            RSURLRequestSetHeaderFieldValue(copy, key, value);
+        });
+    }
+    __RSURLRequestSetIsMutable(copy, mutableCopy ? YES : NO);
+    return copy;
 }
 
 static void __RSURLRequestClassDeallocate(RSTypeRef rs)
@@ -120,7 +152,10 @@ RSInline RSURLRef __RSURLRequestGetURL(RSURLRequestRef urlRequest)
 
 RSInline RSURLRequestRef __RSURLRequestSetURL(RSMutableURLRequestRef urlRequest, RSURLRef URL)
 {
-    if (urlRequest && URL) urlRequest->_url = RSRetain(URL);
+    if (urlRequest && URL) {
+        if (urlRequest->_url) RSRelease(urlRequest->_url);
+        urlRequest->_url = RSRetain(URL);
+    }
     return urlRequest;
 }
 
@@ -132,12 +167,17 @@ RSInline RSMutableDictionaryRef __RSURLRequestGetHeaderField(RSURLRequestRef url
 
 RSInline RSURLRequestRef __RSURLRequestSetHeaderFields(RSMutableURLRequestRef urlRequest, RSDictionaryRef dict)
 {
-    if (urlRequest && dict) urlRequest->_headerFields = RSMutableCopy(RSAllocatorSystemDefault, dict);
+    if (urlRequest && dict) {
+        if (urlRequest->_headerFields) RSRelease(urlRequest->_headerFields);
+        urlRequest->_headerFields = RSMutableCopy(RSAllocatorSystemDefault, dict);
+    }
     return urlRequest;
 }
 
-RSInline void __RSURLRequestSetValue(RSURLRequestRef urlRequest, RSStringRef key, RSTypeRef value)
+RSInline void __RSURLRequestSetValue(RSMutableURLRequestRef urlRequest, RSStringRef key, RSTypeRef value)
 {
+    if (!urlRequest->_headerFields)
+        urlRequest->_headerFields = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
     return RSDictionarySetValue(__RSURLRequestGetHeaderField(urlRequest), key, value);
 }
 
@@ -177,9 +217,9 @@ RSExport RSURLRequestRef RSURLRequestCreateWithURL(RSAllocatorRef allocator, RSU
     return instance;
 }
 
-RSExport RSMutableURLRequestRef RSURLRequestCreateMutable(RSAllocatorRef allocator)
+RSExport RSMutableURLRequestRef RSURLRequestCreateMutable(RSAllocatorRef allocator, RSURLRef aURL)
 {
-    return __RSURLRequestCreateInstance(allocator, nil, nil, 0.0f, YES);
+    return __RSURLRequestCreateInstance(allocator, aURL, nil, 0.0f, YES);
 }
 
 RSExport RSDictionaryRef RSURLRequestGetAllHeaderFields(RSURLRequestRef urlRequest)
@@ -198,7 +238,7 @@ RSExport void RSURLRequestSetURL(RSMutableURLRequestRef urlRequest, RSURLRef url
 {
     if (!urlRequest || !url) return;
     __RSGenericValidInstance(urlRequest, _RSURLRequestTypeID);
-    if (!__RSURLRequestIsMutable(urlRequest)) return;
+    RSAssert1(__RSURLRequestIsMutable(urlRequest), RSLogAlert, "%r is not mutable", urlRequest);
     __RSURLRequestSetURL(urlRequest, url);
 }
 
@@ -207,7 +247,7 @@ RSExport void RSURLRequestSetHeaderFieldValue(RSMutableURLRequestRef urlRequest,
     if (!urlRequest) return;
     if (!key || !value) return;
     __RSGenericValidInstance(urlRequest, _RSURLRequestTypeID);
-    if (!__RSURLRequestIsMutable(urlRequest)) return;
+    RSAssert1(__RSURLRequestIsMutable(urlRequest), RSLogAlert, "%r is not mutable", urlRequest);
     __RSURLRequestSetValue(urlRequest, key, value);
 }
 
@@ -233,30 +273,46 @@ RSExport RSTimeInterval RSURLRequestGetTimeoutInterval(RSURLRequestRef urlReques
 RSExport void RSURLRequestSetTimeoutInterval(RSMutableURLRequestRef urlRequest, RSTimeInterval timeoutInterval)
 {
     __RSGenericValidInstance(urlRequest, _RSURLRequestTypeID);
-    if (__RSURLRequestIsMutable(urlRequest)) return;
+    RSAssert1(__RSURLRequestIsMutable(urlRequest), RSLogAlert, "%r is not mutable", urlRequest);
     __RSURLRequestSetTimeout(urlRequest, timeoutInterval);
 }
 
-RSInline RSDataRef __RSURLRequestGetHttpBody(RSURLRequestRef urlRequest)
+RSInline RSDataRef __RSURLRequestGetHTTPBody(RSURLRequestRef urlRequest)
 {
     if (!urlRequest) return nil;
     return urlRequest->_HTTPBody;
 }
 
-RSExport RSDataRef RSURLRequestGetHttpBody(RSURLRequestRef urlRequest)
+RSExport RSDataRef RSURLRequestGetHTTPBody(RSURLRequestRef urlRequest)
 {
     __RSGenericValidInstance(urlRequest, _RSURLRequestTypeID);
-    return __RSURLRequestGetHttpBody(urlRequest);
+    return __RSURLRequestGetHTTPBody(urlRequest);
 }
 
 RSExport void RSURLRequestSetHTTPBody(RSMutableURLRequestRef urlRequest, RSDataRef HTTPBody)
 {
     if (!urlRequest) return;
     __RSGenericValidInstance(urlRequest, _RSURLRequestTypeID);
+    RSAssert1(__RSURLRequestIsMutable(urlRequest), RSLogAlert, "%r is not mutable", urlRequest);
     __RSURLRequestSetHTTPBody(urlRequest, HTTPBody);
 }
 
-RSExport RSURLRequestRef RSURLRequestWithURL(RSURLRef url)
-{
+RSExport RSStringRef RSURLRequestGetHTTPMethod(RSURLRequestRef urlRequest) {
+    if (!urlRequest) return nil;
+    __RSGenericValidInstance(urlRequest, _RSURLRequestTypeID);
+    if (!urlRequest->_HTTPMethod)
+        ((RSMutableURLRequestRef)urlRequest)->_HTTPMethod = RSSTR("GET");
+    return urlRequest->_HTTPMethod;
+}
+
+RSExport void RSURLRequestSetHTTPMethod(RSMutableURLRequestRef urlRequest, RSStringRef method) {
+    if (!urlRequest) return;
+    __RSGenericValidInstance(urlRequest, _RSURLRequestTypeID);
+    RSAssert1(__RSURLRequestIsMutable(urlRequest), RSLogAlert, "%r is not mutable", urlRequest);
+    if (urlRequest->_HTTPMethod) RSRelease(urlRequest->_HTTPMethod);
+    urlRequest->_HTTPMethod = RSRetain(method);
+}
+
+RSExport RSURLRequestRef RSURLRequestWithURL(RSURLRef url) {
     return RSAutorelease(RSURLRequestCreateWithURL(RSAllocatorSystemDefault, url));
 }

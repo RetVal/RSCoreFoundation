@@ -21,7 +21,7 @@ RSExport int RSStringIntValue(RSStringRef str)
     return _num;
 }
 
-RSExport unsigned int RSStringUnsigendIntValue(RSStringRef str)
+RSExport unsigned int RSStringUnsignedIntValue(RSStringRef str)
 {
     unsigned int _num = 0;
     if (str)

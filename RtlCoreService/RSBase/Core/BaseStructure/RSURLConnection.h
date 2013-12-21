@@ -19,7 +19,7 @@
 RS_EXTERN_C_BEGIN
 
 typedef struct __RSURLConnection *RSURLConnectionRef;
-typedef void (*RSURLConnectionWillStartConnection)(RSURLConnectionRef connection, RSURLRequestRef willSendRequest, RSTypeRef redirectResponse);
+typedef void (*RSURLConnectionWillStartConnection)(RSURLConnectionRef connection, RSURLRequestRef willSendRequest, RSURLResponseRef redirectResponse);
 
 typedef void (*RSURLConnectionDidReceiveResponse)(RSURLConnectionRef connection, RSURLResponseRef response);
 typedef void (*RSURLConnectionDidReceiveData)(RSURLConnectionRef connection, RSDataRef data);
@@ -44,8 +44,14 @@ RSExport RSTypeID RSURLConnectionGetTypeID();
 
 RSExport RSURLConnectionRef RSURLConnectionCreate(RSAllocatorRef allocator, RSURLRequestRef request, RSTypeRef context, const struct RSURLConnectionDelegate *delegate);
 
-RSExport RSURLRequestRef RSURLConnectionGetRequest(RSURLConnectionRef connection);
+RSExport RSURLRequestRef RSURLConnectionGetOrignialRequest(RSURLConnectionRef connection);
+RSExport RSURLRequestRef RSURLConnectionGetCurrentRequest(RSURLConnectionRef connection);
+
+RSExport RSTypeRef RSURLConnectionGetContext(RSURLConnectionRef connection);
+RSExport RSURLResponseRef RSURLConnectionGetResponse(RSURLConnectionRef connection);
+
 RSExport void RSURLConnectionSetRequest(RSURLConnectionRef connection, RSURLRequestRef request);
+RSExport void RSURLConnectionStartOperation(RSURLConnectionRef connection);
 
 RSExport RSDataRef RSURLConnectionSendSynchronousRequest(RSURLRequestRef request, __autorelease RSURLResponseRef *response, __autorelease RSErrorRef *error);
 RSExport void RSURLConnectionSendAsynchronousRequest(RSURLRequestRef request, RSRunLoopRef rl, void (^completeHandler)(__autorelease RSURLResponseRef response, __autorelease RSDataRef data, __autorelease RSErrorRef error));

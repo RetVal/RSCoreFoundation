@@ -891,7 +891,8 @@ static char *skip_and_expand_character_refs_quote(__internal_lookup_tables_quote
 struct __RSXMLNode
 {
     RSRuntimeBase _base;
-    RSXMLNodeTypeId _nodeType;
+    RSUInteger _nodeType;
+    RSUInteger _namespace;
     
     RSStringRef _name;
     RSTypeRef _objectValue;
@@ -899,12 +900,20 @@ struct __RSXMLNode
     struct __RSXMLNode *_parent;
 };
 
-RSInline RSXMLNodeTypeId __RSXMLNodeGetNodetTypeId(RSXMLNodeRef node) {
+RSInline RSUInteger __RSXMLNodeGetNodeTypeId(RSXMLNodeRef node) {
     return node->_nodeType;
 }
 
-RSInline void __RSXMLNodeSetNodeId(RSXMLNodeRef node, RSXMLNodeTypeId nodeType) {
+RSInline void __RSXMLNodeSetNodeTypeId(RSXMLNodeRef node, RSUInteger nodeType) {
     node->_nodeType = nodeType;
+}
+
+RSInline RSUInteger __RSXMLNodeGetNodeNamespace(RSXMLNodeRef node) {
+    return node->_namespace;
+}
+
+RSInline void __RSXMLNodeSetNodeNamespace(RSXMLNodeRef node, RSUInteger namespace) {
+    node->_namespace = namespace;
 }
 
 RSInline RSStringRef __RSXMLNodeGetName(RSXMLNodeRef node)
@@ -980,7 +989,19 @@ static RSHashCode __RSXMLNodeClassHash(RSTypeRef rs)
 static RSStringRef __RSXMLNodeClassDescription(RSTypeRef rs)
 {
     RSXMLNodeRef node = (RSXMLNodeRef)rs;
-    RSStringRef description = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("%r = %r"), __RSXMLNodeGetName(node), __RSXMLNodeGetValue(node));
+    RSStringRef description = nil;
+    if(__RSXMLNodeGetName(node) && __RSXMLNodeGetValue(node)) {
+        RSStringRef format = nil;
+        if (GUMBO_TAG_HTML == __RSXMLNodeGetNodeTypeId(node)) {
+            format = RSSTR("%r = %r");
+        } else {
+            format = RSSTR("%r%r");
+        }
+        description = RSStringCreateWithFormat(RSAllocatorSystemDefault, format, __RSXMLNodeGetName(node), __RSXMLNodeGetValue(node));
+    }
+    else if (__RSXMLNodeGetName(node)) description = RSCopy(RSAllocatorSystemDefault, __RSXMLNodeGetName(node));
+    else if (__RSXMLNodeGetValue(node)) description = RSCopy(RSAllocatorSystemDefault, __RSXMLNodeGetValue(node));
+    else description = RSStringGetEmptyString();
     return description;
 }
 
@@ -1019,7 +1040,7 @@ RSPrivate void __RSXMLNodeDeallocate()
 static RSXMLNodeRef __RSXMLNodeCreateInstance(RSAllocatorRef allocator, RSXMLNodeTypeId typeId, RSStringRef name, RSTypeRef value)
 {
     RSXMLNodeRef instance = (RSXMLNodeRef)__RSRuntimeCreateInstance(allocator, _RSXMLNodeTypeID, sizeof(struct __RSXMLNode) - sizeof(RSRuntimeBase));
-    __RSXMLNodeSetNodeId(instance, typeId);
+    __RSXMLNodeSetNodeTypeId(instance, typeId);
     if (name) instance->_name = RSRetain(name);
     if (value) instance->_objectValue = RSRetain(value);
     
@@ -1069,10 +1090,10 @@ RSExport RSXMLNodeRef RSXMLNodeGetParent(RSXMLNodeRef node)
     return __RSXMLNodeGetParent(node);
 }
 
-RSExport RSXMLNodeTypeId RSXMLNodeGetNodeTypeId(RSXMLNodeRef node)
+RSExport RSUInteger RSXMLNodeGetNodeTypeId(RSXMLNodeRef node)
 {
     __RSXMLNodeGenericValidInstance(node);
-    return __RSXMLNodeGetNodetTypeId(node);
+    return __RSXMLNodeGetNodeTypeId(node);
 }
 
 RSExport RSStringRef RSXMLNodeGetStringValue(RSXMLNodeRef node)
@@ -1151,27 +1172,61 @@ static RSHashCode __RSXMLElementClassHash(RSTypeRef rs)
     return RSHash(element->_attributes);
 }
 
-static void __RSXMLElementClassDescriptionForAttributes(const void *key, const void *value, void *context)
-{
-    RSMutableStringRef ms = (RSMutableStringRef)context;
-    RSStringRef description = RSDescription(value);
-    RSStringAppendStringWithFormat(ms, RSSTR("\t%r,\n"), description);
-    RSRelease(description);
-}
+//static void __RSXMLElementClassDescriptionForAttributes(const void *key, const void *value, void *context)
+//{
+//    RSMutableStringRef ms = (RSMutableStringRef)context;
+//    RSStringRef description = RSDescription(value);
+//    RSStringAppendStringWithFormat(ms, RSSTR("\t%r,\n"), description);
+//    RSRelease(description);
+//}
+//        RSDictionaryApplyFunction(element->_attributes, __RSXMLElementClassDescriptionForAttributes, attributes);
 
 static RSStringRef __RSXMLElementClassDescription(RSTypeRef rs)
 {
     RSXMLElementRef element = (RSXMLElementRef)rs;
-    RSStringRef super = __RSXMLNodeClassDescription(element);
-    RSMutableStringRef attributes = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
-    RSStringAppendCString(attributes, "{\n", RSStringEncodingASCII);
+    RSMutableStringRef attributes = nil;
     if (element->_attributes) {
-        RSDictionaryApplyFunction(element->_attributes, __RSXMLElementClassDescriptionForAttributes, attributes);
+        attributes = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
+        __block RSUInteger idx = 0;
+        RSUInteger cnt = RSDictionaryGetCount(element->_attributes);
+        RSStringRef formatNormal = RSSTR(" %r=\"%r\""), format0 = RSSTR("%r=\"%r\"");
+        RSDictionaryApplyBlock(element->_attributes, ^(const void *key, const void *value, BOOL *stop) {
+            RSStringRef format = nil;
+            if (idx && idx < cnt) {
+                format = formatNormal;
+            } else if (idx == 0) {
+                format = format0;
+            }
+            idx++;
+            RSStringRef description = RSDescription(__RSXMLNodeGetValue((RSXMLNodeRef)value));
+            RSStringAppendStringWithFormat(attributes, format, key, description);
+//            RSShow(RSStringWithFormat(RSSTR("[attributes] = %r"), description));
+            RSRelease(description);
+        });
     }
-    RSStringAppendCString(attributes, "}\n", RSStringEncodingASCII);
-    RSStringRef description = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("%r\nchild = %r\nattributes = %r"), super, element->_children, attributes);
-    RSRelease(attributes);
-    RSRelease(super);
+    RSMutableStringRef children = nil;
+    if (element->_children && RSArrayGetCount(element->_children)) {
+        children = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
+        RSArrayApplyBlock(element->_children, RSMakeRange(0, RSArrayGetCount(element->_children)), ^(RSTypeRef value, RSUInteger idx, BOOL *isStop) {
+            RSXMLElementRef element = (RSXMLElementRef)value;
+            RSStringRef description = RSDescription(element);
+            if (description) {
+                RSStringAppendStringWithFormat(children, RSSTR("%r"), description);
+//                RSShow(RSStringWithFormat(RSSTR("[children] = %r"), description));
+                RSRelease(description);
+            }
+        });
+    }
+    RSStringRef description = nil;
+    if (element->_attributes && (element->_children && RSArrayGetCount(element->_children))) {
+        description = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<%r %r>%r</%r>"), __RSXMLNodeGetName((RSXMLNodeRef)element), attributes, children, __RSXMLNodeGetName((RSXMLNodeRef)element));
+    } else if (element->_attributes) {
+        description = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<%r %r></%r>"), __RSXMLNodeGetName((RSXMLNodeRef)element), attributes, __RSXMLNodeGetName((RSXMLNodeRef)element));
+    } else if ((element->_children && RSArrayGetCount(element->_children))) {
+        description = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<%r>%r</%r>"), __RSXMLNodeGetName((RSXMLNodeRef)element), children, __RSXMLNodeGetName((RSXMLNodeRef)element));
+    }
+    if (attributes) RSRelease(attributes);
+    if (children) RSRelease(children);
     return description;
 }
 
@@ -1211,7 +1266,7 @@ RSPrivate void __RSXMLElementDeallocate()
 static RSXMLElementRef __RSXMLElementCreateInstance(RSAllocatorRef allocator)
 {
     RSXMLElementRef instance = (RSXMLElementRef)__RSRuntimeCreateInstance(allocator, _RSXMLElementTypeID, sizeof(struct __RSXMLElement) - sizeof(RSRuntimeBase));
-    __RSXMLNodeSetNodeId((RSXMLNodeRef)instance, RSXMLNodeElement);
+    __RSXMLNodeSetNodeTypeId((RSXMLNodeRef)instance, RSXMLNodeElement);
     
     return instance;
 }
@@ -1451,7 +1506,15 @@ static RSHashCode __RSXMLDocumentClassHash(RSTypeRef rs)
 static RSStringRef __RSXMLDocumentClassDescription(RSTypeRef rs)
 {
     RSXMLDocumentRef document = (RSXMLDocumentRef)rs;
-    RSStringRef description = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("%r\n%r"), document->_children, document->_rootElement);
+    
+    RSStringRef description = nil;
+    RSUInteger namespace = __RSXMLNodeGetNodeNamespace((RSXMLNodeRef)document);
+    if (namespace == GUMBO_NAMESPACE_HTML) {
+        RSStringRef prefix = RSSTR("<!DOCTYPE HTML>\n");
+        description = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("%r%r"), prefix, document->_rootElement);
+    } else {
+        description = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("%r"), document->_rootElement);
+    }
     return description;
 }
 
@@ -1491,7 +1554,7 @@ static RSXMLDocumentRef __RSXMLDocumentCreateInstance(RSAllocatorRef allocator, 
 {
     RSXMLDocumentRef instance = (RSXMLDocumentRef)__RSRuntimeCreateInstance(allocator, _RSXMLDocumentTypeID, sizeof(struct __RSXMLDocument) - sizeof(RSRuntimeBase));
     
-    __RSXMLNodeSetNodeId((RSXMLNodeRef)instance, RSXMLNodeDocument);
+    __RSXMLNodeSetNodeTypeId((RSXMLNodeRef)instance, RSXMLNodeDocument);
     if (root) instance->_rootElement = (RSXMLElementRef)RSRetain(root);
     
     return instance;
@@ -2363,56 +2426,68 @@ typedef enum {
     RS_HTML_TEXT
 } __RSHtmlGumboType;
 
-static RSArrayRef __RSHTMLArrayOfNodesFromGumboVector(GumboVector *childrenVector, RSXMLNodeRef parent);
+static RSArrayRef __RSHTMLCreateArrayOfNodesFromGumboVector(GumboVector *childrenVector, RSXMLNodeRef parent);
 
-static RSXMLNodeRef __RSHTMLNodeFromGumboNode(GumboNode *gumboNode) {
+static RSXMLNodeRef __RSHTMLCreateNodeFromGumboNode(GumboNode *gumboNode) {
     RSXMLNodeRef node = nil;
     if (gumboNode->type == GUMBO_NODE_DOCUMENT) {
         RSXMLNodeRef document = (RSXMLNodeRef)__RSXMLDocumentCreateInstance(RSAllocatorSystemDefault, nil);
         const char * cName = gumboNode->v.document.name;
-        const char * cSystemIdentifier = gumboNode->v.document.system_identifier;
-        const char * cPublicIdentifier = gumboNode->v.document.public_identifier;
-        __RSXMLNodeSetName(document, RSStringWithUTF8String(cName));
+        const char * cSystemIdentifier __unused = gumboNode->v.document.system_identifier;
+        const char * cPublicIdentifier __unused = gumboNode->v.document.public_identifier;
+        RSStringRef name = RSStringCreateWithCString(RSAllocatorSystemDefault, cName, RSStringEncodingUTF8);
+        __RSXMLNodeSetName(document, name);
+        RSRelease(name);
         GumboVector * vector = &gumboNode->v.document.children;
-        __RSXMLDocumentSetChildren((RSXMLDocumentRef)document, __RSHTMLArrayOfNodesFromGumboVector(vector, document));
+        RSArrayRef nodes = __RSHTMLCreateArrayOfNodesFromGumboVector(vector, document);
+        __RSXMLDocumentSetChildren((RSXMLDocumentRef)document, nodes);
+        RSRelease(nodes);
         node = document;
     } else if (gumboNode->type == GUMBO_NODE_ELEMENT) {
         RSXMLElementRef element = __RSXMLElementCreateInstance(RSAllocatorSystemDefault);
-        
+        __RSXMLNodeSetNodeTypeId((RSXMLNodeRef)element, gumboNode->v.element.tag);
+        __RSXMLNodeSetNodeNamespace((RSXMLNodeRef)element, gumboNode->v.element.tag_namespace);
+        RSStringRef elementTagName = __RSStringMakeConstantString(gumbo_normalized_tagname(gumboNode->v.element.tag));
+        __RSXMLNodeSetName((RSXMLNodeRef)element, elementTagName);
+        RSRelease(elementTagName);
+        GumboVector * cAttributes = &gumboNode->v.element.attributes;
+        for (RSUInteger idx = 0; idx < cAttributes->length; idx++) {
+            GumboAttribute * cAttribute = (GumboAttribute *)cAttributes->data[idx];
+            const char *cName = cAttribute->name;
+            const char *cValue = cAttribute->value;
+            RSStringRef name = RSStringCreateWithCString(RSAllocatorSystemDefault, cName, RSStringEncodingUTF8);
+            RSStringRef value = RSStringCreateWithCString(RSAllocatorSystemDefault, cValue, RSStringEncodingUTF8);
+            RSXMLNodeRef node = __RSXMLNodeCreateInstance(RSAllocatorSystemDefault, 0, name, value);
+            __RSXMLNodeSetNodeNamespace(node, cAttribute->attr_namespace);
+            RSRelease(name);
+            RSRelease(value);
+            __RSXMLElementAddAttribute((RSXMLElementRef)element, node);
+            RSRelease(node);
+        }
+        GumboVector * cChildren = &gumboNode->v.element.children;
+        element->_children = (RSMutableArrayRef)__RSHTMLCreateArrayOfNodesFromGumboVector(cChildren, (RSXMLNodeRef)element);
+        node  = (RSXMLNodeRef)element;
+    } else {
+        if (gumboNode->type != GUMBO_NODE_WHITESPACE) {
+            const char *cText = gumboNode->v.text.text;
+            RSStringRef text = RSStringCreateWithCString(RSAllocatorSystemDefault, cText, RSStringEncodingUTF8);
+            node = __RSXMLNodeCreateInstance(RSAllocatorSystemDefault, gumboNode->type, text, RSStringGetEmptyString());
+            RSRelease(text);
+        }
     }
     return node;
 }
 
-static RSArrayRef __RSHTMLArrayOfNodesFromGumboVector(GumboVector *childrenVector, RSXMLNodeRef parent) {
+static RSArrayRef __RSHTMLCreateArrayOfNodesFromGumboVector(GumboVector *childrenVector, RSXMLNodeRef parent) {
     RSMutableArrayRef children = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
     for (RSUInteger idx = 0; idx < childrenVector->length; idx++) {
-        RSXMLNodeRef node = (childrenVector->data[idx]);
+        RSXMLNodeRef node = __RSHTMLCreateNodeFromGumboNode(childrenVector->data[idx]);
+        if (!node) continue;
         __RSXMLNodeSetParent(node, parent);
         RSArrayAddObject(children, node);
+        RSRelease(node);
     }
     return children;
-}
-
-static RSErrorRef __RSHTML5GumboWalkThrough(GumboNode *node, RSErrorRef (^cb)(__RSHtmlGumboType type, GumboNode *node)) {
-    RSErrorRef error = nil;
-    if (node->type == GUMBO_NODE_DOCUMENT || node->type == GUMBO_NODE_ELEMENT) {
-        if ((error = cb(RS_HTML_ELEMENT_START, node))) return error;
-        GumboVector *children = nil;
-        if (node->type == GUMBO_NODE_DOCUMENT) {
-            children = &node->v.document.children;
-        } else {
-            children = &node->v.element.children;
-        }
-        if (children) {
-            for (int i = 0; i < children->length; i++) {
-                if ((error = __RSHTML5GumboWalkThrough(children->data[i], cb))) return error;
-            }
-        }
-        if ((error = cb(RS_HTML_TEXT, node))) return error;
-    } else {
-        if ((error = cb(RS_HTML_ELEMENT_END, node))) return error;
-    }
-    return error;
 }
 
 RSExport RSXMLDocumentRef __RSHTML5Parser(RSDataRef xmlData, RSErrorRef *error) {
@@ -2422,15 +2497,11 @@ RSExport RSXMLDocumentRef __RSHTML5Parser(RSDataRef xmlData, RSErrorRef *error) 
     RSAutoreleaseBlock(^{
         RSErrorRef parseError = nil;
         GumboOutput* output = gumbo_parse(RSStringGetUTF8String(xmlStr));
-        
-        __block RSMutableStringRef out = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
-        parseError = __RSHTML5GumboWalkThrough(output->root, ^RSErrorRef(__RSHtmlGumboType type, GumboNode *node) {
-            
-            return nil;
-        });
-        
-        RSShow(out);
-        
+        RSTypeRef out = nil;
+        out = __RSHTMLCreateNodeFromGumboNode(output->root);
+        RSXMLDocumentSetRootElement(document, (RSXMLElementRef)out);
+        RSXMLDocumentInsertChild(document, (RSXMLNodeRef)out, 0);
+        RSRelease(out);
         gumbo_destroy_output(&kGumboDefaultOptions, output);
         if (error) *error = (RSErrorRef)RSRetain(parseError);
     });
@@ -2462,7 +2533,7 @@ RSExport RSXMLDocumentRef RSXMLDocumentCreateWithXMLData(RSAllocatorRef allocato
         RSXMLDocumentRef doc = nil;
         switch (documentType) {
             case RSXMLDocumentTidyHTML:
-//                doc = __RSHTML5Parser(xmlData, &error);
+                doc = __RSHTML5Parser(xmlData, &error);
                 break;
             case RSXMLDocumentTidyXML:
             default:

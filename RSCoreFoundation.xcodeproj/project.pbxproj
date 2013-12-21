@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		30F32B3A1860318300A45125 /* RSHTTPCookieStorage.c in Sources */ = {isa = PBXBuildFile; fileRef = 30F32B381860318300A45125 /* RSHTTPCookieStorage.c */; };
+		30F32B3B1860318300A45125 /* RSHTTPCookieStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F32B391860318300A45125 /* RSHTTPCookieStorage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4101F34418447BBA0090C212 /* attribute.c in Sources */ = {isa = PBXBuildFile; fileRef = 4101F32B18447BBA0090C212 /* attribute.c */; };
 		4101F34518447BBA0090C212 /* attribute.h in Headers */ = {isa = PBXBuildFile; fileRef = 4101F32C18447BBA0090C212 /* attribute.h */; };
 		4101F34618447BBA0090C212 /* char_ref.c in Sources */ = {isa = PBXBuildFile; fileRef = 4101F32D18447BBA0090C212 /* char_ref.c */; };
@@ -290,6 +292,8 @@
 		4174EC131649400B004F3435 /* RSPrivateTimeZoneNames.h in Headers */ = {isa = PBXBuildFile; fileRef = 4174EC121649400B004F3435 /* RSPrivateTimeZoneNames.h */; };
 		4174EC1C1649591F004F3435 /* RSPrivateOSCpu.c in Sources */ = {isa = PBXBuildFile; fileRef = 4174EC1B1649591F004F3435 /* RSPrivateOSCpu.c */; };
 		4174EC1E16495B72004F3435 /* RSPrivateOSCpu.h in Headers */ = {isa = PBXBuildFile; fileRef = 4174EC1D16495B72004F3435 /* RSPrivateOSCpu.h */; };
+		4177A7E8185C896E00BEE29C /* RSHTTPCookie.c in Sources */ = {isa = PBXBuildFile; fileRef = 4177A7E6185C896E00BEE29C /* RSHTTPCookie.c */; };
+		4177A7E9185C896E00BEE29C /* RSHTTPCookie.h in Headers */ = {isa = PBXBuildFile; fileRef = 4177A7E7185C896E00BEE29C /* RSHTTPCookie.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4179CF98181F687B004B1334 /* RSURLRequest.c in Sources */ = {isa = PBXBuildFile; fileRef = 4179CF96181F687B004B1334 /* RSURLRequest.c */; };
 		4179CF99181F687B004B1334 /* RSURLRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 4179CF97181F687B004B1334 /* RSURLRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		417B2CC7182262240051BE6B /* RSCoreFoundationLoader.c in Sources */ = {isa = PBXBuildFile; fileRef = 417B2CC6182262240051BE6B /* RSCoreFoundationLoader.c */; };
@@ -714,6 +718,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		30F32B381860318300A45125 /* RSHTTPCookieStorage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSHTTPCookieStorage.c; sourceTree = "<group>"; };
+		30F32B391860318300A45125 /* RSHTTPCookieStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSHTTPCookieStorage.h; sourceTree = "<group>"; };
 		4101F32B18447BBA0090C212 /* attribute.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = attribute.c; sourceTree = "<group>"; };
 		4101F32C18447BBA0090C212 /* attribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = attribute.h; sourceTree = "<group>"; };
 		4101F32D18447BBA0090C212 /* char_ref.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = char_ref.c; sourceTree = "<group>"; };
@@ -1010,6 +1016,8 @@
 		4174EC121649400B004F3435 /* RSPrivateTimeZoneNames.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSPrivateTimeZoneNames.h; sourceTree = "<group>"; };
 		4174EC1B1649591F004F3435 /* RSPrivateOSCpu.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSPrivateOSCpu.c; sourceTree = "<group>"; };
 		4174EC1D16495B72004F3435 /* RSPrivateOSCpu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSPrivateOSCpu.h; sourceTree = "<group>"; };
+		4177A7E6185C896E00BEE29C /* RSHTTPCookie.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSHTTPCookie.c; sourceTree = "<group>"; };
+		4177A7E7185C896E00BEE29C /* RSHTTPCookie.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSHTTPCookie.h; sourceTree = "<group>"; };
 		4179CF96181F687B004B1334 /* RSURLRequest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSURLRequest.c; sourceTree = "<group>"; };
 		4179CF97181F687B004B1334 /* RSURLRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSURLRequest.h; sourceTree = "<group>"; };
 		417B2CC6182262240051BE6B /* RSCoreFoundationLoader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSCoreFoundationLoader.c; sourceTree = "<group>"; };
@@ -1845,6 +1853,10 @@
 				413CD61E18422EA3006FA3E5 /* RSURLResponse.h */,
 				41FED9AE1825170E0079639B /* RSURLConnection.c */,
 				41FED9AF1825170E0079639B /* RSURLConnection.h */,
+				4177A7E6185C896E00BEE29C /* RSHTTPCookie.c */,
+				4177A7E7185C896E00BEE29C /* RSHTTPCookie.h */,
+				30F32B381860318300A45125 /* RSHTTPCookieStorage.c */,
+				30F32B391860318300A45125 /* RSHTTPCookieStorage.h */,
 				41A93AA5178ABDC3008613C5 /* RSXMLParser.c */,
 				41A93AA6178ABDC3008613C5 /* RSXMLParser.h */,
 				41259DD117E18DEC00FECA33 /* RSArchiver.c */,
@@ -2494,6 +2506,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30F32B3B1860318300A45125 /* RSHTTPCookieStorage.h in Headers */,
+				4177A7E9185C896E00BEE29C /* RSHTTPCookie.h in Headers */,
 				41A93AA8178ABDC3008613C5 /* RSXMLParser.h in Headers */,
 				4179CF99181F687B004B1334 /* RSURLRequest.h in Headers */,
 				413CD62018422EA3006FA3E5 /* RSURLResponse.h in Headers */,
@@ -3286,6 +3300,7 @@
 				41FE75F81822B9A600E5E581 /* getenv.c in Sources */,
 				41EBFB9E166F4361008CBF87 /* RSError.c in Sources */,
 				41FE76921822B9A600E5E581 /* transfer.c in Sources */,
+				4177A7E8185C896E00BEE29C /* RSHTTPCookie.c in Sources */,
 				413C15971670BD4C003EDEB6 /* RSErrorPrivate.c in Sources */,
 				41FE75AC1822B9A600E5E581 /* axtls.c in Sources */,
 				41FE76371822B9A600E5E581 /* memdebug.c in Sources */,
@@ -3390,6 +3405,7 @@
 				41FE76461822B9A600E5E581 /* nss.c in Sources */,
 				41FE76051822B9A600E5E581 /* hostip4.c in Sources */,
 				41667E7D17B7F1D90036DBE8 /* RSUnicodePrecomposition.c in Sources */,
+				30F32B3A1860318300A45125 /* RSHTTPCookieStorage.c in Sources */,
 				41FE766D1822B9A600E5E581 /* share.c in Sources */,
 				41D9376117A53A7C004E5E0F /* RSUnicodeDecomposition.c in Sources */,
 				418C49A11833936C00D88CB3 /* RSFileMonitor.c in Sources */,

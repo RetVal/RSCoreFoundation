@@ -242,15 +242,17 @@ RSPrivate void __RSAutoreleasePoolReleaseUntil(RSAutoreleasePoolRef pool, RSType
         
         if (obj != nil)
         {
-#if __RSRuntimeCheckAutoreleaseFlag
-            if (!__RSIsAutorelease(obj))
-            {
-                HALTWithError(RSInvalidArgumentException, "RSAutoreleasePool should not have nil!");
-                return;
-            }
-            if (RSGetRetainCount(obj) == 1)
-            {
-                __RSSetUnAutorelease(obj);
+#if __RSRuntimeDebugPreference
+            if (___RSDebugLogPreference._RSRuntimeCheckAutoreleaseFlag) {
+                if (!__RSIsAutorelease(obj))
+                {
+                    HALTWithError(RSInvalidArgumentException, "RSAutoreleasePool should not have nil!");
+                    return;
+                }
+                if (RSGetRetainCount(obj) == 1)
+                {
+                    __RSSetUnAutorelease(obj);
+                }
             }
 #endif
 //            __RSCLog(RSLogLevelNotice, "RSAutoreleasePool release %p [%lld][rc = %lld]\n", obj, RSGetTypeID(obj), RSGetRetainCount(obj));
@@ -374,9 +376,8 @@ static void __RSAutoreleasePoolClassInit(RSTypeRef obj)
     magic_t_construtor(&pool->_magic);
     pool->_thread = pthread_self();
     pool->_child = nil;
-#if __RSRuntimeInstanceManageWatcher
-    __RSCLog(RSLogLevelDebug, "%s alloc - <%p>\n", "RSAutoreleasePool", obj);
-#endif
+    if (___RSDebugLogPreference._RSRuntimeInstanceManageWatcher)
+        __RSCLog(RSLogLevelDebug, "%s alloc - <%p>\n", "RSAutoreleasePool", obj);
 }
 
 static void __RSAutoreleasePoolClassDeallocate(RSTypeRef obj)

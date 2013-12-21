@@ -299,11 +299,13 @@ RSIndex __RSBufferFindSubString(RSCBuffer str1, RSCBuffer str2)
 {
     if (str1 == nil || str2 == nil) return -1;
     RSIndex* next = nil;
-    RSIndex length = strlen(str2);
+    RSIndex len1 = strlen(str1);
+    RSIndex len2 = strlen(str2);
     
-    next = RSAllocatorAllocate(RSAllocatorSystemDefault, (length+1)*sizeof(RSIndex));
-    __KMPGetNextValue(str2, length, next);
-    RSIndex result = __KMPSearch(str1, strlen(str1), str2, length, next, 0);
+    next = RSAllocatorAllocate(RSAllocatorSystemDefault, (len2+1)*sizeof(RSIndex));
+    __KMPGetNextValue(str2, len2, next);
+
+    RSIndex result = __KMPSearch(str1, len1, str2, len2, next, 0);
     RSAllocatorDeallocate(RSAllocatorSystemDefault, next);
     return result;
 }

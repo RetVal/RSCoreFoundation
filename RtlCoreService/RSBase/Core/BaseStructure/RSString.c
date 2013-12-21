@@ -4832,23 +4832,27 @@ RSRange RSStringGetRangeOfComposedCharactersAtIndex(RSStringRef theString, RSInd
 }
 
 RSStringRef  RSStringCreateWithPascalString(RSAllocatorRef alloc, ConstStringPtr pStr, RSStringEncoding encoding) {
+    if (!pStr) return RSStringGetEmptyString();
     RSIndex len = (RSIndex)(*(uint8_t *)pStr);
     return __RSStringCreateImmutableFunnel3(alloc, pStr, len+1, encoding, NO, NO, YES, NO, NO, ALLOCATORSFREEFUNC, 0);
 }
 
 
 RSExport RSStringRef  RSStringCreateWithCString(RSAllocatorRef alloc, const char *cStr, RSStringEncoding encoding) {
+    if (!cStr) return RSStringGetEmptyString();
     RSIndex len = strlen(cStr);
     return __RSStringCreateImmutableFunnel3(alloc, cStr, len, encoding, NO, NO, NO, YES, NO, ALLOCATORSFREEFUNC, 0);
 }
 
 RSStringRef  RSStringCreateWithPascalStringNoCopy(RSAllocatorRef alloc, ConstStringPtr pStr, RSStringEncoding encoding, RSAllocatorRef contentsDeallocator) {
+    if (!pStr) return RSStringGetEmptyString();
     RSIndex len = (RSIndex)(*(uint8_t *)pStr);
     return __RSStringCreateImmutableFunnel3(alloc, pStr, len+1, encoding, NO, NO, YES, NO, YES, contentsDeallocator, 0);
 }
 
 
 RSStringRef  RSStringCreateWithCStringNoCopy(RSAllocatorRef alloc, const char *cStr, RSStringEncoding encoding, RSAllocatorRef contentsDeallocator) {
+    if (!cStr) return RSStringGetEmptyString();
     RSIndex len = strlen(cStr);
     return __RSStringCreateImmutableFunnel3(alloc, cStr, len, encoding, NO, NO, NO, YES, YES, contentsDeallocator, 0);
 }
@@ -6311,8 +6315,10 @@ RSExport RSStringRef __RSStringMakeConstantString(RSCBuffer cStr)
         return string;
     }
     //__RSCLog(RSLogLevelDebug, "{%s} create\n",cStr);
-#if (__RSStringNoticeWhenConstantStringAddToTable > 0)
-    __RSCLog(RSLogLevelNotice, "\"%s\" = ", cStr);
+#if __RSRuntimeDebugPreference
+    if (___RSDebugLogPreference._RSStringNoticeWhenConstantStringAddToTable) {
+        __RSCLog(RSLogLevelNotice, "\"%s\" = ", cStr);
+    }
 #endif
 //    char *key;
     BOOL isASCII = YES;
@@ -6348,8 +6354,10 @@ RSExport RSStringRef __RSStringMakeConstantString(RSCBuffer cStr)
 //    }
     
     if (string == nil) HALTWithError(RSInvalidArgumentException, "RSRuntime halt with no more memory to use.");
-#if (__RSStringNoticeWhenConstantStringAddToTable > 0)
-    __RSCLog(RSLogLevelNotice, "<%p>\n", string);
+#if __RSRuntimeDebugPreference
+    if (___RSDebugLogPreference._RSStringNoticeWhenConstantStringAddToTable) {
+        __RSCLog(RSLogLevelNotice, "<%p>\n", string);
+    }
 #endif
     __RSRuntimeSetInstanceSpecial(string, YES);
     //__RSCLog(RSLogLevelDebug, "retain count is %ld\n",RSGetRetainCount(string));
@@ -7009,29 +7017,7 @@ RSExport BOOL RSStringFind(RSStringRef aString, RSStringRef stringToFind, RSRang
     if (result == nil) return NO;
     if (!(__RSStringAvailable(aString) && __RSStringAvailable(stringToFind))) return NO;
     __RSAssertRangeIsInStringBounds(aString, rangeToSearch.location, rangeToSearch.length);
-    BOOL find = NO;
-    register RSIndex length = __RSStrLength(stringToFind);
-    RSBuffer cStr = (RSBuffer)__RSStrContents(aString) + __RSStrSkipAnyLengthByte(aString);
-    RSCUBuffer search = __RSStrContents(stringToFind) + __RSStrSkipAnyLengthByte(stringToFind);
-    RSUBlock cache = cStr[rangeToSearch.location + rangeToSearch.length];
-    if (cache != '\0') cStr[rangeToSearch.location + rangeToSearch.length] = 0;
-    RSIndex currentOffset = rangeToSearch.location;
-    register RSIndex offset = 0;
-    offset = __RSBufferFindSubString(cStr + currentOffset, (RSCBuffer)search);
-    if (offset != RSNotFound) find = YES;
-    if (result)
-    {
-        if (offset != RSNotFound)
-        {
-            result->location = offset;
-            result->length = length;
-        }
-        else {
-            *result = RSMakeRange(RSNotFound, RSNotFound);
-        }
-    }
-    if (cache != '\0') cStr[rangeToSearch.location + rangeToSearch.length] = cache;
-    return find;
+    return RSStringFindWithOptions(aString, stringToFind, rangeToSearch, RSCompareCaseInsensitive, result);
 }
 
 RSExport RSComparisonResult RSStringCompareCaseInsensitive(RSStringRef aString, RSStringRef other)

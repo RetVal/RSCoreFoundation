@@ -17,6 +17,7 @@ extern RSMutableDataRef __RSPropertyListCreateWithError(RSTypeRef root, __autore
 RS_PUBLIC_CONST_STRING_DECL(__RSArchiverContextData, "context");    // RSDictionary / RSData
 RS_PUBLIC_CONST_STRING_DECL(__RSArchiverContextOrder, "order");     // RSArray
 RS_PUBLIC_CONST_STRING_DECL(__RSArchiverContextEncoded, "encoded"); // RSNumber (Boolean)
+RS_PUBLIC_CONST_STRING_DECL(RSKeyedArchiveRootObjectKey, "root");
 
 #pragma mark -
 #pragma mark RSArchiver Call Backs
@@ -265,6 +266,7 @@ RSInline RSTypeRef __RSArchiverContextDeserializeObjectEx(const RSUnarchiverRef 
     return __RSArchiverGetDeserializeCallBack(__RSArchiverGetCallBacks((archiver), ID))(archiver, data);
 }
 
+// equal to RSUnarchiverDecodeObject
 RSInline RSTypeRef __RSArchiverContextDeserializeObject(const RSUnarchiverRef unarchiver, RSDataRef data)
 {
     if (!data) return nil;
@@ -272,44 +274,6 @@ RSInline RSTypeRef __RSArchiverContextDeserializeObject(const RSUnarchiverRef un
     if ((ID = __RSArchiverContextPopTypeID(__RSArchiverGetContext(unarchiver))))
         return __RSArchiverContextDeserializeObjectEx(unarchiver, data, ID);
     return nil;
-}
-
-static RSDataRef __RSArchiverContextMakeDataPacket(const RSArchiverRef archiver, RSIndex count, RSDataRef data1, ...)
-{
-    if (archiver == nil || count == 0 || data1 == nil) return nil;
-    
-    RSDataRef data = nil;
-    va_list ap;
-    va_start(ap, data1);
-    RSTypeRef _data = data1;
-    RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorSystemDefault, count);
-    for (RSUInteger idx = 0; idx < count; idx++)
-    {
-        if (_data)
-        {
-            RSArrayAddObject(array, _data);
-            _data = va_arg(ap, RSTypeRef);
-        }
-        else
-        {
-            __RSCLog(RSLogLevelCritical, "Count make error");
-        }
-    }
-    
-    if (RSArrayGetCount(array))
-    {
-        data = __RSArchiverContextSerializeEx(archiver, array, NO);
-    }
-    RSRelease(array);
-    
-    va_end(ap);
-    return data;
-}
-
-static RSArrayRef __RSArchiverContextUnarchivePacket(const RSUnarchiverRef unarchiver, RSDataRef data, RSTypeID ID)
-{
-    if (unarchiver == nil || data == nil) return nil;
-    return __RSArchiverContextDeserializeObjectEx(unarchiver, data, ID);
 }
 
 #pragma mark -
@@ -420,6 +384,45 @@ RSExport RSTypeID RSArchiverGetTypeID()
     return _RSArchiverTypeID;
 }
 
+RSExport RSDataRef RSArchiverContextMakeDataPacket(const RSArchiverRef archiver, RSIndex count, RSDataRef data1, ...)
+{
+    if (archiver == nil || count == 0 || data1 == nil) return nil;
+    __RSGenericValidInstance(archiver, _RSArchiverTypeID);
+    RSDataRef data = nil;
+    va_list ap;
+    va_start(ap, data1);
+    RSTypeRef _data = data1;
+    RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorSystemDefault, count);
+    for (RSUInteger idx = 0; idx < count; idx++)
+    {
+        if (_data)
+        {
+            RSArrayAddObject(array, _data);
+            _data = va_arg(ap, RSTypeRef);
+        }
+        else
+        {
+            __RSCLog(RSLogLevelCritical, "Count make error");
+        }
+    }
+    
+    if (RSArrayGetCount(array))
+    {
+        data = __RSArchiverContextSerializeEx(archiver, array, NO);
+    }
+    RSRelease(array);
+    
+    va_end(ap);
+    return data;
+}
+
+RSExport RSArrayRef RSArchiverContextUnarchivePacket(const RSUnarchiverRef unarchiver, RSDataRef data, RSTypeID ID)
+{
+    if (unarchiver == nil || data == nil) return nil;
+    __RSGenericValidInstance(unarchiver, _RSArchiverTypeID);
+    return __RSArchiverContextDeserializeObjectEx(unarchiver, data, ID);
+}
+
 #pragma mark -
 #pragma mark RSArchiver Built-in rouitne initializer
 static void __RSArchiverInitialize_Allocator();
@@ -487,6 +490,10 @@ static RSArchiverRef __RSArchiverCreateInstance(RSAllocatorRef allocator)
         __RSCLog(RSLogLevelError, "archiver can not be init");
     instance->arch_copy_ptr = __RSArchiverKeyedCopyDataPtr;
     instance->unarch_copy_ptr = __RSUnarchiverKeyedCopyDecodeRoutine;
+    
+    instance->arch_copy_ptr = __RSArchiverNormalCopyDataPtr;
+    instance->unarch_copy_ptr = __RSUnarchiverKeyedCopyDecodeRoutine;
+    
     return instance;
 }
 
@@ -539,14 +546,22 @@ RSExport RSArchiverRef RSArchiverCreate(RSAllocatorRef allocator)
 
 RSExport RSDataRef RSArchiverEncodeObject(RSArchiverRef archiver, RSTypeRef object)
 {
-    if (!archiver || !object) return NO;
+    if (!archiver || !object) return nil;
     __RSGenericValidInstance(archiver, _RSArchiverTypeID);
-    RSDataRef data = __RSArchiverContextSerializeEx(archiver, object, NO);
+    RSDataRef data = __RSArchiverContextSerialize(archiver, object);
     return data;
+}
+
+RSExport RSTypeRef RSUnarchiverDecodeObject(RSUnarchiverRef unarchiver, RSDataRef data) {
+    if (!unarchiver || !data) return nil;
+    __RSGenericValidInstance(unarchiver, _RSArchiverTypeID);
+    RSTypeRef object = __RSArchiverContextDeserializeObject(unarchiver, data);
+    return object;
 }
 
 RSExport BOOL RSArchiverEncodeObjectForKey(RSArchiverRef archiver, RSStringRef key, RSTypeRef object)
 {
+    if (!archiver || !key) return nil;
     __RSGenericValidInstance(archiver, _RSArchiverTypeID);
     return __RSArchiverContextSerializeObjectForKey(archiver, key, object);
 }
@@ -620,10 +635,10 @@ static BOOL __RSUnarchiverRestoreContext(RSUnarchiverRef unarchiver, RSDataRef d
 {
     BOOL result = NO;
     bzero(&unarchiver->_context, sizeof(struct __RSArchiverContext));
-    RSDictionaryRef dict = RSDictionaryCreateWithData(RSAllocatorSystemDefault, data);
-    RSTypeRef encoded = RSDictionaryGetValue(dict, __RSArchiverContextEncoded);
-    RSTypeRef contextData = RSDictionaryGetValue(dict, __RSArchiverContextData);
-    RSArrayRef order = RSDictionaryGetValue(dict, __RSArchiverContextOrder);
+    RSDictionaryRef raw = RSDictionaryCreateWithData(RSAllocatorSystemDefault, data);
+    RSTypeRef encoded = RSDictionaryGetValue(raw, __RSArchiverContextEncoded);
+    RSTypeRef contextData = RSDictionaryGetValue(raw, __RSArchiverContextData);
+    RSArrayRef order = RSDictionaryGetValue(raw, __RSArchiverContextOrder);
     unarchiver->_context._archiveOrder = (RSMutableArrayRef)RSRetain(order);
     
     if (encoded && encoded == RSBooleanTrue && RSGetTypeID(contextData) == RSDataGetTypeID())
@@ -639,6 +654,7 @@ static BOOL __RSUnarchiverRestoreContext(RSUnarchiverRef unarchiver, RSDataRef d
         unarchiver->_context._archiveData = (RSMutableDictionaryRef)RSRetain(contextData);
         result = YES;
     }
+    RSRelease(raw);
     return result;
 }
 
@@ -656,6 +672,14 @@ RSExport RSUnarchiverRef RSUnarchiverCreate(RSAllocatorRef allocator, RSDataRef 
     RSUnarchiverRef unarchiver = nil;
     unarchiver = __RSUnarchiverCreateInstance(allocator, data);
     return unarchiver;
+}
+
+RSExport RSUnarchiverRef RSUnarchiverCreateWithContentOfPath(RSAllocatorRef allocator, RSStringRef path) {
+    return RSUnarchiverCreate(allocator, RSDataWithContentOfPath(path));
+}
+
+RSExport RSTypeRef RSUnarchiverObjectWithContentOfPath(RSStringRef path) {
+    return RSAutorelease(RSUnarchiverCreateWithContentOfPath(RSAllocatorSystemDefault, path));
 }
 
 #pragma mark -
@@ -831,8 +855,7 @@ static RSDataRef __RSCalendarSerializeCallBack(RSArchiverRef archiver, RSTypeRef
         RSArrayAddObject(array, data2);
         RSRelease(data1);
         RSRelease(data2);
-//        RSDataRef data = __RSArchiverContextSerializeEx(archiver, array, NO);
-        RSDataRef data = __RSArchiverContextMakeDataPacket(archiver, 2, data1, data2);
+        RSDataRef data = RSArchiverContextMakeDataPacket(archiver, 2, data1, data2);
         RSRelease(array);
         return data;
     }
@@ -844,7 +867,7 @@ static RSDataRef __RSCalendarSerializeCallBack(RSArchiverRef archiver, RSTypeRef
 static RSTypeRef __RSCalendarDeserializeCallBack(RSUnarchiverRef unarchiver, RSDataRef data)
 {
 //    RSArrayRef array = __RSArchiverContextDeserializeObjectEx(archiver, data, RSArrayGetTypeID());
-    RSArrayRef array = __RSArchiverContextUnarchivePacket(unarchiver, data, RSArrayGetTypeID());
+    RSArrayRef array = RSArchiverContextUnarchivePacket(unarchiver, data, RSArrayGetTypeID());
     RSDataRef data1 = RSArrayObjectAtIndex(array, 0);
     RSDataRef data2 = RSArrayObjectAtIndex(array, 1);
     RSStringRef identifier = __RSArchiverContextDeserializeObject(unarchiver, data1);
@@ -990,7 +1013,7 @@ static RSDataRef __RSErrorSerializeCallBack(RSArchiverRef archiver, RSTypeRef ob
     data1 = __RSArchiverContextSerialize(archiver, domain);
     data2 = __RSArchiverContextSerialize(archiver, errorCode);
     data3 = __RSArchiverContextSerialize(archiver, userInfo);
-    data = __RSArchiverContextMakeDataPacket(archiver, 3, data1, data2, data3);
+    data = RSArchiverContextMakeDataPacket(archiver, 3, data1, data2, data3);
     RSRelease(data1); RSRelease(data2); RSRelease(data3);
     return data;
 }
@@ -998,7 +1021,7 @@ static RSDataRef __RSErrorSerializeCallBack(RSArchiverRef archiver, RSTypeRef ob
 static RSTypeRef __RSErrorDeserializeCallBack(RSUnarchiverRef unarchiver, RSDataRef data)
 {
     RSErrorRef error = nil;
-    RSArrayRef array = __RSArchiverContextUnarchivePacket(unarchiver, data, RSArrayGetTypeID());
+    RSArrayRef array = RSArchiverContextUnarchivePacket(unarchiver, data, RSArrayGetTypeID());
     RSStringRef domain = __RSArchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 0));
     RSNumberRef errorCode = __RSArchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 1));
     RSDictionaryRef userInfo = __RSArchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 2));
@@ -1052,7 +1075,7 @@ static RSDataRef __RSNotificationSerializeCallBack(RSArchiverRef archiver, RSTyp
     RSDataRef data2 = __RSArchiverContextSerialize(archiver, filter);
     RSDataRef data3 = __RSArchiverContextSerialize(archiver, userInfo);
     
-    RSDataRef data = __RSArchiverContextMakeDataPacket(archiver, 3, data1, data2, data3);
+    RSDataRef data = RSArchiverContextMakeDataPacket(archiver, 3, data1, data2, data3);
     
     RSRelease(data1);
     RSRelease(data2);
@@ -1062,7 +1085,7 @@ static RSDataRef __RSNotificationSerializeCallBack(RSArchiverRef archiver, RSTyp
 
 static RSTypeRef __RSNotificationDeserializeCallBack(RSUnarchiverRef unarchiver, RSDataRef data)
 {
-    RSArrayRef array = __RSArchiverContextUnarchivePacket(unarchiver, data, RSArrayGetTypeID());
+    RSArrayRef array = RSArchiverContextUnarchivePacket(unarchiver, data, RSArrayGetTypeID());
     RSStringRef name = __RSArchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 0));
     RSTypeRef filter = __RSArchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 1));
     RSDictionaryRef userInfo = __RSArchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 2));

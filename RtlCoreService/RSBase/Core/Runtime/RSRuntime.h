@@ -20,10 +20,12 @@
 
 #define RSInitializePriority    2000
 
+#define __RSRuntimeDebugPreference              1
+
 #define __RSRuntimeInstanceBZeroBeforeDie       1
 #define __RSRuntimeISABaseOnEmptyField          0
 
-#define __RSRuntimeInstanceManageWatcher        0
+#define __RSRuntimeInstanceManageWatcher        1
 #define __RSRuntimeInstanceRefWatcher           0
 #define __RSRuntimeInstanceAllocFreeWatcher     0
 #define __RSRuntimeInstanceARC                  0
@@ -33,7 +35,6 @@
 #define __RSPropertyListWarningWhenParseNullKey         0
 #define __RSPropertyListWarningWhenParseNullValue       0
 
-//#define RSAutoMemoryLog     1
 RS_EXTERN_C_BEGIN
 enum {
     RuntimeBaseInfoMask = 1 << (0L),
@@ -109,7 +110,7 @@ RSInline BOOL __RSIsValid(RSTypeRef base)
     return valid;
 }
 
-#if __RSRuntimeCheckAutoreleaseFlag
+#if __RSRuntimeDebugPreference
 RSInline void __RSSetAutorelease(RSTypeRef base)
 {
     ((RSRuntimeBase*)base)->_rsinfo._rsinfo |= (1<<4);

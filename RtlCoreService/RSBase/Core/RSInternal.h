@@ -319,6 +319,26 @@ extern void __RSRuntimeMemoryBarrier();
 extern void RSAllocatorLogUnitCount();
 extern void *__RSStartSimpleThread(void *func, void *arg);
 extern void _RSRunLoopRunBackGround();
+
+struct _RSRuntimeLogPreference {
+    RSUInteger _RSRuntimeInstanceBZeroBeforeDie             : 1;
+    RSUInteger _RSRuntimeISABaseOnEmptyField                : 1;
+    RSUInteger _RSRuntimeInstanceManageWatcher              : 1;
+    RSUInteger _RSRuntimeInstanceRefWatcher                 : 1;
+    RSUInteger _RSRuntimeInstanceAllocFreeWatcher           : 1;
+    RSUInteger _RSRuntimeInstanceARC                        : 1;
+    RSUInteger _RSRuntimeCheckAutoreleaseFlag               : 1;
+    RSUInteger _RSStringNoticeWhenConstantStringAddToTable  : 1;
+    RSUInteger _RSPropertyListWarningWhenParseNullKey       : 1;
+    RSUInteger _RSPropertyListWarningWhenParseNullValue     : 1;
+#if __LP64__
+    RSUInteger _RSReserved : 64 - 10;
+#else
+    RSUInteger _RSReserved : 32 - 10;
+#endif
+};
+extern struct _RSRuntimeLogPreference ___RSDebugLogPreference;
+
 #include <RSCoreFoundation/RSRunLoop.h>
 extern void *__RSRunLoopGetQueue(RSRunLoopRef rl);
 

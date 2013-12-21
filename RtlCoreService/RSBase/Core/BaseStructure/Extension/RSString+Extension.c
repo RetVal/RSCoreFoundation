@@ -132,3 +132,18 @@ RSExport BOOL RSStringWriteToFileWithError(RSStringRef string, RSStringRef path,
     }
     return NO;
 }
+
+RSExport RSRange RSStringRangeOfString(RSStringRef string, RSStringRef find) {
+    RSRange range;
+    RSStringFind(string, find, RSStringGetRange(string), &range);
+    return range;
+}
+
+RSExport RSStringRef RSStringByReplacingOccurrencesOfString(RSStringRef string, RSStringRef target, RSStringRef replacement) {
+    RSStringRef newString = nil;
+    RSRange range = RSStringRangeOfString(string, target);
+    RSMutableStringRef copy = RSMutableCopy(RSAllocatorSystemDefault, string);
+    newString = RSCopy(RSAllocatorSystemDefault, RSStringReplace(copy, range, replacement));
+    RSRelease(copy);
+    return newString;
+}

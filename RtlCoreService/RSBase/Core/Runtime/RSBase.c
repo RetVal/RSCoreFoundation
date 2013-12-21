@@ -49,25 +49,28 @@ RSExport RSTypeRef RSRetain(RSTypeRef obj)
     if (__RSCheckInstanceISCustomReferenceType(obj))
     {
         __RSRuntimeInstanceRetain(obj, NO);  // not try
-#if __RSRuntimeInstanceRefWatcher
+#if __RSRuntimeDebugPreference
+        if (___RSDebugLogPreference._RSRuntimeInstanceRefWatcher) {
 #if __LP64__
-        __RSCLog(RSLogLevelDebug, "%s - retain <%p> - count : %lld\n", __RSRuntimeGetClassWithTypeID(RSGetTypeID(obj))->className, obj, RSGetRetainCount(obj));
+            __RSCLog(RSLogLevelDebug, "%s - retain <%p> - count : %lld\n", __RSRuntimeGetClassWithTypeID(RSGetTypeID(obj))->className, obj, RSGetRetainCount(obj));
 #else
-        __RSCLog(RSLogLevelDebug, "%s - retain <%p> - count : %ld\n", __RSRuntimeGetClassWithTypeID(RSGetTypeID(obj))->className, obj, RSGetRetainCount(obj));
+            __RSCLog(RSLogLevelDebug, "%s - retain <%p> - count : %ld\n", __RSRuntimeGetClassWithTypeID(RSGetTypeID(obj))->className, obj, RSGetRetainCount(obj));
 #endif
+        }
 #endif
-
         return obj;
     }
     else
     {
         __RSRuntimeRetain(obj, NO);
-#if __RSRuntimeInstanceRefWatcher
+#if __RSRuntimeDebugPreference
+        if (___RSDebugLogPreference._RSRuntimeInstanceRefWatcher) {
 #if __LP64__
-        __RSCLog(RSLogLevelDebug, "%s - retain <%p> - count : %lld\n", __RSRuntimeGetClassWithTypeID(RSGetTypeID(obj))->className, obj, RSGetRetainCount(obj));
+            __RSCLog(RSLogLevelDebug, "%s - retain <%p> - count : %lld\n", __RSRuntimeGetClassWithTypeID(RSGetTypeID(obj))->className, obj, RSGetRetainCount(obj));
 #else
-        __RSCLog(RSLogLevelDebug, "%s - retain <%p> - count : %ld\n", __RSRuntimeGetClassWithTypeID(RSGetTypeID(obj))->className, obj, RSGetRetainCount(obj));
+            __RSCLog(RSLogLevelDebug, "%s - retain <%p> - count : %ld\n", __RSRuntimeGetClassWithTypeID(RSGetTypeID(obj))->className, obj, RSGetRetainCount(obj));
 #endif
+        }
 #endif
 
         return obj;
@@ -97,15 +100,18 @@ RSExport void RSRelease(RSTypeRef obj)
 {
     if (obj == nil || RS_IS_TAGGED_OBJ(obj)) return;
     
-#if __RSRuntimeInstanceRefWatcher
-    RSIndex rc = RSGetRetainCount(obj);
-    #if __LP64__
+#if __RSRuntimeDebugPreference
+    if (___RSDebugLogPreference._RSRuntimeInstanceRefWatcher) {
+        RSIndex rc = RSGetRetainCount(obj);
+#if __LP64__
         __RSCLog(RSLogLevelDebug, "%s - release <%p> - count : %lld\n", __RSRuntimeGetClassWithTypeID(RSGetTypeID(obj))->className, obj, rc - 1);
-    #else
+#else
         __RSCLog(RSLogLevelDebug, "%s - release <%p> - count : %ld\n", __RSRuntimeGetClassWithTypeID(RSGetTypeID(obj))->className, obj, rc - 1);
-    #endif
 #endif
-#if __RSRuntimeInstanceARC
+    }
+#endif
+    
+#if __RSRuntimeInstanceARC & 0
     if (__RSIsAutorelease(obj))
     {
         void* p = __builtin_return_address(1);
@@ -121,11 +127,12 @@ RSExport void RSRelease(RSTypeRef obj)
         }
     }
 #endif
-#if __RSRuntimeCheckAutoreleaseFlag
-    if (1 == rc && __RSIsAutorelease(obj))
-    {
-        __RSCLog(RSLogLevelWarning, "%s want to release autoreleased object <%p, %lld>\n", __FUNCTION__, obj, RSGetTypeID(obj));
-//        return;
+#if __RSRuntimeDebugPreference
+    if (___RSDebugLogPreference._RSRuntimeCheckAutoreleaseFlag) {
+        RSIndex rc = RSGetRetainCount(obj);
+        if (1 == rc && __RSIsAutorelease(obj)) {
+            __RSCLog(RSLogLevelWarning, "%s want to release autoreleased object <%p, %lld>\n", __FUNCTION__, obj, RSGetTypeID(obj));
+        }
     }
 #endif
     __RSRelease(obj);
@@ -138,14 +145,14 @@ RSExport RSMutableTypeRef RSAutorelease(RSTypeRef obj)
     if (__RSGetTypeID(obj) == RSAutoreleasePoolGetTypeID())
         HALTWithError(RSInvalidArgumentException, "RSAutoreleasePool can not add itself to the pool!");
     if (__RSRuntimeInstanceIsStackValue(obj) || __RSRuntimeIsInstanceSpecial(obj)) return (RSMutableTypeRef)obj;
-#if __RSRuntimeCheckAutoreleaseFlag
-    if (__RSIsAutorelease(obj) && RSGetRetainCount(obj) == 1)
-    {
-        __RSCLog(RSLogLevelWarning, "%s want to add autoreleased object. refuse adding it<%p, %s>\n", __FUNCTION__, obj, __RSRuntimeGetClassNameWithInstance(obj));
-//        __RSLog(RSLogLevelWarning, RSSTR("%s want to add autoreleased object. refuse adding it<%p, %s>\n"), __FUNCTION__, obj, __RSRuntimeGetClassNameWithInstance(obj));
-        return (RSMutableTypeRef)__RSAutorelease(obj);
+#if __RSRuntimeDebugPreference 
+    if (___RSDebugLogPreference._RSRuntimeCheckAutoreleaseFlag) {
+        if (__RSIsAutorelease(obj) && RSGetRetainCount(obj) == 1) {
+            __RSCLog(RSLogLevelWarning, "%s want to add autoreleased object. refuse adding it<%p, %s>\n", __FUNCTION__, obj, __RSRuntimeGetClassNameWithInstance(obj));
+            return (RSMutableTypeRef)__RSAutorelease(obj);
+        }
+        __RSSetAutorelease(obj);
     }
-    __RSSetAutorelease(obj);
 #endif
     return (RSMutableTypeRef)__RSAutorelease(obj);
 }
@@ -233,9 +240,9 @@ void RSDeallocateInstance(RSTypeRef obj)
     RSTypeID id = _RSRuntimeNotATypeID;
     if ((id = RSGetTypeID(obj)) == _RSRuntimeNotATypeID) HALTWithError(RSInvalidArgumentException, "the object is not available");
     RSRuntimeClass* cls = (RSRuntimeClass*)__RSRuntimeGetClassWithTypeID(id);
-#if __RSRuntimeInstanceManageWatcher
-    __RSCLog(RSLogLevelDebug, "%s dealloc - <%p>\n",cls->className, obj);
-#endif
+    if (___RSDebugLogPreference._RSRuntimeInstanceManageWatcher)
+        __RSCLog(RSLogLevelDebug, "%s dealloc - <%p>\n",cls->className, obj);
+
     if (cls->deallocate) __RSRuntimeInstanceDeallocate(obj);
     if (unlikely(YES == __RSRuntimeInstanceIsStackValue(obj))) return;
     return __RSRuntimeDeallocate(obj);
@@ -244,7 +251,7 @@ void RSDeallocateInstance(RSTypeRef obj)
 
 RSExport RSTypeRef RSCopy(RSAllocatorRef allocator, RSTypeRef obj)
 {
-    if (nil == obj) HALTWithError(RSInvalidArgumentException, "the object is nil");
+    if (nil == obj) return nil; //HALTWithError(RSInvalidArgumentException, "the object is nil");
     RSIndex id = _RSRuntimeNotATypeID;
     if ((id = RSGetTypeID(obj)) == _RSRuntimeNotATypeID) HALTWithError(RSInvalidArgumentException, "the object is not available");
     RSRuntimeClass* cls = (RSRuntimeClass*)__RSRuntimeGetClassWithTypeID(id);
@@ -259,7 +266,7 @@ RSExport RSTypeRef RSCopy(RSAllocatorRef allocator, RSTypeRef obj)
 
 RSExport RSMutableTypeRef RSMutableCopy(RSAllocatorRef allocator, RSTypeRef obj)
 {
-    if (nil == obj) HALTWithError(RSInvalidArgumentException, "the object is nil");
+    if (nil == obj) return nil; //HALTWithError(RSInvalidArgumentException, "the object is nil");
     RSIndex id = _RSRuntimeNotATypeID;
     if ((id = RSGetTypeID(obj)) == _RSRuntimeNotATypeID) HALTWithError(RSInvalidArgumentException, "the object is not available");
     RSRuntimeClass* cls = (RSRuntimeClass*)__RSRuntimeGetClassWithTypeID(id);

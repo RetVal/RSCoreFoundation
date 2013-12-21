@@ -37,5 +37,8 @@ RSExport RSStringRef RSStringWithContentOfPath(RSStringRef path) RS_AVAILABLE(0_
 RSExport BOOL RSStringWriteToFile(RSStringRef string, RSStringRef path, RSWriteFileMode mode) RS_AVAILABLE(0_3);
 RSExport BOOL RSStringWriteToFileWithError(RSStringRef string, RSStringRef path, RSErrorRef *error) RS_AVAILABLE(0_3);
 
+RSExport RSRange RSStringRangeOfString(RSStringRef string, RSStringRef find) RS_AVAILABLE(0_4);
+
+RSExport RSStringRef RSStringByReplacingOccurrencesOfString(RSStringRef string, RSStringRef target, RSStringRef replacement) RS_AVAILABLE(0_4);
 RS_EXTERN_C_END
 #endif

@@ -22,7 +22,23 @@
 #include "RSPrivate/libcurl/include/curl/curl.h"
 
 //RS_CONST_STRING_DECL(__RSURLConnection
-RS_CONST_STRING_DECL(__RSURLConnectionUserAgent, "User-Agent");
+RS_CONST_STRING_DECL(__RSHTTPMessageUserAgentHeader, "User-Agent");
+RS_CONST_STRING_DECL(__RSHTTPMessageAcceptRangesHeader, "Accept-Ranges")
+RS_CONST_STRING_DECL(__RSHTTPMessageCacheControlHeader, "Cache-Control")
+RS_CONST_STRING_DECL(__RSHTTPMessageConnectHeader, "Connection")
+RS_CONST_STRING_DECL(__RSHTTPMessageContentLanguageHeader, "Content-Language")
+RS_CONST_STRING_DECL(__RSHTTPMessageContentLengthHeader, "Content-Length")
+RS_CONST_STRING_DECL(__RSHTTPMessageContentLocationHeader, "Content-Location")
+RS_CONST_STRING_DECL(__RSHTTPMessageContentTypeHeader, "Content-Type")
+RS_CONST_STRING_DECL(__RSHTTPMessageDateHeader, "Date")
+RS_CONST_STRING_DECL(__RSHTTPMessageEtagHeader, "Etag")
+RS_CONST_STRING_DECL(__RSHTTPMessageExpiresHeader, "Expires")
+RS_CONST_STRING_DECL(__RSHTTPMessageLastModifiedHeader, "Last-Modified")
+RS_CONST_STRING_DECL(__RSHTTPMessageLocationHeader, "Location")
+RS_CONST_STRING_DECL(__RSHTTPMessageProxyAuthenticateHeader, "Proxy-Authenticate")
+RS_CONST_STRING_DECL(__RSHTTPMessageServerHeader, "Server")
+RS_CONST_STRING_DECL(__RSHTTPMessageSetCookieHeader, "Set-Cookie")
+
 RS_CONST_STRING_DECL(__RSURLConnectionErrorDomain, "RSURLConnectionErrorDomain");
 
 #ifndef __RSURLConnectionInvoke
@@ -46,10 +62,19 @@ struct _core
     void *_core_chunk;
 };
 
+static void __RSURLConnectionWillStartConnection(RSURLConnectionRef connection, RSURLRequestRef willSendRequest, RSURLResponseRef redirectResponse);
+static void __RSURLConnectionDidReceiveResponse(RSURLConnectionRef connection, RSURLResponseRef response);
+static void __RSURLConnectionDidReceiveData(RSURLConnectionRef connection, RSDataRef data);
+static void __RSURLConnectionDidSendBodyData(RSURLConnectionRef connection, RSDataRef data, RSUInteger totalBytesWritten, RSUInteger totalBytesExpectedToWrite);
+static void __RSURLConnectionDidFinishLoading(RSURLConnectionRef connection);
+static void __RSURLConnectionDidFailWithError(RSURLConnectionRef connection, RSErrorRef error);
+
 struct __RSURLConnection
 {
     RSRuntimeBase _base;
-    RSURLRequestRef _request;
+    
+    RSURLRequestRef _orignialRequest;
+    RSMutableURLRequestRef _request;
     
     RSMutableDataRef _responseHeader;
     
@@ -58,7 +83,7 @@ struct __RSURLConnection
     struct _core _core;
     
     RSURLResponseRef _response;
-    RSMutableDataRef _data;
+//    RSMutableDataRef _data;
     RSErrorRef _error;
 };
 
@@ -96,7 +121,7 @@ RSInline void __RSURLConnectionCoreRelease(void *core, BOOL async)
 {
     if (core)
     {
-        curl_easy_reset(core);
+//        curl_easy_reset(core);
         curl_easy_cleanup(core);
 //        if (!async)
 //        {
@@ -136,21 +161,21 @@ RSInline void *__RSURLConnectionCoreSetupChunk(RSURLConnectionRef connection, vo
     return org;
 }
 
-RSInline void __RSURLConnectionCoreSetupHTTPHeaderField(RSURLConnectionRef connection, RSDictionaryRef headerField)
+RSInline void __RSURLConnectionCoreSetupHTTPHeaderFieldIfNecessary(RSURLConnectionRef connection, RSDictionaryRef headerField)
 {
-    assert(connection || headerField);
+    if (!headerField) return;
+    assert(connection);
     void *core = __RSURLConnectionCoreGet(connection);
     RSUInteger cnt = RSDictionaryGetCount(headerField);
     if (0 == cnt) return;
     
     RSAutoreleaseBlock(^{
-        struct curl_slist *chunk = nil;
+        struct curl_slist *chunk = __RSURLConnectionCoreGetChunk(connection);
         
         RSArrayRef keys = RSDictionaryAllKeys(headerField);
         RSArrayRef values = RSDictionaryAllValues(headerField);
         RSStringRef format = RSSTR("%r: %r");
-        for (RSUInteger idx = 0; idx < cnt; idx++)
-        {
+        for (RSUInteger idx = 0; idx < cnt; idx++) {
             RSStringRef mutableString = RSStringCreateWithFormat(RSAllocatorDefault, format, RSArrayObjectAtIndex(keys, idx), RSArrayObjectAtIndex(values, idx));
             const char *item = RSStringCopyUTF8String(mutableString);
             __RSLog(RSLogLevelNotice, RSSTR("%s"), item);
@@ -163,8 +188,37 @@ RSInline void __RSURLConnectionCoreSetupHTTPHeaderField(RSURLConnectionRef conne
 
         curl_easy_setopt(core, CURLOPT_HTTPHEADER, chunk);
         void *org = __RSURLConnectionCoreSetupChunk(connection, chunk);
-        if (org) curl_slist_free_all(org);
+        if (org != chunk) curl_slist_free_all(org);
     });
+}
+
+static void __RSURLConnectionCoreSetupPostBehaviorIfNecessary(RSURLConnectionRef connection, RSURLRequestRef request) {
+    if (!connection || !request || NO == RSEqual(RSSTR("POST"), RSURLRequestGetHTTPMethod(request))) return;
+    void *core = __RSURLConnectionCoreGet(connection);
+    curl_easy_setopt(core, CURLOPT_POST, 1);
+    curl_easy_setopt(core, CURLOPT_POSTFIELDS, RSStringGetUTF8String(RSStringWithData(RSURLRequestGetHTTPBody(request), RSStringEncodingUTF8)));
+    
+    RSStringRef sizeStr = RSDictionaryGetValue(RSURLRequestGetHeaderField(request), __RSHTTPMessageContentLengthHeader);
+    if (sizeStr) {
+        RSDictionaryRemoveValue((RSMutableDictionaryRef)RSURLRequestGetHeaderField(request), __RSHTTPMessageContentLengthHeader);
+        size_t size = RSStringLongValue(sizeStr);
+        curl_easy_setopt(core, CURLOPT_POSTFIELDSIZE, size);
+    }
+}
+
+static void __RSURLConnectionCoreUpdateCurrentURLRequest(RSURLConnectionRef connection) {
+    unsigned long statusCode = 0;
+    const char *effective_url = nil;
+    curl_easy_getinfo(__RSURLConnectionCoreGet(connection), CURLINFO_RESPONSE_CODE, &statusCode);
+    curl_easy_getinfo(__RSURLConnectionCoreGet(connection), CURLINFO_EFFECTIVE_URL, &effective_url);
+    
+    RSStringRef URLString = RSStringCreateWithCString(RSAllocatorSystemDefault, effective_url, RSStringEncodingUTF8);
+    RSURLRef URL = RSURLCreateWithString(RSAllocatorSystemDefault, URLString, nil);
+    RSRelease(URLString);
+    
+    RSMutableURLRequestRef request = connection->_request;
+    RSURLRequestSetURL(request, URL);
+    RSRelease(URL);
 }
 
 static size_t __RSURLConnectionCoreAppendReceiveResponseHeader(void *ptr, size_t size, size_t nmemb, RSURLConnectionRef connection)
@@ -177,10 +231,18 @@ static size_t __RSURLConnectionCoreAppendReceiveResponseHeader(void *ptr, size_t
     if (RSDataGetLength(data) == 2) {
         if (!connection->_response) {
             if (connection->_responseHeader && RSDataGetLength(connection->_responseHeader)) {
-                connection->_response = RSURLResponseCreateWithData(RSAllocatorSystemDefault, RSURLRequestGetURL(RSURLConnectionGetRequest(connection)), connection->_responseHeader);
+                __RSURLConnectionCoreUpdateCurrentURLRequest(connection);
+                connection->_response = RSURLResponseCreateWithData(RSAllocatorSystemDefault, RSURLRequestGetURL(RSURLConnectionGetCurrentRequest(connection)), connection->_responseHeader);
             }
         }
-        __RSURLConnectionInvokeReceiveResponse(connection, connection->_response);
+        __RSURLConnectionDidReceiveResponse(connection, connection->_response);
+        RSUInteger errorCode = RSURLResponseGetStatusCode(connection->_response);
+        if (errorCode / 100 == 3 && RSDictionaryGetValue(RSURLResponseGetAllHeaderFields(connection->_response), RSSTR("Location"))) {
+            RSRelease(connection->_responseHeader);
+            connection->_responseHeader = RSDataCreateMutable(RSAllocatorSystemDefault, 0);
+            RSRelease(connection->_response);
+            connection->_response = nil;
+        }
     }
     RSRelease(data);
     return realSize;
@@ -192,21 +254,22 @@ static size_t __RSURLConnectionCoreAppendReceiveData(void *ptr, size_t size, siz
     size_t realSize = size * nmemb;
     
     RSDataRef data = RSDataCreate(RSAllocatorSystemDefault, ptr, realSize);
-    RSLog(RSSTR("%s : %r"), __func__, RSStringWithData(data, RSStringEncodingUTF8));
-    __RSURLConnectionInvokeReceiveData(connection, data);
+//    RSLog(RSSTR("%s : %r"), __func__, RSStringWithData(data, RSStringEncodingUTF8));
+    __RSURLConnectionDidReceiveData(connection, data);
     RSRelease(data);
     
     return realSize;
 }
 
-RSInline void __RSURLConnectionCoreSetupHTTPDataReceiver(RSURLConnectionRef connection)
-{
-//    typedef CURLcode (*CoreSetOptFunction)(CURL *curl, CURLoption tag, ...);
-//    CoreSetOptFunction core_setopt = __RSURLConnectionIsAsync(connection) ? curl_multi_setopt : curl_easy_setopt;
-    curl_easy_setopt(__RSURLConnectionCoreGet(connection), CURLOPT_WRITEDATA, connection);
-    curl_easy_setopt(__RSURLConnectionCoreGet(connection), CURLOPT_WRITEFUNCTION, __RSURLConnectionCoreAppendReceiveData);
-    curl_easy_setopt(__RSURLConnectionCoreGet(connection), CURLOPT_HEADERDATA, connection);
-    curl_easy_setopt(__RSURLConnectionCoreGet(connection), CURLOPT_HEADERFUNCTION,__RSURLConnectionCoreAppendReceiveResponseHeader);
+RSInline void __RSURLConnectionCoreSetupHTTPDataReceiver(RSURLConnectionRef connection) {
+    void *core = __RSURLConnectionCoreGet(connection);
+    curl_easy_setopt(core, CURLOPT_WRITEDATA, connection);
+    curl_easy_setopt(core, CURLOPT_WRITEFUNCTION, __RSURLConnectionCoreAppendReceiveData);
+    curl_easy_setopt(core, CURLOPT_HEADERDATA, connection);
+    curl_easy_setopt(core, CURLOPT_HEADERFUNCTION,__RSURLConnectionCoreAppendReceiveResponseHeader);
+    curl_easy_setopt(core, CURLOPT_AUTOREFERER, 1);
+    curl_easy_setopt(core, CURLOPT_FOLLOWLOCATION, 1);
+    curl_easy_setopt(core, CURLOPT_COOKIEFILE, "");
 }
 
 static const char* __RSURLConnectionDefaultUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9) AppleWebKit/537.71 (KHTML, like Gecko) Version/7.0 Safari/537.71";
@@ -223,13 +286,14 @@ static void __RSURLConnectionCoreSetupDefault(RSURLConnectionRef connection, con
     RSMutableDictionaryRef header = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
     RSDictionarySetValue(header, RSSTR("DNT"), RSNumberWithInt(1));
     RSDictionarySetValue(header, RSSTR("Cache-Control"), RSSTR("max-age=0"));
-    __RSURLConnectionCoreSetupHTTPHeaderField(connection, header);
+    
+    __RSURLConnectionCoreSetupHTTPHeaderFieldIfNecessary(connection, header);
     RSRelease(header);
 }
 
 RSInline void __RSURLConnectionCostCleanup(RSURLConnectionRef connection) {
     if (connection->_responseHeader) RSDataSetLength(connection->_responseHeader, 0);
-    if (connection->_data) RSDataSetLength(connection->_data, 0);
+//    if (connection->_data) RSDataSetLength(connection->_data, 0);
     
     __RSReleaseSafe(connection->_response);
     __RSReleaseSafe(connection->_error);
@@ -246,31 +310,37 @@ static RSURLConnectionRef __RSURLConnectionSetupWithURLRequest(RSURLConnectionRe
         RSAllocatorDeallocate(RSAllocatorSystemDefault, c_url);
     }
     __RSURLConnectionCoreSetupDefault(connection, nil);
-    RSDictionaryRef headerField = RSURLRequestGetHeaderField(request);
-    if (headerField) __RSURLConnectionCoreSetupHTTPHeaderField(connection, headerField);
+    __RSURLConnectionCoreSetupPostBehaviorIfNecessary(connection, request);
+    __RSURLConnectionCoreSetupHTTPHeaderFieldIfNecessary(connection, RSURLRequestGetHeaderField(request));
+    
     return connection;
 }
 
 static void __RSURLConnectionFinishPerform(RSURLConnectionRef connection) {
     if (!connection->_response) {
         if (connection->_responseHeader && RSDataGetLength(connection->_responseHeader)) {
-            connection->_response = RSURLResponseCreateWithData(RSAllocatorSystemDefault, RSURLRequestGetURL(RSURLConnectionGetRequest(connection)), connection->_responseHeader);
+            connection->_response = RSURLResponseCreateWithData(RSAllocatorSystemDefault, RSURLRequestGetURL(RSURLConnectionGetCurrentRequest(connection)), connection->_responseHeader);
         }
     }
+    
 }
 
 static RSURLConnectionRef __RSURLConnectionCorePerform(RSURLConnectionRef connection)
 {
     void *core = __RSURLConnectionCoreGet(connection);
     CURLcode retCode = curl_easy_perform(core);
+    __RSURLConnectionFinishPerform(connection);
+//    curl_easy_cleanup(core);
+//    struct _core *_core = __RSURLConnectionGetCore(connection);
+//    _core->_core = nil;
+    
     if (retCode) {
         __RSCLog(RSLogLevelNotice, "RSURLConnection Notice ");
-        __RSURLConnectionInvokeFailWithError(connection, RSErrorWithDomainCodeAndUserInfo(__RSURLConnectionErrorDomain, retCode, nil));
+        __RSURLConnectionDidFailWithError(connection, RSErrorWithDomainCodeAndUserInfo(__RSURLConnectionErrorDomain, retCode, nil));
     }
     else {
-        __RSURLConnectionInvokeFinishLoading(connection);
+        __RSURLConnectionDidFinishLoading(connection);
     }
-    __RSURLConnectionFinishPerform(connection);
     return connection;
 }
 
@@ -288,10 +358,12 @@ static RSTypeRef __RSURLConnectionClassCopy(RSAllocatorRef allocator, RSTypeRef 
 static void __RSURLConnectionClassDeallocate(RSTypeRef rs)
 {
     RSURLConnectionRef connection = (RSURLConnectionRef)rs;
+    if (connection->_orignialRequest) RSRelease(connection->_orignialRequest);
+    connection->_orignialRequest = nil;
     if (connection->_request) RSRelease(connection->_request);
     connection->_request = nil;
-    if (connection->_data) RSRelease(connection->_data);
-    connection->_data = nil;
+//    if (connection->_data) RSRelease(connection->_data);
+//    connection->_data = nil;
     if (connection->_responseHeader) RSRelease(connection->_responseHeader);
     connection->_responseHeader = nil;
     __RSURLConnectionCostCleanup(connection);
@@ -303,14 +375,14 @@ static BOOL __RSURLConnectionClassEqual(RSTypeRef rs1, RSTypeRef rs2)
     RSURLConnectionRef RSURLConnection2 = (RSURLConnectionRef)rs2;
     BOOL result = NO;
     
-    result = RSEqual(RSURLConnection1->_request, RSURLConnection2->_request);
+    result = RSEqual(RSURLConnection1->_orignialRequest, RSURLConnection2->_orignialRequest);
     
     return result;
 }
 
 static RSHashCode __RSURLConnectionClassHash(RSTypeRef rs)
 {
-    return RSHash(((RSURLConnectionRef)rs)->_request);
+    return RSHash(((RSURLConnectionRef)rs)->_orignialRequest);
 }
 
 static RSStringRef __RSURLConnectionClassDescription(RSTypeRef rs)
@@ -369,19 +441,24 @@ static void __RSURLConnectionLoaderMain(void *context) {
     RSRelease(source);
     RSUInteger result __unused = RSRunLoopRunInMode(RSRunLoopDefaultMode, 1.0e10, NO);
     RSShow(RSSTR("__RSURLConnectionRunLoop return"));
-    __HALT();
 }
+static void __RSURLConnectionDeallocate(RSNotificationRef notification);
 
 RSPrivate void __RSURLConnectionInitialize()
 {
     _RSURLConnectionTypeID = __RSRuntimeRegisterClass(&__RSURLConnectionClass);
     __RSRuntimeSetClassTypeID(&__RSURLConnectionClass, _RSURLConnectionTypeID);
+    return;
     __RSStartSimpleThread(__RSURLConnectionLoaderMain, nil);
+    RSNotificationCenterAddObserver(RSNotificationCenterGetDefault(), RSAutorelease(RSObserverCreate(RSAllocatorSystemDefault, RSCoreFoundationWillDeallocateNotification, &__RSURLConnectionDeallocate, nil)));
 }
 
-RSPrivate void __RSURLConnectionDeallocate()
+static void __RSURLConnectionDeallocate(RSNotificationRef notification)
 {
-//    <#do your finalize operation#>
+    RSSyncUpdateBlock(__RSURLConnectionRunLoopSpinLock, ^{
+        if (__RSURLConnectionRunLoop)
+            RSRunLoopStop(__RSURLConnectionRunLoop);
+    });
 }
 
 static RSURLConnectionRef __RSURLConnectionCreateInstance(RSAllocatorRef allocator, RSURLRequestRef request, BOOL async, __weak RSTypeRef delegate, const struct RSURLConnectionDelegate *callbacks)
@@ -395,7 +472,8 @@ static RSURLConnectionRef __RSURLConnectionCreateInstance(RSAllocatorRef allocat
     
     if (!request) return instance;
     __RSGenericValidInstance(request, RSURLRequestGetTypeID());
-    instance->_request = RSRetain(request);
+    instance->_orignialRequest = RSRetain(request);
+    instance->_request = RSMutableCopy(RSAllocatorSystemDefault, request);
     return instance;
 }
 
@@ -414,19 +492,31 @@ RSExport void RSURLConnectionSetDelegate(RSURLConnectionRef connection, RSTypeRe
     return;
 }
 
-RSExport RSURLRequestRef RSURLConnectionGetRequest(RSURLConnectionRef connection)
+RSExport RSURLRequestRef RSURLConnectionGetOrignialRequest(RSURLConnectionRef connection)
 {
     if (!connection) return nil;
     __RSGenericValidInstance(connection, _RSURLConnectionTypeID);
+    return connection->_orignialRequest;
+}
+
+RSExport RSURLRequestRef RSURLConnectionGetCurrentRequest(RSURLConnectionRef connection) {
+    if (!connection) return nil;
+    __RSGenericValidInstance(connection, _RSURLConnectionTypeID);
     return connection->_request;
+}
+
+RSExport RSTypeRef RSURLConnectionGetContext(RSURLConnectionRef connection) {
+    if (!connection) return nil;
+    __RSGenericValidInstance(connection, _RSURLConnectionTypeID);
+    return connection->_delegate;
 }
 
 RSExport void RSURLConnectionSetRequest(RSURLConnectionRef connection, RSURLRequestRef request)
 {
     if (!connection) return;
     __RSGenericValidInstance(connection, _RSURLConnectionTypeID);
-    if (connection->_request) RSRelease(connection->_request);
-    if (request) connection->_request = RSRetain(request);
+    if (connection->_orignialRequest) RSRelease(connection->_orignialRequest);
+    if (request) connection->_orignialRequest = RSRetain(request);
     return;
 }
 
@@ -442,63 +532,62 @@ RSExport void RSURLConnectionStartOperationInQueue(RSURLConnectionRef connection
         if (!__RSURLConnectionRunLoop)
             __RSURLConnectionRunLoop = RSRunLoopGetCurrent();
     });
-    RSSyncUpdateBlock(__RSURLConnectionRunLoopSpinLock, ^{
-        
-    });
-    return;
-}
-
-RSExport void RSURLConnectionStartOperation(RSURLConnectionRef connection)
-{
-    if (!connection) return;
-    __RSGenericValidInstance(connection, _RSURLConnectionTypeID);
-    if (!connection->_delegate) return;
-    __RSURLConnectionInvokeStartConnection(connection, connection->_request, nil);
-    if (__RSURLConnectionIsAsync(connection))
-    {
-//        RSPerformBlockInBackGround(^{
-//            __RSURLConnectionCorePerform(connection);
-//        });
-        return;
-    }
-    __RSURLConnectionCorePerform(connection);
     return;
 }
 
 static void __RSURLConnectionWillStartConnectionRoutine(RSURLConnectionRef connection, RSURLRequestRef willSendRequest) {
     __RSURLConnectionSetupWithURLRequest(connection, willSendRequest, __RSURLConnectionIsAsync(connection));
-    if (!connection->_data) connection->_data = RSDataCreateMutable(RSAllocatorDefault, 0);
-    else RSDataSetLength(connection->_data, 0);
+//    if (!connection->_data) connection->_data = RSDataCreateMutable(RSAllocatorDefault, 0);
+//    else RSDataSetLength(connection->_data, 0);
 }
 
-static void __RSURLConnectionWillStartConnection(RSURLConnectionRef connection, RSURLRequestRef willSendRequest, RSTypeRef redirectResponse) {
+static void __RSURLConnectionWillStartConnection(RSURLConnectionRef connection, RSURLRequestRef willSendRequest, RSURLResponseRef redirectResponse) {
     __RSURLConnectionWillStartConnectionRoutine(connection, willSendRequest);
     __RSURLConnectionCoreSetupHTTPDataReceiver(connection);
+    __RSURLConnectionInvokeStartConnection(connection, RSURLConnectionGetCurrentRequest(connection), nil);
 }
 
 static void __RSURLConnectionDidReceiveResponse(RSURLConnectionRef connection, RSURLResponseRef response) {
+    __RSURLConnectionInvokeReceiveResponse(connection, connection->_response);
     RSUInteger errorCode = RSURLResponseGetStatusCode(response);
+    RSShow(response);
     if (errorCode == 200) return;
-    RSUInteger prefixCode = errorCode / 100;
-    
 }
 
 static void __RSURLConnectionDidReceiveData(RSURLConnectionRef connection, RSDataRef data) {
-    RSDataAppend((RSMutableDataRef)connection->_data, data);
+//    RSDataAppend((RSMutableDataRef)connection->_data, data);
+    __RSURLConnectionInvokeReceiveData(connection, data);
 }
 
 static void __RSURLConnectionDidSendBodyData(RSURLConnectionRef connection, RSDataRef data, RSUInteger totalBytesWritten, RSUInteger totalBytesExpectedToWrite) {
-    
+    RSShow(RSSTR("send body data"));
+    __RSURLConnectionInvokeSendData(connection, data, totalBytesWritten, totalBytesExpectedToWrite);
 }
 
 static void __RSURLConnectionDidFinishLoading(RSURLConnectionRef connection) {
-    
+    RSShow(RSAutorelease(RSURLCopyHostName(RSURLRequestGetURL(RSURLConnectionGetCurrentRequest(connection)))));
+    __RSURLConnectionInvokeFinishLoading(connection);
 }
 
 static void __RSURLConnectionDidFailWithError(RSURLConnectionRef connection, RSErrorRef error) {
-    RSRelease(connection->_data);
-    connection->_data = nil;
+//    RSRelease(connection->_data);
+//    connection->_data = nil;
+    __RSURLConnectionInvokeFailWithError(connection, error);
 }
+
+static void __RSURLConnectionDidReceiveData_PrivateDelegate(RSURLConnectionRef connection, RSDataRef data) {
+    RSDataAppend((RSMutableDataRef)RSURLConnectionGetContext(connection), data);
+}
+
+static const struct RSURLConnectionDelegate __RSURLConnectionPrivateDelegate = {
+    0,
+    nil,
+    nil,
+    __RSURLConnectionDidReceiveData_PrivateDelegate,
+    nil,
+    nil,
+    nil
+};
 
 static const struct RSURLConnectionDelegate __RSURLConnectionImpDelegate = {
     0,
@@ -510,15 +599,21 @@ static const struct RSURLConnectionDelegate __RSURLConnectionImpDelegate = {
     __RSURLConnectionDidFailWithError
 };
 
+#include "RSHTTPCookie.h"
+
 RSExport RSDataRef RSURLConnectionSendSynchronousRequest(RSURLRequestRef request, __autorelease RSURLResponseRef *response, __autorelease RSErrorRef *error) {
-    RSURLConnectionRef connection = RSURLConnectionCreate(RSAllocatorDefault, request, nil, &__RSURLConnectionImpDelegate);
-    __RSURLConnectionInvokeStartConnection(connection, request, nil);
+    RSMutableDataRef data = RSDataCreateMutable(RSAllocatorSystemDefault, 0);
+    RSURLConnectionRef connection = RSURLConnectionCreate(RSAllocatorDefault, request, data, &__RSURLConnectionPrivateDelegate);
+    __RSURLConnectionWillStartConnection(connection, RSURLConnectionGetCurrentRequest(connection), nil);
     __RSURLConnectionCorePerform(connection);
-    RSDataRef data = RSAutorelease(RSRetain(connection->_data));
+    RSArrayRef cookies = RSCookiesWithCore(__RSURLConnectionCoreGet(connection));
+    RSShow(cookies);
+    
+//    RSDataRef data = RSAutorelease(RSRetain(connection->_data));
     if (response && connection->_response) *response = RSAutorelease(RSRetain(connection->_response));
     if (error && connection->_error) *error = RSAutorelease(RSRetain(connection->_error));
     RSRelease(connection);
-    return data;
+    return RSAutorelease(data);
 }
 
 struct __RSURLConnectionQueueCalloutContext {
@@ -536,6 +631,19 @@ static void __RSURLConnectionQueueCallout(void *info) {
     if (ctx->error) RSRelease(ctx->error);
     Block_release(ctx->completeHandler);
     RSAllocatorDeallocate(RSAllocatorSystemDefault, ctx);
+}
+
+RSExport void RSURLConnectionStartOperation(RSURLConnectionRef connection)
+{
+    if (!connection) return;
+    __RSGenericValidInstance(connection, _RSURLConnectionTypeID);
+    if (!connection->_delegate) return;
+    RSRunLoopPerformBlock(__RSURLConnectionRunLoop, RSRunLoopDefault, ^{
+        __RSURLConnectionWillStartConnection(connection, RSURLConnectionGetCurrentRequest(connection), nil);
+        __RSURLConnectionCorePerform(connection);
+    });
+    if (RSRunLoopIsWaiting(__RSURLConnectionRunLoop)) RSRunLoopWakeUp(__RSURLConnectionRunLoop);
+    return;
 }
 
 RSExport void RSURLConnectionSendAsynchronousRequest(RSURLRequestRef request, RSRunLoopRef rl, void (^completeHandler)(__autorelease RSURLResponseRef response, __autorelease RSDataRef data, __autorelease RSErrorRef error)) {

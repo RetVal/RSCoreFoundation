@@ -55,6 +55,8 @@
 #include <RSCoreFoundation/RSURLRequest.h>
 #include <RSCoreFoundation/RSURLResponse.h>
 #include <RSCoreFoundation/RSURLConnection.h>
+#include <RSCoreFoundation/RSHTTPCookie.h>
+#include <RSCoreFoundation/RSHTTPCookieStorage.h>
 #include <RSCoreFoundation/RSUUID.h>
 #include <RSCoreFoundation/RSXMLParser.h>
 

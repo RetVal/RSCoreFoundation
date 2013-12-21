@@ -8995,7 +8995,8 @@ RSPrivate void *__RSRunLoopGetQueue(RSRunLoopRef rl)
 
 RSPrivate void __RSRunLoopDeallocate()
 {
-//    RSDeallocateInstance(RSRunLoopMain);
+//    __RSRuntimeSetClassTypeID(&__RSRunLoopModeClass, __RSRunLoopModeTypeID);
+//    __runloop_malloc_vm_pressure_setup();
 }
 
 #if RS_BLOCKS_AVAILABLE

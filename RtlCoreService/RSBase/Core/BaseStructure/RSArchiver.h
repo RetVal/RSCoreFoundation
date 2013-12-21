@@ -19,36 +19,36 @@ typedef struct __RSArchiverContext *RSArchiverContextRef;
 typedef struct __RSArchiver *RSArchiverRef;
 typedef struct __RSArchiver *RSUnarchiverRef;
 
+RSExport RSStringRef const RSKeyedArchiveRootObjectKey;
+
 RSExport RSTypeID RSArchiverGetTypeID() RS_AVAILABLE(0_0);
 
 typedef RSDataRef (*RSArchiverSerializeCallBack)(RSArchiverRef archiver, RSTypeRef object);
-typedef RSTypeRef (*RSArchiverDeserializeCallBack)(RSArchiverRef archiver, RSDataRef);
-typedef struct __RSArchiverCallBacks
-{
+typedef RSTypeRef (*RSArchiverDeserializeCallBack)(RSUnarchiverRef archiver, RSDataRef data);
+typedef struct __RSArchiverCallBacks {
     RSIndex version;
     RSTypeID classID;
     RSArchiverSerializeCallBack serialize;
     RSArchiverDeserializeCallBack deserialize;
 }RSArchiverCallBacks RS_AVAILABLE(0_0);
 
-RSExport RSDataRef RSArchiveObject(RSTypeRef object);
 RSExport RSArchiverRef RSArchiverCreate(RSAllocatorRef allocator);
 
-RSExport BOOL RSArchiverEncodeObjectForKey(RSArchiverRef archiver, RSStringRef key, RSTypeRef object);
+RSExport RSDataRef RSArchiverContextMakeDataPacket(RSArchiverRef archiver, RSIndex count, RSDataRef data1, ...);
+RSExport RSArrayRef RSArchiverContextUnarchivePacket(const RSUnarchiverRef unarchiver, RSDataRef data, RSTypeID ID);
+RSExport RSDataRef RSArchiverEncodeObject(RSArchiverRef archiver, RSTypeRef object);
+RSExport RSTypeRef RSUnarchiverDecodeObject(RSUnarchiverRef unarchiver, RSDataRef data);
 
+RSExport BOOL RSArchiverEncodeObjectForKey(RSArchiverRef archiver, RSStringRef key, RSTypeRef object);
+RSExport RSTypeRef RSUnarchiverDecodeObjectForKey(RSUnarchiverRef unarchiver, RSStringRef key);
+
+// get current archived data from archiver's context.
 RSExport RSDataRef RSArchiverCopyData(RSArchiverRef archiver);
 
+// create an unarchiver with data, and restore the context from archiver copy data
 RSExport RSUnarchiverRef RSUnarchiverCreate(RSAllocatorRef allocator, RSDataRef data);
 RSExport RSUnarchiverRef RSUnarchiverCreateWithContext(RSAllocatorRef allocator, RSArchiverContextRef context);
-RSExport RSUnarchiverRef RSUnarchiverCreateWithFile(RSAllocatorRef allocator, RSStringRef path);
-
-RSExport RSTypeRef RSUnarchiverObjectWithFilePath(RSStringRef path);
-RSExport RSTypeRef RSUnarchiverCreateObjectWithFilePath(RSStringRef path);
-
-RSExport RSTypeRef RSUnarchiverObjectWithData(RSDataRef data);
-RSExport RSTypeRef RSUnarchiverCreateObjectWithData(RSDataRef data);
-
-RSExport RSTypeRef RSUnarchiverDecodeObjectForKey(RSUnarchiverRef unarchiver, RSStringRef key);
+RSExport RSUnarchiverRef RSUnarchiverCreateWithContentOfPath(RSAllocatorRef allocator, RSStringRef path);
 
 RS_EXTERN_C_END
 #endif 

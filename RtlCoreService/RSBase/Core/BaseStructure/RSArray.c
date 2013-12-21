@@ -2050,16 +2050,17 @@ static RSStringRef __RSArrayClassDescription(RSTypeRef rs)
     cnt = __RSArrayGetCount(array);
     allocator = RSGetAllocator(array);
     result = RSStringCreateMutable(allocator, 0);
-    switch (__RSArrayGetType(array))
-    {
-        case __RSArrayImmutable:
-            RSStringAppendStringWithFormat(result, RSSTR("<RSArray %p [%p]>{type = immutable, count = %u, values = (%s"), rs, allocator, cnt, cnt ? "\n" : "");
-            break;
-        case __RSArrayDeque:
-            RSStringAppendStringWithFormat(result, RSSTR("<RSArray %p [%p]>{type = mutable-small, count = %u, values = (%s"), rs, allocator, cnt, cnt ? "\n" : "");
-            break;
-    }
+//    switch (__RSArrayGetType(array))
+//    {
+//        case __RSArrayImmutable:
+//            RSStringAppendStringWithFormat(result, RSSTR("<RSArray %p [%p]>{type = immutable, count = %u, values = (%s"), rs, allocator, cnt, cnt ? "\n" : "");
+//            break;
+//        case __RSArrayDeque:
+//            RSStringAppendStringWithFormat(result, RSSTR("<RSArray %p [%p]>{type = mutable-small, count = %u, values = (%s"), rs, allocator, cnt, cnt ? "\n" : "");
+//            break;
+//    }
     cb = __RSArrayGetCallBacks(array);
+    RSStringAppendString(result, RSSTR("{\n"));
     for (idx = 0; idx < cnt; idx++)
     {
         RSStringRef desc = nil;
@@ -2070,13 +2071,15 @@ static RSStringRef __RSArrayClassDescription(RSTypeRef rs)
         }
         if (nil != desc)
         {
-            RSStringAppendStringWithFormat(result, RSSTR("\t%u : %R\n"), idx, desc);
+//            RSStringAppendStringWithFormat(result, RSSTR("\t%u : %R\n"), idx, desc);
+            RSStringAppendStringWithFormat(result, RSSTR("\t%R\n"), desc);
             RSRelease(desc);
         } else {
-            RSStringAppendStringWithFormat(result, RSSTR("\t%u : <%p>\n"), idx, val);
+            RSStringAppendStringWithFormat(result, RSSTR("\t<%p>\n"), val);
+//            RSStringAppendStringWithFormat(result, RSSTR("\t%u : <%p>\n"), idx, val);
         }
     }
-    RSStringAppendString(result, RSSTR(")}"));
+    RSStringAppendString(result, RSSTR("}"));
     return result;
 }
 
