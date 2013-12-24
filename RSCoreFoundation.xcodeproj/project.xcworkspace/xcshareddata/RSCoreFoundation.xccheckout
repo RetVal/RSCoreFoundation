@@ -5,20 +5,20 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>6E4D311F-AA8B-451A-91E0-8BBFECBE22CC</string>
+	<string>AA3E2072-2820-4AE2-A26E-E603DA326BC6</string>
 	<key>IDESourceControlProjectName</key>
-	<string>RSObjectLeakParser</string>
+	<string>RSCoreFoundation</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>541A1A70-F74F-46FE-A4A5-CBCE2A1189D0</key>
 		<string>https://github.com/RetVal/RSCoreFoundation.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>Library/RSCFLibrary/RSObjectLeakParser/RSObjectLeakParser.xcodeproj/project.xcworkspace</string>
+	<string>RSCoreFoundation.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>541A1A70-F74F-46FE-A4A5-CBCE2A1189D0</key>
-		<string>../../../../..</string>
+		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/RetVal/RSCoreFoundation.git</string>
