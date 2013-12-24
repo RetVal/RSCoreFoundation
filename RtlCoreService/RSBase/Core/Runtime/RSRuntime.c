@@ -18,6 +18,7 @@
 #include <RSCoreFoundation/RSRuntime.h>
 #include "RSRuntimeAtomic.h"
 #include "../BaseStructure/RSPrivate/RSPrivateOperatingSystem/RSPrivateTask.h"
+#include "../CoreFoundation/Hash/RSRawHashTable.h"
 
 // define the runtime class table   (10 bits)
 #define  __RSClassTableSize 1024
@@ -141,9 +142,47 @@ struct ____RSDebugLogContext {
 #include <sys/stat.h>
 static struct ____RSDebugLogContext ____RSRuntimeDebugLevelLogContext = {0};
 
+static BOOL __RSDebugLevelPreferencesParser(const char *buffer, size_t len, struct _RSRuntimeLogPreference *preference) {
+    BOOL result = NO;
+    if (!buffer || !len || !preference)
+        return result;
+    
+    
+    
+    return result;
+}
+
 static void __RSDebugLevelPreferencesInitialize() {
     RSBlock _preferencesPath[RSMaxPathSize] = {0};
-    
+    strcpy(_preferencesPath, __RSRuntimeGetEnvironment("HOME") ? : "");
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_LINUX
+    strcat(_preferencesPath, ".RSCoreFoundationPreferences");
+    int handle = open(_preferencesPath, O_RDONLY, 0555);
+    if (handle >= 0) {
+        size_t fileSize = lseek(handle, 0, SEEK_END);
+        if (fileSize) {
+            lseek(handle, 0, SEEK_SET);
+            const char *buffer = nil;
+            if (fileSize < RSMaxPathSize) {
+                __builtin_memset(_preferencesPath, 0, RSMaxPathSize);
+                buffer = _preferencesPath;
+            } else {
+                buffer = (const char *)calloc(1, fileSize + 1);
+            }
+            ssize_t readLength = read(handle, (void *)buffer, fileSize);
+            if (readLength) {
+                struct _RSRuntimeLogPreference preference = ___RSDebugLogPreference;
+                if (__RSDebugLevelPreferencesParser(buffer, readLength, &preference))
+                    ___RSDebugLogPreference = preference;
+            }
+            if (buffer != _preferencesPath)
+                free((void *)buffer);
+        }
+        close(handle);
+    }
+#elif DEPLOYMENT_TARGET_WINDOWS
+
+#endif
 }
 
 static void __RSDebugLevelInitialize()
@@ -196,9 +235,14 @@ static void __RSRuntimeEnvironmentInitialize()
     }
 }
 
+static void __RSRuntimeSetClassTypeIDWithNameToCache(const char *name, RSTypeID ID);
+static void __RSRuntimeRemoveClassTypeIDWithNameFromCache(const char *name);
+
 const RSHashCode RSIndexMax = ~0;
 RSExport RSTypeID __RSRuntimeRegisterClass(const RSRuntimeClass* restrict const cls)
 {
+    if (!cls->className)
+        return _RSRuntimeNotATypeID;
     if (_RSRuntimeScannedObject != cls->version) {
         return _RSRuntimeNotATypeID;
     }
@@ -214,6 +258,7 @@ RSExport RSTypeID __RSRuntimeRegisterClass(const RSRuntimeClass* restrict const 
     __RSRuntimeScanClass(cls);
     __RSRuntimeClassTable[__RSRuntimeClassTableCount] = (RSRuntimeClass*)cls;
     RSTypeID type = __RSRuntimeClassTableCount++;
+    __RSRuntimeSetClassTypeIDWithNameToCache(cls->className, type);
     __RSRuntimeUnlockTable();
     return type;
 }
@@ -225,11 +270,13 @@ RSExport void __RSRuntimeUnregisterClass(RSTypeID classID)
     __RSRuntimeUnlockTable();
 }
 
-RSExport const RSRuntimeClass* __RSRuntimeGetClassWithTypeID(RSTypeID classID)
-{
+RSExport const RSRuntimeClass* __RSRuntimeGetClassWithTypeID(RSTypeID classID) {
+    __RSRuntimeLockTable();
     if (classID >= __RSRuntimeClassTableCount) HALTWithError(RSInvalidArgumentException, "the size of class table in runtime is overflow");
     if (__RSRuntimeClassTable[classID] == nil) HALTWithError(RSInvalidArgumentException, "the class is not registered in runtime");
-    return (const RSRuntimeClass*)__RSRuntimeClassTable[classID];
+    const RSRuntimeClass *cls = (const RSRuntimeClass*)__RSRuntimeClassTable[classID];
+    __RSRuntimeUnlockTable();
+    return cls;
 }
 
 RSExport const char* __RSRuntimeGetClassNameWithTypeID(RSTypeID classID)
@@ -319,14 +366,12 @@ RSExport uintptr_t __RSDoExternRefOperation(uintptr_t op, void* obj)
     switch (op)
     {
         case 300:   // increment
-            //if (__CFOASafe) __CFRecordAllocationEvent(__kCFObjectRetainedEvent, obj, 0, 0, NULL);
         case _RSRuntimeOperationRetain:   // increment, no event
             RSSpinLockLock(lock);
             RSBasicHashAddValue(table, disguised, disguised);
             RSSpinLockUnlock(lock);
             return (uintptr_t)obj;
         case 400:   // decrement
-            //if (__CFOASafe) __CFRecordAllocationEvent(__kCFObjectReleasedEvent, obj, 0, 0, NULL);
         case _RSRuntimeOperationRelease:   // decrement, no event
             RSSpinLockLock(lock);
             count = (uintptr_t)RSBasicHashRemoveValue(table, disguised);
@@ -473,17 +518,14 @@ RSExport RSIndex __RSRuntimeInstanceGetRetainCount(RSTypeRef obj)
     return 0;
 }
 
-RSExport void __RSRuntimeInstanceDeallocate(RSTypeRef obj)
-{
+RSExport void __RSRuntimeInstanceDeallocate(RSTypeRef obj) {
     RSRuntimeClass* cls = (RSRuntimeClass*)__RSRuntimeGetClassWithTypeID(RSGetTypeID(obj));
     return cls->deallocate(obj);
 }
 
-RSExport RSTypeRef __RSRuntimeRetain(RSTypeRef obj, BOOL try)
-{
+RSExport RSTypeRef __RSRuntimeRetain(RSTypeRef obj, BOOL try) {
     RSTypeID typeID = RSGetTypeID(obj);
-    if (typeID != _RSRuntimeNotATypeID)
-    {
+    if (typeID != _RSRuntimeNotATypeID) {
         //RSUInteger refCount = ~0;
         if (try) return obj;
         RSIndex ref = 0;
@@ -520,7 +562,6 @@ RSExport void __RSRuntimeRelease(RSTypeRef obj, BOOL try)
         if (((RSRuntimeBase*)obj)->_rsinfo._special) return;
         ref = ((RSRuntimeBase*)obj)->_rc;
         if (ref == 1) {
-            //OSAtomicDecrement64Barrier((int64_t*)&((RSRuntimeBase *)obj)->_rc);
             return RSDeallocateInstance(obj);
         }
         do {
@@ -816,6 +857,71 @@ RSExport void __RSTraceLog(RSCBuffer format,...)
     }
 }
 
+
+
+#pragma mark -
+#pragma mark Runtime Class Name Cache (Name - TypeID)
+
+static raw_hash_table __RSRuntimeRawHashTable = {0};
+static RSSpinLock __RSRuntimeRawHashTableLock = RSSpinLockInit;
+
+static void __RSRuntimeClassCacheInitize() {
+    raw_ht_init(&__RSRuntimeRawHashTable, HT_KEY_CONST, 0.05);
+}
+
+static void __RSRuntimeClassCacheDeallocate() {
+    raw_ht_destroy(&__RSRuntimeRawHashTable);
+}
+
+static RSTypeID __RSRuntimeGetClassTypeIDWithNameInCache(const char *name) {
+    if (!name) return _RSRuntimeNotATypeID;
+    __block RSTypeID ID = _RSRuntimeNotATypeID;
+    RSSyncUpdateBlock(__RSRuntimeRawHashTableLock, ^{
+        size_t value_size = 0;
+        void *value = raw_ht_get(&__RSRuntimeRawHashTable, (void *)name, strlen(name) + 1, &value_size);
+        if (value)
+            __builtin_memcpy(&ID, value, value_size);
+    });
+    return ID;
+}
+
+static void __RSRuntimeSetClassTypeIDWithNameToCache(const char *name, RSTypeID ID) {
+    if (!name || ID == _RSRuntimeNotATypeID)
+        return ;
+    RSSyncUpdateBlock(__RSRuntimeRawHashTableLock, ^{
+        RSTypeID typeID = ID;
+        raw_ht_insert(&__RSRuntimeRawHashTable, (void *)name, strlen(name) + 1, (void *)&typeID, sizeof(RSTypeID));
+    });
+    return ;
+}
+
+static void __RSRuntimeRemoveClassTypeIDWithNameFromCache(const char *name) {
+    if (!name)
+        return;
+    RSSyncUpdateBlock(__RSRuntimeRawHashTableLock, ^{
+        raw_ht_remove(&__RSRuntimeRawHashTable, (void *)name, strlen(name) + 1);
+    });
+}
+
+RSExport RSTypeID __RSRuntimeGetClassTypeIDWithName(const char *name) {
+    RSTypeID ID = _RSRuntimeNotATypeID;
+    if (!name) return ID;
+    if (_RSRuntimeNotAType != (ID = __RSRuntimeGetClassTypeIDWithNameInCache(name)))
+        return ID;
+    __RSRuntimeLockTable();
+    for (RSTypeID idx = 0; idx < __RSRuntimeClassTableCount; idx++) {
+        if (__RSRuntimeClassTable[idx]->className && 0 == strcmp(name, __RSRuntimeClassTable[idx]->className)) {
+            ID = idx;
+            break;
+        }
+    }
+    if (_RSRuntimeNotATypeID != ID) {
+        __RSRuntimeSetClassTypeIDWithNameToCache(name, ID);
+    }
+    __RSRuntimeUnlockTable();
+    return ID;
+}
+
 RSPrivate pthread_t _RSMainPThread = kNilPthreadT;
 
 extern void __RSNilInitialize();
@@ -885,6 +991,7 @@ RSExport __RS_INIT_ROUTINE(RSRuntimePriority) void RSCoreFoundationInitialize()
     
     __RSRuntimeEnvironmentInitialize();
 	__RSDebugLevelInitialize();
+    __RSRuntimeClassCacheInitize();
     
     RSZeroMemory(__RSRuntimeClassTable, sizeof(__RSRuntimeClassTable));
     
@@ -1002,6 +1109,7 @@ void RSCoreFoundationDeallocate()
 #if DEBUG
 //    RSAllocatorLogUnitCount();        // check the Memory unit, it should be 0 or memory leaks.
 #endif
+    __RSRuntimeClassCacheDeallocate();
     RSAllocatorLogUnitCount();        // check the Memory unit, it should be 0 or memory leaks.
 	__RSDebugLevelDeallocate();
 }

@@ -63,7 +63,7 @@ static RSArrayRef cookiesFromCurl(CURL *curl) {
     });
 }
 
-static RSArrayRef RSCookieCreateArray(RSArrayRef properties) {
+static RSArrayRef RSCookiesCreateWithProperties(RSArrayRef properties) {
     RSMutableArrayRef cookies = RSArrayCreateMutable(RSAllocatorSystemDefault, RSArrayGetCount(properties));
     RSArrayApplyBlock(properties, RSMakeRange(0, RSArrayGetCount(properties)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
         RSHTTPCookieRef cookie = RSHTTPCookieCreate(RSAllocatorSystemDefault, value);
@@ -74,7 +74,7 @@ static RSArrayRef RSCookieCreateArray(RSArrayRef properties) {
 }
 
 RSExport RSArrayRef RSCookiesWithCore(void *core) {
-    return RSAutorelease(RSCookieCreateArray(cookiesFromCurl(core)));
+    return RSAutorelease(RSCookiesCreateWithProperties(cookiesFromCurl(core)));
 }
 
 struct __RSHTTPCookie
@@ -110,8 +110,14 @@ static BOOL __RSHTTPCookieClassEqual(RSTypeRef rs1, RSTypeRef rs2)
     RSHTTPCookieRef RSHTTPCookie2 = (RSHTTPCookieRef)rs2;
     BOOL result = NO;
     
-    result = RSEqual(RSHTTPCookie1->_properties, RSHTTPCookie2->_properties) && RSHTTPCookie1->_httpOnly == RSHTTPCookie2->_httpOnly && RSHTTPCookie1->_sessionOnly == RSHTTPCookie2->_sessionOnly;
-    
+    result = RSHTTPCookie1->_httpOnly == RSHTTPCookie2->_httpOnly && RSHTTPCookie1->_sessionOnly == RSHTTPCookie2->_sessionOnly;
+    if (result) {
+        result = RSEqual(RSHTTPCookieGetDomain(RSHTTPCookie1), RSHTTPCookieGetDomain(RSHTTPCookie2)) &&
+                 RSEqual(RSHTTPCookieGetPath(RSHTTPCookie1), RSHTTPCookieGetPath(RSHTTPCookie2)) &&
+                 RSEqual(RSHTTPCookieGetName(RSHTTPCookie1), RSHTTPCookieGetName(RSHTTPCookie2)) &&
+//                 RSEqual(RSHTTPCookieGetValue(RSHTTPCookie1), RSHTTPCookieGetValue(RSHTTPCookie2)) &&
+                 RSEqual(RSHTTPCookieGetVersion(RSHTTPCookie1), RSHTTPCookieGetVersion(RSHTTPCookie2));
+    }
     return result;
 }
 
@@ -136,8 +142,8 @@ static RSStringRef __RSHTTPCookieClassDescription(RSTypeRef rs)
     RSStringRef format0 = RSSTR("%r=%r; "), format1 = RSSTR("%r=%r");
     RSStringRef format = format0;
     RSMutableStringRef buffer = nil;
-    RSArrayRef keys = RSDictionaryAllKeys(cookie->_properties);
-    RSArrayRef values = RSDictionaryAllValues(cookie->_properties);
+    RSArrayRef keys = RSDictionaryCopyAllKeys(cookie->_properties);
+    RSArrayRef values = RSDictionaryCopyAllValues(cookie->_properties);
     
     RSUInteger cnt = RSDictionaryGetCount(cookie->_properties);
     if (cnt) {

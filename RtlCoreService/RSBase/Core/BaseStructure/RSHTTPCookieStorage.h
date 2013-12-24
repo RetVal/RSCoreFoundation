@@ -24,5 +24,7 @@ RSExport RSHTTPCookieStorageRef RSHTTPCookieStorageGetSharedStorage();
 
 RSExport void RSHTTPCookieStorageSetCookie(RSHTTPCookieStorageRef storage, RSHTTPCookieRef cookie);
 RSExport void RSHTTPCookieStorageRemoveCookie(RSHTTPCookieStorageRef storage, RSHTTPCookieRef cookie);
+
+RSExport RSArrayRef RSHTTPCookieStorageGetCookies(RSHTTPCookieStorageRef storage);
 RS_EXTERN_C_END
 #endif 

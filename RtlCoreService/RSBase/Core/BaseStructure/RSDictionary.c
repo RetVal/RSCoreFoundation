@@ -576,7 +576,7 @@ RSExport RSDictionaryRef RSDictionaryCreate(RSAllocatorRef allocator, const void
 RSExport RSMutableDictionaryRef RSDictionaryCreateMutableCopy(RSAllocatorRef allocator, RSDictionaryRef dictionary)
 {
     __RSGenericValidInstance(dictionary, RSDictionaryGetTypeID());
-    //RSArrayRef keys = RSDictionaryAllKeys(dictionary);
+    //RSArrayRef keys = RSDictionaryCopyAllKeys(dictionary);
     RSMutableDictionaryRef copy = RSDictionaryCreateMutable(allocator, 0, dictionary->_context);
     
     rbtree_container* rbt = __RSDictionaryRoot(dictionary);
@@ -697,7 +697,7 @@ RSExport RSIndex RSDictionaryGetCount(RSDictionaryRef dictionary)
     return __RSDictionaryCount(dictionary);
 }
 
-RSExport RSArrayRef RSDictionaryAllKeys(RSDictionaryRef dictionary)
+RSExport RSArrayRef RSDictionaryCopyAllKeys(RSDictionaryRef dictionary)
 {
     __RSDictionaryAvailable(dictionary);
     if (dictionary->_context == RSDictionaryNilKeyContext) return nil;
@@ -716,7 +716,7 @@ RSExport RSArrayRef RSDictionaryAllKeys(RSDictionaryRef dictionary)
     
 }
 
-RSExport RSArrayRef RSDictionaryAllValues(RSDictionaryRef dictionary)
+RSExport RSArrayRef RSDictionaryCopyAllValues(RSDictionaryRef dictionary)
 {
     __RSDictionaryAvailable(dictionary);
     if (dictionary->_context == RSDictionaryNilValueContext) return nil;
@@ -1675,7 +1675,7 @@ void RSDictionaryRemoveAllObjects(RSMutableHashRef hc) {
     RS_OBJC_KVO_DIDCHANGEALL(hc);
 }
 
-RSExport RSArrayRef RSDictionaryAllKeys(RSHashRef hc)
+RSExport RSArrayRef RSDictionaryCopyAllKeys(RSHashRef hc)
 {
     RSIndex cnt = RSDictionaryGetCount(hc);
     if (cnt == 0) return RSArrayCreate(RSAllocatorSystemDefault, nil);
@@ -1688,7 +1688,7 @@ RSExport RSArrayRef RSDictionaryAllKeys(RSHashRef hc)
     return array;
 }
 
-RSExport RSArrayRef RSDictionaryAllValues(RSHashRef hc)
+RSExport RSArrayRef RSDictionaryCopyAllValues(RSHashRef hc)
 {
     RSIndex cnt = RSDictionaryGetCount(hc);
     if (cnt == 0) return RSArrayCreate(RSAllocatorSystemDefault, nil);

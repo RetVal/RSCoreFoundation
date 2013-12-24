@@ -787,13 +787,26 @@ void RSSetApplyFunction(RSHashRef hc, RSSetApplierFunction applier, any_pointer_
     });
 }
 
+#if RS_BLOCKS_AVAILABLE
+RSExport void RSSetApplyBlock(RSHashRef hc, void (^block)(const void* value, BOOL *stop)) {
+    FAULT_CALLBACK((void **)&(applier));
+    
+    __RSGenericValidInstance(hc, __RSSetTypeID);
+    RSBasicHashApplyBlock((RSBasicHashRef)hc, ^BOOL(RSBasicHashBucket btk, BOOL *stop) {
+#if RSSet
+        block((const_any_pointer_t)btk.weak_value, stop);
+#endif
+        return YES;
+    });
+}
+#endif
+
 // This function is for Foundation's benefit; no one else should use it.
-//RSExport unsigned long _RSSetFastEnumeration(RSHashRef hc, struct __objcFastEnumerationStateEquivalent *state, void *stackbuffer, unsigned long count)
-//{
-//    if (RS_IS_OBJC(__RSSetTypeID, hc)) return 0;
-//    __RSGenericValidInstance(hc, __RSSetTypeID);
-//    return __RSBasicHashFastEnumeration((RSBasicHashRef)hc, (struct __RSFastEnumerationStateEquivalent2 *)state, stackbuffer, count);
-//}
+RSExport unsigned long _RSSetFastEnumeration(RSHashRef hc, struct __RSFastEnumerationStateEquivalent2 *state, void *stackbuffer, unsigned long count) {
+    if (RS_IS_OBJC(__RSSetTypeID, hc)) return 0;
+    __RSGenericValidInstance(hc, __RSSetTypeID);
+    return __RSBasicHashFastEnumeration((RSBasicHashRef)hc, (struct __RSFastEnumerationStateEquivalent2 *)state, stackbuffer, count);
+}
 
 // This function is for Foundation's benefit; no one else should use it.
 RSExport BOOL _RSSetIsMutable(RSHashRef hc)

@@ -127,7 +127,7 @@ static RSProtocolRef __RSDelegateLookupProtocolWithName(restrict RSDelegateRef d
 {
     restrict RSProtocolRef protocol = (ISA)RSDictionaryGetValue(delegate->_protocols, name);
     if (protocol) return protocol;
-    RSArrayRef allProtocols = RSDictionaryAllValues(delegate->_protocols);
+    RSArrayRef allProtocols = RSDictionaryCopyAllValues(delegate->_protocols);
     
     RSUInteger idx = 0, cnt = RSArrayGetCount(allProtocols);
     while (idx < cnt) {

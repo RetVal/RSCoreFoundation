@@ -172,8 +172,8 @@ RSInline void __RSURLConnectionCoreSetupHTTPHeaderFieldIfNecessary(RSURLConnecti
     RSAutoreleaseBlock(^{
         struct curl_slist *chunk = __RSURLConnectionCoreGetChunk(connection);
         
-        RSArrayRef keys = RSDictionaryAllKeys(headerField);
-        RSArrayRef values = RSDictionaryAllValues(headerField);
+        RSArrayRef keys = RSDictionaryCopyAllKeys(headerField);
+        RSArrayRef values = RSDictionaryCopyAllValues(headerField);
         RSStringRef format = RSSTR("%r: %r");
         for (RSUInteger idx = 0; idx < cnt; idx++) {
             RSStringRef mutableString = RSStringCreateWithFormat(RSAllocatorDefault, format, RSArrayObjectAtIndex(keys, idx), RSArrayObjectAtIndex(values, idx));

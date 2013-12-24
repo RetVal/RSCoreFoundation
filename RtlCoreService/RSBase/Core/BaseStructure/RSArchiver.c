@@ -14,6 +14,41 @@ extern RSTypeRef __RSBPLCreateObjectWithData(RSDataRef data);
 extern RSDataRef __RSBPLCreateDataForObject(RSTypeRef obj);
 extern RSMutableDataRef __RSPropertyListCreateWithError(RSTypeRef root, __autorelease RSErrorRef* error);
 
+#pragma mark -
+#pragma mark RSUnarchiver Class System
+// dynamic register class will case the TypeID of class changed, use class-name transform.
+
+static RSArrayRef __RSUnarchiverCopyClassNamesFromClassTypeIDs(RSArrayRef classTypeIDs) {
+    RSMutableArrayRef classNames = RSArrayCreateMutable(RSAllocatorSystemDefault, RSArrayGetCount(classTypeIDs));
+    RSArrayApplyBlock(classTypeIDs, RSMakeRange(0, RSArrayGetCount(classTypeIDs)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+        RSNumberRef classTypeID = (RSNumberRef)value;
+        RSTypeID typeID = _RSRuntimeNotATypeID;
+        if (RSNumberGetValue(classTypeID, &typeID)) {
+            RSStringRef className = RSStringCreateWithCString(RSAllocatorSystemDefault, __RSRuntimeGetClassNameWithTypeID(typeID), RSStringEncodingUTF8);
+            RSArrayAddObject(classNames, className);
+            RSRelease(className);
+        }
+    });
+    return classNames;
+}
+
+static RSArrayRef __RSUnarchiverCopyClassTypeIDsFromClassNames(RSArrayRef classNames) {
+    RSMutableArrayRef classTypeIDs = RSArrayCreateMutable(RSAllocatorSystemDefault, RSArrayGetCount(classNames));
+    RSArrayApplyBlock(classNames, RSMakeRange(0, RSArrayGetCount(classNames)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+        RSTypeID classTypeID = __RSRuntimeGetClassTypeIDWithName(RSStringGetUTF8String((RSStringRef)value));
+        if (classTypeID != _RSRuntimeNotATypeID) {
+            RSArrayAddObject(classTypeIDs,
+#if __LP64__
+                             RSNumberWithUnsignedLonglong(classTypeID)
+#else
+                             RSNumberWithUnsignedLong(classTypeID)
+#endif
+                             );
+        }
+    });
+    return classTypeIDs;
+}
+
 RS_PUBLIC_CONST_STRING_DECL(__RSArchiverContextData, "context");    // RSDictionary / RSData
 RS_PUBLIC_CONST_STRING_DECL(__RSArchiverContextOrder, "order");     // RSArray
 RS_PUBLIC_CONST_STRING_DECL(__RSArchiverContextEncoded, "encoded"); // RSNumber (Boolean)
@@ -31,34 +66,28 @@ extern const RSDictionaryContext* __RSStringConstantTableContext;
 extern RSTypeRef ___RSISAPayloadCreateWithISACopy(RSAllocatorRef allocator, ISA isa, RSIndex size);
 extern ISA ___RSISAPayloadGetISA(RSTypeRef _isa);
 
-static void __RSArchiverCallBacksInitialize()
-{
+static void __RSArchiverCallBacksInitialize() {
     RSSpinLockLock(&_RSArchiverCallbacksLock);
-    if (!_RSArchiverCallbacks)
-    {
+    if (!_RSArchiverCallbacks) {
         _RSArchiverCallbacks = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, __RSStringConstantTableContext);
         __RSRuntimeSetInstanceSpecial(_RSArchiverCallbacks, YES);
     }
     RSSpinLockUnlock(&_RSArchiverCallbacksLock);
 }
 
-RSInline RSIndex __RSArchiverGetVersion(const RSArchiverCallBacks *callbacks)
-{
+RSInline RSIndex __RSArchiverGetVersion(const RSArchiverCallBacks *callbacks) {
     return callbacks->version;
 }
 
-RSInline RSArchiverSerializeCallBack __RSArchiverGetSerializeCallBack(const RSArchiverCallBacks *callbacks)
-{
+RSInline RSArchiverSerializeCallBack __RSArchiverGetSerializeCallBack(const RSArchiverCallBacks *callbacks) {
     return callbacks->serialize;
 }
 
-RSInline RSArchiverDeserializeCallBack __RSArchiverGetDeserializeCallBack(const RSArchiverCallBacks *callbacks)
-{
+RSInline RSArchiverDeserializeCallBack __RSArchiverGetDeserializeCallBack(const RSArchiverCallBacks *callbacks) {
     return callbacks->deserialize;
 }
 
-RSInline RSTypeID __RSArchiverGetClassID(const RSArchiverCallBacks *callbacks)
-{
+RSInline RSTypeID __RSArchiverGetClassID(const RSArchiverCallBacks *callbacks) {
     return callbacks->classID;
 }
 
@@ -68,16 +97,13 @@ RSInline BOOL __RSArchiverCallBacksValid(const RSArchiverCallBacks *callbacks)
     return NO;
 }
 
-static BOOL __RSArchiverRegisterCallbacks(const RSArchiverCallBacks *callbacks)
-{
-    if (__RSArchiverCallBacksValid(callbacks))
-    {
+static BOOL __RSArchiverRegisterCallbacks(const RSArchiverCallBacks *callbacks) {
+    if (__RSArchiverCallBacksValid(callbacks)) {
         RSTypeRef isa = ___RSISAPayloadCreateWithISACopy(RSAllocatorSystemDefault, (ISA)callbacks, sizeof(RSArchiverCallBacks));
         if (!isa) return NO;
         BOOL result = NO;
         RSSpinLockLock(&_RSArchiverCallbacksLock);
-        if (nil == RSDictionaryGetValue(_RSArchiverCallbacks, __RSRuntimeGetClassNameWithTypeID(__RSArchiverGetClassID(callbacks))))
-        {
+        if (nil == RSDictionaryGetValue(_RSArchiverCallbacks, __RSRuntimeGetClassNameWithTypeID(__RSArchiverGetClassID(callbacks)))) {
             RSDictionarySetValue(_RSArchiverCallbacks, __RSRuntimeGetClassNameWithTypeID(__RSArchiverGetClassID(callbacks)), (isa));
             result = YES;
         }
@@ -90,10 +116,8 @@ static BOOL __RSArchiverRegisterCallbacks(const RSArchiverCallBacks *callbacks)
     return NO;
 }
 
-static void __RSArchiverUnregisterCallbacks(RSTypeID clsId)
-{
-    if (clsId > 0)
-    {
+static void __RSArchiverUnregisterCallbacks(RSTypeID clsId) {
+    if (clsId > 0) {
         const void *key = __RSRuntimeGetClassNameWithTypeID(clsId);
         if (!key) return;
         RSSpinLockLock(&_RSArchiverCallbacksLock);
@@ -102,18 +126,15 @@ static void __RSArchiverUnregisterCallbacks(RSTypeID clsId)
     }
 }
 
-RSExport BOOL RSArchiverRegisterCallbacks(const RSArchiverCallBacks * callbacks )
-{
+RSExport BOOL RSArchiverRegisterCallbacks(const RSArchiverCallBacks * callbacks ) {
     return __RSArchiverRegisterCallbacks(callbacks);
 }
 
-RSExport void RSArchiverUnregisterCallbacks(RSTypeID classId)
-{
+RSExport void RSArchiverUnregisterCallbacks(RSTypeID classId) {
     return __RSArchiverUnregisterCallbacks(classId);
 }
 
-static RSTypeRef __RSArchiverGetCallBacksISAForID(RSTypeID ID)
-{
+static RSTypeRef __RSArchiverGetCallBacksISAForID(RSTypeID ID) {
     RSTypeRef isa = nil;
     RSSpinLockLock(&_RSArchiverCallbacksLock);
     isa = RSDictionaryGetValue(_RSArchiverCallbacks, __RSRuntimeGetClassNameWithTypeID(ID));
@@ -121,8 +142,7 @@ static RSTypeRef __RSArchiverGetCallBacksISAForID(RSTypeID ID)
     return isa;
 }
 
-static RSArchiverCallBacks *__RSArchiverGetCallBacksForID(RSTypeID ID)
-{
+static RSArchiverCallBacks *__RSArchiverGetCallBacksForID(RSTypeID ID) {
     RSTypeRef isa = __RSArchiverGetCallBacksISAForID(ID);
     return isa ? ___RSISAPayloadGetISA(isa) : nil;
 }
@@ -138,81 +158,80 @@ struct __RSArchiverContext {
     RSMutableDataRef _data;             // Caller setup(weak)
 };
 
-static BOOL __RSArchiverContextInit(struct __RSArchiverContext *context)
-{
+typedef struct __RSArchiverContext __RSArchiverContext;
+typedef struct __RSArchiverContext __RSUnarchiverContext;
+
+static BOOL __RSArchiverContextInit(__RSArchiverContext *context) {
     context->_serializeIndex = 0;
     context->_archiveData = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
     context->_archiveOrder = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
     return context->_archiveData && context->_archiveOrder;
 }
 
-static void __RSArchiverContextRelease(struct __RSArchiverContext *context)
-{
-    if (context->_archiveData)
-    {
+static void __RSArchiverContextRelease(__RSArchiverContext *context) {
+    if (context->_archiveData) {
         RSRelease(context->_archiveData);
         context->_archiveData = nil;
     }
     
-    if (context->_archiveOrder)
-    {
+    if (context->_archiveOrder) {
         RSRelease(context->_archiveOrder);
         context->_archiveData = nil;
     }
 }
 
-RSInline RSIndex __RSArchiverContextGetSerializeIndex(const struct __RSArchiverContext *context)
+RSInline RSIndex __RSArchiverContextGetSerializeIndex(const __RSArchiverContext *context)
 {
     return context->_serializeIndex;
 }
 
-RSInline RSIndex __RSArchiverContextGetDeserializeIndex(const struct __RSArchiverContext *context)
+RSInline RSIndex __RSArchiverContextGetDeserializeIndex(const __RSArchiverContext *context)
 {
     return context->_deserializeIndex;
 }
 
-RSInline void __RSArchiverContextAddSerializeIndex(struct __RSArchiverContext *context, RSIndex idx)
+RSInline void __RSArchiverContextAddSerializeIndex(__RSArchiverContext *context, RSIndex idx)
 {
     context->_serializeIndex += idx;
 }
 
-RSInline void __RSArchiverContextAddDeserializeIndex(struct __RSArchiverContext *context, RSIndex idx)
+RSInline void __RSArchiverContextAddDeserializeIndex(__RSArchiverContext *context, RSIndex idx)
 {
     context->_deserializeIndex += idx;
 }
 
-RSInline RSIndex __RSArchiverContextGetIndexAndIncrement(struct __RSArchiverContext *context)
+RSInline RSIndex __RSArchiverContextGetIndexAndIncrement(__RSArchiverContext *context)
 {
     RSIndex ret = __RSArchiverContextGetSerializeIndex(context);
     __RSArchiverContextAddSerializeIndex(context, 1);
     return ret;
 }
 
-RSInline RSMutableArrayRef __RSArchiverContextGetOrder(const struct __RSArchiverContext *context)
+RSInline RSMutableArrayRef __RSArchiverContextGetOrder(const __RSArchiverContext *context)
 {
     return context->_archiveOrder;
 }
 
-static void __RSArchiverContextPushTypeID(const struct __RSArchiverContext *context, RSTypeID ID)
+static void __RSArchiverContextPushTypeID(const __RSArchiverContext *context, RSTypeID ID)
 {
     RSArrayAddObject(__RSArchiverContextGetOrder(context), RSNumberWithUnsignedLonglong(ID));
-    __RSArchiverContextAddSerializeIndex((struct __RSArchiverContext *)context, 1);
+    __RSArchiverContextAddSerializeIndex((__RSArchiverContext *)context, 1);
 }
 
-RSInline RSTypeID __RSArchiverContextPopTypeID(const struct __RSArchiverContext *context)
+RSInline RSTypeID __RSArchiverContextPopTypeID(const __RSArchiverContext *context)
 {
     RSTypeID ID = 0;
     if (RSNumberGetValue(RSArrayObjectAtIndex(__RSArchiverContextGetOrder(context), __RSArchiverContextGetDeserializeIndex(context)), &ID))
-        __RSArchiverContextAddDeserializeIndex((struct __RSArchiverContext*)context, 1);
+        __RSArchiverContextAddDeserializeIndex((__RSArchiverContext*)context, 1);
     return ID;
 }
 
-RSInline RSMutableDictionaryRef __RSArchiverContextGetDataMap(const struct __RSArchiverContext *context)
+RSInline RSMutableDictionaryRef __RSArchiverContextGetDataMap(const __RSArchiverContext *context)
 {
     return context->_archiveData;
 }
 
-RSInline RSTypeRef __RSArchiverContextGetData(const struct __RSArchiverContext *context)
+RSInline RSTypeRef __RSArchiverContextGetData(const __RSArchiverContext *context)
 {
     return context->_data;
 }
@@ -222,7 +241,7 @@ RSInline void __RSArchiverContextSetData(RSArchiverContextRef context, RSMutable
     context->_data = data;
 }
 
-RSInline const struct __RSArchiverContext *__RSArchiverGetContext(const RSArchiverRef archiver);
+RSInline const __RSArchiverContext *__RSArchiverGetContext(const RSArchiverRef archiver);
 RSInline RSStringRef __RSArchiverGetCurrentKey(const RSArchiverRef archiver);
 RSInline void __RSArchiverSetCurrentKey(RSArchiverRef archiver, RSStringRef key);
 static const RSArchiverCallBacks *__RSArchiverGetCallBacks(const RSArchiverRef archiver, RSTypeID ID);
@@ -259,35 +278,17 @@ RSInline BOOL __RSArchiverContextSerializeObjectForKey(const RSArchiverRef archi
     return NO;
 }
 
-RSInline RSTypeRef __RSArchiverContextDeserializeObjectEx(const RSUnarchiverRef archiver, RSDataRef data, RSTypeID typeID)
-{
-    if (!data) return nil;
-    RSTypeID ID = typeID;
-    return __RSArchiverGetDeserializeCallBack(__RSArchiverGetCallBacks((archiver), ID))(archiver, data);
-}
-
-// equal to RSUnarchiverDecodeObject
-RSInline RSTypeRef __RSArchiverContextDeserializeObject(const RSUnarchiverRef unarchiver, RSDataRef data)
-{
-    if (!data) return nil;
-    RSTypeID ID = 0;
-    if ((ID = __RSArchiverContextPopTypeID(__RSArchiverGetContext(unarchiver))))
-        return __RSArchiverContextDeserializeObjectEx(unarchiver, data, ID);
-    return nil;
-}
-
 #pragma mark -
 #pragma mark RSArchiver
 
-struct __RSArchiver
-{
+struct __RSArchiver {
     RSRuntimeBase _base;
     RSMutableDictionaryRef _cache;      // class-name : isa (get callbacks from register table and add to cache)
     RSStringRef _name;
     RSStringRef _ck; // __weak
     RSDataRef (*arch_copy_ptr)(RSArchiverRef archiver);
     RSDataRef (*unarch_copy_ptr)(RSDataRef);
-    struct __RSArchiverContext _context;
+    __RSArchiverContext _context;
 };
 
 RSInline void __RSArchiverSetSerializeMode(RSArchiverRef archiver, BOOL serialized)
@@ -315,8 +316,7 @@ RSInline void __RSArchiverSetCallBacks(const RSArchiverRef archiver, RSTypeID ID
     RSDictionarySetValue(archiver->_cache, __RSRuntimeGetClassNameWithTypeID(ID), isa);
 }
 
-static const RSArchiverCallBacks *__RSArchiverGetCallBacks(const RSArchiverRef archiver, RSTypeID ID)
-{
+static const RSArchiverCallBacks *__RSArchiverGetCallBacks(const RSArchiverRef archiver, RSTypeID ID) {
     const RSArchiverCallBacks *cb = ___RSISAPayloadGetISA(RSDictionaryGetValue(archiver->_cache, __RSRuntimeGetClassNameWithTypeID(ID)));
     if (cb) return cb;
     RSTypeRef isa = __RSArchiverGetCallBacksISAForID(ID);    // need spin lock
@@ -379,10 +379,136 @@ static RSRuntimeClass __RSArchiverClass =
 
 static RSTypeID _RSArchiverTypeID = _RSRuntimeNotATypeID;
 
-RSExport RSTypeID RSArchiverGetTypeID()
-{
+RSExport RSTypeID RSArchiverGetTypeID() {
     return _RSArchiverTypeID;
 }
+
+#pragma mark -
+#pragma mark RSUnarchiver
+
+struct __RSUnarchiver {
+    RSRuntimeBase _base;
+    RSMutableDictionaryRef _cache;      // class-name : isa (get callbacks from register table and add to cache)
+    RSStringRef _name;
+    RSStringRef _ck; // __weak
+    RSDataRef (*arch_copy_ptr)(RSArchiverRef archiver);
+    RSDataRef (*unarch_copy_ptr)(RSDataRef);
+    __RSUnarchiverContext _context;
+};
+
+RSInline void __RSUnarchiverSetSerializeMode(RSUnarchiverRef unarchiver, BOOL serialized)
+{
+    __RSBitfieldSetValue(RSRuntimeClassBaseFiled(unarchiver), 2, 1, serialized);
+}
+
+RSInline BOOL __RSUnarchiverGetSerializeMode(RSUnarchiverRef unarchiver)
+{
+    return __RSBitfieldGetValue(RSRuntimeClassBaseFiled(unarchiver), 2, 1);
+}
+
+RSInline void __RSUnarchiverSetSerializing(RSUnarchiverRef unarchiver, BOOL serializing)
+{
+    __RSBitfieldSetValue(RSRuntimeClassBaseFiled(unarchiver), 3, 2, serializing);
+}
+
+RSInline BOOL __RSUnarchiverIsSerializing(RSUnarchiverRef unarchiver)
+{
+    return __RSBitfieldGetValue(RSRuntimeClassBaseFiled(unarchiver), 3, 2);
+}
+
+RSInline void __RSUnarchiverSetCallBacks(const RSUnarchiverRef unarchiver, RSTypeID ID, RSTypeRef isa)
+{
+    RSDictionarySetValue(unarchiver->_cache, __RSRuntimeGetClassNameWithTypeID(ID), isa);
+}
+
+static const RSArchiverCallBacks *__RSUnarchiverGetCallBacks(const RSUnarchiverRef unarchiver, RSTypeID ID)
+{
+    const RSArchiverCallBacks *cb = ___RSISAPayloadGetISA(RSDictionaryGetValue(unarchiver->_cache, __RSRuntimeGetClassNameWithTypeID(ID)));
+    if (cb) return cb;
+    RSTypeRef isa = __RSArchiverGetCallBacksISAForID(ID);    // need spin lock
+    if (isa)
+    {
+        __RSUnarchiverSetCallBacks(unarchiver, ID, isa);
+        cb = ___RSISAPayloadGetISA(isa);
+    }
+    return cb;
+}
+
+RSInline RSTypeRef __RSUnarchiverContextDeserializeObjectEx(const RSUnarchiverRef archiver, RSDataRef data, RSTypeID typeID) {
+    if (!data) return nil;
+    RSTypeID ID = typeID;
+    return __RSArchiverGetDeserializeCallBack(__RSUnarchiverGetCallBacks((archiver), ID))(archiver, data);
+}
+
+
+RSInline const __RSUnarchiverContext *__RSUnarchiverGetContext(RSUnarchiverRef unarchiver) {
+    return &unarchiver->_context;
+}
+// equal to RSUnarchiverDecodeObject
+RSInline RSTypeRef __RSUnarchiverContextDeserializeObject(const RSUnarchiverRef unarchiver, RSDataRef data) {
+    if (!data) return nil;
+    RSTypeID ID = 0;
+    if ((ID = __RSArchiverContextPopTypeID(__RSUnarchiverGetContext(unarchiver))))
+        return __RSUnarchiverContextDeserializeObjectEx(unarchiver, data, ID);
+    return nil;
+}
+
+
+static void __RSUnarchiverClassInit(RSTypeRef rs)
+{
+    RSUnarchiverRef unarchiver = (RSUnarchiverRef)rs;
+    unarchiver->_name = RSSTR("RSUnarchiver");
+    unarchiver->_cache = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, __RSStringConstantTableContext);
+}
+
+static RSTypeRef __RSUnarchiverClassCopy(RSAllocatorRef allocator, RSTypeRef rs, BOOL mutableCopy)
+{
+    return RSRetain(rs);
+}
+
+static void __RSUnarchiverClassDeallocate(RSTypeRef rs)
+{
+    RSArchiverRef archiver = (RSArchiverRef)rs;
+    RSRelease(archiver->_name);
+    RSRelease(archiver->_cache);
+    __RSArchiverContextRelease(&archiver->_context);
+}
+
+static BOOL __RSUnarchiverClassEqual(RSTypeRef rs1, RSTypeRef rs2)
+{
+    RSArchiverRef RSArchiver1 = (RSArchiverRef)rs1;
+    RSArchiverRef RSArchiver2 = (RSArchiverRef)rs2;
+    BOOL result = RSEqual(RSArchiver1->_name, RSArchiver2->_name);
+    return result;
+}
+
+static RSStringRef __RSUnarchiverClassDescription(RSTypeRef rs)
+{
+    RSArchiverRef archiver = (RSArchiverRef)rs;
+    RSStringRef description = RSStringCreateWithFormat(RSAllocatorDefault, RSSTR("RSArchiver (%r)<%p>\n%r\n%r\n"), archiver->_name, archiver, __RSArchiverContextGetDataMap(__RSArchiverGetContext(archiver)), archiver->_context._archiveOrder);
+    return description;
+}
+
+static RSRuntimeClass __RSUnarchiverClass =
+{
+    _RSRuntimeScannedObject,
+    "RSUnarchiver",
+    __RSUnarchiverClassInit,
+    __RSUnarchiverClassCopy,
+    __RSUnarchiverClassDeallocate,
+    __RSUnarchiverClassEqual,
+    nil,
+    __RSUnarchiverClassDescription,
+    nil,
+    nil
+};
+
+static RSTypeID _RSUnarchiverTypeID = _RSRuntimeNotATypeID;
+
+RSExport RSTypeID RSUnarchiverGetTypeID() {
+    return _RSUnarchiverTypeID;
+}
+
 
 RSExport RSDataRef RSArchiverContextMakeDataPacket(const RSArchiverRef archiver, RSIndex count, RSDataRef data1, ...)
 {
@@ -420,7 +546,7 @@ RSExport RSArrayRef RSArchiverContextUnarchivePacket(const RSUnarchiverRef unarc
 {
     if (unarchiver == nil || data == nil) return nil;
     __RSGenericValidInstance(unarchiver, _RSArchiverTypeID);
-    return __RSArchiverContextDeserializeObjectEx(unarchiver, data, ID);
+    return __RSUnarchiverContextDeserializeObjectEx(unarchiver, data, ID);
 }
 
 #pragma mark -
@@ -447,6 +573,9 @@ RSPrivate void __RSArchiverInitialize()
 {
     _RSArchiverTypeID = __RSRuntimeRegisterClass(&__RSArchiverClass);
     __RSRuntimeSetClassTypeID(&__RSArchiverClass, _RSArchiverTypeID);
+    _RSUnarchiverTypeID = __RSRuntimeRegisterClass(&__RSUnarchiverClass);
+    __RSRuntimeSetClassTypeID(&__RSUnarchiverClass, _RSUnarchiverTypeID);
+    
     __RSArchiverCallBacksInitialize();
     __RSArchiverInitialize_Allocator();
     __RSArchiverInitialize_Array();
@@ -501,30 +630,17 @@ static BOOL __RSUnarchiverRestoreContext(RSUnarchiverRef, RSDataRef);
 
 static RSUnarchiverRef __RSUnarchiverCreateInstance(RSAllocatorRef allocator, RSDataRef data)
 {
-    RSUnarchiverRef instance = (RSUnarchiverRef)__RSRuntimeCreateInstance(allocator, _RSArchiverTypeID, sizeof(struct __RSArchiver) - sizeof(RSRuntimeBase));
+    RSUnarchiverRef instance = (RSUnarchiverRef)__RSRuntimeCreateInstance(allocator, _RSUnarchiverTypeID, sizeof(struct __RSUnarchiver) - sizeof(RSRuntimeBase));
     instance->_name = RSSTR("RSUnarchiver");
-    if (!__RSUnarchiverRestoreContext(instance, data))
-    {
+    if (!__RSUnarchiverRestoreContext(instance, data)) {
         RSExceptionCreateAndRaise(allocator, RSInvalidArgumentException, RSSTR("data is invalid archiver data"), nil);
         RSRelease(instance);
         instance = nil;
     }
-//    RSDictionaryRef dict = RSDictionaryCreateWithData(allocator, data);
-//    if (dict)
-//    {
-//        
-//        instance->_context._archiveOrder = RSMutableCopy(allocator, RSDictionaryGetValue(dict, __RSArchiverContextOrder));
-//        instance->_context._archiveData = RSMutableCopy(allocator, RSDictionaryGetValue(dict, __RSArchiverContextData));
-//        RSRelease(dict);
-//    }
-//    else
-//    {
-//        
-//    }
     return instance;
 }
 
-RSInline const struct __RSArchiverContext *__RSArchiverGetContext(RSArchiverRef archiver)
+RSInline const __RSArchiverContext *__RSArchiverGetContext(RSArchiverRef archiver)
 {
     return &archiver->_context;
 }
@@ -554,8 +670,8 @@ RSExport RSDataRef RSArchiverEncodeObject(RSArchiverRef archiver, RSTypeRef obje
 
 RSExport RSTypeRef RSUnarchiverDecodeObject(RSUnarchiverRef unarchiver, RSDataRef data) {
     if (!unarchiver || !data) return nil;
-    __RSGenericValidInstance(unarchiver, _RSArchiverTypeID);
-    RSTypeRef object = __RSArchiverContextDeserializeObject(unarchiver, data);
+    __RSGenericValidInstance(unarchiver, _RSUnarchiverTypeID);
+    RSTypeRef object = __RSUnarchiverContextDeserializeObject(unarchiver, data);
     return object;
 }
 
@@ -574,14 +690,16 @@ RSExport RSStringRef RSArchiverGetCurrentKey(RSArchiverRef archiver)
 
 RSExport RSTypeRef RSUnarchiverDecodeObjectForKey(RSUnarchiverRef unarchiver, RSStringRef key)
 {
-    __RSGenericValidInstance(unarchiver, _RSArchiverTypeID);
-    return __RSArchiverContextDeserializeObject(unarchiver, RSDictionaryGetValue(__RSArchiverContextGetDataMap(__RSArchiverGetContext(unarchiver)), key));
+    __RSGenericValidInstance(unarchiver, _RSUnarchiverTypeID);
+    return __RSUnarchiverContextDeserializeObject(unarchiver, RSDictionaryGetValue(__RSArchiverContextGetDataMap(__RSUnarchiverGetContext(unarchiver)), key));
 }
 
 static RSDataRef __RSArchiverNormalCopyDataPtr(RSArchiverRef archiver)
 {
     RSMutableDictionaryRef dict = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
-    RSDictionarySetValue(dict, __RSArchiverContextOrder, __RSArchiverContextGetOrder(__RSArchiverGetContext(archiver)));
+    RSArrayRef classNames = __RSUnarchiverCopyClassNamesFromClassTypeIDs(__RSArchiverContextGetOrder(__RSArchiverGetContext(archiver)));
+    RSDictionarySetValue(dict, __RSArchiverContextOrder, classNames);
+    RSRelease(classNames);
     RSDictionarySetValue(dict, __RSArchiverContextData, __RSArchiverContextGetDataMap(__RSArchiverGetContext(archiver)));
     RSDataRef data = RSPropertyListCreateXMLData(RSAllocatorSystemDefault, dict);
     RSRelease(dict);
@@ -591,7 +709,9 @@ static RSDataRef __RSArchiverNormalCopyDataPtr(RSArchiverRef archiver)
 static RSDataRef __RSArchiverKeyedCopyDataPtr(RSArchiverRef archiver)
 {
     RSMutableDictionaryRef dict = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
-    RSDictionarySetValue(dict, __RSArchiverContextOrder, __RSArchiverContextGetOrder(__RSArchiverGetContext(archiver)));
+    RSArrayRef classNames = __RSUnarchiverCopyClassNamesFromClassTypeIDs(__RSArchiverContextGetOrder(__RSArchiverGetContext(archiver)));
+    RSDictionarySetValue(dict, __RSArchiverContextOrder, classNames);
+    RSRelease(classNames);
     RSDictionarySetValue(dict, __RSArchiverContextData, __RSArchiverContextGetDataMap(__RSArchiverGetContext(archiver)));
     RSDataRef data = RSBinaryPropertyListCreateXMLData(RSAllocatorSystemDefault, dict);
     RSRelease(dict);
@@ -634,12 +754,11 @@ static RSDataRef __RSArchiverKeyedEncodedCopyDataPtr(RSArchiverRef archiver)
 static BOOL __RSUnarchiverRestoreContext(RSUnarchiverRef unarchiver, RSDataRef data)
 {
     BOOL result = NO;
-    bzero(&unarchiver->_context, sizeof(struct __RSArchiverContext));
+    bzero(&unarchiver->_context, sizeof(__RSArchiverContext));
     RSDictionaryRef raw = RSDictionaryCreateWithData(RSAllocatorSystemDefault, data);
     RSTypeRef encoded = RSDictionaryGetValue(raw, __RSArchiverContextEncoded);
     RSTypeRef contextData = RSDictionaryGetValue(raw, __RSArchiverContextData);
-    RSArrayRef order = RSDictionaryGetValue(raw, __RSArchiverContextOrder);
-    unarchiver->_context._archiveOrder = (RSMutableArrayRef)RSRetain(order);
+    unarchiver->_context._archiveOrder = (RSMutableArrayRef)__RSUnarchiverCopyClassTypeIDsFromClassNames(RSDictionaryGetValue(raw, __RSArchiverContextOrder));
     
     if (encoded && encoded == RSBooleanTrue && RSGetTypeID(contextData) == RSDataGetTypeID())
     {
@@ -816,7 +935,7 @@ static RSTypeRef __RSArrayDeserializeCallBack(RSUnarchiverRef unarchiver, RSData
         array = RSDictionaryGetValue(dict, RSSTR("array"));
 #if RS_BLOCKS_AVAILABLE
         RSArrayApplyBlock(array, RSMakeRange(0, RSArrayGetCount(array)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
-            RSTypeRef object = __RSArchiverContextDeserializeObject(unarchiver, value);
+            RSTypeRef object = __RSUnarchiverContextDeserializeObject(unarchiver, value);
             RSArrayAddObject(retArray, object);
             RSRelease(object);
         });
@@ -870,8 +989,8 @@ static RSTypeRef __RSCalendarDeserializeCallBack(RSUnarchiverRef unarchiver, RSD
     RSArrayRef array = RSArchiverContextUnarchivePacket(unarchiver, data, RSArrayGetTypeID());
     RSDataRef data1 = RSArrayObjectAtIndex(array, 0);
     RSDataRef data2 = RSArrayObjectAtIndex(array, 1);
-    RSStringRef identifier = __RSArchiverContextDeserializeObject(unarchiver, data1);
-    RSStringRef tz = __RSArchiverContextDeserializeObject(unarchiver, data2);
+    RSStringRef identifier = __RSUnarchiverContextDeserializeObject(unarchiver, data1);
+    RSStringRef tz = __RSUnarchiverContextDeserializeObject(unarchiver, data2);
     RSRelease(array);
     
     RSCalendarRef calendar = RSCalendarCreateWithIndentifier(RSAllocatorSystemDefault, identifier);
@@ -972,7 +1091,7 @@ static RSTypeRef __RSDictionaryDeserializeCallBack(RSUnarchiverRef unarchiver, R
         RSDictionaryGetKeysAndValues(dict, &keyValuePairs[0], &keyValuePairs[count]);
         for (RSUInteger idx = 0; idx < count; idx++)
         {
-            keyValuePairs[count * 2 + idx] = __RSArchiverContextDeserializeObject(unarchiver, keyValuePairs[count * 1 + idx]);
+            keyValuePairs[count * 2 + idx] = __RSUnarchiverContextDeserializeObject(unarchiver, keyValuePairs[count * 1 + idx]);
         }
         
         retDict = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
@@ -1022,9 +1141,9 @@ static RSTypeRef __RSErrorDeserializeCallBack(RSUnarchiverRef unarchiver, RSData
 {
     RSErrorRef error = nil;
     RSArrayRef array = RSArchiverContextUnarchivePacket(unarchiver, data, RSArrayGetTypeID());
-    RSStringRef domain = __RSArchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 0));
-    RSNumberRef errorCode = __RSArchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 1));
-    RSDictionaryRef userInfo = __RSArchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 2));
+    RSStringRef domain = __RSUnarchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 0));
+    RSNumberRef errorCode = __RSUnarchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 1));
+    RSDictionaryRef userInfo = __RSUnarchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 2));
     RSRelease(array);
     RSIndex ec = 0;
     RSNumberGetValue(errorCode, &ec);
@@ -1086,9 +1205,9 @@ static RSDataRef __RSNotificationSerializeCallBack(RSArchiverRef archiver, RSTyp
 static RSTypeRef __RSNotificationDeserializeCallBack(RSUnarchiverRef unarchiver, RSDataRef data)
 {
     RSArrayRef array = RSArchiverContextUnarchivePacket(unarchiver, data, RSArrayGetTypeID());
-    RSStringRef name = __RSArchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 0));
-    RSTypeRef filter = __RSArchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 1));
-    RSDictionaryRef userInfo = __RSArchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 2));
+    RSStringRef name = __RSUnarchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 0));
+    RSTypeRef filter = __RSUnarchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 1));
+    RSDictionaryRef userInfo = __RSUnarchiverContextDeserializeObject(unarchiver, RSArrayObjectAtIndex(array, 2));
     RSRelease(array);
     
     RSNotificationRef notificaiton = RSNotificationCreate(RSAllocatorSystemDefault, name, filter, userInfo);
@@ -1129,7 +1248,7 @@ static RSDataRef __RSPlistSerializeCallBack(RSArchiverRef archiver, RSTypeRef ob
 
 static RSTypeRef __RSPlistDeserializeCallBack(RSUnarchiverRef unarchiver, RSDataRef data)
 {
-    RSTypeRef content = __RSArchiverContextDeserializeObject(unarchiver, data);
+    RSTypeRef content = __RSUnarchiverContextDeserializeObject(unarchiver, data);
     RSPropertyListRef plist = RSPropertyListCreateWithContent(RSAllocatorSystemDefault, content);
     RSRelease(content);
     return plist;
@@ -1192,7 +1311,7 @@ static RSDataRef __RSTimeZoneSerializeCallBack(RSArchiverRef archiver, RSTypeRef
 
 static RSTypeRef __RSTimeZoneDeserializeCallBack(RSUnarchiverRef archiver, RSDataRef data)
 {
-    RSStringRef id = __RSArchiverContextDeserializeObject(archiver, data);
+    RSStringRef id = __RSUnarchiverContextDeserializeObject(archiver, data);
     RSTimeZoneRef tz = RSTimeZoneCreateWithName(RSAllocatorSystemDefault, id);
     RSRelease(id);
     return tz;
@@ -1272,24 +1391,24 @@ RSExport void __RSArchiverTestMain()
     RSDataWriteToFile(RSAutorelease(RSArchiverCopyData(archiver)), RSFileManagerStandardizingPath(RSSTR("~/Desktop/archiver.plist")), RSWriteFileAutomatically);
     RSRelease(archiver);
     
-    archiver = RSUnarchiverCreate(RSAllocatorSystemDefault, RSDataWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/archiver.plist"))));
-    RSDateRef date = RSUnarchiverDecodeObjectForKey(archiver, RSSTR("date"));
+    unarchiver = RSUnarchiverCreate(RSAllocatorSystemDefault, RSDataWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/archiver.plist"))));
+    RSDateRef date = RSUnarchiverDecodeObjectForKey(unarchiver, RSSTR("date"));
     RSShow(date);
     RSRelease(date);
     
-    RSStringRef value = RSUnarchiverDecodeObjectForKey(archiver, RSSTR("test"));
+    RSStringRef value = RSUnarchiverDecodeObjectForKey(unarchiver, RSSTR("test"));
     RSShow(value);
     RSRelease(value);
     
-    tz = RSUnarchiverDecodeObjectForKey(archiver, RSSTR("tz"));
+    tz = RSUnarchiverDecodeObjectForKey(unarchiver, RSSTR("tz"));
     RSShow(tz);
     RSRelease(tz);
     
-    data = RSUnarchiverDecodeObjectForKey(archiver, RSSTR("data"));
+    data = RSUnarchiverDecodeObjectForKey(unarchiver, RSSTR("data"));
     RSShow(data);
     RSRelease(data);
     
-    calendar = (RSCalendarRef)RSUnarchiverDecodeObjectForKey(archiver, RSSTR("cal"));
+    calendar = (RSCalendarRef)RSUnarchiverDecodeObjectForKey(unarchiver, RSSTR("cal"));
     RSShow(calendar);
     RSRelease(calendar);
 

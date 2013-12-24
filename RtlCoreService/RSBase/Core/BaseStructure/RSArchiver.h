@@ -17,7 +17,7 @@ RS_EXTERN_C_BEGIN
 
 typedef struct __RSArchiverContext *RSArchiverContextRef;
 typedef struct __RSArchiver *RSArchiverRef;
-typedef struct __RSArchiver *RSUnarchiverRef;
+typedef struct __RSUnarchiver *RSUnarchiverRef;
 
 RSExport RSStringRef const RSKeyedArchiveRootObjectKey;
 

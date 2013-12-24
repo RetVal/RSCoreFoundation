@@ -418,7 +418,7 @@ static RSErrorCode __RSAppendXML0(RSTypeRef object, RSBitU32 indentation, RSMuta
         _plistAppendCharacters(xmlString, RSXMLPlistTagsUnicode[DICT_IX], DICT_TAG_LENGTH);
         _plistAppendUTF8CString(xmlString, ">\n");
         new_rstype_array(keys, count);
-        //RSArrayRef keys = RSDictionaryAllKeys(object);
+        //RSArrayRef keys = RSDictionaryCopyAllKeys(object);
         RSDictionaryGetKeysAndValues((RSDictionaryRef)object, keys, nil);
 //        keyArray = RSArrayCreateWithObjects(RSAllocatorSystemDefault, keys, count);
         keyArray = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);

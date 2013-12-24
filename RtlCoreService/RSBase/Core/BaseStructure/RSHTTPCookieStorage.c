@@ -28,6 +28,7 @@ RS_CONST_STRING_DECL(__RSHTTPCookieStorageUUID, "UUID");                        
 
 struct __RSHTTPCookieStorage {
     RSRuntimeBase _base;
+    RSSpinLock _lock;
     RSMutableDictionaryRef _cache;
     RSStringRef _storageBasePath;
     RSDictionaryRef _preferences;
@@ -172,7 +173,7 @@ static void __RSHTTPCookieStorageDeallocate(RSNotificationRef notification);
 static RSTypeID _RSHTTPCookieStorageTypeID = _RSRuntimeNotATypeID;
 
 RSExport RSTypeID RSHTTPCookieStorageGetTypeID() {
-    if (!__RSHTTPCookieSharedStorageLock)
+    if (!_RSHTTPCookieStorageTypeID)
         RSHTTPCookieStorageGetSharedStorage();
     return _RSHTTPCookieStorageTypeID;
 }
@@ -220,7 +221,10 @@ RSExport RSHTTPCookieStorageRef RSHTTPCookieStorageGetSharedStorage() {
     return __RSHTTPCookieSharedStorage;
 }
 
-static RSStringRef __RSHTTPCookieStorageUpdateCookieInCache(RSDictionaryRef cache, RSHTTPCookieRef cookie) {
+
+// update cache with cookie
+// return cookie uuid in cache, maybe nil.
+static RSStringRef __RSHTTPCookieStorageUpdateCookieInCache(RSDictionaryRef cache, RSHTTPCookieRef cookie, BOOL remove) {
     RSMutableDictionaryRef transformation = (RSMutableDictionaryRef)RSDictionaryGetValue(cache, __RSHTTPCookieStorageTransformation);
     if (!transformation) {
         RSMutableDictionaryRef dict = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
@@ -230,6 +234,10 @@ static RSStringRef __RSHTTPCookieStorageUpdateCookieInCache(RSDictionaryRef cach
     }
     RSDictionaryRef paths = RSDictionaryGetValue(transformation, RSHTTPCookieGetDomain(cookie));
     if (!paths) {
+        if (remove) {
+            // if remove, the paths need not be built.
+            return nil;
+        }
         RSMutableDictionaryRef dict = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
         RSDictionarySetValue((RSMutableDictionaryRef)transformation, RSHTTPCookieGetDomain(cookie), dict);
         RSRelease(dict);
@@ -237,6 +245,14 @@ static RSStringRef __RSHTTPCookieStorageUpdateCookieInCache(RSDictionaryRef cach
     }
     RSMutableArrayRef uuids = (RSMutableArrayRef)RSDictionaryGetValue(paths, RSHTTPCookieGetPath(cookie));
     if (!(uuids && RSArrayGetCount(uuids))) {
+        if (remove) {
+            // if remove, the collection need not be built, and empty collection should be removed!
+            if (RSArrayGetCount(uuids))
+                RSDictionaryRemoveValue((RSMutableDictionaryRef)paths, RSHTTPCookieGetPath(cookie));
+            if (RSDictionaryGetCount(paths))
+                RSDictionaryRemoveValue((RSMutableDictionaryRef)transformation, RSHTTPCookieGetDomain(cookie));
+            return nil;
+        }
         RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
         RSDictionarySetValue((RSMutableDictionaryRef)paths, RSHTTPCookieGetPath(cookie), array);
         RSRelease(array);
@@ -245,15 +261,30 @@ static RSStringRef __RSHTTPCookieStorageUpdateCookieInCache(RSDictionaryRef cach
     __block RSStringRef result = nil;
     RSArrayApplyBlock(uuids, RSMakeRange(0, RSArrayGetCount(uuids)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
         *isStop = RSEqual(cookie, RSDictionaryGetValue(RSDictionaryGetValue(cache, __RSHTTPCookieStorageUUID), value));
-        if (*isStop) result = value;
+        if (*isStop)
+            result = value;
+        else {
+            RSLog(RSSTR("\n%r - \n%r\n"), cookie, RSDictionaryGetValue(RSDictionaryGetValue(cache, __RSHTTPCookieStorageUUID), value));
+        }
     });
-    if (!result) {
-        result = RSUUIDCreateString(RSAllocatorSystemDefault, RSAutorelease(RSUUIDCreate(RSAllocatorSystemDefault)));
-        RSArrayAddObject(uuids, result);
-        RSRelease(result);
-    }
-    RSDictionarySetValue((RSMutableDictionaryRef)RSDictionaryGetValue(cache, __RSHTTPCookieStorageUUID), result, cookie);
     
+    if (!remove) {
+        if (!result) {
+            result = RSUUIDCreateString(RSAllocatorSystemDefault, RSAutorelease(RSUUIDCreate(RSAllocatorSystemDefault)));
+            RSArrayAddObject(uuids, result);
+            RSRelease(result);
+        }
+        RSDictionarySetValue((RSMutableDictionaryRef)RSDictionaryGetValue(cache, __RSHTTPCookieStorageUUID), result, cookie);
+    } else {
+        if (result) {
+            RSArrayRemoveObject(uuids, result);
+            if (RSArrayGetCount(uuids))
+                RSDictionaryRemoveValue((RSMutableDictionaryRef)paths, RSHTTPCookieGetPath(cookie));
+            if (RSDictionaryGetCount(paths))
+                RSDictionaryRemoveValue((RSMutableDictionaryRef)transformation, RSHTTPCookieGetDomain(cookie));
+            RSDictionaryRemoveValue((RSMutableDictionaryRef)RSDictionaryGetValue(cache, __RSHTTPCookieStorageUUID), result);
+        }
+    }
     return result;
 }
 
@@ -298,6 +329,18 @@ static RSStringRef __RSHTTPCookieStorageFindCookieInCache(RSDictionaryRef cache,
     return result;
 }
 
+static RSArrayRef __RSHTTPCookieStorageCopyCookies(RSHTTPCookieStorageRef storage) {
+    RSMutableArrayRef cookies = nil;
+    RSDictionaryRef uuidCookies = RSDictionaryGetValue(storage->_cache, __RSHTTPCookieStorageUUID);
+    if (uuidCookies && RSDictionaryGetCount(uuidCookies)) {
+        cookies = RSArrayCreateMutable(RSAllocatorSystemDefault, RSDictionaryGetCount(uuidCookies));
+        RSDictionaryApplyBlock(uuidCookies, ^(const void *key, const void *value, BOOL *stop) {
+            RSArrayAddObject(cookies, value);   // cookie is readonly, need not use copy method.
+        });
+    }
+    return cookies;
+}
+
 static RSStringRef __RSHTTPCookieStorageUpdateCookieTransformationAndUUID(RSHTTPCookieStorageRef storage, RSHTTPCookieRef cookie) {
     RSStringRef uuidString = RSRetain(__RSHTTPCookieStorageFindCookieInCache(storage->_cache, cookie));
     if (!uuidString) {
@@ -308,15 +351,28 @@ static RSStringRef __RSHTTPCookieStorageUpdateCookieTransformationAndUUID(RSHTTP
     return uuidString;
 }
 
-static void __RSHTTPCookieStorageUpdateCookie(RSHTTPCookieStorageRef storage, RSHTTPCookieRef cookie) {
-    RSMutableArrayRef transformation = (RSMutableArrayRef)RSDictionaryGetValue(storage->_cache, __RSHTTPCookieStorageTransformation);
-    RSMutableArrayRef uuids = (RSMutableArrayRef)RSDictionaryGetValue(storage->_cache, __RSHTTPCookieStorageUUID);
-}
-
 RSExport void RSHTTPCookieStorageSetCookie(RSHTTPCookieStorageRef storage, RSHTTPCookieRef cookie) {
     if (!storage || !cookie) return;
     __RSGenericValidInstance(storage, _RSHTTPCookieStorageTypeID);
-    RSSyncUpdateBlock(__RSHTTPCookieSharedStorageLock, ^{
-        __RSHTTPCookieStorageUpdateCookieInCache(storage->_cache, cookie);
+    RSSyncUpdateBlock(storage->_lock, ^{
+        __RSHTTPCookieStorageUpdateCookieInCache(storage->_cache, cookie, NO);
     });
+}
+
+RSExport void RSHTTPCookieStorageRemoveCookie(RSHTTPCookieStorageRef storage, RSHTTPCookieRef cookie) {
+    if (!storage || !cookie) return;
+    __RSGenericValidInstance(storage, _RSHTTPCookieStorageTypeID);
+    RSSyncUpdateBlock(storage->_lock, ^{
+        __RSHTTPCookieStorageUpdateCookieInCache(storage->_cache, cookie, YES);
+    });
+}
+
+RSExport RSArrayRef RSHTTPCookieStorageGetCookies(RSHTTPCookieStorageRef storage) {
+    if (!storage) return nil;
+    __RSGenericValidInstance(storage, _RSHTTPCookieStorageTypeID);
+    __block RSArrayRef cookies = nil;
+    RSSyncUpdateBlock(storage->_lock, ^{
+        cookies = __RSHTTPCookieStorageCopyCookies(storage);
+    });
+    return RSAutorelease(cookies);
 }

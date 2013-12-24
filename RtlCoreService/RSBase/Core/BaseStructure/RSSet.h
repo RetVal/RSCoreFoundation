@@ -325,6 +325,9 @@ void RSSetGetValues(RSSetRef theSet, const void **values) RS_AVAILABLE(0_1);
 RSExport
 void RSSetApplyFunction(RSSetRef theSet, RSSetApplierFunction applier, void *context) RS_AVAILABLE(0_1);
 
+#if RS_BLOCKS_AVAILABLE
+RSExport void RSSetApplyBlock(RSSetRef theSet, void (^block)(const void* value, BOOL *stop)) RS_AVAILABLE(0_4);
+#endif
 /*!
  @function RSSetAddValue
  Adds the value to the set if it is not already present.

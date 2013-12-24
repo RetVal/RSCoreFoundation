@@ -25,7 +25,7 @@
 #define __RSRuntimeInstanceBZeroBeforeDie       1
 #define __RSRuntimeISABaseOnEmptyField          0
 
-#define __RSRuntimeInstanceManageWatcher        1
+#define __RSRuntimeInstanceManageWatcher        0
 #define __RSRuntimeInstanceRefWatcher           0
 #define __RSRuntimeInstanceAllocFreeWatcher     0
 #define __RSRuntimeInstanceARC                  0
@@ -253,16 +253,17 @@ RSInline void __RSRuntimeSetClassVersionInformation(RSRuntimeClass* cls, RSRunti
 
 RSExport int       __RSRuntimeVersionRetainConstomer(const RSRuntimeClass* const cls) RS_AVAILABLE(0_0);
 RSExport void      __RSRuntimeSetClassTypeID(const RSRuntimeClass* const cls, RSTypeID id) RS_AVAILABLE(0_0);
-RSExport RSTypeID   __RSRuntimeGetClassTypeID(const RSRuntimeClass* const cls) RS_AVAILABLE(0_0);
+RSExport RSTypeID  __RSRuntimeGetClassTypeID(const RSRuntimeClass* const cls) RS_AVAILABLE(0_0);
 RSExport void      __RSRuntimeSetInstanceTypeID(RSTypeRef obj, RSTypeID id) RS_AVAILABLE(0_0);
 
-RSExport RSTypeID   __RSRuntimeRegisterClass(const RSRuntimeClass* const cls) RS_AVAILABLE(0_0);
+RSExport RSTypeID  __RSRuntimeRegisterClass(const RSRuntimeClass* const cls) RS_AVAILABLE(0_0);
 RSExport void      __RSRuntimeUnregisterClass(RSTypeID classID) RS_AVAILABLE(0_0);
 
 RSExport const RSRuntimeClass* __RSRuntimeGetClassWithTypeID(RSTypeID classID) RS_AVAILABLE(0_0);
 RSExport const char* __RSRuntimeGetClassNameWithTypeID(RSTypeID classID) RS_AVAILABLE(0_0);
 RSExport const char* __RSRuntimeGetClassNameWithInstance(RSTypeRef obj) RS_AVAILABLE(0_0);
-RSExport BOOL      __RSRuntimeScanClass(const RSRuntimeClass* cls) RS_AVAILABLE(0_0);
+RSExport RSTypeID __RSRuntimeGetClassTypeIDWithName(const char * name) RS_AVAILABLE(0_4);
+RSExport BOOL __RSRuntimeScanClass(const RSRuntimeClass* cls) RS_AVAILABLE(0_0);
 
 /****************************************************************************************************************/
 

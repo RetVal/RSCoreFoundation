@@ -1289,7 +1289,7 @@ RSExport void RSXMLElementRemoveAttributeForName(RSXMLElementRef element, RSStri
 RSExport RSArrayRef RSXMLElementGetAttributes(RSXMLElementRef element)
 {
     __RSGenericValidInstance(element, _RSXMLElementTypeID);
-    return RSAutorelease(RSDictionaryAllValues(__RSXMLElementGetAttributes(element)));
+    return RSAutorelease(RSDictionaryCopyAllValues(__RSXMLElementGetAttributes(element)));
 }
 
 RSInline RSXMLNodeRef __RSXMLElementGetAttributeForName(RSXMLElementRef element, RSStringRef name)

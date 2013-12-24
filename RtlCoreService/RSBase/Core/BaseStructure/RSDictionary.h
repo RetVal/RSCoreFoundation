@@ -76,8 +76,8 @@ RSExport void RSDictionaryRemoveValue(RSMutableDictionaryRef dictionary, const v
 
 RSExport void RSDictionaryRemoveAllObjects(RSMutableDictionaryRef dictionary) RS_AVAILABLE(0_0);
 
-RSExport RSArrayRef RSDictionaryAllKeys(RSDictionaryRef dictionary) RS_AVAILABLE(0_0);
-RSExport RSArrayRef RSDictionaryAllValues(RSDictionaryRef dictionary) RS_AVAILABLE(0_0);
+RSExport RSArrayRef RSDictionaryCopyAllKeys(RSDictionaryRef dictionary) RS_AVAILABLE(0_0);
+RSExport RSArrayRef RSDictionaryCopyAllValues(RSDictionaryRef dictionary) RS_AVAILABLE(0_0);
 RSExport void RSDictionaryGetKeysAndValues(RSDictionaryRef dictionary, RSTypeRef* keys, RSTypeRef* values) RS_AVAILABLE(0_0);
 
 RSExport void RSDictionaryApplyFunction(RSDictionaryRef dictionary, RSDictionaryApplierFunction apply, void* context) RS_AVAILABLE(0_0);
