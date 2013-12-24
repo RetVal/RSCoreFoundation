@@ -654,7 +654,7 @@ RSPrivate void __RSTypeCollectionRelease(RSAllocatorRef allocator, const void *p
 static RSSpinLock __RSLogSpinlock = RSSpinLockInit;
 void __RSCPrint(int fd, RSCBuffer cStr)
 {
-    RSSyncUpdateBlock(__RSLogSpinlock, ^{
+    RSSyncUpdateBlock(&__RSLogSpinlock, ^{
         printf("%s", cStr);
     });
 }
@@ -876,7 +876,7 @@ static void __RSRuntimeClassCacheDeallocate() {
 static RSTypeID __RSRuntimeGetClassTypeIDWithNameInCache(const char *name) {
     if (!name) return _RSRuntimeNotATypeID;
     __block RSTypeID ID = _RSRuntimeNotATypeID;
-    RSSyncUpdateBlock(__RSRuntimeRawHashTableLock, ^{
+    RSSyncUpdateBlock(&__RSRuntimeRawHashTableLock, ^{
         size_t value_size = 0;
         void *value = raw_ht_get(&__RSRuntimeRawHashTable, (void *)name, strlen(name) + 1, &value_size);
         if (value)
@@ -888,7 +888,7 @@ static RSTypeID __RSRuntimeGetClassTypeIDWithNameInCache(const char *name) {
 static void __RSRuntimeSetClassTypeIDWithNameToCache(const char *name, RSTypeID ID) {
     if (!name || ID == _RSRuntimeNotATypeID)
         return ;
-    RSSyncUpdateBlock(__RSRuntimeRawHashTableLock, ^{
+    RSSyncUpdateBlock(&__RSRuntimeRawHashTableLock, ^{
         RSTypeID typeID = ID;
         raw_ht_insert(&__RSRuntimeRawHashTable, (void *)name, strlen(name) + 1, (void *)&typeID, sizeof(RSTypeID));
     });
@@ -898,7 +898,7 @@ static void __RSRuntimeSetClassTypeIDWithNameToCache(const char *name, RSTypeID 
 static void __RSRuntimeRemoveClassTypeIDWithNameFromCache(const char *name) {
     if (!name)
         return;
-    RSSyncUpdateBlock(__RSRuntimeRawHashTableLock, ^{
+    RSSyncUpdateBlock(&__RSRuntimeRawHashTableLock, ^{
         raw_ht_remove(&__RSRuntimeRawHashTable, (void *)name, strlen(name) + 1);
     });
 }

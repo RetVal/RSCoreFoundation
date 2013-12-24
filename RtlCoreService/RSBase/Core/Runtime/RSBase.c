@@ -323,12 +323,13 @@ RSExport RSStringRef RSClassNameFromInstance(RSTypeRef id)
 }
 
 #if RS_BLOCKS_AVAILABLE
-void RSSyncUpdateBlock(RSSpinLock lock, void (^block)(void))
+void RSSyncUpdateBlock(volatile RSSpinLock * lock, void (^block)(void))
 {
-    RSSpinLockLock(&lock);
+    if (!lock) return;
+    RSSpinLockLock(lock);
     block();
-    if (!RSSpinLockTry(&lock))
-        RSSpinLockUnlock(&lock);
+    if (!RSSpinLockTry(lock))
+        RSSpinLockUnlock(lock);
     else
         __RSCLog(RSLogLevelWarning, "May be case an dead lock, %s can only be used updating your data synchronized", __func__);
 }

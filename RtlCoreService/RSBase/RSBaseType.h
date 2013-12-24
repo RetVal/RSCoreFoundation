@@ -177,7 +177,7 @@ RSInline BOOL RSSpinLockTry(volatile RSSpinLock_t *lock) {
 
 #if RS_BLOCKS_AVAILABLE
 
-void RSSyncUpdateBlock(RSSpinLock lock, void (^block)(void));
+void RSSyncUpdateBlock(volatile RSSpinLock *lock, void (^block)(void));
 
 #endif
 #endif

@@ -84,7 +84,6 @@ struct __RSURLConnection
     
     RSURLResponseRef _response;
 //    RSMutableDataRef _data;
-    RSErrorRef _error;
 };
 
 RSInline BOOL __RSURLConnectionIsAsync(RSURLConnectionRef connection)
@@ -296,7 +295,6 @@ RSInline void __RSURLConnectionCostCleanup(RSURLConnectionRef connection) {
 //    if (connection->_data) RSDataSetLength(connection->_data, 0);
     
     __RSReleaseSafe(connection->_response);
-    __RSReleaseSafe(connection->_error);
     if (__RSURLConnectionGetCore(connection)) __RSURLConnectionCoreDeallocate(__RSURLConnectionGetCore(connection), __RSURLConnectionIsAsync(connection));
 }
 
@@ -414,7 +412,21 @@ RSExport RSTypeID RSURLConnectionGetTypeID()
 
 static RSRunLoopRef __RSURLConnectionRunLoop = nil;
 static RSSpinLock __RSURLConnectionRunLoopSpinLock = RSSpinLockInit;
-//static dispatch_queue_t __RSURLConnectionDispatchQueue = nil;
+static void __RSURLConnectionLoaderMain(void *context);
+static void __RSURLConnectionDeallocate(RSNotificationRef notification);
+
+static void __RSURLConnectionRunLoopInitialize() {
+    RSSyncUpdateBlock(&__RSURLConnectionRunLoopSpinLock, ^{
+        if (!__RSURLConnectionRunLoop) {
+            __RSStartSimpleThread(__RSURLConnectionLoaderMain, nil);
+            
+            // deadlock unless __RSURLConnectionLoaderMain ready
+            RSSpinLockLock(&__RSURLConnectionRunLoopSpinLock);
+            
+            RSNotificationCenterAddObserver(RSNotificationCenterGetDefault(), RSAutorelease(RSObserverCreate(RSAllocatorSystemDefault, RSCoreFoundationWillDeallocateNotification, &__RSURLConnectionDeallocate, nil)));
+        }
+    });
+}
 
 static void _emptyPerform(void *info) {
     ;
@@ -439,23 +451,21 @@ static void __RSURLConnectionLoaderMain(void *context) {
     RSRunLoopSourceRef source = RSRunLoopSourceCreate(RSAllocatorSystemDefault, 0, &ctx);
     RSRunLoopAddSource(__RSURLConnectionRunLoop, source, RSRunLoopDefaultMode);
     RSRelease(source);
+    if (NO == RSSpinLockTry(&__RSURLConnectionRunLoopSpinLock))
+        RSSpinLockUnlock(&__RSURLConnectionRunLoopSpinLock);
     RSUInteger result __unused = RSRunLoopRunInMode(RSRunLoopDefaultMode, 1.0e10, NO);
     RSShow(RSSTR("__RSURLConnectionRunLoop return"));
 }
-static void __RSURLConnectionDeallocate(RSNotificationRef notification);
 
-RSPrivate void __RSURLConnectionInitialize()
-{
+
+RSPrivate void __RSURLConnectionInitialize() {
     _RSURLConnectionTypeID = __RSRuntimeRegisterClass(&__RSURLConnectionClass);
     __RSRuntimeSetClassTypeID(&__RSURLConnectionClass, _RSURLConnectionTypeID);
-    return;
-    __RSStartSimpleThread(__RSURLConnectionLoaderMain, nil);
-    RSNotificationCenterAddObserver(RSNotificationCenterGetDefault(), RSAutorelease(RSObserverCreate(RSAllocatorSystemDefault, RSCoreFoundationWillDeallocateNotification, &__RSURLConnectionDeallocate, nil)));
 }
 
 static void __RSURLConnectionDeallocate(RSNotificationRef notification)
 {
-    RSSyncUpdateBlock(__RSURLConnectionRunLoopSpinLock, ^{
+    RSSyncUpdateBlock(&__RSURLConnectionRunLoopSpinLock, ^{
         if (__RSURLConnectionRunLoop)
             RSRunLoopStop(__RSURLConnectionRunLoop);
     });
@@ -528,7 +538,7 @@ RSExport RSURLConnectionRef RSURLConnectionCreate(RSAllocatorRef allocator, RSUR
 
 RSExport void RSURLConnectionStartOperationInQueue(RSURLConnectionRef connection)
 {
-    RSSyncUpdateBlock(__RSURLConnectionRunLoopSpinLock, ^{
+    RSSyncUpdateBlock(&__RSURLConnectionRunLoopSpinLock, ^{
         if (!__RSURLConnectionRunLoop)
             __RSURLConnectionRunLoop = RSRunLoopGetCurrent();
     });
@@ -575,8 +585,17 @@ static void __RSURLConnectionDidFailWithError(RSURLConnectionRef connection, RSE
     __RSURLConnectionInvokeFailWithError(connection, error);
 }
 
+struct __RSURLConnectionPrivateDelegateContext {
+    RSMutableDataRef data;
+    RSErrorRef error;
+};
+
 static void __RSURLConnectionDidReceiveData_PrivateDelegate(RSURLConnectionRef connection, RSDataRef data) {
-    RSDataAppend((RSMutableDataRef)RSURLConnectionGetContext(connection), data);
+    RSDataAppend(((struct __RSURLConnectionPrivateDelegateContext*)RSURLConnectionGetContext(connection))->data, data);
+}
+
+static void __RSURLConnectionDidFailWithError_PrivateDelegate(RSURLConnectionRef connection, RSErrorRef error) {
+    ((struct __RSURLConnectionPrivateDelegateContext*)RSURLConnectionGetContext(connection))->error = error;
 }
 
 static const struct RSURLConnectionDelegate __RSURLConnectionPrivateDelegate = {
@@ -586,7 +605,7 @@ static const struct RSURLConnectionDelegate __RSURLConnectionPrivateDelegate = {
     __RSURLConnectionDidReceiveData_PrivateDelegate,
     nil,
     nil,
-    nil
+    __RSURLConnectionDidFailWithError_PrivateDelegate
 };
 
 static const struct RSURLConnectionDelegate __RSURLConnectionImpDelegate = {
@@ -603,7 +622,8 @@ static const struct RSURLConnectionDelegate __RSURLConnectionImpDelegate = {
 
 RSExport RSDataRef RSURLConnectionSendSynchronousRequest(RSURLRequestRef request, __autorelease RSURLResponseRef *response, __autorelease RSErrorRef *error) {
     RSMutableDataRef data = RSDataCreateMutable(RSAllocatorSystemDefault, 0);
-    RSURLConnectionRef connection = RSURLConnectionCreate(RSAllocatorDefault, request, data, &__RSURLConnectionPrivateDelegate);
+    struct __RSURLConnectionPrivateDelegateContext context = {data, error ? *error : nil};
+    RSURLConnectionRef connection = RSURLConnectionCreate(RSAllocatorDefault, request, &context, &__RSURLConnectionPrivateDelegate);
     __RSURLConnectionWillStartConnection(connection, RSURLConnectionGetCurrentRequest(connection), nil);
     __RSURLConnectionCorePerform(connection);
     RSArrayRef cookies = RSCookiesWithCore(__RSURLConnectionCoreGet(connection));
@@ -611,9 +631,9 @@ RSExport RSDataRef RSURLConnectionSendSynchronousRequest(RSURLRequestRef request
     
 //    RSDataRef data = RSAutorelease(RSRetain(connection->_data));
     if (response && connection->_response) *response = RSAutorelease(RSRetain(connection->_response));
-    if (error && connection->_error) *error = RSAutorelease(RSRetain(connection->_error));
+    if (error && context.error) *error = context.error; // error is already autoreleased
     RSRelease(connection);
-    return RSAutorelease(data);
+    return RSDataGetLength(data) ? RSAutorelease(data) : (RSRelease(data), nil);
 }
 
 struct __RSURLConnectionQueueCalloutContext {
@@ -638,6 +658,7 @@ RSExport void RSURLConnectionStartOperation(RSURLConnectionRef connection)
     if (!connection) return;
     __RSGenericValidInstance(connection, _RSURLConnectionTypeID);
     if (!connection->_delegate) return;
+    __RSURLConnectionRunLoopInitialize();
     RSRunLoopPerformBlock(__RSURLConnectionRunLoop, RSRunLoopDefault, ^{
         __RSURLConnectionWillStartConnection(connection, RSURLConnectionGetCurrentRequest(connection), nil);
         __RSURLConnectionCorePerform(connection);
@@ -650,6 +671,7 @@ RSExport void RSURLConnectionSendAsynchronousRequest(RSURLRequestRef request, RS
     if (!request || !completeHandler) return;
     RSRetain(request);
     if (rl == nil) rl = RSRunLoopGetMain();
+    __RSURLConnectionRunLoopInitialize();
     RSRunLoopPerformBlock(__RSURLConnectionRunLoop, RSRunLoopDefault, ^{
         RSURLResponseRef response = nil;
         RSErrorRef error = nil;

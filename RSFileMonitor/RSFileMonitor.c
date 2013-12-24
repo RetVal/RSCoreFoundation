@@ -125,7 +125,7 @@ static void __RSFileMonitorDeallocate()
 
 static void __RSFileMonitorInitialize()
 {
-    RSSyncUpdateBlock(__RSFileMonitorDefaultLock, ^{ RSPerformBlockInBackGround(^{ RSRunLoopPerformBlock(RSRunLoopGetCurrent(), RSRunLoopDefaultMode, ^{ __RSFileMonitorCore();}); RSRunLoopRun();});});
+    RSSyncUpdateBlock(&__RSFileMonitorDefaultLock, ^{ RSPerformBlockInBackGround(^{ RSRunLoopPerformBlock(RSRunLoopGetCurrent(), RSRunLoopDefaultMode, ^{ __RSFileMonitorCore();}); RSRunLoopRun();});});
 }
 
 RSExport RSTypeID RSFileMonitorGetTypeID()

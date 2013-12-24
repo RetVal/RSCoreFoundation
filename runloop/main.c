@@ -262,27 +262,16 @@ void RSCoreAnalyzerRelease(RSCoreAnalyzer analyzer) {
 #include <curl/curl.h>
 int main (int argc, char **argv)
 {
-    CURL *core = nil;
-    const char *filename = RSStringGetUTF8String(RSFileManagerStandardizingPath(RSSTR("~/Desktop/cookie")));
-    
-    core = curl_easy_init();
-    curl_easy_setopt(core, CURLOPT_URL, "http://www.baidu.com");
-    curl_easy_setopt(core, CURLOPT_FOLLOWLOCATION, 1);
-    curl_easy_setopt(core, CURLOPT_COOKIEFILE, filename);
-//    curl_easy_setopt(core, CURLOPT_COOKIEJAR, filename);
-    if (0 == curl_easy_perform(core))
-        RSShow(RSSTR("baidu success"));
-    
-    
-    RSHTTPCookieStorageRef storage = RSHTTPCookieStorageGetSharedStorage();
-    RSArrayRef cookies = RSCookiesWithCore(core);
-    RSArrayApplyBlock(cookies, RSMakeRange(0, RSArrayGetCount(cookies)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
-        RSHTTPCookieStorageSetCookie(storage, (RSHTTPCookieRef)value);
-    });
-    curl_easy_cleanup(core);
-    RSPerformBlockAfterDelay(1.0, ^{
+    RSURLConnectionSendAsynchronousRequest(RSURLRequestWithURL(RSURLWithString(RSSTR("http://123.321.fuck"))), nil, ^(RSURLResponseRef response, RSDataRef data, RSErrorRef error) {
+        RSShow(response);
+        RSShow(data);
+        RSShow(error);
         RSRunLoopStop(RSRunLoopGetMain());
     });
+//    RSHTTPCookieStorageRef storage = RSHTTPCookieStorageGetSharedStorage();
+//    RSArrayApplyBlock(cookies, RSMakeRange(0, RSArrayGetCount(cookies)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+//        RSHTTPCookieStorageSetCookie(storage, (RSHTTPCookieRef)value);
+//    });
     RSRunLoopRun();
     return 0;
     

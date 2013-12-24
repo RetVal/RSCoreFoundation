@@ -824,7 +824,7 @@ RSPrivate void __RSFileManagerInitialize()
 
 RSPrivate void __RSFileManagerDeallocate()
 {
-    RSSyncUpdateBlock(__RSFileManagerDefaultLock, ^{
+    RSSyncUpdateBlock(&__RSFileManagerDefaultLock, ^{
         if (_RSTemporaryDirectory) {
             __RSRuntimeSetInstanceSpecial(_RSTemporaryDirectory, NO);
             RSAutorelease(_RSTemporaryDirectory); // maybe use in the later deallocate routines, so just autorelease it here (RSAutoreleasePool is the last deallocate routine).
@@ -866,7 +866,7 @@ static RSFileManagerRef __RSFileManagerCreateInstance(RSAllocatorRef allocator)
 
 RSExport RSFileManagerRef RSFileManagerGetDefault()
 {
-    RSSyncUpdateBlock(__RSFileManagerDefaultLock, ^{
+    RSSyncUpdateBlock(&__RSFileManagerDefaultLock, ^{
         if (!__RSFileManagerDefault) {
            __RSFileManagerCreateInstance(RSAllocatorSystemDefault);
         }

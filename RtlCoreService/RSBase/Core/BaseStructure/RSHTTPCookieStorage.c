@@ -194,7 +194,7 @@ static void __RSHTTPCookieStorageInitialize() {
 }
 
 static void __RSHTTPCookieStorageDeallocate(RSNotificationRef notification) {
-    RSSyncUpdateBlock(__RSHTTPCookieSharedStorageLock, ^{
+    RSSyncUpdateBlock(&__RSHTTPCookieSharedStorageLock, ^{
         if (nil != __RSHTTPCookieSharedStorage) {
             __RSRuntimeSetInstanceSpecial(__RSHTTPCookieSharedStorage, NO);
             RSRelease(__RSHTTPCookieSharedStorage);
@@ -211,7 +211,7 @@ static RSHTTPCookieStorageRef __RSHTTPCookieStorageCreateInstance(RSAllocatorRef
 }
 
 RSExport RSHTTPCookieStorageRef RSHTTPCookieStorageGetSharedStorage() {
-    RSSyncUpdateBlock(__RSHTTPCookieSharedStorageLock, ^{
+    RSSyncUpdateBlock(&__RSHTTPCookieSharedStorageLock, ^{
         if (nil == __RSHTTPCookieSharedStorage) {
             __RSHTTPCookieStorageInitialize();
             __RSHTTPCookieSharedStorage = __RSHTTPCookieStorageCreateInstance(RSAllocatorSystemDefault);
@@ -354,7 +354,7 @@ static RSStringRef __RSHTTPCookieStorageUpdateCookieTransformationAndUUID(RSHTTP
 RSExport void RSHTTPCookieStorageSetCookie(RSHTTPCookieStorageRef storage, RSHTTPCookieRef cookie) {
     if (!storage || !cookie) return;
     __RSGenericValidInstance(storage, _RSHTTPCookieStorageTypeID);
-    RSSyncUpdateBlock(storage->_lock, ^{
+    RSSyncUpdateBlock(&storage->_lock, ^{
         __RSHTTPCookieStorageUpdateCookieInCache(storage->_cache, cookie, NO);
     });
 }
@@ -362,7 +362,7 @@ RSExport void RSHTTPCookieStorageSetCookie(RSHTTPCookieStorageRef storage, RSHTT
 RSExport void RSHTTPCookieStorageRemoveCookie(RSHTTPCookieStorageRef storage, RSHTTPCookieRef cookie) {
     if (!storage || !cookie) return;
     __RSGenericValidInstance(storage, _RSHTTPCookieStorageTypeID);
-    RSSyncUpdateBlock(storage->_lock, ^{
+    RSSyncUpdateBlock(&storage->_lock, ^{
         __RSHTTPCookieStorageUpdateCookieInCache(storage->_cache, cookie, YES);
     });
 }
@@ -371,7 +371,7 @@ RSExport RSArrayRef RSHTTPCookieStorageGetCookies(RSHTTPCookieStorageRef storage
     if (!storage) return nil;
     __RSGenericValidInstance(storage, _RSHTTPCookieStorageTypeID);
     __block RSArrayRef cookies = nil;
-    RSSyncUpdateBlock(storage->_lock, ^{
+    RSSyncUpdateBlock(&storage->_lock, ^{
         cookies = __RSHTTPCookieStorageCopyCookies(storage);
     });
     return RSAutorelease(cookies);
