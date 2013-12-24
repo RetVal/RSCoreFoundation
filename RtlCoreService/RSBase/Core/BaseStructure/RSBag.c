@@ -832,6 +832,19 @@ void RSBagApplyFunction(RSHashRef hc, RSBagApplierFunction applier, any_pointer_
     });
 }
 
+#if RS_BLOCKS_AVAILABLE
+RSExport void RSBagApplyBlock(RSHashRef hc, void (^block)(const void* value, BOOL *stop)) {
+    FAULT_CALLBACK((void **)&(applier));
+    if (RSDictionary) RS_OBJC_FUNCDISPATCHV(__RSBagTypeID, void, (NSDictionary *)hc, __apply:(void (*)(const void *, const void *, void *))applier context:(void *)context);
+    if (RSSet) RS_OBJC_FUNCDISPATCHV(__RSBagTypeID, void, (NSSet *)hc, __applyValues:(void (*)(const void *, void *))applier context:(void *)context);
+    __RSGenericValidInstance(hc, __RSBagTypeID);
+    RSBasicHashApplyBlock((RSBasicHashRef)hc, ^BOOL(RSBasicHashBucket bkt, BOOL *stop) {
+        INVOKE_CALLBACK2(block, (const_any_pointer_t)bkt.weak_value, stop);
+        return (BOOL)true;
+    });
+}
+#endif
+
 // This function is for Foundation's benefit; no one else should use it.
 RS_EXPORT unsigned long _RSBagFastEnumeration(RSHashRef hc, struct __RSFastEnumerationStateEquivalent2 *state, void *stackbuffer, unsigned long count) {
     if (RS_IS_OBJC(__RSBagTypeID, hc)) return 0;

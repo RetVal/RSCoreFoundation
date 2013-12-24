@@ -60,6 +60,10 @@ RSExport void RSBagGetValues(RSBagRef theBag, const void **values);
 
 RSExport void RSBagApplyFunction(RSBagRef theBag, RSBagApplierFunction applier, void *context);
 
+#if RS_BLOCKS_AVAILABLE
+RSExport void RSBagApplyBlock(RSBagRef bag, void (^block)(const void* value, BOOL *stop)) RS_AVAILABLE(0_4);
+#endif
+
 RSExport void RSBagAddValue(RSMutableBagRef theBag, const void *value);
 
 RSExport void RSBagReplaceValue(RSMutableBagRef theBag, const void *value);
