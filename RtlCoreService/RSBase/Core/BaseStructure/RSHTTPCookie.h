@@ -16,17 +16,17 @@
 
 RS_EXTERN_C_BEGIN
 
-typedef struct __RSHTTPCookie *RSHTTPCookieRef;
+typedef const struct __RSHTTPCookie *RSHTTPCookieRef;
 
 RSExport RSTypeID RSHTTPCookieGetTypeID();
 
-RSExport RSArrayRef RSCookiesWithCore(void *core);
 RSExport RSHTTPCookieRef RSHTTPCookieCreate(RSAllocatorRef allocator, RSDictionaryRef properties) RS_AVAILABLE(0_4);
 RSExport RSDictionaryRef RSHTTPCookieGetProperties(RSHTTPCookieRef cookie) RS_AVAILABLE(0_4);
 RSExport RSUInteger RSHTTPCookieGetVersion(RSHTTPCookieRef cookie) RS_AVAILABLE(0_4);
 RSExport RSStringRef RSHTTPCookieGetName(RSHTTPCookieRef cookie) RS_AVAILABLE(0_4);
 RSExport RSStringRef RSHTTPCookieGetValue(RSHTTPCookieRef cookie) RS_AVAILABLE(0_4);
 RSExport RSDateRef  RSHTTPCookieGetExpiresDate(RSHTTPCookieRef cookie) RS_AVAILABLE(0_4);
+RSExport RSTimeInterval RSHTTPCookieGetMaximumAge(RSHTTPCookieRef cookie) RS_AVAILABLE(0_4);
 RSExport BOOL RSHTTPCookieIsSessionOnly(RSHTTPCookieRef cookie) RS_AVAILABLE(0_4);
 RSExport RSStringRef RSHTTPCookieGetDomain(RSHTTPCookieRef cookie) RS_AVAILABLE(0_4);
 RSExport RSStringRef RSHTTPCookieGetPath(RSHTTPCookieRef cookie) RS_AVAILABLE(0_4);

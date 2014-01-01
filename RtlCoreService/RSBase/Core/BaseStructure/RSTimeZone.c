@@ -210,7 +210,7 @@ RSExport RSTimeZoneRef RSTimeZoneCreateWithName(RSAllocatorRef allocator, RSStri
 RSExport RSStringRef RSTimeZoneGetName(RSTimeZoneRef timeZone)
 {
     __RSTimeZoneAvailable(timeZone);
-    return RSRetain(__RSTimeZoneGetName(timeZone));
+    return (__RSTimeZoneGetName(timeZone));
 }
 
 RSExport RSArrayRef RSTimeZoneCopyKnownNames()

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		304B3850186C36F300806E4B /* RSRegularExpression.c in Sources */ = {isa = PBXBuildFile; fileRef = 304B384E186C36F300806E4B /* RSRegularExpression.c */; };
+		304B3851186C36F300806E4B /* RSRegularExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 304B384F186C36F300806E4B /* RSRegularExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3098391E1868818400398AC3 /* RSRawHashTable.c in Sources */ = {isa = PBXBuildFile; fileRef = 3098391C1868818400398AC3 /* RSRawHashTable.c */; };
 		3098391F1868818400398AC3 /* RSRawHashTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 3098391D1868818400398AC3 /* RSRawHashTable.h */; };
 		30F32B3A1860318300A45125 /* RSHTTPCookieStorage.c in Sources */ = {isa = PBXBuildFile; fileRef = 30F32B381860318300A45125 /* RSHTTPCookieStorage.c */; };
@@ -143,7 +145,6 @@
 		4151C1E417600E6500C9AC40 /* rbbi.h in Headers */ = {isa = PBXBuildFile; fileRef = 4151C14417600E6500C9AC40 /* rbbi.h */; };
 		4151C1E517600E6500C9AC40 /* rbnf.h in Headers */ = {isa = PBXBuildFile; fileRef = 4151C14517600E6500C9AC40 /* rbnf.h */; };
 		4151C1E617600E6500C9AC40 /* rbtz.h in Headers */ = {isa = PBXBuildFile; fileRef = 4151C14617600E6500C9AC40 /* rbtz.h */; };
-		4151C1E717600E6500C9AC40 /* regex.h in Headers */ = {isa = PBXBuildFile; fileRef = 4151C14717600E6500C9AC40 /* regex.h */; };
 		4151C1E817600E6500C9AC40 /* rep.h in Headers */ = {isa = PBXBuildFile; fileRef = 4151C14817600E6500C9AC40 /* rep.h */; };
 		4151C1E917600E6500C9AC40 /* resbund.h in Headers */ = {isa = PBXBuildFile; fileRef = 4151C14917600E6500C9AC40 /* resbund.h */; };
 		4151C1EA17600E6500C9AC40 /* schriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4151C14A17600E6500C9AC40 /* schriter.h */; };
@@ -720,6 +721,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		304B384E186C36F300806E4B /* RSRegularExpression.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRegularExpression.c; sourceTree = "<group>"; };
+		304B384F186C36F300806E4B /* RSRegularExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRegularExpression.h; sourceTree = "<group>"; };
 		3098391C1868818400398AC3 /* RSRawHashTable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRawHashTable.c; sourceTree = "<group>"; };
 		3098391D1868818400398AC3 /* RSRawHashTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRawHashTable.h; sourceTree = "<group>"; };
 		30F32B381860318300A45125 /* RSHTTPCookieStorage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSHTTPCookieStorage.c; sourceTree = "<group>"; };
@@ -858,7 +861,6 @@
 		4151C14417600E6500C9AC40 /* rbbi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rbbi.h; sourceTree = "<group>"; };
 		4151C14517600E6500C9AC40 /* rbnf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rbnf.h; sourceTree = "<group>"; };
 		4151C14617600E6500C9AC40 /* rbtz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rbtz.h; sourceTree = "<group>"; };
-		4151C14717600E6500C9AC40 /* regex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = regex.h; sourceTree = "<group>"; };
 		4151C14817600E6500C9AC40 /* rep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rep.h; sourceTree = "<group>"; };
 		4151C14917600E6500C9AC40 /* resbund.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = resbund.h; sourceTree = "<group>"; };
 		4151C14A17600E6500C9AC40 /* schriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = schriter.h; sourceTree = "<group>"; };
@@ -1625,7 +1627,6 @@
 				4151C14417600E6500C9AC40 /* rbbi.h */,
 				4151C14517600E6500C9AC40 /* rbnf.h */,
 				4151C14617600E6500C9AC40 /* rbtz.h */,
-				4151C14717600E6500C9AC40 /* regex.h */,
 				4151C14817600E6500C9AC40 /* rep.h */,
 				4151C14917600E6500C9AC40 /* resbund.h */,
 				4151C14A17600E6500C9AC40 /* schriter.h */,
@@ -1848,6 +1849,8 @@
 		41704FF01647C713005E7FB5 /* BaseStructure */ = {
 			isa = PBXGroup;
 			children = (
+				304B384E186C36F300806E4B /* RSRegularExpression.c */,
+				304B384F186C36F300806E4B /* RSRegularExpression.h */,
 				41704FFD1647C713005E7FB5 /* RSPrivate */,
 				418AED401813BED60001694B /* RSURL.c */,
 				418AED411813BED60001694B /* RSURL.h */,
@@ -2512,6 +2515,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				304B3851186C36F300806E4B /* RSRegularExpression.h in Headers */,
 				30F32B3B1860318300A45125 /* RSHTTPCookieStorage.h in Headers */,
 				4177A7E9185C896E00BEE29C /* RSHTTPCookie.h in Headers */,
 				41A93AA8178ABDC3008613C5 /* RSXMLParser.h in Headers */,
@@ -2755,7 +2759,6 @@
 				4151C1E517600E6500C9AC40 /* rbnf.h in Headers */,
 				4151C1E617600E6500C9AC40 /* rbtz.h in Headers */,
 				41FE760D1822B9A600E5E581 /* http_digest.h in Headers */,
-				4151C1E717600E6500C9AC40 /* regex.h in Headers */,
 				4151C1E817600E6500C9AC40 /* rep.h in Headers */,
 				4151C1E917600E6500C9AC40 /* resbund.h in Headers */,
 				41FE76891822B9A600E5E581 /* strtok.h in Headers */,
@@ -3284,6 +3287,7 @@
 				417050771647C713005E7FB5 /* RSRuntime.c in Sources */,
 				41FE76821822B9A600E5E581 /* strdup.c in Sources */,
 				41FE75A91822B9A600E5E581 /* asyn-ares.c in Sources */,
+				304B3850186C36F300806E4B /* RSRegularExpression.c in Sources */,
 				41FE76741822B9A600E5E581 /* socks.c in Sources */,
 				41FE75F41822B9A600E5E581 /* ftp.c in Sources */,
 				4170507A1647C713005E7FB5 /* RSRuntimeClassVersion.c in Sources */,

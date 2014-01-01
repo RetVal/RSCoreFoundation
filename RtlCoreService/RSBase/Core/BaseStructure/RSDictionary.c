@@ -1429,6 +1429,7 @@ RSExport RSMutableHashRef RSDictionaryCreateMutableCopy(RSAllocatorRef allocator
 RSExport RSIndex RSDictionaryGetCount(RSHashRef hc) {
     if (RSDictionary) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, RSIndex, (NSDictionary *)hc, count);
     if (RSSet) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, RSIndex, (NSSet *)hc, count);
+    if (!hc) return 0;
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
     return RSBasicHashGetCount((RSBasicHashRef)hc);
 }
@@ -1436,6 +1437,7 @@ RSExport RSIndex RSDictionaryGetCount(RSHashRef hc) {
 RSExport RSIndex RSDictionaryGetCountOfKey(RSHashRef hc, const_any_pointer_t key) {
     if (RSDictionary) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, RSIndex, (NSDictionary *)hc, countForKey:(id)key);
     if (RSSet) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, RSIndex, (NSSet *)hc, countForObject:(id)key);
+    if (!hc) return nil;
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
     return RSBasicHashGetCountOfKey((RSBasicHashRef)hc, (uintptr_t)key);
 }
@@ -1445,6 +1447,7 @@ RSExport BOOL RSDictionaryContainsKey(RSHashRef hc, const_any_pointer_t key) {
     
     if (RSDictionary) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, char, (NSDictionary *)hc, containsKey:(id)key);
     if (RSSet) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, char, (NSSet *)hc, containsObject:(id)key);
+    if (!hc) return nil;
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
     return (0 < RSBasicHashGetCountOfKey((RSBasicHashRef)hc, (uintptr_t)key));
 }
@@ -1452,6 +1455,7 @@ RSExport BOOL RSDictionaryContainsKey(RSHashRef hc, const_any_pointer_t key) {
 RSExport const_any_pointer_t RSDictionaryGetValue(RSHashRef hc, const_any_pointer_t key) {
     if (RSDictionary) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, const_any_pointer_t, (NSDictionary *)hc, objectForKey:(id)key);
     if (RSSet) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, const_any_pointer_t, (NSSet *)hc, member:(id)key);
+    if (!hc) return nil;
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
     RSBasicHashBucket bkt = RSBasicHashFindBucket((RSBasicHashRef)hc, (uintptr_t)key);
     return (0 < bkt.count ? (const_any_pointer_t)bkt.weak_value : 0);
@@ -1460,6 +1464,7 @@ RSExport const_any_pointer_t RSDictionaryGetValue(RSHashRef hc, const_any_pointe
 RSExport BOOL RSDictionaryGetValueIfPresent(RSHashRef hc, const_any_pointer_t key, const_any_pointer_t *value) {
     if (RSDictionary) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, BOOL, (NSDictionary *)hc, __getValue:(id *)value forKey:(id)key);
     if (RSSet) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, BOOL, (NSSet *)hc, __getValue:(id *)value forObj:(id)key);
+    if (!hc) return NO;
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
     RSBasicHashBucket bkt = RSBasicHashFindBucket((RSBasicHashRef)hc, (uintptr_t)key);
     if (0 < bkt.count) {
@@ -1477,18 +1482,21 @@ RSExport BOOL RSDictionaryGetValueIfPresent(RSHashRef hc, const_any_pointer_t ke
 
 RSExport RSIndex RSDictionaryGetCountOfValue(RSHashRef hc, const_any_pointer_t value) {
     RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, RSIndex, (NSDictionary *)hc, countForObject:(id)value);
+    if (!hc) return -1;
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
     return RSBasicHashGetCountOfValue((RSBasicHashRef)hc, (uintptr_t)value);
 }
 
 RSExport BOOL RSDictionaryContainsValue(RSHashRef hc, const_any_pointer_t value) {
     RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, char, (NSDictionary *)hc, containsObject:(id)value);
+    if (!hc) return NO;
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
     return (0 < RSBasicHashGetCountOfValue((RSBasicHashRef)hc, (uintptr_t)value));
 }
 
 RSExport BOOL RSDictionaryGetKeyIfPresent(RSHashRef hc, const_any_pointer_t key, const_any_pointer_t *actualkey) {
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
+    if (!hc) return NO;
     RSBasicHashBucket bkt = RSBasicHashFindBucket((RSBasicHashRef)hc, (uintptr_t)key);
     if (0 < bkt.count) {
         if (actualkey) {
@@ -1507,6 +1515,7 @@ RSExport void RSDictionaryGetKeysAndValues(RSHashRef hc, const_any_pointer_t *ke
 {
     if (RSDictionary) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSDictionary *)hc, getObjects:(id *)valuebuf andKeys:(id *)keybuf);
     if (RSSet) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSSet *)hc, getObjects:(id *)keybuf);
+    if (!hc) return;
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
     if (RSUseCollectableAllocator) {
         RSOptionFlags flags = RSBasicHashGetFlags((RSBasicHashRef)hc);
@@ -1530,6 +1539,7 @@ RSExport void RSDictionaryApplyFunction(RSHashRef hc, RSDictionaryApplierFunctio
     FAULT_CALLBACK((void **)&(applier));
     if (RSDictionary) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSDictionary *)hc, __apply:(void (*)(const void *, const void *, void *))applier context:(void *)context);
     if (RSSet) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSSet *)hc, __applyValues:(void (*)(const void *, void *))applier context:(void *)context);
+    if (!hc) return;
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
     RSBasicHashApply((RSBasicHashRef)hc, ^(RSBasicHashBucket bkt) {
         INVOKE_CALLBACK3(applier, (const_any_pointer_t)bkt.weak_key, (const_any_pointer_t)bkt.weak_value, context);
@@ -1541,6 +1551,7 @@ RSExport void RSDictionaryApplyBlock(RSHashRef hc, void (^applier)(const void* k
     FAULT_CALLBACK((void **)&(applier));
     if (RSDictionary) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSDictionary *)hc, __apply:(void (*)(const void *, const void *, void *))applier context:(void *)context);
     if (RSSet) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSSet *)hc, __applyValues:(void (*)(const void *, void *))applier context:(void *)context);
+    if (!hc) return;
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
     RSBasicHashApplyBlock((RSBasicHashRef)hc, ^BOOL(RSBasicHashBucket bkt, BOOL *stop) {
         INVOKE_CALLBACK3(applier, (const_any_pointer_t)bkt.weak_key, (const_any_pointer_t)bkt.weak_value, stop);
@@ -1610,6 +1621,7 @@ void RSDictionaryAddValue(RSMutableHashRef hc, const_any_pointer_t key, const_an
     
     if (RSDictionary) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSMutableDictionary *)hc, __addObject:(id)value forKey:(id)key);
     if (RSSet) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSMutableSet *)hc, addObject:(id)key);
+    if (!hc) return;
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
     RSAssert2(RSBasicHashIsMutable((RSBasicHashRef)hc), __RSLogAssertion, "%s(): immutable collection %p passed to mutating operation", __PRETTY_FUNCTION__, hc);
     if (!RSBasicHashIsMutable((RSBasicHashRef)hc)) {
@@ -1624,6 +1636,7 @@ void RSDictionaryAddValue(RSMutableHashRef hc, const_any_pointer_t key, const_an
 void RSDictionaryReplaceValue(RSMutableHashRef hc, const_any_pointer_t key, const_any_pointer_t value) {
     if (RSDictionary) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSMutableDictionary *)hc, replaceObject:(id)value forKey:(id)key);
     if (RSSet) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSMutableSet *)hc, replaceObject:(id)key);
+    if (!hc) return;
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
     RSAssert2(RSBasicHashIsMutable((RSBasicHashRef)hc), __RSLogAssertion, "%s(): immutable collection %p passed to mutating operation", __PRETTY_FUNCTION__, hc);
     if (!RSBasicHashIsMutable((RSBasicHashRef)hc)) {
@@ -1638,6 +1651,7 @@ void RSDictionarySetValue(RSMutableHashRef hc, const_any_pointer_t key, const_an
     
     if (RSDictionary) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSMutableDictionary *)hc, __setObject:(id)value forKey:(id)key);
     if (RSSet) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSMutableSet *)hc, setObject:(id)key);
+    if (!hc) return;
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
     RSAssert2(RSBasicHashIsMutable((RSBasicHashRef)hc), __RSLogAssertion, "%s(): immutable collection %p passed to mutating operation", __PRETTY_FUNCTION__, hc);
     if (!RSBasicHashIsMutable((RSBasicHashRef)hc)) {
@@ -1652,6 +1666,7 @@ void RSDictionarySetValue(RSMutableHashRef hc, const_any_pointer_t key, const_an
 void RSDictionaryRemoveValue(RSMutableHashRef hc, const_any_pointer_t key) {
     if (RSDictionary) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSMutableDictionary *)hc, removeObjectForKey:(id)key);
     if (RSSet) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSMutableSet *)hc, removeObject:(id)key);
+    if (!hc) return;
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
     RSAssert2(RSBasicHashIsMutable((RSBasicHashRef)hc), __RSLogAssertion, "%s(): immutable collection %p passed to mutating operation", __PRETTY_FUNCTION__, hc);
     if (!RSBasicHashIsMutable((RSBasicHashRef)hc)) {
@@ -1665,6 +1680,7 @@ void RSDictionaryRemoveValue(RSMutableHashRef hc, const_any_pointer_t key) {
 void RSDictionaryRemoveAllObjects(RSMutableHashRef hc) {
     if (RSDictionary) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSMutableDictionary *)hc, removeAllObjects);
     if (RSSet) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, void, (NSMutableSet *)hc, removeAllObjects);
+    if (!hc) return;
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
     RSAssert2(RSBasicHashIsMutable((RSBasicHashRef)hc), __RSLogAssertion, "%s(): immutable collection %p passed to mutating operation", __PRETTY_FUNCTION__, hc);
     if (!RSBasicHashIsMutable((RSBasicHashRef)hc)) {
@@ -1677,6 +1693,7 @@ void RSDictionaryRemoveAllObjects(RSMutableHashRef hc) {
 
 RSExport RSArrayRef RSDictionaryCopyAllKeys(RSHashRef hc)
 {
+    if (!hc) return nil;
     RSIndex cnt = RSDictionaryGetCount(hc);
     if (cnt == 0) return RSArrayCreate(RSAllocatorSystemDefault, nil);
     STACK_BUFFER_DECL(RSTypeRef, keys, cnt);
@@ -1690,6 +1707,7 @@ RSExport RSArrayRef RSDictionaryCopyAllKeys(RSHashRef hc)
 
 RSExport RSArrayRef RSDictionaryCopyAllValues(RSHashRef hc)
 {
+    if (!hc) return nil;
     RSIndex cnt = RSDictionaryGetCount(hc);
     if (cnt == 0) return RSArrayCreate(RSAllocatorSystemDefault, nil);
     STACK_BUFFER_DECL(RSTypeRef, values, cnt);

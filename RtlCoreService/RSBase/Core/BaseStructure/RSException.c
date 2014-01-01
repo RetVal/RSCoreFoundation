@@ -274,3 +274,81 @@ RSExport void RSExceptionBlock(RSExecutableBlock tryBlock, RSExceptionHandler fi
         else __tls_cls_exception_handler(&__RSExceptionDefaultHandler);
     }
 }
+
+static void __RSGetBacktrace(void** stack, int* size)
+{
+    *size = backtrace(stack, *size);
+}
+
+__attribute__((__format__(printf, 1, 0)))
+static void vprintf_stderr_common(const char* format, va_list args)
+{
+#if !DEPLOYMENT_TARGET_WINDOWS
+    if (strstr(format, "%@")) {
+        RSStringRef rsformat = RSStringCreateWithCString(RSAllocatorSystemDefault, format, RSStringEncodingUTF8);
+        
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
+#endif
+        RSStringRef str = RSStringCreateWithFormatAndArguments(RSAllocatorSystemDefault, 0, rsformat, args);
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
+        const char* buffer = RSStringCopyUTF8String(str);
+    
+        fputs(buffer, stderr);
+        
+        free((void *)buffer);
+        RSRelease(str);
+        RSRelease(rsformat);
+        return;
+    }
+#endif
+}
+
+__attribute__((__format__(printf, 1, 2)))
+static void printf_stderr_common(const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    vprintf_stderr_common(format, args);
+    va_end(args);
+}
+
+static void __RSPrintBacktrace(void** stack, int size)
+{
+    for (int i = 0; i < size; ++i) {
+        const char* mangledName = 0;
+        char* cxaDemangled = 0;
+        const int frameNumber = i + 1;
+        if (mangledName || cxaDemangled)
+            printf_stderr_common("%-3d %p %s\n", frameNumber, stack[i], cxaDemangled ? cxaDemangled : mangledName);
+        else
+            printf_stderr_common("%-3d %p\n", frameNumber, stack[i]);
+        free(cxaDemangled);
+    }
+}
+
+static void __RSReportBacktrace()
+{
+    static const int framesToShow = 31;
+    static const int framesToSkip = 2;
+    void* samples[framesToShow + framesToSkip];
+    int frames = framesToShow + framesToSkip;
+    
+    __RSGetBacktrace(samples, &frames);
+    __RSPrintBacktrace(samples + framesToSkip, frames - framesToSkip);
+}
+
+RSExport void RSCoreFoundationCrash()
+{
+    __RSReportBacktrace();
+    *(int *)(uintptr_t)0xbbadbeef = 0;
+    // More reliable, but doesn't say BBADBEEF.
+#if defined(__clang__)
+    __builtin_trap();
+#else
+    ((void(*)())0)();
+#endif
+}

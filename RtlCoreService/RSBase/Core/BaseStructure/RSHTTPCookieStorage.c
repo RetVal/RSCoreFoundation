@@ -15,7 +15,7 @@
 RS_CONST_STRING_DECL(__RSHTTPCookieStoragePreferencePathTargetFormat, "~/Library/Cookies/RSCoreFoundation/%s/RSCookie.plist");
 RS_CONST_STRING_DECL(__RSHTTPCookieStoragePreferencePathTargetRSFormat, "~/Library/Cookies/RSCoreFoundation/%r/RSCookie.plist");
 RS_CONST_STRING_DECL(__RSHTTPCookieStoragePreferencePathDirectoryFormat, "~/Library/Cookies/RSCoreFoundation/%s/");
-RS_CONST_STRING_DECL(__RSHTTPCookieStoragePreferencePathDirectoryRSFormat, "~/Library/Cookies/RSCoreFoundation/%s/");
+RS_CONST_STRING_DECL(__RSHTTPCookieStoragePreferencePathDirectoryRSFormat, "~/Library/Cookies/RSCoreFoundation/%r/");
 
 
 RS_CONST_STRING_DECL(__RSHTTPCookieStorageBasePathKey, "BasePath");             //  RSString
@@ -247,9 +247,9 @@ static RSStringRef __RSHTTPCookieStorageUpdateCookieInCache(RSDictionaryRef cach
     if (!(uuids && RSArrayGetCount(uuids))) {
         if (remove) {
             // if remove, the collection need not be built, and empty collection should be removed!
-            if (RSArrayGetCount(uuids))
+            if (uuids && RSArrayGetCount(uuids))
                 RSDictionaryRemoveValue((RSMutableDictionaryRef)paths, RSHTTPCookieGetPath(cookie));
-            if (RSDictionaryGetCount(paths))
+            if (paths && RSDictionaryGetCount(paths))
                 RSDictionaryRemoveValue((RSMutableDictionaryRef)transformation, RSHTTPCookieGetDomain(cookie));
             return nil;
         }
@@ -264,7 +264,7 @@ static RSStringRef __RSHTTPCookieStorageUpdateCookieInCache(RSDictionaryRef cach
         if (*isStop)
             result = value;
         else {
-            RSLog(RSSTR("\n%r - \n%r\n"), cookie, RSDictionaryGetValue(RSDictionaryGetValue(cache, __RSHTTPCookieStorageUUID), value));
+//            RSLog(RSSTR("\n%r - \n%r\n"), cookie, RSDictionaryGetValue(RSDictionaryGetValue(cache, __RSHTTPCookieStorageUUID), value));
         }
     });
     
@@ -277,27 +277,106 @@ static RSStringRef __RSHTTPCookieStorageUpdateCookieInCache(RSDictionaryRef cach
         RSDictionarySetValue((RSMutableDictionaryRef)RSDictionaryGetValue(cache, __RSHTTPCookieStorageUUID), result, cookie);
     } else {
         if (result) {
+            RSStringRef key = RSRetain(result);
             RSArrayRemoveObject(uuids, result);
-            if (RSArrayGetCount(uuids))
+            if (0 == RSArrayGetCount(uuids))
                 RSDictionaryRemoveValue((RSMutableDictionaryRef)paths, RSHTTPCookieGetPath(cookie));
-            if (RSDictionaryGetCount(paths))
+            if (0 == RSDictionaryGetCount(paths))
                 RSDictionaryRemoveValue((RSMutableDictionaryRef)transformation, RSHTTPCookieGetDomain(cookie));
-            RSDictionaryRemoveValue((RSMutableDictionaryRef)RSDictionaryGetValue(cache, __RSHTTPCookieStorageUUID), result);
+            RSDictionaryRemoveValue((RSMutableDictionaryRef)RSDictionaryGetValue(cache, __RSHTTPCookieStorageUUID), key);
+            RSRelease(key);
         }
     }
     return result;
 }
 
+static RSArrayRef __RSHTTPCookieStorageCopyGuessDomain(RSStringRef domain) {
+    if (!domain) return nil;
+    RSMutableArrayRef results = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
+    RS_CONST_STRING_DECL(__RSHTTPCookieStorageGuessDoaminFormat0, "%r");
+    RS_CONST_STRING_DECL(__RSHTTPCookieStorageGuessDoaminFormat1, ".%r");
+    RS_CONST_STRING_DECL(__RSHTTPCookieStorageGuessDoaminFormat2, "*.%r");
+    
+    RSStringRef __RSHTTPCookieStorageGuessDoaminFormat[] = {__RSHTTPCookieStorageGuessDoaminFormat0, __RSHTTPCookieStorageGuessDoaminFormat1, __RSHTTPCookieStorageGuessDoaminFormat2};
+    
+    const RSUInteger cnt = sizeof(__RSHTTPCookieStorageGuessDoaminFormat) / sizeof(RSStringRef);
+    for (RSUInteger idx = 0; idx < cnt; idx++) {
+        RSStringRef guess = RSStringCreateWithFormat(RSAllocatorSystemDefault, __RSHTTPCookieStorageGuessDoaminFormat[idx], domain);
+        RSArrayAddObject(results, guess);
+        RSRelease(guess);
+    }
+    
+    return results;
+}
+
+static RSArrayRef __RSHTTPCookieStorageCopyCookiesForURLDomainAndPath(RSDictionaryRef cache, RSURLRef URL, RSStringRef domain, RSStringRef path) {
+    RSDictionaryRef transformation = RSDictionaryGetValue(cache, __RSHTTPCookieStorageTransformation);
+    if (!transformation) {
+        RSMutableDictionaryRef dict = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
+        RSDictionarySetValue((RSMutableDictionaryRef)cache, __RSHTTPCookieStorageTransformation, dict);
+        RSRelease(dict);
+        return nil;
+    }
+    
+    // guess the domain
+    RSArrayRef domains = __RSHTTPCookieStorageCopyGuessDomain(domain);
+    RSStringRef host = RSURLCopyHostName(URL);
+    RSArrayAddObject((RSMutableArrayRef)domains, host);
+    RSRelease(host);
+    RSUInteger cnt = RSArrayGetCount(domains);
+    
+    RSMutableArrayRef paths = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
+    RSArrayRef pathDomain = RSStringCreateArrayBySeparatingStrings(RSAllocatorSystemDefault, path, RSSTR("/"));
+    RSMutableStringRef currentPath = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
+    RSArrayApplyBlock(pathDomain, RSMakeRange(0, RSArrayGetCount(pathDomain) - 1), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+        RSStringRef path = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("%r%r/"), currentPath, value);
+        RSStringAppendStringWithFormat(currentPath, RSSTR("%r/"), value);
+        RSArrayAddObject(paths, path);
+        RSRelease(path);
+    });
+    RSStringRef tmp = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("%r%r"), currentPath, RSArrayLastObject(pathDomain));
+    RSArrayAddObject(paths, tmp);
+    RSRelease(tmp);
+    RSStringAppendString(currentPath, RSArrayLastObject(pathDomain));
+    RSRelease(pathDomain);
+    tmp = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("%r/"), currentPath);
+    RSArrayAddObject(paths, tmp);
+    RSRelease(tmp);
+    RSRelease(currentPath);
+
+    RSMutableArrayRef results = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
+    for (RSUInteger idx = 0; idx < cnt; idx++)
+    {
+        RSStringRef domain = RSArrayObjectAtIndex(domains, idx);
+        RSDictionaryRef pathsTransformation = RSDictionaryGetValue(transformation, domain);
+        if (!pathsTransformation) {
+            continue;
+        }
+        RSArrayApplyBlock(paths, RSMakeRange(0, RSArrayGetCount(paths)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+            RSStringRef path = value;
+            RSArrayRef uuids = RSDictionaryGetValue(pathsTransformation, path);
+            if ((uuids && RSArrayGetCount(uuids))) {
+                RSArrayApplyBlock(uuids, RSMakeRange(0, RSArrayGetCount(uuids)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+                    RSArrayAddObject(results, RSDictionaryGetValue(RSDictionaryGetValue(cache, __RSHTTPCookieStorageUUID), value));
+                });
+            }
+        });
+    }
+    RSRelease(paths);
+    RSRelease(domains);
+    return results;
+}
+
 static RSStringRef __RSHTTPCookieStorageFindCookieInCache(RSDictionaryRef cache, RSHTTPCookieRef cookie) {
     /*
-        ----cache(dict)
-        |
-        |----Transformation(array)
-        |            |
-        |            |----Host Names, Paths (UUIDs)
-        |
-        |
-        |----UUID----Cookie
+     ----cache(dict)
+     |
+     |----Transformation(array)
+     |            |
+     |            |----Host Names, Paths (UUIDs)
+     |
+     |
+     |----UUID----Cookie
      */
     RSDictionaryRef transformation = RSDictionaryGetValue(cache, __RSHTTPCookieStorageTransformation);
     if (!transformation) {
@@ -351,9 +430,46 @@ static RSStringRef __RSHTTPCookieStorageUpdateCookieTransformationAndUUID(RSHTTP
     return uuidString;
 }
 
+static RSStringRef __RSHTTPCookieStorageCreateDomainWithHostName(RSStringRef hostName) {
+    if (!hostName) return nil;
+    RS_CONST_STRING_DECL(__RSHTTPCookieDomainSegmentation, ".")
+    RSStringRef domain = nil;
+    RSIndex numberOfResult = 0;
+    RSRange *results = RSStringFindAll(hostName, __RSHTTPCookieDomainSegmentation, &numberOfResult);
+    if (results && numberOfResult > 1) {
+        domain = RSStringCreateWithSubstring(RSAllocatorSystemDefault, hostName, RSMakeRange(results[0].location + results[0].length, RSStringGetLength(hostName) - results[0].location - results[0].length));
+        RSAllocatorDeallocate(RSAllocatorSystemDefault, results);
+    }
+    return domain;
+}
+
+
+RSExport RSArrayRef RSHTTPCookieStorageCopyCookiesForURL(RSHTTPCookieStorageRef storage, RSURLRef URL) {
+    if (!storage || !URL) return nil;
+    __RSGenericValidInstance(storage, _RSHTTPCookieStorageTypeID);
+    __block RSArrayRef cookies = nil;
+    RSSyncUpdateBlock(&storage->_lock, ^{
+        RS_CONST_STRING_DECL(__RSHTTPCookieRootPath, "/");
+        RSStringRef host = RSURLCopyHostName(URL);
+        RSStringRef path = RSURLCopyPath(URL);
+        if (RSEqual(path, RSStringGetEmptyString())) {
+            RSRelease(path);
+            path = __RSHTTPCookieRootPath;
+        }
+        RSStringRef domain = __RSHTTPCookieStorageCreateDomainWithHostName(host);
+        RSRelease(host);
+        cookies = __RSHTTPCookieStorageCopyCookiesForURLDomainAndPath(storage->_cache, URL, domain, path);
+        RSRelease(domain);
+        RSRelease(path);
+    });
+    return cookies;
+}
+
 RSExport void RSHTTPCookieStorageSetCookie(RSHTTPCookieStorageRef storage, RSHTTPCookieRef cookie) {
     if (!storage || !cookie) return;
     __RSGenericValidInstance(storage, _RSHTTPCookieStorageTypeID);
+//    if (RSAbsoluteTimeGetCurrent() > RSDateGetAbsoluteTime(RSHTTPCookieGetExpiresDate(cookie)) + RSHTTPCookieGetMaximumAge(cookie))
+//        return;
     RSSyncUpdateBlock(&storage->_lock, ^{
         __RSHTTPCookieStorageUpdateCookieInCache(storage->_cache, cookie, NO);
     });
@@ -367,12 +483,28 @@ RSExport void RSHTTPCookieStorageRemoveCookie(RSHTTPCookieStorageRef storage, RS
     });
 }
 
-RSExport RSArrayRef RSHTTPCookieStorageGetCookies(RSHTTPCookieStorageRef storage) {
+RSExport void RSHTTPCookieStorageRemoveCookiesFromArray(RSHTTPCookieStorageRef storage, RSArrayRef cookies) {
+    if (!storage || !cookies) return;
+    __RSGenericValidInstance(storage, _RSHTTPCookieStorageTypeID);
+    RSArrayApplyBlock(cookies, RSMakeRange(0, RSArrayGetCount(cookies)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+        if (RSGetTypeID(value) == RSHTTPCookieGetTypeID())
+            RSHTTPCookieStorageRemoveCookie(storage, value);
+    });
+}
+RSExport void RSHTTPCookieStorageRemoveAllCookies(RSHTTPCookieStorageRef storage) {
+    if (!storage) return;
+    __RSGenericValidInstance(storage, _RSHTTPCookieStorageTypeID);
+    RSArrayRef cookies = RSHTTPCookieStorageCopyCookies(storage);
+    RSHTTPCookieStorageRemoveCookiesFromArray(storage, cookies);
+    RSRelease(cookies);
+}
+
+RSExport RSArrayRef RSHTTPCookieStorageCopyCookies(RSHTTPCookieStorageRef storage) {
     if (!storage) return nil;
     __RSGenericValidInstance(storage, _RSHTTPCookieStorageTypeID);
     __block RSArrayRef cookies = nil;
     RSSyncUpdateBlock(&storage->_lock, ^{
         cookies = __RSHTTPCookieStorageCopyCookies(storage);
     });
-    return RSAutorelease(cookies);
+    return (cookies);
 }

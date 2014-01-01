@@ -18,13 +18,17 @@ RS_EXTERN_C_BEGIN
 
 typedef struct __RSHTTPCookieStorage *RSHTTPCookieStorageRef;
 
-RSExport RSTypeID RSHTTPCookieStorageGetTypeID();
+RSExport RSTypeID RSHTTPCookieStorageGetTypeID() RS_AVAILABLE(0_4);
 
-RSExport RSHTTPCookieStorageRef RSHTTPCookieStorageGetSharedStorage();
+RSExport RSHTTPCookieStorageRef RSHTTPCookieStorageGetSharedStorage() RS_AVAILABLE(0_4);
 
-RSExport void RSHTTPCookieStorageSetCookie(RSHTTPCookieStorageRef storage, RSHTTPCookieRef cookie);
-RSExport void RSHTTPCookieStorageRemoveCookie(RSHTTPCookieStorageRef storage, RSHTTPCookieRef cookie);
+RSExport RSArrayRef RSHTTPCookieStorageCopyCookiesForURL(RSHTTPCookieStorageRef storage, RSURLRef URL) RS_AVAILABLE(0_4);
+RSExport void RSHTTPCookieStorageSetCookie(RSHTTPCookieStorageRef storage, RSHTTPCookieRef cookie) RS_AVAILABLE(0_4);
+RSExport void RSHTTPCookieStorageRemoveCookie(RSHTTPCookieStorageRef storage, RSHTTPCookieRef cookie) RS_AVAILABLE(0_4);
 
-RSExport RSArrayRef RSHTTPCookieStorageGetCookies(RSHTTPCookieStorageRef storage);
+RSExport void RSHTTPCookieStorageRemoveCookiesFromArray(RSHTTPCookieStorageRef stroage, RSArrayRef cookies) RS_AVAILABLE(0_4);
+RSExport void RSHTTPCookieStorageRemoveAllCookies(RSHTTPCookieStorageRef stroage) RS_AVAILABLE(0_4);
+
+RSExport RSArrayRef RSHTTPCookieStorageCopyCookies(RSHTTPCookieStorageRef storage) RS_AVAILABLE(0_4);
 RS_EXTERN_C_END
 #endif 

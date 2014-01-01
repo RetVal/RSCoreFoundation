@@ -7,6 +7,14 @@
 //
 
 #include <RSCoreFoundation/RSNumber+Extension.h>
+RSExport RSNumberRef RSNumberWithChar(char value) {
+    return RSAutorelease(RSNumberCreateChar(RSAllocatorSystemDefault, value));
+}
+
+RSExport RSNumberRef RSNumberWithUnsignedChar(unsigned char value) {
+    return RSAutorelease(RSNumberCreateUnsignedChar(RSAllocatorSystemDefault, value));
+}
+
 RSExport RSNumberRef RSNumberWithShort(short value)
 {
     return RSAutorelease(RSNumberCreateShort(RSAllocatorSystemDefault, value));
@@ -89,3 +97,14 @@ RSExport RSNumberRef RSNumberWithRSFloat(RSFloat value)
     return RSAutorelease(RSNumberCreateRSFloat(RSAllocatorSystemDefault, value));
 }
 
+RSExport RSNumberRef RSNumberWithRange(RSRange value) {
+    return RSAutorelease(RSNumberCreateRange(RSAllocatorSystemDefault, value));
+}
+
+RSExport RSNumberRef RSNumberWithPointer(void *value) {
+    return RSAutorelease(RSNumberCreatePointer(RSAllocatorSystemDefault, value));
+}
+
+RSExport RSNumberRef RSNumberWithString(RSStringRef value) {
+    return RSAutorelease(RSNumberCreateString(RSAllocatorSystemDefault, value));
+}

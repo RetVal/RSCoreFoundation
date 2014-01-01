@@ -81,6 +81,7 @@ static void __RSURLRequestClassDeallocate(RSTypeRef rs)
     if (urlRequest->_url) RSRelease(urlRequest->_url);
     if (urlRequest->_headerFields) RSRelease(urlRequest->_headerFields);
     if (urlRequest->_HTTPBody) RSRelease(urlRequest->_HTTPBody);
+    if (urlRequest->_HTTPMethod) RSRelease(urlRequest->_HTTPMethod);
 }
 
 static BOOL __RSURLRequestClassEqual(RSTypeRef rs1, RSTypeRef rs2)

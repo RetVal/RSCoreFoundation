@@ -44,6 +44,7 @@
 #include <RSCoreFoundation/RSPropertyList.h>
 #include <RSCoreFoundation/RSQueue.h>
 #include <RSCoreFoundation/RSRunLoop.h>
+#include <RSCoreFoundation/RSRegularExpression.h>
 #include <RSCoreFoundation/RSSet.h>
 #include <RSCoreFoundation/RSSocket.h>
 #include <RSCoreFoundation/RSString.h>
@@ -68,3 +69,4 @@
 #include <RSCoreFoundation/RSString+Extension.h>
 
 #include <RSCoreFoundation/RSProcessInfo.h>
+RSExport void RSCoreFoundationCrash();

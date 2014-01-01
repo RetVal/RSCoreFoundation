@@ -31,7 +31,7 @@ RSExport RSStringRef RSStringConvert(RSStringRef aString, RSStringEncoding encod
 RSExport RSStringRef RSStringCreateWithData(RSAllocatorRef allocator, RSDataRef data, RSStringEncoding encoding) RS_AVAILABLE(0_3);
 RSExport RSStringRef RSStringWithData(RSDataRef data, RSStringEncoding encoding) RS_AVAILABLE(0_3);
 
-RSExport RSStringRef RSStringCreateWithContentOfPath(RSAllocatorRef allocator, RSStringRef path) RS_AVAILABLE(0_3);
+RSExport RSStringRef RSStringCreateWithContentOfPath(RSAllocatorRef allocator, RSStringRef path, RSStringEncoding encoding, __autorelease RSErrorRef *error) RS_AVAILABLE(0_4);
 RSExport RSStringRef RSStringWithContentOfPath(RSStringRef path) RS_AVAILABLE(0_3);
 
 RSExport BOOL RSStringWriteToFile(RSStringRef string, RSStringRef path, RSWriteFileMode mode) RS_AVAILABLE(0_3);

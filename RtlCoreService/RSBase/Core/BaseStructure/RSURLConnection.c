@@ -160,6 +160,21 @@ RSInline void *__RSURLConnectionCoreSetupChunk(RSURLConnectionRef connection, vo
     return org;
 }
 
+
+static void __RSURLConnectionCoreSetupPostBehaviorIfNecessary(RSURLConnectionRef connection, RSURLRequestRef request) {
+    if (!connection || !request || NO == RSEqual(RSSTR("POST"), RSURLRequestGetHTTPMethod(request))) return;
+    void *core = __RSURLConnectionCoreGet(connection);
+    curl_easy_setopt(core, CURLOPT_POST, 1);
+    curl_easy_setopt(core, CURLOPT_POSTFIELDS, RSStringGetUTF8String(RSStringWithData(RSURLRequestGetHTTPBody(request), RSStringEncodingUTF8)));
+    
+    RSStringRef sizeStr = RSDictionaryGetValue(RSURLRequestGetHeaderField(request), __RSHTTPMessageContentLengthHeader);
+    if (sizeStr) {
+        RSDictionaryRemoveValue((RSMutableDictionaryRef)RSURLRequestGetHeaderField(request), __RSHTTPMessageContentLengthHeader);
+        size_t size = RSStringLongValue(sizeStr);
+        curl_easy_setopt(core, CURLOPT_POSTFIELDSIZE, size);
+    }
+}
+
 RSInline void __RSURLConnectionCoreSetupHTTPHeaderFieldIfNecessary(RSURLConnectionRef connection, RSDictionaryRef headerField)
 {
     if (!headerField) return;
@@ -177,7 +192,7 @@ RSInline void __RSURLConnectionCoreSetupHTTPHeaderFieldIfNecessary(RSURLConnecti
         for (RSUInteger idx = 0; idx < cnt; idx++) {
             RSStringRef mutableString = RSStringCreateWithFormat(RSAllocatorDefault, format, RSArrayObjectAtIndex(keys, idx), RSArrayObjectAtIndex(values, idx));
             const char *item = RSStringCopyUTF8String(mutableString);
-            __RSLog(RSLogLevelNotice, RSSTR("%s"), item);
+//            __RSLog(RSLogLevelNotice, RSSTR("%s"), item);
             chunk = curl_slist_append(chunk, item);
             RSAllocatorDeallocate(RSAllocatorSystemDefault, item);
             RSRelease(mutableString);
@@ -191,18 +206,22 @@ RSInline void __RSURLConnectionCoreSetupHTTPHeaderFieldIfNecessary(RSURLConnecti
     });
 }
 
-static void __RSURLConnectionCoreSetupPostBehaviorIfNecessary(RSURLConnectionRef connection, RSURLRequestRef request) {
-    if (!connection || !request || NO == RSEqual(RSSTR("POST"), RSURLRequestGetHTTPMethod(request))) return;
-    void *core = __RSURLConnectionCoreGet(connection);
-    curl_easy_setopt(core, CURLOPT_POST, 1);
-    curl_easy_setopt(core, CURLOPT_POSTFIELDS, RSStringGetUTF8String(RSStringWithData(RSURLRequestGetHTTPBody(request), RSStringEncodingUTF8)));
-    
-    RSStringRef sizeStr = RSDictionaryGetValue(RSURLRequestGetHeaderField(request), __RSHTTPMessageContentLengthHeader);
-    if (sizeStr) {
-        RSDictionaryRemoveValue((RSMutableDictionaryRef)RSURLRequestGetHeaderField(request), __RSHTTPMessageContentLengthHeader);
-        size_t size = RSStringLongValue(sizeStr);
-        curl_easy_setopt(core, CURLOPT_POSTFIELDSIZE, size);
+static void __RSURLConnectionCoreSetupCookieIfNecessary(RSURLConnectionRef connection, RSURLRequestRef request) {
+    RSHTTPCookieStorageRef storage = RSHTTPCookieStorageGetSharedStorage();
+    RSArrayRef cookies = RSHTTPCookieStorageCopyCookiesForURL(storage, RSURLRequestGetURL(request));
+    if (!cookies) return;
+    if (!RSArrayGetCount(cookies)) {
+        RSRelease(cookies);
+        return;
     }
+    RSMutableStringRef cookieInfo = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
+    RSArrayApplyBlock(cookies, RSMakeRange(0, RSArrayGetCount(cookies)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+        RSHTTPCookieRef cookie = (RSHTTPCookieRef)value;
+        RSStringAppendStringWithFormat(cookieInfo, RSSTR("%r=%r; "), RSHTTPCookieGetName(cookie), RSHTTPCookieGetValue(cookie));
+    });
+    curl_easy_setopt(__RSURLConnectionCoreGet(connection), CURLOPT_COOKIE, RSStringGetUTF8String(cookieInfo));
+    RSRelease(cookies);
+    RSRelease(cookieInfo);
 }
 
 static void __RSURLConnectionCoreUpdateCurrentURLRequest(RSURLConnectionRef connection) {
@@ -280,12 +299,9 @@ static void __RSURLConnectionCoreSetupDefault(RSURLConnectionRef connection, con
     assert(core);
     curl_easy_setopt(core, CURLOPT_HEADER, 0);
     curl_easy_setopt(core, CURLOPT_USERAGENT, userAgent ? : __RSURLConnectionDefaultUserAgent);
-    curl_easy_setopt(core, CURLOPT_ACCEPT_ENCODING, "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+//    curl_easy_setopt(core, CURLOPT_ACCEPT_ENCODING, "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
     
     RSMutableDictionaryRef header = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
-    RSDictionarySetValue(header, RSSTR("DNT"), RSNumberWithInt(1));
-    RSDictionarySetValue(header, RSSTR("Cache-Control"), RSSTR("max-age=0"));
-    
     __RSURLConnectionCoreSetupHTTPHeaderFieldIfNecessary(connection, header);
     RSRelease(header);
 }
@@ -307,9 +323,12 @@ static RSURLConnectionRef __RSURLConnectionSetupWithURLRequest(RSURLConnectionRe
         __RSURLConnectionCoreSetupURL(__RSURLConnectionCoreGet(connection), c_url);
         RSAllocatorDeallocate(RSAllocatorSystemDefault, c_url);
     }
+    if (RSEqual(RSDictionaryGetValue(RSURLRequestGetHeaderField(request), RSSTR("debug")), RSBooleanTrue))
+        curl_easy_setopt(__RSURLConnectionCoreGet(connection), CURLOPT_VERBOSE, 1);
     __RSURLConnectionCoreSetupDefault(connection, nil);
     __RSURLConnectionCoreSetupPostBehaviorIfNecessary(connection, request);
     __RSURLConnectionCoreSetupHTTPHeaderFieldIfNecessary(connection, RSURLRequestGetHeaderField(request));
+    __RSURLConnectionCoreSetupCookieIfNecessary(connection, request);
     
     return connection;
 }
@@ -321,6 +340,56 @@ static void __RSURLConnectionFinishPerform(RSURLConnectionRef connection) {
         }
     }
     
+}
+
+
+#include <RSCoreFoundation/RSHTTPCookie.h>
+#include "RSPrivate/libcurl/lib/cookie.h"
+#include "RSPrivate/libcurl/lib/share.h"
+
+static RSArrayRef __RSURLConnectionWalkThroughCoreCookies(struct SessionHandle *data, RSDictionaryRef (^block)(struct Cookie *cookie)){
+    RSMutableArrayRef cookies = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
+    Curl_share_lock(data, CURL_LOCK_DATA_COOKIE, CURL_LOCK_ACCESS_SINGLE);
+    
+    if (data && data->cookies && data->cookies->numcookies) {
+        struct Cookie *cookie = data->cookies->cookies;
+        while (cookie) {
+            RSDictionaryRef properties = block(cookie);
+            if (properties) {
+                RSArrayAddObject(cookies, properties);
+                RSRelease(properties);
+            }
+            cookie = cookie->next;
+        }
+    }
+    Curl_share_unlock(data, CURL_LOCK_DATA_COOKIE);
+    return RSAutorelease(cookies);
+}
+
+static RSArrayRef __RSHTTPCookiesFromCurl(CURL *curl) {
+    return __RSURLConnectionWalkThroughCoreCookies(curl, ^RSDictionaryRef(struct Cookie *cookie) {
+        RSMutableDictionaryRef properties = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
+        RSDictionarySetValue(properties, RSHTTPCookieName, RSStringWithUTF8String(cookie->name));
+        RSDictionarySetValue(properties, RSHTTPCookieValue, RSStringWithUTF8String(cookie->value));
+        RSDictionarySetValue(properties, RSHTTPCookieDomain, RSStringWithUTF8String(cookie->domain));
+        RSDictionarySetValue(properties, RSHTTPCookiePath, RSStringWithUTF8String(cookie->path));
+        if (cookie->expires) RSDictionarySetValue(properties, RSHTTPCookieExpires, RSAutorelease(RSDateCreate(RSAllocatorSystemDefault, cookie->expires - RSAbsoluteTimeIntervalSince1970)));
+        RSDictionarySetValue(properties, RSHTTPCookieVersion, cookie->version ? RSStringWithUTF8String(cookie->version) : RSSTR("0"));
+        if (cookie->maxage) RSDictionarySetValue(properties, RSHTTPCookieMaximumAge, RSStringWithUTF8String(cookie->maxage));
+        RSDictionarySetValue(properties, RSHTTPCookieSecure, cookie->secure ? RSSTR("YES") : RSSTR("NO"));
+        RSDictionarySetValue(properties, RSSTR("HTTPOnly"), cookie->httponly ? RSSTR("YES") : RSSTR("NO"));
+        return properties;
+    });
+}
+
+static RSArrayRef __RSHTTPCookiesCreateWithProperties(RSArrayRef properties) {
+    RSMutableArrayRef cookies = RSArrayCreateMutable(RSAllocatorSystemDefault, RSArrayGetCount(properties));
+    RSArrayApplyBlock(properties, RSMakeRange(0, RSArrayGetCount(properties)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+        RSHTTPCookieRef cookie = RSHTTPCookieCreate(RSAllocatorSystemDefault, value);
+        RSArrayAddObject(cookies, cookie);
+        RSRelease(cookie);
+    });
+    return cookies;
 }
 
 static RSURLConnectionRef __RSURLConnectionCorePerform(RSURLConnectionRef connection)
@@ -337,6 +406,15 @@ static RSURLConnectionRef __RSURLConnectionCorePerform(RSURLConnectionRef connec
         __RSURLConnectionDidFailWithError(connection, RSErrorWithDomainCodeAndUserInfo(__RSURLConnectionErrorDomain, retCode, nil));
     }
     else {
+        
+        RSAutoreleaseBlock(^{
+            RSArrayRef cookies = RSAutorelease(__RSHTTPCookiesCreateWithProperties(__RSHTTPCookiesFromCurl(__RSURLConnectionCoreGet(connection))));
+            RSHTTPCookieStorageRef storage = RSHTTPCookieStorageGetSharedStorage();
+            RSArrayApplyBlock(cookies, RSMakeRange(0, RSArrayGetCount(cookies)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+                RSHTTPCookieRef cookie = value;
+                RSHTTPCookieStorageSetCookie(storage, cookie);
+            });
+        });
         __RSURLConnectionDidFinishLoading(connection);
     }
     return connection;
@@ -436,7 +514,8 @@ static void __RSURLConnectionLoaderMain(void *context) {
     pthread_setname_np("com.retval.RSURLConnectionLoaderMain");
     __RSURLConnectionRunLoop = RSRunLoopGetCurrent();
     RSRunLoopPerformBlock(RSRunLoopGetCurrent(), RSRunLoopDefaultMode, ^{
-        // do nothing;
+        if (NO == RSSpinLockTry(&__RSURLConnectionRunLoopSpinLock))
+            RSSpinLockUnlock(&__RSURLConnectionRunLoopSpinLock);
     });
     RSRunLoopSourceContext ctx;
     ctx.version = 0;
@@ -451,10 +530,8 @@ static void __RSURLConnectionLoaderMain(void *context) {
     RSRunLoopSourceRef source = RSRunLoopSourceCreate(RSAllocatorSystemDefault, 0, &ctx);
     RSRunLoopAddSource(__RSURLConnectionRunLoop, source, RSRunLoopDefaultMode);
     RSRelease(source);
-    if (NO == RSSpinLockTry(&__RSURLConnectionRunLoopSpinLock))
-        RSSpinLockUnlock(&__RSURLConnectionRunLoopSpinLock);
     RSUInteger result __unused = RSRunLoopRunInMode(RSRunLoopDefaultMode, 1.0e10, NO);
-    RSShow(RSSTR("__RSURLConnectionRunLoop return"));
+    __RSCLog(RSLogLevelNotice, "__RSURLConnectionRunLoop return\n");
 }
 
 
@@ -559,9 +636,9 @@ static void __RSURLConnectionWillStartConnection(RSURLConnectionRef connection, 
 
 static void __RSURLConnectionDidReceiveResponse(RSURLConnectionRef connection, RSURLResponseRef response) {
     __RSURLConnectionInvokeReceiveResponse(connection, connection->_response);
-    RSUInteger errorCode = RSURLResponseGetStatusCode(response);
-    RSShow(response);
-    if (errorCode == 200) return;
+//    RSUInteger errorCode = RSURLResponseGetStatusCode(response);
+//    RSShow(response);
+//    if (errorCode == 200) return;
 }
 
 static void __RSURLConnectionDidReceiveData(RSURLConnectionRef connection, RSDataRef data) {
@@ -570,12 +647,11 @@ static void __RSURLConnectionDidReceiveData(RSURLConnectionRef connection, RSDat
 }
 
 static void __RSURLConnectionDidSendBodyData(RSURLConnectionRef connection, RSDataRef data, RSUInteger totalBytesWritten, RSUInteger totalBytesExpectedToWrite) {
-    RSShow(RSSTR("send body data"));
     __RSURLConnectionInvokeSendData(connection, data, totalBytesWritten, totalBytesExpectedToWrite);
 }
 
 static void __RSURLConnectionDidFinishLoading(RSURLConnectionRef connection) {
-    RSShow(RSAutorelease(RSURLCopyHostName(RSURLRequestGetURL(RSURLConnectionGetCurrentRequest(connection)))));
+//    RSShow(RSAutorelease(RSURLCopyHostName(RSURLRequestGetURL(RSURLConnectionGetCurrentRequest(connection)))));
     __RSURLConnectionInvokeFinishLoading(connection);
 }
 
@@ -618,18 +694,12 @@ static const struct RSURLConnectionDelegate __RSURLConnectionImpDelegate = {
     __RSURLConnectionDidFailWithError
 };
 
-#include "RSHTTPCookie.h"
-
 RSExport RSDataRef RSURLConnectionSendSynchronousRequest(RSURLRequestRef request, __autorelease RSURLResponseRef *response, __autorelease RSErrorRef *error) {
     RSMutableDataRef data = RSDataCreateMutable(RSAllocatorSystemDefault, 0);
     struct __RSURLConnectionPrivateDelegateContext context = {data, error ? *error : nil};
     RSURLConnectionRef connection = RSURLConnectionCreate(RSAllocatorDefault, request, &context, &__RSURLConnectionPrivateDelegate);
     __RSURLConnectionWillStartConnection(connection, RSURLConnectionGetCurrentRequest(connection), nil);
     __RSURLConnectionCorePerform(connection);
-    RSArrayRef cookies = RSCookiesWithCore(__RSURLConnectionCoreGet(connection));
-    RSShow(cookies);
-    
-//    RSDataRef data = RSAutorelease(RSRetain(connection->_data));
     if (response && connection->_response) *response = RSAutorelease(RSRetain(connection->_response));
     if (error && context.error) *error = context.error; // error is already autoreleased
     RSRelease(connection);
@@ -687,5 +757,7 @@ RSExport void RSURLConnectionSendAsynchronousRequest(RSURLRequestRef request, RS
         ctx->completeHandler = Block_copy(completeHandler);
         dispatch_async_f(__RSRunLoopGetQueue(rl), ctx, __RSURLConnectionQueueCallout);
     });
-    if (RSRunLoopIsWaiting(__RSURLConnectionRunLoop)) RSRunLoopWakeUp(__RSURLConnectionRunLoop);
+
+    if (RSRunLoopIsWaiting(__RSURLConnectionRunLoop))
+        RSRunLoopWakeUp(__RSURLConnectionRunLoop);
 }

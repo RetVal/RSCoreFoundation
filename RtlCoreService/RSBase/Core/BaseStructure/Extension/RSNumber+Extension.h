@@ -13,6 +13,8 @@
 
 RS_EXTERN_C_BEGIN
 
+RSExport RSNumberRef RSNumberWithChar(char value) RS_AVAILABLE(0_4);
+RSExport RSNumberRef RSNumberWithUnsignedChar(unsigned char value) RS_AVAILABLE(0_4);
 RSExport RSNumberRef RSNumberWithShort(short value) RS_AVAILABLE(0_3);
 RSExport RSNumberRef RSNumberWithUnsignedShort(unsigned short value) RS_AVAILABLE(0_3);
 RSExport RSNumberRef RSNumberWithInt(int value) RS_AVAILABLE(0_3);
@@ -27,6 +29,9 @@ RSExport RSNumberRef RSNumberWithUnsignedInteger(RSUInteger value) RS_AVAILABLE(
 RSExport RSNumberRef RSNumberWithLonglong(long long value) RS_AVAILABLE(0_3);
 RSExport RSNumberRef RSNumberWithUnsignedLonglong(unsigned long long value) RS_AVAILABLE(0_3);
 RSExport RSNumberRef RSNumberWithRSFloat(RSFloat value) RS_AVAILABLE(0_3);
+RSExport RSNumberRef RSNumberWithRange(RSRange value) RS_AVAILABLE(0_4);
+RSExport RSNumberRef RSNumberWithPointer(void *value) RS_AVAILABLE(0_4);
+RSExport RSNumberRef RSNumberWithString(RSStringRef value) RS_AVAILABLE(0_4);
 
 RS_EXTERN_C_END
 #endif

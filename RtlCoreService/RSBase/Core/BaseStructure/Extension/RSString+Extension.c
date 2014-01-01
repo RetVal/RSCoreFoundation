@@ -97,11 +97,10 @@ RSExport RSStringRef RSStringWithData(RSDataRef data, RSStringEncoding encoding)
 
 RSExport RSStringRef RSStringWithContentOfPath(RSStringRef path)
 {
-    return RSAutorelease(RSStringCreateWithContentOfPath(RSAllocatorSystemDefault, path));
+    return RSAutorelease(RSStringCreateWithContentOfPath(RSAllocatorSystemDefault, path, RSStringEncodingUTF8, nil));
 }
 
-RSExport RSStringRef RSStringCreateWithContentOfPath(RSAllocatorRef allocator, RSStringRef path)
-{
+RSExport RSStringRef RSStringCreateWithContentOfPath(RSAllocatorRef allocator, RSStringRef path, RSStringEncoding encoding, __autorelease RSErrorRef *error) {
     RSDataRef data = RSDataCreateWithContentOfPath(allocator, path);
     if (data) {
         RSStringRef string = RSStringCreateWithData(allocator, data, RSStringEncodingUTF8);
@@ -145,5 +144,5 @@ RSExport RSStringRef RSStringByReplacingOccurrencesOfString(RSStringRef string, 
     RSMutableStringRef copy = RSMutableCopy(RSAllocatorSystemDefault, string);
     newString = RSCopy(RSAllocatorSystemDefault, RSStringReplace(copy, range, replacement));
     RSRelease(copy);
-    return newString;
+    return RSAutorelease(newString);
 }

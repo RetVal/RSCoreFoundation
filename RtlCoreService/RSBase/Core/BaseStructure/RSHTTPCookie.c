@@ -11,9 +11,6 @@
 #include <RSCoreFoundation/RSRuntime.h>
 #include <RSCoreFoundation/RSArchiver.h>
 
-#include "RSPrivate/libcurl/lib/share.h"
-#include "RSPrivate/libcurl/lib/cookie.h"
-
 RS_PUBLIC_CONST_STRING_DECL(RSHTTPCookieName, "name");
 RS_PUBLIC_CONST_STRING_DECL(RSHTTPCookieValue, "value");
 RS_PUBLIC_CONST_STRING_DECL(RSHTTPCookieOriginURL, "origin-url");
@@ -27,55 +24,6 @@ RS_PUBLIC_CONST_STRING_DECL(RSHTTPCookieCommentURL, "comment-url");
 RS_PUBLIC_CONST_STRING_DECL(RSHTTPCookieDiscard, "discard");
 RS_PUBLIC_CONST_STRING_DECL(RSHTTPCookieMaximumAge, "maximum-age");
 RS_PUBLIC_CONST_STRING_DECL(RSHTTPCookiePort, "port");
-
-static RSArrayRef walkThroughCurlCookies(struct SessionHandle *data, RSDictionaryRef (^block)(struct Cookie *cookie)){
-    RSMutableArrayRef cookies = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
-    Curl_share_lock(data, CURL_LOCK_DATA_COOKIE, CURL_LOCK_ACCESS_SINGLE);
-    
-    if (data && data->cookies && data->cookies->numcookies) {
-        struct Cookie *cookie = data->cookies->cookies;
-        while (cookie) {
-            RSDictionaryRef properties = block(cookie);
-            if (properties) {
-                RSArrayAddObject(cookies, properties);
-                RSRelease(properties);
-            }
-            cookie = cookie->next;
-        }
-    }
-    Curl_share_unlock(data, CURL_LOCK_DATA_COOKIE);
-    return RSAutorelease(cookies);
-}
-
-static RSArrayRef cookiesFromCurl(CURL *curl) {
-    return walkThroughCurlCookies(curl, ^RSDictionaryRef(struct Cookie *cookie) {
-        RSMutableDictionaryRef properties = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
-        RSDictionarySetValue(properties, RSHTTPCookieName, RSStringWithUTF8String(cookie->name));
-        RSDictionarySetValue(properties, RSHTTPCookieValue, RSStringWithUTF8String(cookie->value));
-        RSDictionarySetValue(properties, RSHTTPCookieDomain, RSStringWithUTF8String(cookie->domain));
-        RSDictionarySetValue(properties, RSHTTPCookiePath, RSStringWithUTF8String(cookie->path));
-        RSDictionarySetValue(properties, RSHTTPCookieExpires, RSAutorelease(RSDateCreate(RSAllocatorSystemDefault, cookie->expires)));
-        RSDictionarySetValue(properties, RSHTTPCookieVersion, cookie->version ? RSStringWithUTF8String(cookie->version) : RSSTR("0"));
-        RSDictionarySetValue(properties, RSHTTPCookieMaximumAge, RSStringWithUTF8String(cookie->maxage));
-        RSDictionarySetValue(properties, RSHTTPCookieSecure, cookie->secure ? RSSTR("YES") : RSSTR("NO"));
-        RSDictionarySetValue(properties, RSSTR("HTTPOnly"), cookie->httponly ? RSSTR("YES") : RSSTR("NO"));
-        return properties;
-    });
-}
-
-static RSArrayRef RSCookiesCreateWithProperties(RSArrayRef properties) {
-    RSMutableArrayRef cookies = RSArrayCreateMutable(RSAllocatorSystemDefault, RSArrayGetCount(properties));
-    RSArrayApplyBlock(properties, RSMakeRange(0, RSArrayGetCount(properties)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
-        RSHTTPCookieRef cookie = RSHTTPCookieCreate(RSAllocatorSystemDefault, value);
-        RSArrayAddObject(cookies, cookie);
-        RSRelease(cookie);
-    });
-    return cookies;
-}
-
-RSExport RSArrayRef RSCookiesWithCore(void *core) {
-    return RSAutorelease(RSCookiesCreateWithProperties(cookiesFromCurl(core)));
-}
 
 struct __RSHTTPCookie
 {
@@ -138,14 +86,60 @@ static RSStringRef __RSHTTPCookieClassDescription(RSTypeRef rs)
             domainPtr = "";
         }
     }
-//    H_PS_PSSID=4382_1436_4414_4263; path=/; domain=.baidu.com
-    RSStringRef format0 = RSSTR("%r=%r; "), format1 = RSSTR("%r=%r");
+    
+    RS_CONST_STRING_DECL(format0, "%r=%r; ");
+    RS_CONST_STRING_DECL(format1, "%r=%r");
     RSStringRef format = format0;
     RSMutableStringRef buffer = nil;
-    RSArrayRef keys = RSDictionaryCopyAllKeys(cookie->_properties);
-    RSArrayRef values = RSDictionaryCopyAllValues(cookie->_properties);
+    RSMutableArrayRef keys = (RSMutableArrayRef)RSDictionaryCopyAllKeys(cookie->_properties);
+    RSMutableArrayRef values = (RSMutableArrayRef)RSDictionaryCopyAllValues(cookie->_properties);
     
-    RSUInteger cnt = RSDictionaryGetCount(cookie->_properties);
+    RS_CONST_STRING_DECL(HTTPOnly, "HTTPOnly");
+    RSIndex indexOfHTTPOnly = RSArrayIndexOfObject(keys, HTTPOnly);
+    if (indexOfHTTPOnly != RSNotFound) {
+        RSArrayRemoveObjectAtIndex(keys, indexOfHTTPOnly);
+        RSArrayRemoveObjectAtIndex(values, indexOfHTTPOnly);
+    }
+    RSIndex indexOfSecure = RSArrayIndexOfObject(keys, RSHTTPCookieSecure);
+    if (indexOfSecure != RSNotFound) {
+        RSArrayRemoveObjectAtIndex(keys, indexOfSecure);
+        RSArrayRemoveObjectAtIndex(values, indexOfSecure);
+    }
+    RSIndex indexOfName = RSArrayIndexOfObject(keys, RSHTTPCookieName);
+    RSIndex indexOfValue = RSArrayIndexOfObject(keys, RSHTTPCookieValue);
+    if (indexOfName != RSNotFound && indexOfValue != RSNotFound) {
+        RSStringRef name = RSRetain(RSArrayObjectAtIndex(values, indexOfName));
+        RSStringRef value = RSRetain(RSArrayObjectAtIndex(values, indexOfValue));
+        RSArrayRemoveObjectAtIndex(keys, indexOfName);
+        RSArrayRemoveObjectAtIndex(values, indexOfName);
+        RSArrayRemoveObjectAtIndex(keys, indexOfValue);
+        RSArrayRemoveObjectAtIndex(values, indexOfValue);
+        RSArrayAddObject(keys, name);
+        RSArrayAddObject(values, value);
+    }
+    
+    RSIndex indexOfExpireDate = RSArrayIndexOfObject(keys, RSHTTPCookieExpires);
+    if (indexOfExpireDate != RSNotFound) {
+        RSDateRef expireDate = RSArrayObjectAtIndex(values, indexOfExpireDate);
+        RSStringRef (^process)(RSDateRef date) = ^RSStringRef(RSDateRef date) {
+            static const char * const c_wkday[] __unused =
+            {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+            static const char * const c_weekday[] __unused =
+            { "Monday", "Tuesday", "Wednesday", "Thursday",
+                "Friday", "Saturday", "Sunday" };
+            static const char * const c_month[] __unused =
+            { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+            
+            RSTimeZoneRef timeZone = RSAutorelease(RSTimeZoneCreateWithName(RSAllocatorDefault, RSSTR("GMT")));
+            RSGregorianDate gregorianDate = RSAbsoluteTimeGetGregorianDate(RSDateGetAbsoluteTime(date), timeZone);
+            RSStringRef desc = RSStringWithFormat(RSSTR("%s, %02d-%s-%04d %2d:%2d:%02d %r"), c_wkday[RSDateGetDayOfWeek(date)], gregorianDate.day, c_month[gregorianDate.month - 1], gregorianDate.year, gregorianDate.hour, gregorianDate.minute, (RSUInteger)(gregorianDate.second), RSTimeZoneGetName(timeZone));
+            return desc;
+        };
+        RSArraySetObjectAtIndex((RSMutableArrayRef)values, indexOfExpireDate, process(expireDate));
+    }
+    
+    RSUInteger cnt = RSArrayGetCount(keys);
     if (cnt) {
         buffer = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
         for (RSUInteger idx = 0; idx < cnt - 1; idx++) {
@@ -217,7 +211,7 @@ RSPrivate void __RSHTTPCookieDeallocate()
 }
 
 static RSHTTPCookieRef __RSHTTPCookieCreateInstance(RSAllocatorRef allocator, RSDictionaryRef _properties) {
-    RSHTTPCookieRef instance = (RSHTTPCookieRef)__RSRuntimeCreateInstance(allocator, _RSHTTPCookieTypeID, sizeof(struct __RSHTTPCookie) - sizeof(RSRuntimeBase));
+    struct __RSHTTPCookie *instance = (struct __RSHTTPCookie *)__RSRuntimeCreateInstance(allocator, _RSHTTPCookieTypeID, sizeof(struct __RSHTTPCookie) - sizeof(RSRuntimeBase));
     if (_properties) {
         instance->_properties = RSRetain(_properties);
         RSTypeRef value = RSDictionaryGetValue(_properties, RSSTR("HTTPOnly"));
@@ -261,6 +255,12 @@ RSExport RSDateRef  RSHTTPCookieGetExpiresDate(RSHTTPCookieRef cookie) {
     RSDictionaryRef properties = RSHTTPCookieGetProperties(cookie);
     if (!properties) return nil;
     return RSDictionaryGetValue(properties, RSHTTPCookieExpires);
+}
+
+RSExport RSTimeInterval RSHTTPCookieGetMaximumAge(RSHTTPCookieRef cookie) {
+    RSDictionaryRef properties = RSHTTPCookieGetProperties(cookie);
+    if (!properties) return 0;
+    return RSStringFloatValue(RSDictionaryGetValue(properties, RSHTTPCookieMaximumAge));
 }
 
 RSExport BOOL RSHTTPCookieIsSessionOnly(RSHTTPCookieRef cookie) {
