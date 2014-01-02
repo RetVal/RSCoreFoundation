@@ -9,19 +9,19 @@
 #include "RSRegularExpression.h"
 
 #include <RSCoreFoundation/RSRuntime.h>
-#include <regex.h>
+#include "uregex.h"
 
+typedef void * RSRegularExpression;
 struct __RSRegularExpression
 {
     RSRuntimeBase _base;
-    regex_t _regex;
-    
+    RSRegularExpression _regex;
 };
 
 static void __RSRegularExpressionClassDeallocate(RSTypeRef rs)
 {
     struct __RSRegularExpression *expression = (struct __RSRegularExpression *)rs;
-    regfree(&expression->_regex);
+    if (expression->_regex) uregex_close(expression->_regex);
 }
 
 static RSStringRef __RSRegularExpressionClassDescription(RSTypeRef rs)
@@ -33,7 +33,7 @@ static RSStringRef __RSRegularExpressionClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSRegularExpressionClass =
 {
     _RSRuntimeScannedObject,
-    "RSRegularExpression.h",
+    "RSRegularExpression",
     nil,
     nil,
     __RSRegularExpressionClassDeallocate,
@@ -59,16 +59,29 @@ static void __RSRegularExpressionInitialize() {
 
 static RSRegularExpressionRef __RSRegularExpressionCreateInstance(RSAllocatorRef allocator, RSStringRef expression, int flag) {
     __RSRegularExpressionInitialize();
-    const char *ptr = RSStringCopyUTF8String(expression);
-    if (!ptr) return nil;
-    regex_t _regex;
-    if (0 == regcomp(&_regex, ptr, REG_EXTENDED)) {
-        struct __RSRegularExpression * instance = (struct __RSRegularExpression *)__RSRuntimeCreateInstance(allocator, _RSRegularExpressionTypeID, sizeof(struct __RSRegularExpression) - sizeof(RSRuntimeBase));
-        __builtin_memcpy(&instance->_regex, &_regex, sizeof(regex_t));
-        RSAllocatorDeallocate(RSAllocatorSystemDefault, ptr);
+    const UChar *ptr = RSStringGetCharactersPtr(expression);
+    BOOL needFree = NO;
+    if (!ptr) {
+        ptr = RSAllocatorAllocate(RSAllocatorSystemDefault, RSStringGetMaximumSizeForEncoding(RSStringGetLength(expression), RSStringEncodingUnicode));
+        if (!ptr) {
+            return nil;
+        }
+        UniChar *unichar = (UniChar *)ptr;
+        RSStringGetCharacters(expression, RSStringGetRange(expression), unichar);
+        needFree = YES;
+    }
+    
+    RSRegularExpression _regex = nil;
+    UParseError error = {0};
+    UErrorCode errorCode = 0;
+    _regex = uregex_open(ptr, -1, 0, &error, &errorCode);
+    if (errorCode == U_ZERO_ERROR && _regex != nil) {
+        struct __RSRegularExpression* instance = (struct __RSRegularExpression *)__RSRuntimeCreateInstance(allocator, _RSRegularExpressionTypeID, sizeof(struct __RSRegularExpression) - sizeof(RSRuntimeBase));
+        instance->_regex = _regex;
+        if (needFree) RSAllocatorDeallocate(RSAllocatorSystemDefault, ptr);
         return instance;
     }
-    RSAllocatorDeallocate(RSAllocatorSystemDefault, ptr);
+    if (needFree) RSAllocatorDeallocate(RSAllocatorSystemDefault, ptr);
     return nil;
 }
 
@@ -81,33 +94,34 @@ RSExport RSArrayRef RSRegularExpressionApplyOnString(RSRegularExpressionRef rege
     if (!regexExpression || !str) return nil;
     __RSGenericValidInstance(regexExpression, _RSRegularExpressionTypeID);
     if (!str) return nil;
-    const char *utf8 = nil;
-    RSIndex usedLength = 0, maxSize = RSStringGetMaximumSizeForEncoding(RSStringGetLength(str), RSStringEncodingUTF8);
-    if (maxSize) {
-        if ((utf8 = RSAllocatorAllocate(RSAllocatorSystemDefault, ++maxSize))) {
-            usedLength = RSStringGetCString(str, (char *)utf8, maxSize, RSStringEncodingUTF8) + 1; // add end flag
-            char *tmp = RSAllocatorAllocate(RSAllocatorSystemDefault, usedLength);
-            if (tmp) {
-                __builtin_memcpy(tmp, utf8, usedLength);
-                RSAllocatorDeallocate(RSAllocatorSystemDefault, utf8);
-                utf8 = tmp;
-            }
+    const UChar *ptr = RSStringGetCharactersPtr(str);
+    BOOL needFree = NO;
+    if (!ptr) {
+        ptr = RSAllocatorAllocate(RSAllocatorSystemDefault, RSStringGetMaximumSizeForEncoding(RSStringGetLength(str), RSStringEncodingUnicode));
+        if (!ptr) {
+            return nil;
         }
+        UniChar *unichar = (UniChar *)ptr;
+        RSStringGetCharacters(str, RSStringGetRange(str), unichar);
+        needFree = YES;
     }
-    if (!utf8) return nil;
     RSMutableArrayRef results = nil;
-    regmatch_t match = {0};
-    size_t nmatch = 1;
-    int result = regnexec(&regexExpression->_regex, utf8, usedLength, nmatch, &match, 1);
-    if (REG_NOMATCH == result) {
-        __RSCLog(RSLogLevelNotice, "regex expression no match!");
-    } else if (0 == result) {
-        for (RSUInteger offset = match.rm_so; result == 0 && offset < usedLength && match.rm_so != -1; result = regnexec(&regexExpression->_regex, utf8 + offset, usedLength - offset, nmatch, &match, 1)) {
-            RSShow(RSStringWithSubstring(str, RSMakeRange(offset, match.rm_eo - match.rm_so)));
-            offset += match.rm_eo - match.rm_so;
-        }
-    } else if (!result && error) {
+    UErrorCode errorCode = U_ZERO_ERROR;
+    uregex_setText(regexExpression->_regex, ptr, -1, &errorCode);
+    RSIndex offset = 0;
+    BOOL find = uregex_find64(regexExpression->_regex, offset, &errorCode);
+    if (find) {
+        results = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
     }
-    RSAllocatorDeallocate(RSAllocatorSystemDefault, utf8);
-    return results;
+    while (find) {
+        RSRange range = RSMakeRange(uregex_start64(regexExpression->_regex, 0, &errorCode), uregex_end64(regexExpression->_regex, 0, &errorCode));
+        range.length = range.length - range.location;
+        RSArrayAddObject(results, RSNumberWithRange(range));
+        find = uregex_findNext(regexExpression->_regex, &errorCode);
+    }
+    if (needFree) {
+        RSAllocatorDeallocate(RSAllocatorSystemDefault, ptr);
+        ptr = nil;
+    }
+    return RSAutorelease(results);
 }

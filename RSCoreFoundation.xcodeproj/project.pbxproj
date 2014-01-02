@@ -11,8 +11,10 @@
 		304B3851186C36F300806E4B /* RSRegularExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 304B384F186C36F300806E4B /* RSRegularExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3098391E1868818400398AC3 /* RSRawHashTable.c in Sources */ = {isa = PBXBuildFile; fileRef = 3098391C1868818400398AC3 /* RSRawHashTable.c */; };
 		3098391F1868818400398AC3 /* RSRawHashTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 3098391D1868818400398AC3 /* RSRawHashTable.h */; };
+		30D845901875164C004DEBE0 /* regex.h in Headers */ = {isa = PBXBuildFile; fileRef = 30D8458F1875164C004DEBE0 /* regex.h */; };
 		30F32B3A1860318300A45125 /* RSHTTPCookieStorage.c in Sources */ = {isa = PBXBuildFile; fileRef = 30F32B381860318300A45125 /* RSHTTPCookieStorage.c */; };
 		30F32B3B1860318300A45125 /* RSHTTPCookieStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F32B391860318300A45125 /* RSHTTPCookieStorage.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		30F9A85818752F27006EC81B /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 30F9A85718752F27006EC81B /* libicucore.dylib */; };
 		4101F34418447BBA0090C212 /* attribute.c in Sources */ = {isa = PBXBuildFile; fileRef = 4101F32B18447BBA0090C212 /* attribute.c */; };
 		4101F34518447BBA0090C212 /* attribute.h in Headers */ = {isa = PBXBuildFile; fileRef = 4101F32C18447BBA0090C212 /* attribute.h */; };
 		4101F34618447BBA0090C212 /* char_ref.c in Sources */ = {isa = PBXBuildFile; fileRef = 4101F32D18447BBA0090C212 /* char_ref.c */; };
@@ -301,7 +303,6 @@
 		4179CF99181F687B004B1334 /* RSURLRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 4179CF97181F687B004B1334 /* RSURLRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		417B2CC7182262240051BE6B /* RSCoreFoundationLoader.c in Sources */ = {isa = PBXBuildFile; fileRef = 417B2CC6182262240051BE6B /* RSCoreFoundationLoader.c */; };
 		417B2CC8182262A30051BE6B /* RSCoreFoundationLoader.c in Sources */ = {isa = PBXBuildFile; fileRef = 417B2CC6182262240051BE6B /* RSCoreFoundationLoader.c */; };
-		41813437168B394500B08722 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 41813436168B394500B08722 /* libicucore.dylib */; };
 		418246B016292A6400750E2A /* RSBaseMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 418246AF16292A6400750E2A /* RSBaseMacro.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		418246B316292BFE00750E2A /* RSErrorCode.h in Headers */ = {isa = PBXBuildFile; fileRef = 418246B216292BFE00750E2A /* RSErrorCode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		418AED421813BED60001694B /* RSURL.c in Sources */ = {isa = PBXBuildFile; fileRef = 418AED401813BED60001694B /* RSURL.c */; };
@@ -383,7 +384,6 @@
 		41C0DC4B182F14CC0022D5DC /* RSBag.c in Sources */ = {isa = PBXBuildFile; fileRef = 41C0DC49182F14CC0022D5DC /* RSBag.c */; };
 		41C0DC4C182F14CC0022D5DC /* RSBag.h in Headers */ = {isa = PBXBuildFile; fileRef = 41C0DC4A182F14CC0022D5DC /* RSBag.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		41C583E61776D42D00E037E4 /* RSCoreFoundation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4158D55A1625C4C60070E69F /* RSCoreFoundation.framework */; };
-		41D340321831E36300A9B93E /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41B0E3C6182F434000A5E00D /* CoreFoundation.framework */; };
 		41D49BE816797659002AB893 /* RSStringEncoding.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D49BE716797659002AB893 /* RSStringEncoding.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		41D919231652758E007568E9 /* RSInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D919221652758E007568E9 /* RSInternal.h */; };
 		41D9375D17A538AB004E5E0F /* RSUniChar.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D9375C17A538AB004E5E0F /* RSUniChar.h */; };
@@ -725,8 +725,12 @@
 		304B384F186C36F300806E4B /* RSRegularExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRegularExpression.h; sourceTree = "<group>"; };
 		3098391C1868818400398AC3 /* RSRawHashTable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRawHashTable.c; sourceTree = "<group>"; };
 		3098391D1868818400398AC3 /* RSRawHashTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRawHashTable.h; sourceTree = "<group>"; };
+		30D8458F1875164C004DEBE0 /* regex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = regex.h; sourceTree = "<group>"; };
 		30F32B381860318300A45125 /* RSHTTPCookieStorage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSHTTPCookieStorage.c; sourceTree = "<group>"; };
 		30F32B391860318300A45125 /* RSHTTPCookieStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSHTTPCookieStorage.h; sourceTree = "<group>"; };
+		30F9A85318752AB7006EC81B /* libicui18n.51.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicui18n.51.1.dylib; path = usr/lib/libicui18n.51.1.dylib; sourceTree = SDKROOT; };
+		30F9A85518752AEE006EC81B /* libicui18n.51.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicui18n.51.1.dylib; path = "../ICU-511.25/build/lib/libicui18n.51.1.dylib"; sourceTree = "<group>"; };
+		30F9A85718752F27006EC81B /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/usr/lib/libicucore.dylib; sourceTree = DEVELOPER_DIR; };
 		4101F32B18447BBA0090C212 /* attribute.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = attribute.c; sourceTree = "<group>"; };
 		4101F32C18447BBA0090C212 /* attribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = attribute.h; sourceTree = "<group>"; };
 		4101F32D18447BBA0090C212 /* char_ref.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = char_ref.c; sourceTree = "<group>"; };
@@ -1393,12 +1397,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				41D340321831E36300A9B93E /* CoreFoundation.framework in Frameworks */,
+				30F9A85818752F27006EC81B /* libicucore.dylib in Frameworks */,
 				4129250E1822BAE800F2D71B /* libcrypto.dylib in Frameworks */,
 				4129250C1822BAE200F2D71B /* libssl.dylib in Frameworks */,
 				4129250A1822BADE00F2D71B /* libldap.dylib in Frameworks */,
 				412925081822BACB00F2D71B /* libz.dylib in Frameworks */,
-				41813437168B394500B08722 /* libicucore.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1627,6 +1630,7 @@
 				4151C14417600E6500C9AC40 /* rbbi.h */,
 				4151C14517600E6500C9AC40 /* rbnf.h */,
 				4151C14617600E6500C9AC40 /* rbtz.h */,
+				30D8458F1875164C004DEBE0 /* regex.h */,
 				4151C14817600E6500C9AC40 /* rep.h */,
 				4151C14917600E6500C9AC40 /* resbund.h */,
 				4151C14A17600E6500C9AC40 /* schriter.h */,
@@ -1756,6 +1760,9 @@
 		4158D55C1625C4C60070E69F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				30F9A85718752F27006EC81B /* libicucore.dylib */,
+				30F9A85518752AEE006EC81B /* libicui18n.51.1.dylib */,
+				30F9A85318752AB7006EC81B /* libicui18n.51.1.dylib */,
 				41B0E3C8182FE1FA00A5E00D /* MobileDevice.framework */,
 				41B0E3C6182F434000A5E00D /* CoreFoundation.framework */,
 				4152FB48182DD659005ED016 /* libdispatch.dylib */,
@@ -2635,6 +2642,7 @@
 				41FE75F51822B9A600E5E581 /* ftp.h in Headers */,
 				41D919231652758E007568E9 /* RSInternal.h in Headers */,
 				41A6174E165B68FD008FC250 /* RSPacket.h in Headers */,
+				30D845901875164C004DEBE0 /* regex.h in Headers */,
 				413C15991670C165003EDEB6 /* RSErrorPrivate.h in Headers */,
 				41B080C91674491B00DA68DF /* RSBasicHash.h in Headers */,
 				41EEAABF16B98A68005D855D /* RSFileManagerEnumSupport.h in Headers */,
@@ -3709,10 +3717,11 @@
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Frameworks",
 					"$(SDKROOT)/usr/lib/system",
+					"/SourceCache/Library/ICU-511.25/build/lib",
 				);
 				PRODUCT_NAME = RSCoreFoundation;
 				SDKROOT = macosx10.9;
-				USER_HEADER_SEARCH_PATHS = "icu/**";
+				USER_HEADER_SEARCH_PATHS = "icu/** \"$(SRCROOT)/icu/common/\"/**";
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Debug;
@@ -3778,10 +3787,11 @@
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Frameworks",
 					"$(SDKROOT)/usr/lib/system",
+					"/SourceCache/Library/ICU-511.25/build/lib",
 				);
 				PRODUCT_NAME = RSCoreFoundation;
 				SDKROOT = macosx10.9;
-				USER_HEADER_SEARCH_PATHS = "icu/**";
+				USER_HEADER_SEARCH_PATHS = "icu/** \"$(SRCROOT)/icu/common/\"/**";
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Release;

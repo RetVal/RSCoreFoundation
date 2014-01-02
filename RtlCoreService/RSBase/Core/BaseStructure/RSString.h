@@ -44,8 +44,8 @@ RSExport RSStringRef RSStringCreateWithCString(RSAllocatorRef allocator, RSCBuff
 RSExport RSStringRef RSStringCreateWithCStringNoCopy(RSAllocatorRef alloc, const char *cStr, RSStringEncoding encoding, RSAllocatorRef contentsDeallocator) RS_AVAILABLE(0_0);
 RSExport RSStringRef RSStringCreateWithFormat(RSAllocatorRef allocator, RSStringRef format, ...) RS_AVAILABLE(0_0);
 RSExport RSStringRef RSStringCreateWithFormatAndArguments(RSAllocatorRef allocator, RSIndex capacity, RSStringRef format, va_list arguments) RS_AVAILABLE(0_0);
-RSExport RSStringRef RSStringCreateWithBytes(RSAllocatorRef alloc, const uint8_t *bytes, RSIndex numBytes, RSStringEncoding encoding, BOOL externalFormat) RS_AVAILABLE(0_0);
-RSExport  RSStringRef  RSStringCreateWithBytesNoCopy(RSAllocatorRef alloc, const uint8_t *bytes, RSIndex numBytes, RSStringEncoding encoding, BOOL externalFormat, RSAllocatorRef contentsDeallocator) RS_AVAILABLE(0_0);
+RSExport RSStringRef RSStringCreateWithBytes(RSAllocatorRef alloc, const void *bytes, RSIndex numBytes, RSStringEncoding encoding, BOOL externalFormat) RS_AVAILABLE(0_0);
+RSExport  RSStringRef  RSStringCreateWithBytesNoCopy(RSAllocatorRef alloc, const void *bytes, RSIndex numBytes, RSStringEncoding encoding, BOOL externalFormat, RSAllocatorRef contentsDeallocator) RS_AVAILABLE(0_0);
 RSExport void RSStringSetExternalCharactersNoCopy(RSMutableStringRef string, UniChar *chars, RSIndex length, RSIndex capacity) RS_AVAILABLE(0_0);
 //
 RSExport RSStringRef RSStringCreateWithCharacters(RSAllocatorRef allocator, const UniChar* characters, RSIndex numChars) RS_AVAILABLE(0_0);
@@ -81,7 +81,7 @@ RSExport void RSStringDelete(RSMutableStringRef aString, RSRange range) RS_AVAIL
 //RSExport void RSStringMakeUpper(RSMutableStringRef aString, RSRange range) RS_AVAILABLE(0_0);
 //RSExport void RSStringMakeLower(RSMutableStringRef aString, RSRange range) RS_AVAILABLE(0_0);
 //RSExport void RSStringMakeCapital(RSMutableStringRef aString, RSRange range) RS_AVAILABLE(0_3);
-RSExport RSIndex RSStringGetBytes(RSStringRef str, RSRange range, RSStringEncoding encoding, uint8_t lossByte, BOOL isExternalRepresentation, uint8_t *buffer, RSIndex maxBufLen, RSIndex *usedBufLen) RS_AVAILABLE(0_0);
+RSExport RSIndex RSStringGetBytes(RSStringRef str, RSRange range, RSStringEncoding encoding, uint8_t lossByte, BOOL isExternalRepresentation, void *buffer, RSIndex maxBufLen, RSIndex *usedBufLen) RS_AVAILABLE(0_0);
 RSExport void RSStringAppendString(RSMutableStringRef aString, RSStringRef append) RS_AVAILABLE(0_0);
 RSExport void RSStringAppendStringWithFormat(RSMutableStringRef aString, RSStringRef format,...) RS_AVAILABLE(0_0);
 RSExport void RSStringAppendCString(RSMutableStringRef aString, RSCBuffer cString, RSStringEncoding encoding) RS_AVAILABLE(0_0);

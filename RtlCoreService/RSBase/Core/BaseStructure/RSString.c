@@ -3838,7 +3838,7 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
 
 #undef SNPRINTF
 
-RSExport RSStringRef  RSStringCreateWithBytesNoCopy(RSAllocatorRef alloc, const uint8_t *bytes, RSIndex numBytes, RSStringEncoding encoding, BOOL externalFormat, RSAllocatorRef contentsDeallocator);
+RSExport RSStringRef  RSStringCreateWithBytesNoCopy(RSAllocatorRef alloc, const void *bytes, RSIndex numBytes, RSStringEncoding encoding, BOOL externalFormat, RSAllocatorRef contentsDeallocator);
 static RSStringRef __RSStringFormatAndArguments(RSAllocatorRef allocator, RSIndex size, RSStringRef format, va_list arguments)
 {
     RSRetain(format);
@@ -4126,7 +4126,7 @@ RSExport RSIndex RSStringGetLength(RSStringRef str)
     return __RSStrLength(str);
 }
 
-RSExport RSIndex RSStringGetBytes(RSStringRef str, RSRange range, RSStringEncoding encoding, uint8_t lossByte, BOOL isExternalRepresentation, uint8_t *buffer, RSIndex maxBufLen, RSIndex *usedBufLen)
+RSExport RSIndex RSStringGetBytes(RSStringRef str, RSRange range, RSStringEncoding encoding, uint8_t lossByte, BOOL isExternalRepresentation, void *buffer, RSIndex maxBufLen, RSIndex *usedBufLen)
 {
     
     /* No objc dispatch needed here since __RSStringEncodeByteStream works with both RSString and NSString */
@@ -4868,16 +4868,16 @@ RSExport RSStringRef  RSStringCreateWithCharactersNoCopy(RSAllocatorRef alloc, c
 }
 
 
-RSExport RSStringRef  RSStringCreateWithBytes(RSAllocatorRef alloc, const uint8_t *bytes, RSIndex numBytes, RSStringEncoding encoding, BOOL externalFormat)
+RSExport RSStringRef  RSStringCreateWithBytes(RSAllocatorRef alloc, const void *bytes, RSIndex numBytes, RSStringEncoding encoding, BOOL externalFormat)
 {
     return __RSStringCreateImmutableFunnel3(alloc, bytes, numBytes, encoding, externalFormat, YES, NO, NO, NO, ALLOCATORSFREEFUNC, 0);
 }
 
-RSStringRef  _RSStringCreateWithBytesNoCopy(RSAllocatorRef alloc, const uint8_t *bytes, RSIndex numBytes, RSStringEncoding encoding, BOOL externalFormat, RSAllocatorRef contentsDeallocator) {
+RSStringRef  _RSStringCreateWithBytesNoCopy(RSAllocatorRef alloc, const void *bytes, RSIndex numBytes, RSStringEncoding encoding, BOOL externalFormat, RSAllocatorRef contentsDeallocator) {
     return __RSStringCreateImmutableFunnel3(alloc, bytes, numBytes, encoding, externalFormat, YES, NO, NO, YES, contentsDeallocator, 0);
 }
 
-RSExport RSStringRef  RSStringCreateWithBytesNoCopy(RSAllocatorRef alloc, const uint8_t *bytes, RSIndex numBytes, RSStringEncoding encoding, BOOL externalFormat, RSAllocatorRef contentsDeallocator) {
+RSExport RSStringRef  RSStringCreateWithBytesNoCopy(RSAllocatorRef alloc, const void *bytes, RSIndex numBytes, RSStringEncoding encoding, BOOL externalFormat, RSAllocatorRef contentsDeallocator) {
     return __RSStringCreateImmutableFunnel3(alloc, bytes, numBytes, encoding, externalFormat, YES, NO, NO, YES, contentsDeallocator, 0);
 }
 
@@ -5270,18 +5270,25 @@ static void __collatorFinalize(UCollator *collator)
 
 #if defined(RSInline)
 RSInline const UniChar *RSStringGetCharactersPtrFromInlineBuffer(RSStringInlineBuffer *buf, RSRange desiredRange) {
-    if ((desiredRange.location < 0) || ((desiredRange.location + desiredRange.length) > buf->rangeToBuffer.length)) return nil;
+    if ((desiredRange.location < 0) || ((desiredRange.location + desiredRange.length) > buf->rangeToBuffer.length)) return NULL;
     
-    if (buf->directBuffer) {
-        return buf->directBuffer + buf->rangeToBuffer.location + desiredRange.location;
+    if (buf->directUniCharBuffer) {
+        return buf->directUniCharBuffer + buf->rangeToBuffer.location + desiredRange.location;
     } else {
-        if (desiredRange.length > __RSStringInlineBufferLength) return nil;
+        if (desiredRange.length > __RSStringInlineBufferLength) return NULL;
         
         if (((desiredRange.location + desiredRange.length) > buf->bufferedRangeEnd) || (desiredRange.location < buf->bufferedRangeStart)) {
             buf->bufferedRangeStart = desiredRange.location;
             buf->bufferedRangeEnd = buf->bufferedRangeStart + __RSStringInlineBufferLength;
             if (buf->bufferedRangeEnd > buf->rangeToBuffer.length) buf->bufferedRangeEnd = buf->rangeToBuffer.length;
-            RSStringGetCharacters(buf->theString, RSMakeRange(buf->rangeToBuffer.location + buf->bufferedRangeStart, buf->bufferedRangeEnd - buf->bufferedRangeStart), buf->buffer);
+            RSIndex location = buf->rangeToBuffer.location + buf->bufferedRangeStart;
+            RSIndex length = buf->bufferedRangeEnd - buf->bufferedRangeStart;
+            if (buf->directCStringBuffer) {
+                UniChar *bufPtr = buf->buffer;
+                while (length--) *bufPtr++ = (UniChar)buf->directCStringBuffer[location++];
+            } else {
+                RSStringGetCharacters(buf->theString, RSMakeRange(location, length), buf->buffer);
+            }
         }
         
         return buf->buffer + (desiredRange.location - buf->bufferedRangeStart);
@@ -5289,8 +5296,8 @@ RSInline const UniChar *RSStringGetCharactersPtrFromInlineBuffer(RSStringInlineB
 }
 
 RSInline void RSStringGetCharactersFromInlineBuffer(RSStringInlineBuffer *buf, RSRange desiredRange, UniChar *outBuf) {
-    if (buf->directBuffer) {
-        memmove(outBuf, buf->directBuffer + buf->rangeToBuffer.location + desiredRange.location, desiredRange.length * sizeof(UniChar));
+    if (buf->directUniCharBuffer) {
+        memmove(outBuf, buf->directUniCharBuffer + buf->rangeToBuffer.location + desiredRange.location, desiredRange.length * sizeof(UniChar));
     } else {
         if ((desiredRange.location >= buf->bufferedRangeStart) && (desiredRange.location < buf->bufferedRangeEnd)) {
             RSIndex bufLen = desiredRange.length;
@@ -5308,16 +5315,25 @@ RSInline void RSStringGetCharactersFromInlineBuffer(RSStringInlineBuffer *buf, R
             }
         }
         
-        if (desiredRange.length > 0) RSStringGetCharacters(buf->theString, RSMakeRange(buf->rangeToBuffer.location + desiredRange.location, desiredRange.length), outBuf);
+        if (desiredRange.length > 0) {
+            RSIndex location = buf->rangeToBuffer.location + desiredRange.location;
+            RSIndex length = desiredRange.length;
+            if (buf->directCStringBuffer) {
+                UniChar *bufPtr = outBuf;
+                while (length--) *bufPtr++ = (UniChar)buf->directCStringBuffer[location++];
+            } else {
+                RSStringGetCharacters(buf->theString, RSMakeRange(location, length), outBuf);
+            }
+        }
     }
 }
 
 #else
-#define RSStringGetCharactersPtrFromInlineBuffer(buf, desiredRange) ((buf)->directBuffer ? (buf)->directBuffer + (buf)->rangeToBuffer.location + desiredRange.location : nil)
+#define RSStringGetCharactersPtrFromInlineBuffer(buf, desiredRange) ((buf)->directUniCharBuffer ? (buf)->directUniCharBuffer + (buf)->rangeToBuffer.location + desiredRange.location : NULL)
 
 #define RSStringGetCharactersFromInlineBuffer(buf, desiredRange, outBuf) \
-if (buf->directBuffer) memmove(outBuf, (buf)->directBuffer + (buf)->rangeToBuffer.location + desiredRange.location, desiredRange.length * sizeof(UniChar)); \
-else RSStringGetCharacters((buf)->theString, RSMakeRange((buf)->rangeToBuffer.location + desiredRange.location, desiredRange.length), outBuf);
+if (buf->directUniCharBuffer) memmove(outBuf, (buf)->directUniCharBuffer + (buf)->rangeToBuffer.location + desiredRange.location, desiredRange.length * sizeof(UniChar)); \
+else RSStringGetCharacters((buf)->theString, RSRangeMake((buf)->rangeToBuffer.location + desiredRange.location, desiredRange.length), outBuf);
 
 #endif /* RSInline */
 

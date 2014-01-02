@@ -219,6 +219,8 @@ static void __RSURLConnectionCoreSetupCookieIfNecessary(RSURLConnectionRef conne
         RSHTTPCookieRef cookie = (RSHTTPCookieRef)value;
         RSStringAppendStringWithFormat(cookieInfo, RSSTR("%r=%r; "), RSHTTPCookieGetName(cookie), RSHTTPCookieGetValue(cookie));
     });
+    if (RSEqual(RSDictionaryGetValue(RSURLRequestGetHeaderField(request), RSSTR("debug")), RSBooleanTrue))
+        RSShow(cookieInfo);
     curl_easy_setopt(__RSURLConnectionCoreGet(connection), CURLOPT_COOKIE, RSStringGetUTF8String(cookieInfo));
     RSRelease(cookies);
     RSRelease(cookieInfo);

@@ -1102,10 +1102,8 @@ static BOOL _stringContainsCharacter(RSStringRef string, UniChar ch) {
     RSIndex i, c = RSStringGetLength(string);
     RSStringInlineBuffer buf;
     RSStringInitInlineBuffer(string, &buf, RSMakeRange(0, c));
-    for (i = 0; i < c; i ++)
-        if (buf.directBuffer[i] == ch) return YES;
-    //if (__RSStringGetCharacterFromInlineBufferQuick(&buf, i) == ch) return YES;
-    return NO;
+    for (i = 0; i < c; i ++) if (__RSStringGetCharacterFromInlineBufferQuick(&buf, i) == ch) return true;
+    return false;
 }
 
 static BOOL _shouldPercentReplaceChar(UniChar ch, void *context) {
@@ -1123,10 +1121,113 @@ static BOOL _shouldPercentReplaceChar(UniChar ch, void *context) {
 }
 
 RSExport RSStringRef RSURLCreateStringByAddingPercentEscapes(RSAllocatorRef allocator, RSStringRef originalString, RSStringRef charactersToLeaveUnescaped, RSStringRef legalURLCharactersToBeEscaped, RSStringEncoding encoding) {
-    RSStringRef strings[2];
-    strings[0] = charactersToLeaveUnescaped;
-    strings[1] = legalURLCharactersToBeEscaped;
-    return _addPercentEscapesToString(allocator, originalString, _shouldPercentReplaceChar, nil, encoding, strings);
+    RSMutableStringRef newString = NULL;
+    RSIndex idx, length;
+    RSStringInlineBuffer buf;
+    enum {
+        kCharBufferMax = 4096,
+    };
+    STACK_BUFFER_DECL(UniChar, charBuffer, kCharBufferMax);
+    RSIndex charBufferIndex = 0;
+    
+    if (!originalString) return NULL;
+    length = RSStringGetLength(originalString);
+    if (length == 0) return (RSStringRef)RSStringCreateCopy(allocator, originalString);
+    RSStringInitInlineBuffer(originalString, &buf, RSMakeRange(0, length));
+    
+    for (idx = 0; idx < length; idx ++) {
+        UniChar ch = __RSStringGetCharacterFromInlineBufferQuick(&buf, idx);
+        Boolean shouldReplace = (isURLLegalCharacter(ch) == false);
+        if (shouldReplace) {
+            if (charactersToLeaveUnescaped && _stringContainsCharacter(charactersToLeaveUnescaped, ch)) {
+                shouldReplace = false;
+            }
+        } else if (legalURLCharactersToBeEscaped && _stringContainsCharacter(legalURLCharactersToBeEscaped, ch)) {
+            shouldReplace = true;
+        }
+        
+        if (shouldReplace) {
+            enum {
+                kMaxBytesPerUniChar = 8,    // 8 bytes is the maximum a single UniChar can require in any current encodings; future encodings could require more
+                kMaxPercentEncodedUniChars = kMaxBytesPerUniChar * 3
+            };
+            
+            static const UInt8 hexchars[] = "0123456789ABCDEF";
+            uint8_t bytes[kMaxBytesPerUniChar];
+            uint8_t *bytePtr = bytes;
+            uint8_t *currByte;
+            uint8_t *endPtr;
+            RSIndex byteLength;
+            
+            // Perform the replacement
+            if ( !newString ) {
+                newString = RSStringCreateMutableCopy(RSGetAllocator(originalString), 0, originalString);
+                RSStringDelete(newString, RSMakeRange(idx, length-idx));
+            }
+            // make sure charBuffer has enough room
+            if ( charBufferIndex >= (kCharBufferMax - kMaxPercentEncodedUniChars) ) {
+                // make room
+                RSStringAppendCharacters(newString, charBuffer, charBufferIndex);
+                charBufferIndex = 0;
+            }
+            
+            // convert the UniChar to bytes
+            if ( RSStringEncodingUnicodeToBytes(encoding, 0, &ch, 1, NULL, bytePtr, 8, &byteLength) == RSStringEncodingConversionSuccess ) {
+                // percent-encode the bytes
+                endPtr = bytePtr + byteLength;
+                for ( currByte = bytePtr; currByte < endPtr; currByte++ ) {
+                    charBuffer[charBufferIndex++] = '%';
+                    charBuffer[charBufferIndex++] = hexchars[*currByte >> 4];
+                    charBuffer[charBufferIndex++] = hexchars[*currByte & 0x0f];
+                }
+            }
+            else {
+                // FIXME: once RSString supports finding glyph boundaries walk by glyph boundaries instead of by unichars
+                if ( encoding == RSStringEncodingUTF8 && RSCharacterSetIsSurrogateHighCharacter(ch) && idx + 1 < length && RSCharacterSetIsSurrogateLowCharacter(__RSStringGetCharacterFromInlineBufferQuick(&buf, idx+1)) ) {
+                    UniChar surrogate[2];
+                    uint8_t *currByte;
+                    
+                    surrogate[0] = ch;
+                    surrogate[1] = __RSStringGetCharacterFromInlineBufferQuick(&buf, idx+1);
+                    // Aki sez it should never take more than 6 bytes
+                    if (RSStringEncodingUnicodeToBytes(RSStringEncodingUTF8, 0, surrogate, 2, NULL, bytes, 6, &byteLength) == RSStringEncodingConversionSuccess) {
+                        endPtr = bytePtr + byteLength;
+                        for ( currByte = bytes; currByte < endPtr; currByte++ ) {
+                            charBuffer[charBufferIndex++] = '%';
+                            charBuffer[charBufferIndex++] = hexchars[*currByte >> 4];
+                            charBuffer[charBufferIndex++] = hexchars[*currByte & 0x0f];
+                        }
+                        idx++; // We consumed 2 characters, not 1
+                    }
+                    else {
+                        // surrogate pair conversion failed
+                        break;
+                    }
+                } else {
+                    // not a surrogate pair
+                    break;
+                }
+            }
+        } else if (newString) {
+            charBuffer[charBufferIndex++] = ch;
+            if ( charBufferIndex == kCharBufferMax ) {
+                RSStringAppendCharacters(newString, charBuffer, charBufferIndex);
+                charBufferIndex = 0;
+            }
+        }
+    }
+    if (idx < length) {
+        // Ran into an encoding failure
+        if (newString) RSRelease(newString);
+        return NULL;
+    } else if (newString) {
+        if ( charBufferIndex != 0 ) {
+            RSStringAppendCharacters(newString, charBuffer, charBufferIndex);
+        }
+        return newString;
+    } else {
+        return (RSStringRef)RSStringCreateCopy(RSGetAllocator(originalString), originalString);
+    }
 }
 
 static BOOL __RSURLClassEqual(RSTypeRef  rs1, RSTypeRef  rs2) {

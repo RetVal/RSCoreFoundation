@@ -7,144 +7,124 @@
 //
 
 #include <RSCoreFoundation/RSCoreFoundation.h>
-#include <CoreFoundation/CoreFoundation.h>
 
-extern int AMDeviceConnect (void *device);
-extern int AMDeviceValidatePairing (void *device);
-extern int AMDeviceStartSession (void *device);
-extern int AMDeviceStopSession (void *device);
-extern int AMDeviceDisconnect (void *device);
+typedef struct RSCoreAnalyzer {
+    RSURLConnectionRef connection;
+    RSMutableDataRef reiceveData;
+    RSURLResponseRef response;
+    RSDictionaryRef token;
+}*RSCoreAnalyzer;
 
-extern int AMDServiceConnectionReceive(void *device, char *buf,int size, int );
-
-extern int AMDeviceSecureStartService(void *device,
-                                      CFStringRef serviceName, // One of the services in lockdown's Services.plist
-                                      int  flagsButZeroIsFineAlso,
-                                      void *handle);
-
-extern int AMDeviceNotificationSubscribe(void *, int , int , int, void **);
-
-struct AMDeviceNotificationCallbackInformation {
-	void 		*deviceHandle;
-	uint32_t	msgType;
-} ;
-
-
-#define  BUFSIZE 128 // This is used by purpleConsole. So I figure I'll use it too.
-
-void doDeviceConnect(void *deviceHandle)
-{
- 	int rc = AMDeviceConnect(deviceHandle);
-	
-	int fd;
-	char buf[BUFSIZE];
-    
-    
-	if (rc) {
-		fprintf (stderr, "AMDeviceConnect returned: %d\n", rc);
-		exit(1);
-	}
-    
-	rc = AMDeviceValidatePairing(deviceHandle);
-    
-	if (rc)
-    {
-		fprintf (stderr, "AMDeviceValidatePairing() returned: %d\n", rc);
-		exit(2);
-        
-	}
-    
-	rc = AMDeviceStartSession(deviceHandle);
-	if (rc)
-    {
-		fprintf (stderr, "AMStartSession() returned: %d\n", rc);
-		exit(2);
-        
-	}
-    
-	void *f;
-	rc = AMDeviceSecureStartService(deviceHandle,
-                                    (CFStringRef)RSSTR("com.apple.syslog_relay"), // Any of the services in lockdown's services.plist
-                                    0,
-                                    &f);
-    
-	if (rc != 0)
-	{
-        
-		fprintf(stderr, "Unable to start service -- Rc %d fd: %p\n", rc, f);
-		exit(4);
-        
-	}
-    
-    
- 	rc = AMDeviceStopSession(deviceHandle);
-	if (rc != 0)
-	{
-		fprintf(stderr, "Unable to disconnect - rc is %d\n",rc);
-		exit(4);
-        
-	}
-    
- 	rc = AMDeviceDisconnect(deviceHandle);
-    
-    
-	if (rc != 0)
-	{
-		fprintf(stderr, "Unable to disconnect - rc is %d\n",rc);
-		exit(5);
-	}
-    
-    
-    
-	memset (buf, '\0', 128); // technically, buf[0] = '\0' is enough
-    
-	while ((rc = AMDServiceConnectionReceive(f,
-                                             buf,
-                                             BUFSIZE, 0) > 0))
-        
-	{
-		// Messages are read to the buf (Framework uses a socket descriptor)
-		// For syslog_relay, messages are just the raw ASL output (including
-		// kernel.debug), which makes it easy for this sample code.
-		// Other services use bplists, which would call for those nasty
-		// CFDictionary and other APIs..
-		
-		printf("%s", buf);
-		fflush(NULL);
-		memset (buf, '\0', 128);
-        
-	}
-    
-    
-} // end doDevice
-
-
-void callback(struct AMDeviceNotificationCallbackInformation *CallbackInfo)
-{
-	void *deviceHandle = CallbackInfo->deviceHandle;
-	fprintf (stderr,"In callback, msgType is %d\n", CallbackInfo->msgType);
-    
-	switch (CallbackInfo->msgType)
-	{
-            
-		case 1:
-			fprintf(stderr, "Device %p connected\n", deviceHandle);
-			doDeviceConnect(deviceHandle);
-			break;
-		case 2:
-			fprintf(stderr, "Device %p disconnected\n", deviceHandle);
-			break;
-		case 3:
-			fprintf(stderr, "Unsubscribed\n");
-			break;
-            
-		default:
-			fprintf(stderr, "Unknown message %d\n", CallbackInfo->msgType);
-	}
-    
+RSStringRef RSStringURLEncode(RSDictionaryRef dict) {
+    RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorDefault, RSDictionaryGetCount(dict));
+    RSDictionaryApplyBlock(dict, ^(const void *key, const void *value, BOOL *stop) {
+        RSArrayAddObject(array, RSStringWithFormat(RSSTR("%r=%r"), RSAutorelease(RSURLCreateStringByAddingPercentEscapes(RSAllocatorDefault, key, nil, RSSTR("!*'();:@&=+$,/?%#[]"), RSStringEncodingUTF8)), RSAutorelease(RSURLCreateStringByAddingPercentEscapes(RSAllocatorDefault, value, nil, RSSTR("!*'();:@&=+$,/?%#[]"), RSStringEncodingUTF8))));
+    });
+    RSStringRef str = RSStringCreateByCombiningStrings(RSAllocatorDefault, array, RSSTR("&"));
+    RSRelease(array);
+    return RSAutorelease(str);
 }
 
-#include <RSFileMonitor/RSFileMonitor.h>
+static RSURLRequestRef remoteUpdateUser(RSStringRef uid, RSUInteger count, RSCoreAnalyzer analyzer) {
+    if (!analyzer) return nil;
+    RSTypeRef token = analyzer->token;
+    RSMutableURLRequestRef request = RSURLRequestCreateMutable(RSAllocatorDefault, RSURLWithString(RSStringWithFormat(RSSTR("http://www.renren.com/moreminifeed.do?p=%r&u=%r&requestToken=%r&_rtk=%r"), RSNumberWithUnsignedInteger(count), uid, RSDictionaryGetValue(token, RSSTR("requestToken")), RSDictionaryGetValue(token, RSSTR("_rtk")))));
+    return RSAutorelease(request);
+}
+
+static RSMutableArrayRef substringWithRegular(RSStringRef self, RSStringRef regular) {
+    RSStringRef reg=regular;
+    RSRegularExpressionRef expression = RSRegularExpressionCreate(RSAllocatorDefault, reg);
+    if (!expression) return nil;
+    RSArrayRef results = RSRegularExpressionApplyOnString(expression, self, nil);
+    RSRelease(expression);
+    if (!results) return nil;
+    RSMutableArrayRef arr = RSArrayCreateMutable(RSAllocatorDefault, 0);
+    RSArrayApplyBlock(results, RSMakeRange(0, RSArrayGetCount(results)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+        RSArrayAddObject(arr, RSStringWithSubstring(self, RSNumberRangeValue(value)));
+    });
+    return RSAutorelease(arr);
+}
+
+static RSDictionaryRef initModel(RSStringRef content, RSStringRef mode) {
+    const char *ptr = RSStringGetUTF8String(content);
+    if (!content || *ptr != '(' || !RSStringHasSuffix(content, RSSTR(")"))) return nil;
+    RSMutableDictionaryRef model = RSDictionaryCreateMutable(RSAllocatorDefault, 0, RSDictionaryRSTypeContext);
+    RSDictionarySetValue(model, RSSTR("mode"), mode);
+    RSMutableArrayRef container = RSArrayCreateMutable(RSAllocatorDefault, 5);
+    ptr++;
+    unsigned int count = 0;
+    while (count < 5) {
+        BOOL inside = NO;
+        while (*ptr != '\'')
+            ptr++;
+        inside = YES;
+        ptr++;
+        char *end = (char *)ptr;
+        while (*end != '\'')
+            end++;
+        RSStringRef subContent = RSStringCreateWithBytes(RSAllocatorDefault, ptr, end - ptr, RSStringEncodingUTF8, 0);
+        RSArraySetObjectAtIndex(container, count, subContent);
+        RSRelease(subContent);
+        end++;
+        ptr = end;
+        count++;
+    }
+    RSDictionarySetValue(model, RSSTR("container"), container);
+    RSRelease(container);
+    return RSAutorelease(model);
+}
+
+static void modelAction(RSDictionaryRef model) {
+    RSStringRef urlFormat = RSAutorelease(RSURLCreateStringByAddingPercentEscapes(RSAllocatorDefault,
+                                                                                  RSStringWithFormat(RSSTR("http://like.renren.com/%r?gid=%r_%r&uid=%r&owner=%r&type=%r&name=%r"),
+                                                                                                     RSDictionaryGetValue(model, RSSTR("mode")),
+                                                                                                     RSArrayObjectAtIndex(RSDictionaryGetValue(model, RSSTR("container")), 0),
+                                                                                                     RSArrayObjectAtIndex(RSDictionaryGetValue(model, RSSTR("container")), 1),
+                                                                                                     RSArrayObjectAtIndex(RSDictionaryGetValue(model, RSSTR("container")), 2),
+                                                                                                     RSArrayObjectAtIndex(RSDictionaryGetValue(model, RSSTR("container")), 3),
+                                                                                                     RSNumberWithInt(3),
+                                                                                                     RSArrayObjectAtIndex(RSDictionaryGetValue(model, RSSTR("container")), 4)),
+                                                                                  nil,
+                                                                                  nil,
+                                                                                  RSStringEncodingUTF8));
+    RSURLResponseRef response = nil;
+    RSDataRef data = nil;
+    RSErrorRef error = nil;
+    RSShow(urlFormat);
+    data = RSURLConnectionSendSynchronousRequest(RSURLRequestWithURL(RSURLWithString(urlFormat)), &response, &error);
+    if (error) {
+        RSShow(error);
+        return;
+    }
+    if (!data) return;
+    RSStringRef str = RSStringCreateWithData(RSAllocatorDefault, data, RSStringEncodingUTF8);
+    if (str) RSLog(RSSTR("json result string = %r"), str);
+    RSRelease(str);
+    if (RSURLResponseGetStatusCode(response) == 200)
+        RSShow(RSSTR("success"));
+}
+
+static RSArrayRef model(RSStringRef content, RSStringRef mode, RSCoreAnalyzer analyzer) {
+    RSStringRef __kMatchExpress1 = RSSTR("\\(?onclick=\\\"ILike_toggleUserLike\\(.*?\\)\\\"");
+    RSStringRef __kMatchExpress2 = RSSTR("\\(.*\\)");
+    if (!analyzer) return nil;
+    RSStringRef htmlContent = content;
+    if (!htmlContent) return nil;
+    RSArrayRef regexResults = substringWithRegular(htmlContent, __kMatchExpress1);
+    RSMutableArrayRef results = RSArrayCreateMutable(RSAllocatorDefault, RSArrayGetCount(regexResults));
+    RSArrayApplyBlock(regexResults, RSMakeRange(0, RSArrayGetCount(regexResults)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+        RSArrayAddObject(results, RSArrayObjectAtIndex(substringWithRegular(value, __kMatchExpress2), 0));
+    });
+    regexResults = nil;
+    RSMutableArrayRef models = RSArrayCreateMutable(RSAllocatorDefault, 0);
+    RSArrayApplyBlock(results, RSMakeRange(0, RSArrayGetCount(results)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+        RSArrayAddObject(models, initModel(value, mode));
+    });
+    RSRelease(results);
+    return RSAutorelease(models);
+}
+
 RSDataRef RSDataWithURL(RSURLRef URL) {
     return RSURLConnectionSendSynchronousRequest(RSURLRequestWithURL(URL), nil, nil);
 }
@@ -160,16 +140,20 @@ static RSStringRef __buildURLString(RSStringRef baseString, RSStringRef domain, 
 }
 
 static RSStringRef uid(RSStringRef info) {
-    return RSStringByReplacingOccurrencesOfString(info, RSSTR("http://www.renren.com/"), RSSTR(""));
+    RSStringRef uid = RSStringByReplacingOccurrencesOfString(info, RSSTR("http://www.renren.com/"), RSSTR(""));
+    RSShow(uid);
+    return uid;
 }
 
 static RSMutableDictionaryRef token(RSStringRef uid) {
     __block RSStringRef requestToken = nil, _rtk = nil;
     RSAutoreleaseBlock(^{
         RSStringRef str = RSStringWithData(RSDataWithURL(RSURLWithString(RSStringWithFormat(RSSTR("http://www.renren.com/%r"), uid))), RSStringEncodingUTF8);
+        RSStringWriteToFile(str, RSFileManagerStandardizingPath(RSSTR("~/Desktop/renren.html")), RSWriteFileAutomatically);
         RSRange range = RSStringRangeOfString(str, RSSTR("get_check:'"));
         str = RSStringWithSubstring(str, RSMakeRange(range.location + range.length, RSStringGetLength(str) - range.location - range.length - 1));
         range = RSStringRangeOfString(str, RSSTR("'"));
+        
         requestToken = RSStringWithSubstring(str, RSMakeRange(0, range.location));
         str = RSStringWithSubstring(str, RSMakeRange(range.location + range.length, RSStringGetLength(str) - range.location - range.length - 1));
         
@@ -184,13 +168,6 @@ static RSMutableDictionaryRef token(RSStringRef uid) {
     });
     return RSAutorelease(RSMutableCopy(RSAllocatorDefault, RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorDefault, RSAutorelease(requestToken), RSSTR("requestToken"), RSAutorelease(_rtk), RSSTR("_rtk"), NULL))));
 }
-
-struct RSCoreAnalyzer {
-    RSURLConnectionRef connection;
-    RSMutableDataRef reiceveData;
-    RSURLResponseRef response;  // weak
-};
-typedef struct RSCoreAnalyzer *RSCoreAnalyzer;
 
 static struct RSCoreAnalyzer analyzer = {0};
 
@@ -210,29 +187,72 @@ static void RSURLConnectionDidSendBodyData_CoreAnalyzer(RSURLConnectionRef conne
     
 }
 
-static void RSURLConnectionDidFinishLoading_CoreAnalyzer(RSURLConnectionRef connection){
-    RSShow(RSSTR("finished loading"));
-    RSShow(token(uid(RSURLGetString(RSURLResponseGetURL(((RSCoreAnalyzer)RSURLConnectionGetContext(connection))->response)))));
+static void RSURLConnectionDidFailWithError_CoreAnalyzer(RSURLConnectionRef connection, RSErrorRef error) {
+    RSShow(RSSTR("login failed"));
+    RSShow(analyzer.response);
     RSRunLoopStop(RSRunLoopGetMain());
 }
 
-static void RSURLConnectionDidFailWithError_CoreAnalyzer(RSURLConnectionRef connection, RSErrorRef error) {
-    RSShow(error);
+static void RSURLConnectionDidFinishLoading_CoreAnalyzer(RSURLConnectionRef connection){
+    RSShow(RSSTR("finished loading"));
+    if (RSStringRangeOfString(RSURLGetString(RSURLResponseGetURL(((RSCoreAnalyzer)RSURLConnectionGetContext(connection))->response)), RSSTR("failCode=")).length > 0) {
+        RSURLConnectionDidFailWithError_CoreAnalyzer(connection, nil);
+        return;
+    }
+    RSShow(analyzer.token = RSRetain(token(uid(RSURLGetString(RSURLResponseGetURL(((RSCoreAnalyzer)RSURLConnectionGetContext(connection))->response))))));
+    RSPerformBlockOnMainThread(^{
+        __block RSUInteger begin = 0;
+        __block RSUInteger limit = 0;
+        __block RSUInteger count = 5;
+        __block BOOL shouldContinue = YES;
+        RSMutableArrayRef models = RSArrayCreateMutable(RSAllocatorDefault, 0);
+        RSStringRef userId = RSSTR("359364053");
+        while (shouldContinue) {
+            if (count <= begin) {
+                shouldContinue = NO;
+                break;
+            }
+            RSAutoreleaseBlock(^{
+                RSURLResponseRef response = nil;
+                RSDataRef data = nil;
+                RSErrorRef error = nil;
+                data = RSURLConnectionSendSynchronousRequest(remoteUpdateUser(userId, limit, &analyzer), &response, &error);
+                if (RSURLResponseGetStatusCode(response) == 200)
+                    RSArrayAddObjects(models, model(RSStringWithData(data, RSStringEncodingUTF8), RSSTR("addlike"), &analyzer));
+                else
+                    shouldContinue = NO;
+                begin = RSArrayGetCount(models);
+                limit ++;
+                RSLog(RSSTR("Collecting items for user(%r)... Loop = %ld, count = %ld"), userId, limit, begin);
+                sleep(1.25);
+            });
+        }
+        if (RSArrayGetCount(models)) {
+            RSArrayApplyBlock(models, RSMakeRange(0, RSArrayGetCount(models)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+                if (idx > count) {
+                    *isStop = YES;
+                    return ;
+                }
+                RSLog(RSSTR("Zan (%ld) for user (%r)"), idx, userId);
+                modelAction(value);
+                sleep(2);
+            });
+            RSShow(RSSTR("end"));
+        }
+        RSRelease(models);
+        RSRunLoopStop(RSRunLoopGetMain());
+    });
 }
-
 
 void RSCoreAnalyzerCreate(RSCoreAnalyzer analyzer, RSStringRef userName, RSStringRef password) {
     if (!analyzer) return;
     RSStringRef baseURLString = RSSTR("http://www.renren.com/PLogin.do");
     RSMutableURLRequestRef request = RSAutorelease(RSURLRequestCreateMutable(RSAllocatorDefault, RSURLWithString(baseURLString)));
     RSStringRef post = __buildURLString(RSSTR("http://www.renren.com/SysHome.do"), RSSTR("renren.com"), userName, password);
-    RSShow(post);
-    RSShow(request);
     RSDataRef postData = RSAutorelease(RSStringCreateExternalRepresentation(RSAllocatorDefault, post, RSStringEncodingASCII, YES));
     RSURLRequestSetHTTPMethod(request, RSSTR("POST"));
-//    RSURLRequestSetHeaderFieldValue(request, RSSTR("Content-Length"), RSStringWithFormat(RSSTR("%ld"), RSDataGetLength(postData)));
+    RSURLRequestSetHeaderFieldValue(request, RSSTR("Content-Length"), RSStringWithFormat(RSSTR("%ld"), RSDataGetLength(postData)));
     RSURLRequestSetHeaderFieldValue(request, RSSTR("Content-Type"), RSSTR("application/x-www-form-urlencoded"));
-//    RSURLRequestSetHeaderFieldValue(request, RSSTR("debug"), RSBooleanTrue);
     RSURLRequestSetHTTPBody(request, postData);
     
     struct RSURLConnectionDelegate delegate = {
@@ -257,22 +277,16 @@ void RSCoreAnalyzerStart(RSCoreAnalyzer analyzer) {
 void RSCoreAnalyzerRelease(RSCoreAnalyzer analyzer) {
     RSRelease(analyzer->reiceveData);
     RSRelease(analyzer->connection);
+    RSRelease(analyzer->token);
 }
 
-#include "curl.h"
 int main (int argc, char **argv)
 {
-//    RSHTTPCookieStorageRemoveAllCookies(RSHTTPCookieStorageGetSharedStorage());
-//    RSCoreAnalyzerCreate(&analyzer, RSSTR("821016215@qq.com"), RSSTR("retvalhusihua"));
-//    RSCoreAnalyzerStart(&analyzer);
-    
-    RSPerformBlockAfterDelay(1.0, ^{
-        RSShow(token(uid(RSURLGetString(RSURLWithString(RSSTR("http://www.renren.com/340278563"))))));
-        RSRunLoopStop(RSRunLoopGetMain());
-    });
+    if (argc != 3) return 0;
+    RSCoreAnalyzerCreate(&analyzer, RSStringWithUTF8String(argv[1]) /*email*/, RSStringWithUTF8String(argv[2])/*password*/);
+    RSCoreAnalyzerStart(&analyzer);
     RSRunLoopRun();
     RSCoreAnalyzerRelease(&analyzer);
-    sleep(1);
     sleep(1);
     return 0;
 }

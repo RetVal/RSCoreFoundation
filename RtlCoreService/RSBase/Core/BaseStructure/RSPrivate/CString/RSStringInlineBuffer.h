@@ -14,7 +14,8 @@
 typedef struct {
     UniChar buffer[__RSStringInlineBufferLength];
     RSStringRef theString;
-    const UniChar *directBuffer;
+    const UniChar *directUniCharBuffer;
+    const char *directCStringBuffer;
     RSRange rangeToBuffer;		/* Range in string to buffer */
     RSIndex bufferedRangeStart;		/* Start of range currently buffered (relative to rangeToBuffer.location) */
     RSIndex bufferedRangeEnd;		/* bufferedRangeStart + number of chars actually buffered */
@@ -26,15 +27,15 @@ RSExport const char* RSStringGetCStringPtr(RSStringRef str, RSStringEncoding enc
 RSInline void RSStringInitInlineBuffer(RSStringRef str, RSStringInlineBuffer *buf, RSRange range) {
     buf->theString = str;
     buf->rangeToBuffer = range;
-    buf->directBuffer = (UniChar *)RSStringGetCStringPtr(str, RSStringEncodingUnicode);
+    buf->directCStringBuffer = (buf->directUniCharBuffer = RSStringGetCharactersPtr(str)) ? NULL : RSStringGetCStringPtr(str, RSStringEncodingASCII);
     buf->bufferedRangeStart = buf->bufferedRangeEnd = 0;
 }
 
 RSExport void RSStringGetCharacters(RSStringRef str, RSRange range, UniChar *buffer);
 RSInline UniChar RSStringGetCharacterFromInlineBuffer(RSStringInlineBuffer *buf, RSIndex idx) {
-    if (buf->directBuffer) {
+    if (buf->directUniCharBuffer) {
         if (idx < 0 || idx >= buf->rangeToBuffer.length) return 0;
-        return buf->directBuffer[idx + buf->rangeToBuffer.location];
+        return buf->directUniCharBuffer[idx + buf->rangeToBuffer.location];
     }
     if (idx >= buf->bufferedRangeEnd || idx < buf->bufferedRangeStart) {
         if (idx < 0 || idx >= buf->rangeToBuffer.length) return 0;
@@ -49,9 +50,9 @@ RSInline UniChar RSStringGetCharacterFromInlineBuffer(RSStringInlineBuffer *buf,
 /* Same as RSStringGetCharacterFromInlineBuffer() but returns 0xFFFF on out of bounds access
  */
 RSInline UniChar __RSStringGetCharacterFromInlineBufferAux(RSStringInlineBuffer *buf, RSIndex idx) {
-    if (buf->directBuffer) {
+    if (buf->directUniCharBuffer) {
         if (idx < 0 || idx >= buf->rangeToBuffer.length) return 0xFFFF;
-        return buf->directBuffer[idx + buf->rangeToBuffer.location];
+        return buf->directUniCharBuffer[idx + buf->rangeToBuffer.location];
     }
     if (idx >= buf->bufferedRangeEnd || idx < buf->bufferedRangeStart) {
         if (idx < 0 || idx >= buf->rangeToBuffer.length) return 0xFFFF;
@@ -66,7 +67,7 @@ RSInline UniChar __RSStringGetCharacterFromInlineBufferAux(RSStringInlineBuffer 
 /* Same as RSStringGetCharacterFromInlineBuffer(), but without the bounds checking (will return garbage or crash)
  */
 RSInline UniChar __RSStringGetCharacterFromInlineBufferQuick(RSStringInlineBuffer *buf, RSIndex idx) {
-    if (buf->directBuffer) return buf->directBuffer[idx + buf->rangeToBuffer.location];
+    if (buf->directUniCharBuffer) return buf->directUniCharBuffer[idx + buf->rangeToBuffer.location];
     if (idx >= buf->bufferedRangeEnd || idx < buf->bufferedRangeStart)
     {
         if ((buf->bufferedRangeStart = idx - 4) < 0)
