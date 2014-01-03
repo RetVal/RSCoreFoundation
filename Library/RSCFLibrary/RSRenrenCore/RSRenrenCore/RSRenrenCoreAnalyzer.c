@@ -250,9 +250,10 @@ RSExport RSArrayRef RSRenrenCoreAnalyzerCreateLikeEvent(RSRenrenCoreAnalyzerRef 
     return (models);
 }
 
-RSExport void RSRenrenCoreAnalyzerCreateEventContentsWithUserId(RSRenrenCoreAnalyzerRef analyzer, RSStringRef userId, RSUInteger count, void (^handler)(RSRenrenEventRef), void (^compelete)()) {
+RSExport void RSRenrenCoreAnalyzerCreateEventContentsWithUserId(RSRenrenCoreAnalyzerRef analyzer, RSStringRef userId, RSUInteger count, BOOL like, void (^handler)(RSRenrenEventRef), void (^compelete)()) {
     if (!analyzer || !userId || !count || !handler) return;
     __RSGenericValidInstance(analyzer, _RSRenrenCoreAnalyzerTypeID);
+    RSRetain(userId);
     RSPerformBlockInBackGround(^{
         __block RSUInteger begin = 0;
         __block RSUInteger limit = 0;
@@ -269,7 +270,7 @@ RSExport void RSRenrenCoreAnalyzerCreateEventContentsWithUserId(RSRenrenCoreAnal
                 RSErrorRef error = nil;
                 data = RSURLConnectionSendSynchronousRequest(remoteUpdateUser(analyzer, userId, limit), &response, &error);
                 if (RSURLResponseGetStatusCode(response) == 200)
-                    RSArrayAddObjects(models, RSAutorelease(RSRenrenCoreAnalyzerCreateLikeEvent(analyzer, RSStringWithData(data, RSStringEncodingUTF8), YES)));
+                    RSArrayAddObjects(models, RSAutorelease(RSRenrenCoreAnalyzerCreateLikeEvent(analyzer, RSStringWithData(data, RSStringEncodingUTF8), like)));
                 else
                     shouldContinue = NO;
                 begin = RSArrayGetCount(models);
@@ -291,6 +292,7 @@ RSExport void RSRenrenCoreAnalyzerCreateEventContentsWithUserId(RSRenrenCoreAnal
             RSShow(RSSTR("end"));
         }
         RSRelease(models);
+        RSRelease(userId);
         if (compelete) compelete();
     });
 }

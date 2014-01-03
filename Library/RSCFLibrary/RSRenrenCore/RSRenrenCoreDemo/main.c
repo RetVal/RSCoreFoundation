@@ -14,21 +14,21 @@ int main(int argc, const char * argv[])
         RSShow(RSSTR("RSRenrenDemo email password target-id"));
         return -1;
     }
+    RSShow(RSStringWithUTF8String(argv[3]));
     RSRenrenCoreAnalyzerRef analyzer = RSRenrenCoreAnalyzerCreate(RSAllocatorDefault, RSStringWithUTF8String(argv[1]), RSStringWithUTF8String(argv[2]), ^(RSRenrenCoreAnalyzerRef analyzer, RSDataRef data, RSURLResponseRef response, RSErrorRef error) {
         if (error) {
             RSShow(error);
             return;
         }
         RSShow(RSSTR("login success"));
-        void dump(RSRenrenCoreAnalyzerRef analyzer);
-        dump(analyzer);
-        RSRunLoopStop(RSRunLoopGetMain());
-//        RSRenrenCoreAnalyzerCreateEventContentsWithUserId(analyzer, RSStringWithUTF8String(argv[3]), 1, ^(RSRenrenEventRef event) {
-//            RSShow(event);
-//            RSRenrenEventDo(event);
-//        }, ^(void) {
-//            RSRunLoopStop(RSRunLoopGetMain());
-//        });
+        RSRenrenCoreAnalyzerCreateEventContentsWithUserId(analyzer, RSStringWithUTF8String(argv[3]), 150, NO, ^(RSRenrenEventRef event) {
+            RSShow(event);
+            
+            RSRenrenEventDo(event);
+            sleep(2);
+        }, ^(void) {
+            RSRunLoopStop(RSRunLoopGetMain());
+        });
     });
     RSRenrenCoreAnalyzerStartLogin(analyzer);
     RSRunLoopRun();

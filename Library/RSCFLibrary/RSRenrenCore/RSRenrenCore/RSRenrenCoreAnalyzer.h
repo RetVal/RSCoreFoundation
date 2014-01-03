@@ -21,7 +21,7 @@ RSExport RSRenrenCoreAnalyzerRef RSRenrenCoreAnalyzerCreate(RSAllocatorRef alloc
 RSExport void RSRenrenCoreAnalyzerStartLogin(RSRenrenCoreAnalyzerRef analyzer);
 RSExport RSArrayRef RSRenrenCoreAnalyzerCreateLikeEvent(RSRenrenCoreAnalyzerRef analyzer, RSStringRef content, BOOL addlike);
 
-RSExport void RSRenrenCoreAnalyzerCreateEventContentsWithUserId(RSRenrenCoreAnalyzerRef analyzer, RSStringRef userId, RSUInteger count, void (^handler)(RSRenrenEventRef event), void (^compelete)());
+RSExport void RSRenrenCoreAnalyzerCreateEventContentsWithUserId(RSRenrenCoreAnalyzerRef analyzer, RSStringRef userId, RSUInteger count, BOOL like, void (^handler)(RSRenrenEventRef), void (^compelete)());
 
 RSExport RSStringRef RSRenrenCoreAnalyzerGetUserId(RSRenrenCoreAnalyzerRef analyzer);
 RSExport RSStringRef RSRenrenCoreAnalyzerGetEmail(RSRenrenCoreAnalyzerRef analyzer);

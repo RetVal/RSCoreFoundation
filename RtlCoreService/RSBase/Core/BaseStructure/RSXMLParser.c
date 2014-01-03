@@ -1650,8 +1650,7 @@ RSExport void RSXMLDocumentReplaceChild(RSXMLDocumentRef document, RSXMLNodeRef 
 
 RSExport RSDataRef RSXMLDocumentGetXMLData(RSXMLDocumentRef document)
 {
-    //FIXME: implement it.
-    return nil;
+    return RSDataWithString(RSAutorelease(RSDescription(document)), RSStringEncodingUTF8);
 }
 
 #pragma mark -
