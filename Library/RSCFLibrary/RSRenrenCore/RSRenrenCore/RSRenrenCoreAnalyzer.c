@@ -250,10 +250,10 @@ RSExport RSArrayRef RSRenrenCoreAnalyzerCreateLikeEvent(RSRenrenCoreAnalyzerRef 
     return (models);
 }
 
-RSExport void RSRenrenCoreAnalyzerCreateEventContentsWithUserId(RSRenrenCoreAnalyzerRef analyzer, RSStringRef userId, RSUInteger count, void (^handler)(RSRenrenEventRef)) {
+RSExport void RSRenrenCoreAnalyzerCreateEventContentsWithUserId(RSRenrenCoreAnalyzerRef analyzer, RSStringRef userId, RSUInteger count, void (^handler)(RSRenrenEventRef), void (^compelete)()) {
     if (!analyzer || !userId || !count || !handler) return;
     __RSGenericValidInstance(analyzer, _RSRenrenCoreAnalyzerTypeID);
-    RSPerformBlockOnMainThread(^{
+    RSPerformBlockInBackGround(^{
         __block RSUInteger begin = 0;
         __block RSUInteger limit = 0;
         __block BOOL shouldContinue = YES;
@@ -291,7 +291,7 @@ RSExport void RSRenrenCoreAnalyzerCreateEventContentsWithUserId(RSRenrenCoreAnal
             RSShow(RSSTR("end"));
         }
         RSRelease(models);
-        RSRunLoopStop(RSRunLoopGetMain());
+        if (compelete) compelete();
     });
 }
 

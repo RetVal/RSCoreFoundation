@@ -17,11 +17,14 @@ int main(int argc, const char * argv[])
     RSRenrenCoreAnalyzerRef analyzer = RSRenrenCoreAnalyzerCreate(RSAllocatorDefault, RSStringWithUTF8String(argv[1]), RSStringWithUTF8String(argv[2]), ^(RSRenrenCoreAnalyzerRef analyzer, RSDataRef data, RSURLResponseRef response, RSErrorRef error) {
         if (error) {
             RSShow(error);
-            return ;
+            return;
         }
         RSShow(RSSTR("login success"));
         RSRenrenCoreAnalyzerCreateEventContentsWithUserId(analyzer, RSStringWithUTF8String(argv[3]), 1, ^(RSRenrenEventRef event) {
             RSShow(event);
+            RSRenrenEventDo(event);
+        }, ^(void) {
+            RSRunLoopStop(RSRunLoopGetMain());
         });
     });
     RSRenrenCoreAnalyzerStartLogin(analyzer);
