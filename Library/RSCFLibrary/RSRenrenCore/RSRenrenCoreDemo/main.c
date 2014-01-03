@@ -21,14 +21,17 @@ int main(int argc, const char * argv[])
             return;
         }
         RSShow(RSSTR("login success"));
-        RSRenrenCoreAnalyzerCreateEventContentsWithUserId(analyzer, RSStringWithUTF8String(argv[3]), 150, NO, ^(RSRenrenEventRef event) {
-            RSShow(event);
-            
-            RSRenrenEventDo(event);
-            sleep(2);
-        }, ^(void) {
-            RSRunLoopStop(RSRunLoopGetMain());
-        });
+        extern void dump(RSRenrenCoreAnalyzerRef);
+        dump(analyzer);
+        RSRunLoopStop(RSRunLoopGetMain());
+//        RSRenrenCoreAnalyzerCreateEventContentsWithUserId(analyzer, RSStringWithUTF8String(argv[3]), 150, NO, ^(RSRenrenEventRef event) {
+//            RSShow(event);
+//            
+//            RSRenrenEventDo(event);
+//            sleep(2);
+//        }, ^(void) {
+//            RSRunLoopStop(RSRunLoopGetMain());
+//        });
     });
     RSRenrenCoreAnalyzerStartLogin(analyzer);
     RSRunLoopRun();

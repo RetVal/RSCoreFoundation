@@ -12,7 +12,7 @@
 #include <RSCoreFoundation/RSCoreFoundation.h>
 
 RS_EXTERN_C_BEGIN
-typedef struct __RSXMLNode *RSXMLNodeRef;
+typedef const struct __RSXMLNode *RSXMLNodeRef;
 
 RSExport RSTypeID RSXMLNodeGetTypeID();
 RSExport RSStringRef RSXMLNodeGetName(RSXMLNodeRef node);
@@ -23,7 +23,7 @@ RSExport RSXMLNodeRef RSXMLNodeGetParent(RSXMLNodeRef node);
 RSExport RSUInteger RSXMLNodeGetNodeTypeId(RSXMLNodeRef node);
 RSExport RSStringRef RSXMLNodeGetStringValue(RSXMLNodeRef node);
 
-typedef struct __RSXMLElement *RSXMLElementRef;
+typedef const struct __RSXMLElement *RSXMLElementRef;
 
 RSExport RSTypeID RSXMLElementGetTypeID();
 RSExport void RSXMLElementAddAttribute(RSXMLElementRef element, RSXMLNodeRef attribute);
@@ -40,7 +40,7 @@ RSExport void RSXMLElementAddChild(RSXMLElementRef element, RSXMLNodeRef child);
 RSExport void RSXMLElementReplaceChild(RSXMLElementRef element, RSXMLNodeRef child, RSIndex atIndex);
 
 
-typedef struct __RSXMLDocument *RSXMLDocumentRef;
+typedef const struct __RSXMLDocument *RSXMLDocumentRef;
 
 RSExport RSTypeID RSXMLDocumentGetTypeID();
 RSExport void RSXMLDocumentInsertChild(RSXMLDocumentRef document, RSXMLNodeRef child, RSIndex atIndex);

@@ -282,6 +282,10 @@ void RSCoreAnalyzerRelease(RSCoreAnalyzer analyzer) {
 
 int main (int argc, char **argv)
 {
+    RSXMLDocumentRef document = RSXMLDocumentCreateWithContentOfFile(RSAllocatorDefault, RSFileManagerStandardizingPath(RSSTR("~/Desktop/renren.html")), RSXMLDocumentTidyHTML);
+    
+    RSRelease(document);
+    return 0;
     if (argc != 3) return 0;
     RSCoreAnalyzerCreate(&analyzer, RSStringWithUTF8String(argv[1]) /*email*/, RSStringWithUTF8String(argv[2])/*password*/);
     RSCoreAnalyzerStart(&analyzer);

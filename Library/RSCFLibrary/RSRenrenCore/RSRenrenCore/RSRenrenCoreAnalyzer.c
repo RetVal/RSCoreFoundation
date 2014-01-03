@@ -324,23 +324,31 @@ RSExport RSURLResponseRef RSRenrenCoreAnalyzerGetResponse(RSRenrenCoreAnalyzerRe
 #pragma mark -
 #pragma mark Friend Analyzer 
 
-static RSStringRef baseURLStringFormatForDumpFriendList()
+RSInline RSStringRef baseURLStringFormatForDumpFriendList()
 {
     return RSSTR("http://friend.renren.com/GetFriendList.do?curpage=%ld&id=%r");
 }
 
-static RSURLRef urlForCoreDumpFriendListWithUserId(RSStringRef userId, RSUInteger pageNumber)
+RSInline RSURLRef urlForCoreDumpFriendListWithUserId(RSStringRef userId, RSUInteger pageNumber)
 {
     return RSURLWithString(RSStringWithFormat(baseURLStringFormatForDumpFriendList(), pageNumber, userId));
 }
 
+RSInline RSUInteger friendNumberFromDocument(RSXMLDocumentRef document) {
+    return RSStringIntegerValue(RSXMLNodeGetValue(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSXMLDocumentGetRootElement(document), RSSTR("body")), 0), RSSTR("div")), 0), RSSTR("div")), 3), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("p")), 0), RSSTR("span")), 0)));
+}
+
 void dump(RSRenrenCoreAnalyzerRef analyzer) {
     RSUInteger pageNumber = 0;
-    RSDataRef data = RSDataWithURL(urlForCoreDumpFriendListWithUserId(RSRenrenCoreAnalyzerGetUserId(analyzer), pageNumber));
+    RSURLRef URL = urlForCoreDumpFriendListWithUserId(RSRenrenCoreAnalyzerGetUserId(analyzer), pageNumber);
+    RSShow(URL);
+    RSDataRef data = RSDataWithURL(URL);
     RSXMLDocumentRef document = RSXMLDocumentCreateWithXMLData(RSAllocatorDefault, data, RSXMLDocumentTidyHTML);
     if (document) {
-        
-        RSStringWriteToFile(RSAutorelease(RSDescription(document)), RSFileManagerStandardizingPath(RSSTR("~/Desktop/document.html")), RSWriteFileAutomatically);
+        RSShow(RSSTR("start"));
+        RSAutoreleaseBlock(^{
+            RSShow(RSNumberWithInteger(friendNumberFromDocument(document)));
+        });
         RSRelease(document);
     }
 }
