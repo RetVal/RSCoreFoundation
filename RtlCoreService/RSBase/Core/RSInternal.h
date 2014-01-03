@@ -331,10 +331,11 @@ struct _RSRuntimeLogPreference {
     RSUInteger _RSStringNoticeWhenConstantStringAddToTable  : 1;
     RSUInteger _RSPropertyListWarningWhenParseNullKey       : 1;
     RSUInteger _RSPropertyListWarningWhenParseNullValue     : 1;
+    RSUInteger _RSRuntimeLogSave                            : 1;
 #if __LP64__
-    RSUInteger _RSReserved : 64 - 10;
+    RSUInteger _RSReserved : 64 - 11;
 #else
-    RSUInteger _RSReserved : 32 - 10;
+    RSUInteger _RSReserved : 32 - 11;
 #endif
 };
 extern struct _RSRuntimeLogPreference ___RSDebugLogPreference;

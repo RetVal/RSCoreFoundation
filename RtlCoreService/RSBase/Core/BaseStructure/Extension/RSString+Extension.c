@@ -146,3 +146,13 @@ RSExport RSStringRef RSStringByReplacingOccurrencesOfString(RSStringRef string, 
     RSRelease(copy);
     return RSAutorelease(newString);
 }
+
+RSExport RSStringRef RSStringURLEncode(RSDictionaryRef dict) {
+    RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorDefault, RSDictionaryGetCount(dict));
+    RSDictionaryApplyBlock(dict, ^(const void *key, const void *value, BOOL *stop) {
+        RSArrayAddObject(array, RSStringWithFormat(RSSTR("%r=%r"), RSAutorelease(RSURLCreateStringByAddingPercentEscapes(RSAllocatorDefault, key, nil, RSSTR("!*'();:@&=+$,/?%#[]"), RSStringEncodingUTF8)), RSAutorelease(RSURLCreateStringByAddingPercentEscapes(RSAllocatorDefault, value, nil, RSSTR("!*'();:@&=+$,/?%#[]"), RSStringEncodingUTF8))));
+    });
+    RSStringRef str = RSStringCreateByCombiningStrings(RSAllocatorDefault, array, RSSTR("&"));
+    RSRelease(array);
+    return RSAutorelease(str);
+}

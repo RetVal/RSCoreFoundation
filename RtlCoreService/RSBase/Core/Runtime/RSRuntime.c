@@ -130,10 +130,12 @@ struct _RSRuntimeLogPreference ___RSDebugLogPreference = {
     ._RSStringNoticeWhenConstantStringAddToTable            = __RSStringNoticeWhenConstantStringAddToTable,
     ._RSPropertyListWarningWhenParseNullKey                 = __RSPropertyListWarningWhenParseNullKey,
     ._RSPropertyListWarningWhenParseNullValue               = __RSPropertyListWarningWhenParseNullValue,
+    ._RSRuntimeLogSave                                      = __RSRuntimeInstanceManageWatcher | __RSRuntimeInstanceRefWatcher | __RSRuntimeInstanceAllocFreeWatcher | __RSStringNoticeWhenConstantStringAddToTable | __RSRuntimeCheckAutoreleaseFlag,
 };
 
 struct ____RSDebugLogContext {
     RSSpinLock _debugLogLock;
+    FILE *_file;
     int _handle;
 	RSBlock _logPath[RSMaxPathSize];
 };
@@ -194,7 +196,7 @@ static void __RSDebugLevelInitialize()
     strcat(_debuglogPrefixPath, "/Library/Logs/RSCoreFoundation");
 	mkdir(_debuglogPrefixPath, 0777);
     sprintf(____RSRuntimeDebugLevelLogContext._logPath, "%s/com.retval.RSCoreFoundation.runtime.runid%05d.log", _debuglogPrefixPath, getpid());
-    ____RSRuntimeDebugLevelLogContext._handle = open(____RSRuntimeDebugLevelLogContext._logPath, O_RDWR | O_CREAT, 0555);
+    ____RSRuntimeDebugLevelLogContext._handle = fileno(____RSRuntimeDebugLevelLogContext._file = tmpfile());
 #elif DEPLOYMENT_TARGET_WINDOWS
     ____RSRuntimeDebugLevelLogContext._handle = open(____RSRuntimeDebugLevelLogContext._logPath, O_RDWR | O_CREAT, 0555);
 #endif
@@ -204,15 +206,24 @@ static void __RSDebugLevelDeallocate()
 {
 	unsigned long long org = lseek(____RSRuntimeDebugLevelLogContext._handle, 0, SEEK_CUR);
     lseek(____RSRuntimeDebugLevelLogContext._handle, 0, SEEK_END);
-    unsigned long long size = lseek(____RSRuntimeDebugLevelLogContext._handle, 0, SEEK_CUR); // get current file pointer
+    unsigned long long size __unused = lseek(____RSRuntimeDebugLevelLogContext._handle, 0, SEEK_CUR); // get current file pointer
     lseek(____RSRuntimeDebugLevelLogContext._handle, org, SEEK_SET);
-    if (size < 1 )
+    if (___RSDebugLogPreference._RSRuntimeLogSave)
 	{
-		close(____RSRuntimeDebugLevelLogContext._handle);
-		unlink(____RSRuntimeDebugLevelLogContext._logPath);
-		____RSRuntimeDebugLevelLogContext._handle = 0;
-		__builtin_memset(____RSRuntimeDebugLevelLogContext._logPath, 0, 2*RSMaxPathSize);
+        int fd = open(____RSRuntimeDebugLevelLogContext._logPath, O_RDWR | O_CREAT, 0555);
+        if (fd > 0) {
+            char *buf = calloc(1, size);
+            lseek(____RSRuntimeDebugLevelLogContext._handle, 0, SEEK_SET);
+            read(____RSRuntimeDebugLevelLogContext._handle, buf, size);
+            write(fd, buf, size);
+            close(fd);
+        }
 	}
+    
+    close(____RSRuntimeDebugLevelLogContext._handle);
+    fclose(____RSRuntimeDebugLevelLogContext._file);
+    ____RSRuntimeDebugLevelLogContext._handle = 0;
+    __builtin_memset(____RSRuntimeDebugLevelLogContext._logPath, 0, 2*RSMaxPathSize);
 }
 
 static void ___RSDebugLevelLogWrite(RSCBuffer tolog, RSIndex length)
@@ -1107,10 +1118,10 @@ void RSCoreFoundationDeallocate()
 	    __RSRuntimeRelease(__RSRetainCounters[idx].table, NO);
 	}
 #if DEBUG
-//    RSAllocatorLogUnitCount();        // check the Memory unit, it should be 0 or memory leaks.
+    RSAllocatorLogUnitCount();        // check the Memory unit, it should be 0 or memory leaks.
 #endif
     __RSRuntimeClassCacheDeallocate();
-    RSAllocatorLogUnitCount();        // check the Memory unit, it should be 0 or memory leaks.
+    // check the Memory unit, it should be 0 or memory leaks.
 	__RSDebugLevelDeallocate();
 }
 

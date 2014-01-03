@@ -298,13 +298,13 @@ static RSFileHandleRef __RSFileHandleCreateInstance(RSAllocatorRef allocator, RS
     {
         if (isTempFile)
         {
-            fileName = mkstemp("RSCoreFoundationXXXXXX");//mktemp();
+            fd = fileno(tmpfile());//mkstemp("RSCoreFoundationXXXXXX");//mktemp();
         }
         else
         {
             fileName = RSStringGetCStringPtr(filePath, __RSDefaultEightBitStringEncoding);
         }
-        fd = open(fileName, fdMode, privilege);
+        fd = fd != -1 ?: open(fileName, fdMode, privilege);
     }
     if (fd != -1)
     {

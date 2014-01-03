@@ -84,7 +84,7 @@ static BOOL _RSDataWriteToPath(RSDataRef data, RSStringRef path)
 
 static BOOL _RSDataWriteAutomatically(RSDataRef data, RSStringRef path)
 {
-    RSStringRef tmpPath = RSTemporaryPath(RSSTR("RSCoreFoundation-cache-"), RSSTR(".atdata"));
+    RSStringRef tmpPath = RSTemporaryPath(nil, RSSTR(".atdata"));
     BOOL result = _RSDataWriteToPath(data, tmpPath);
     if (result) result = RSFileManagerMoveFileToPath(RSFileManagerGetDefault(), tmpPath, path);
     return result;

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		30217B891875D18D00BC813A /* RSURL+Extension.c in Sources */ = {isa = PBXBuildFile; fileRef = 30217B881875D18D00BC813A /* RSURL+Extension.c */; };
+		30217B8B1875D19700BC813A /* RSURL+Extension.h in Headers */ = {isa = PBXBuildFile; fileRef = 30217B8A1875D19700BC813A /* RSURL+Extension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		304B3850186C36F300806E4B /* RSRegularExpression.c in Sources */ = {isa = PBXBuildFile; fileRef = 304B384E186C36F300806E4B /* RSRegularExpression.c */; };
 		304B3851186C36F300806E4B /* RSRegularExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 304B384F186C36F300806E4B /* RSRegularExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3098391E1868818400398AC3 /* RSRawHashTable.c in Sources */ = {isa = PBXBuildFile; fileRef = 3098391C1868818400398AC3 /* RSRawHashTable.c */; };
@@ -721,6 +723,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		30217B881875D18D00BC813A /* RSURL+Extension.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "RSURL+Extension.c"; sourceTree = "<group>"; };
+		30217B8A1875D19700BC813A /* RSURL+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RSURL+Extension.h"; sourceTree = "<group>"; };
 		304B384E186C36F300806E4B /* RSRegularExpression.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRegularExpression.c; sourceTree = "<group>"; };
 		304B384F186C36F300806E4B /* RSRegularExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRegularExpression.h; sourceTree = "<group>"; };
 		3098391C1868818400398AC3 /* RSRawHashTable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRawHashTable.c; sourceTree = "<group>"; };
@@ -1523,6 +1527,8 @@
 				41ABD4B6175F6D7C00A4B4F6 /* RSNumber+Extension.h */,
 				41FB48FB177AE3B900571B16 /* RSError+Extension.c */,
 				41FB48FD177AE3CC00571B16 /* RSError+Extension.h */,
+				30217B881875D18D00BC813A /* RSURL+Extension.c */,
+				30217B8A1875D19700BC813A /* RSURL+Extension.h */,
 			);
 			name = Extension;
 			path = RSBase/Core/BaseStructure/Extension;
@@ -2523,6 +2529,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				304B3851186C36F300806E4B /* RSRegularExpression.h in Headers */,
+				30217B8B1875D19700BC813A /* RSURL+Extension.h in Headers */,
 				30F32B3B1860318300A45125 /* RSHTTPCookieStorage.h in Headers */,
 				4177A7E9185C896E00BEE29C /* RSHTTPCookie.h in Headers */,
 				41A93AA8178ABDC3008613C5 /* RSXMLParser.h in Headers */,
@@ -3438,6 +3445,7 @@
 				41FE768A1822B9A600E5E581 /* strtoofft.c in Sources */,
 				410C4BAB1756DDD800A0434B /* RSData+Extension.c in Sources */,
 				41FE76801822B9A600E5E581 /* ssluse.c in Sources */,
+				30217B891875D18D00BC813A /* RSURL+Extension.c in Sources */,
 				419C42B0175DB23400C1D41E /* RSDictionary+Extension.c in Sources */,
 				41FE76111822B9A600E5E581 /* http_proxy.c in Sources */,
 				41FE76421822B9A600E5E581 /* non-ascii.c in Sources */,

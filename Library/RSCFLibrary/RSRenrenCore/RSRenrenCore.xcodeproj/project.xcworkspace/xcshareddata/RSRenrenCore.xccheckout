@@ -5,20 +5,20 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>DC7B2CF5-8D38-412A-84EC-14C870DB10BD</string>
+	<string>914AAF5F-895A-4D3F-8C30-9DCA9E566250</string>
 	<key>IDESourceControlProjectName</key>
-	<string>RSCoreFoundation</string>
+	<string>RSRenrenCore</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>541A1A70-F74F-46FE-A4A5-CBCE2A1189D0</key>
 		<string>https://github.com/RetVal/RSCoreFoundation.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>RSCoreFoundation.xcodeproj/project.xcworkspace</string>
+	<string>Library/RSCFLibrary/RSRenrenCore/RSRenrenCore.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>541A1A70-F74F-46FE-A4A5-CBCE2A1189D0</key>
-		<string>../..</string>
+		<string>../../../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/RetVal/RSCoreFoundation.git</string>

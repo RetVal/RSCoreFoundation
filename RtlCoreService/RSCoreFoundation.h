@@ -67,6 +67,7 @@
 #include <RSCoreFoundation/RSError+Extension.h>
 #include <RSCoreFoundation/RSNumber+Extension.h>
 #include <RSCoreFoundation/RSString+Extension.h>
+#include <RSCoreFoundation/RSURL+Extension.h>
 
 #include <RSCoreFoundation/RSProcessInfo.h>
 RSExport void RSCoreFoundationCrash();
