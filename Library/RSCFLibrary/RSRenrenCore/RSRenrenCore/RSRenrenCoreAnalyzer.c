@@ -319,3 +319,26 @@ RSExport RSURLResponseRef RSRenrenCoreAnalyzerGetResponse(RSRenrenCoreAnalyzerRe
     return analyzer->_response;
 }
 
+#pragma mark -
+#pragma mark Friend Analyzer 
+
+static RSStringRef baseURLStringFormatForDumpFriendList()
+{
+    return RSSTR("http://friend.renren.com/GetFriendList.do?curpage=%ld&id=%r");
+}
+
+static RSURLRef urlForCoreDumpFriendListWithUserId(RSStringRef userId, RSUInteger pageNumber)
+{
+    return RSURLWithString(RSStringWithFormat(baseURLStringFormatForDumpFriendList(), pageNumber, userId));
+}
+
+void dump(RSRenrenCoreAnalyzerRef analyzer) {
+    RSUInteger pageNumber = 0;
+    RSDataRef data = RSDataWithURL(urlForCoreDumpFriendListWithUserId(RSRenrenCoreAnalyzerGetUserId(analyzer), pageNumber));
+    RSXMLDocumentRef document = RSXMLDocumentCreateWithXMLData(RSAllocatorDefault, data, RSXMLDocumentTidyHTML);
+    if (document) {
+        
+        RSStringWriteToFile(RSAutorelease(RSDescription(document)), RSFileManagerStandardizingPath(RSSTR("~/Desktop/document.html")), RSWriteFileAutomatically);
+        RSRelease(document);
+    }
+}

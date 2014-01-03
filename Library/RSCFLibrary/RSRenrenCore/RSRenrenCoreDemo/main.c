@@ -10,7 +10,7 @@
 
 int main(int argc, const char * argv[])
 {
-    if (3 != argc) {
+    if (4 != argc) {
         RSShow(RSSTR("RSRenrenDemo email password target-id"));
         return -1;
     }
@@ -20,15 +20,19 @@ int main(int argc, const char * argv[])
             return;
         }
         RSShow(RSSTR("login success"));
-        RSRenrenCoreAnalyzerCreateEventContentsWithUserId(analyzer, RSStringWithUTF8String(argv[3]), 1, ^(RSRenrenEventRef event) {
-            RSShow(event);
-            RSRenrenEventDo(event);
-        }, ^(void) {
-            RSRunLoopStop(RSRunLoopGetMain());
-        });
+        void dump(RSRenrenCoreAnalyzerRef analyzer);
+        dump(analyzer);
+        RSRunLoopStop(RSRunLoopGetMain());
+//        RSRenrenCoreAnalyzerCreateEventContentsWithUserId(analyzer, RSStringWithUTF8String(argv[3]), 1, ^(RSRenrenEventRef event) {
+//            RSShow(event);
+//            RSRenrenEventDo(event);
+//        }, ^(void) {
+//            RSRunLoopStop(RSRunLoopGetMain());
+//        });
     });
     RSRenrenCoreAnalyzerStartLogin(analyzer);
     RSRunLoopRun();
+    sleep(1);
     RSRelease(analyzer);
     return 0;
 }

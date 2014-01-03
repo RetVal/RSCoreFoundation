@@ -19,6 +19,8 @@
 		30A09AF7187651E700920C81 /* RSRenrenCoreDemo.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 30A09AF6187651E700920C81 /* RSRenrenCoreDemo.1 */; };
 		30A09AFB1876520000920C81 /* RSCoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30A09AEC187650C100920C81 /* RSCoreFoundation.framework */; };
 		30A09AFC1876520400920C81 /* RSRenrenCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30217B571875D0F300BC813A /* RSRenrenCore.framework */; };
+		30B6AADC18767B5B0082690A /* RSRenrenFriend.c in Sources */ = {isa = PBXBuildFile; fileRef = 30B6AADA18767B5B0082690A /* RSRenrenFriend.c */; };
+		30B6AADD18767B5B0082690A /* RSRenrenFriend.h in Headers */ = {isa = PBXBuildFile; fileRef = 30B6AADB18767B5B0082690A /* RSRenrenFriend.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -50,6 +52,8 @@
 		30A09AF2187651E700920C81 /* RSRenrenCoreDemo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RSRenrenCoreDemo; sourceTree = BUILT_PRODUCTS_DIR; };
 		30A09AF4187651E700920C81 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		30A09AF6187651E700920C81 /* RSRenrenCoreDemo.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = RSRenrenCoreDemo.1; sourceTree = "<group>"; };
+		30B6AADA18767B5B0082690A /* RSRenrenFriend.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRenrenFriend.c; sourceTree = "<group>"; };
+		30B6AADB18767B5B0082690A /* RSRenrenFriend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRenrenFriend.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +114,8 @@
 				30217B8D1875D30B00BC813A /* RSRenrenCoreAnalyzer.h */,
 				30217B901875D4F500BC813A /* RSRenrenEvent.c */,
 				30217B911875D4F500BC813A /* RSRenrenEvent.h */,
+				30B6AADA18767B5B0082690A /* RSRenrenFriend.c */,
+				30B6AADB18767B5B0082690A /* RSRenrenFriend.h */,
 				30217B611875D0F300BC813A /* Supporting Files */,
 			);
 			path = RSRenrenCore;
@@ -142,6 +148,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				30217B8F1875D30B00BC813A /* RSRenrenCoreAnalyzer.h in Headers */,
+				30B6AADD18767B5B0082690A /* RSRenrenFriend.h in Headers */,
 				30217B931875D4F500BC813A /* RSRenrenEvent.h in Headers */,
 				30217B871875D15200BC813A /* RSRenrenCore.h in Headers */,
 			);
@@ -246,6 +253,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30B6AADC18767B5B0082690A /* RSRenrenFriend.c in Sources */,
 				30217B691875D0F300BC813A /* RSRenrenCore.c in Sources */,
 				30217B921875D4F500BC813A /* RSRenrenEvent.c in Sources */,
 				30217B8E1875D30B00BC813A /* RSRenrenCoreAnalyzer.c in Sources */,
