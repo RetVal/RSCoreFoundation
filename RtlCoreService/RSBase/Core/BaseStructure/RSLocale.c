@@ -10,6 +10,8 @@
 #include <RSCoreFoundation/RSCalendar.h>
 #include <RSCoreFoundation/RSRuntime.h>
 #include <RSCoreFoundation/RSString.h>
+#include <RSCoreFoundation/RSSet.h>
+#include <RSCoreFoundation/RSNumber.h>
 
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
 #include "unicode/uloc.h"           // ICU locales

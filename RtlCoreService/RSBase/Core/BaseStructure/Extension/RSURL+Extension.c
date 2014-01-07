@@ -11,6 +11,7 @@
 #include <RSCoreFoundation/RSURLResponse.h>
 #include <RSCoreFoundation/RSURLRequest.h>
 #include <RSCoreFoundation/RSURLConnection.h>
+#include <RSCoreFoundation/RSData+Extension.h>
 
 RSExport RSDataRef RSDataWithURL(RSURLRef URL) {
     if (!URL) return nil;

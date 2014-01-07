@@ -10,6 +10,7 @@
 #define RSCoreFoundation_RSString_Extension_h
 
 #include <RSCoreFoundation/RSError.h>
+#include <RSCoreFoundation/RSCharacterSet.h>
 
 RS_EXTERN_C_BEGIN
 
@@ -40,6 +41,7 @@ RSExport BOOL RSStringWriteToFileWithError(RSStringRef string, RSStringRef path,
 RSExport RSRange RSStringRangeOfString(RSStringRef string, RSStringRef find) RS_AVAILABLE(0_4);
 
 RSExport RSStringRef RSStringByReplacingOccurrencesOfString(RSStringRef string, RSStringRef target, RSStringRef replacement) RS_AVAILABLE(0_4);
+RSExport RSStringRef RSStringByTrimmingCharactersInSet(RSStringRef string, RSCharacterSetRef characterSet) RS_AVAILABLE(0_4);
 RSExport RSStringRef RSStringURLEncode(RSDictionaryRef dict) RS_AVAILABLE(0_4);
 RS_EXTERN_C_END
 #endif

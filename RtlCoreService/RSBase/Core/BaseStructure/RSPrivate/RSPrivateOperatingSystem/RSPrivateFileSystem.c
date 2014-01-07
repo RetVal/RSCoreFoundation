@@ -7,6 +7,8 @@
 //
 
 #include "RSPrivateFileSystem.h"
+#include <RSCoreFoundation/RSFileManager.h>
+#include <RSCoreFoundation/RSString+Extension.h>
 
 BOOL _RSGetCurrentDirectory(char *path, int maxlen)
 {

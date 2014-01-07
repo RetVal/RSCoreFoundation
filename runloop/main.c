@@ -7,6 +7,191 @@
 //
 
 #include <RSCoreFoundation/RSCoreFoundation.h>
+#include "RSRenrenFriend.h"
+
+#pragma mark -
+#pragma mark Friend Analyzer
+
+RSInline RSStringRef baseURLStringFormatForDumpFriendList()
+{
+    return RSSTR("http://friend.renren.com/GetFriendList.do?curpage=%ld&id=%r");
+}
+
+RSInline RSURLRef urlForCoreDumpFriendListWithUserId(RSStringRef userId, RSUInteger pageNumber)
+{
+    return RSURLWithString(RSStringWithFormat(baseURLStringFormatForDumpFriendList(), pageNumber, userId));
+}
+
+RSInline RSArrayRef friendsElementsFromDocument(RSXMLDocumentRef document) {
+    RSXMLElementRef root = RSXMLDocumentGetRootElement(document);
+    RSXMLElementRef body = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(root, RSSTR("body")), 0);
+    RSXMLElementRef containerDiv = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(body, RSSTR("div")), 0);
+    RSXMLElementRef containerForBuddyListDiv = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(containerDiv, RSSTR("div")), 3);
+    RSXMLElementRef contentDiv = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(containerForBuddyListDiv, RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0);
+    RSXMLElementRef stdContainerDiv = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(contentDiv, RSSTR("div")), 1);
+    RSXMLElementRef list_resultDiv = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(stdContainerDiv, RSSTR("div")), 1);
+    RSXMLElementRef friendListCon_ol = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(list_resultDiv, RSSTR("ol")), 1);
+    return RSXMLElementGetElementsForName(friendListCon_ol, RSSTR("li"));
+}
+
+//- (id)_analyzeFriendForAvatar:(NSXMLElement *)avatar
+//{
+//    NSMutableDictionary *avatarInfo = [[NSMutableDictionary alloc] initWithCapacity:2];
+//    NSXMLElement *a = [[avatar elementsForName:@"a"] lastObject];
+//    NSXMLNode *href = [a attributeForName:@"href"];
+//
+//    [avatarInfo setObject:[href objectValue] forKey:_kCAHomePageLinkKey];
+//
+//    NSXMLElement *img = [[a elementsForName:@"img"] lastObject];
+//    NSXMLNode *src = [img attributeForName:@"src"];
+//
+//    [avatarInfo setObject:[src objectValue] forKey:_kCAHeadImageLinkKey];
+//    return avatarInfo;
+//}
+
+RSInline RSDictionaryRef analyzeFriendAvatar(RSXMLElementRef avatar) {
+    RSMutableDictionaryRef avatarInfo = RSAutorelease(RSDictionaryCreateMutable(RSAllocatorDefault, 0, RSDictionaryRSTypeContext));
+    RSXMLElementRef a = RSArrayLastObject(RSXMLElementGetElementsForName(avatar, RSSTR("a")));
+    RSXMLNodeRef href = RSXMLElementGetAttributeForName(a, RSSTR("href"));
+    RSDictionarySetValue(avatarInfo, RSSTR("homePageLink"), RSXMLNodeGetValue(href));
+    RSXMLElementRef img = RSArrayLastObject(RSXMLElementGetElementsForName(a, RSSTR("img")));
+    RSXMLNodeRef src = RSXMLElementGetAttributeForName(img, RSSTR("src"));
+    RSDictionarySetValue(avatarInfo, RSSTR("headImageLink"), RSXMLNodeGetValue(src));
+    return avatarInfo;
+}
+
+//- (id)_analyzeFriendForInfo:(NSXMLElement *)info
+//{
+//    NSMutableDictionary *infoInfo = [[NSMutableDictionary alloc] initWithCapacity:3];
+//    NSXMLElement *dl = [[info elementsForName:@"dl"] lastObject];
+//    NSXMLElement *dd = [dl elementsForName:@"dd"][0];
+//    NSXMLElement *dd_location = [[dl elementsForName:@"dd"] lastObject];
+//
+//    NSXMLElement *a = [[dd elementsForName:@"a"] lastObject];
+//    NSXMLNode *href __unused = [a attributeForName:@"href"];
+//
+//    if (dd_location && NO == [dd isEqual:dd_location])
+//    {
+//        [infoInfo setObject:[a objectValue] forKey:_kCANameKey];
+//        [infoInfo setObject:[[dd_location objectValue] stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]] forKey:_kCASchoolKey];
+//    }
+//    else
+//    {
+//        [infoInfo setObject:[a objectValue] forKey:_kCANameKey];
+//    }
+//
+//    return infoInfo;
+//}
+
+RSInline RSDictionaryRef analyzeFriendForInfo(RSXMLElementRef info) {
+    RSMutableDictionaryRef infoInfo = RSAutorelease(RSDictionaryCreateMutable(RSAllocatorDefault, 0, RSDictionaryRSTypeContext));
+    RSXMLElementRef dl = RSArrayLastObject(RSXMLElementGetElementsForName(info, RSSTR("dl")));
+    RSXMLElementRef dd = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(dl, RSSTR("dd")), 0);
+    RSXMLElementRef dd_location = RSArrayLastObject(RSXMLElementGetElementsForName(dl, RSSTR("dd")));
+    RSXMLElementRef a = RSArrayLastObject(RSXMLElementGetElementsForName(dd, RSSTR("a")));
+    RSXMLNodeRef href __unused = RSXMLElementGetAttributeForName(a, RSSTR("href"));
+    if (dd_location && NO == RSEqual(dd, dd_location)) {
+        RSDictionarySetValue(infoInfo, RSSTR("name"), RSXMLNodeGetValue((RSXMLNodeRef)a));
+        RSDictionarySetValue(infoInfo, RSSTR("school"), RSStringByTrimmingCharactersInSet(RSXMLNodeGetValue((RSXMLNodeRef)dd_location), RSCharacterSetGetPredefined(RSCharacterSetNewline)));
+    } else {
+        RSDictionarySetValue(infoInfo, RSSTR("name"), RSXMLNodeGetValue((RSXMLNodeRef)a));
+    }
+    return infoInfo;
+}
+
+//- (NSString *)_analyzeFriendForAccountId:(RSBaseModel *)model
+//{
+//    NSString *homelink = [[model homePageURL] absoluteString];
+//    NSString *userId = nil;
+//    if ([homelink hasPrefix:@"http://www.renren.com/profile.do?id="])
+//        userId = [[homelink mutableCopy] stringByReplacingOccurrencesOfString:@"http://www.renren.com/profile.do?id=" withString:@""];
+//        else
+//            userId = nil;
+//            return userId;
+//}
+RSInline RSStringRef analyzeFriendForAccountID(RSRenrenFriendRef friend) {
+    
+    RSStringRef homelink = RSURLGetString(RSAutorelease(RSURLCopyAbsoluteURL(RSRenrenFriendGetHomePageURL(friend))));
+    RSStringRef userId = nil;
+    if (RSStringHasPrefix(homelink, RSSTR("http://www.renren.com/profile.do?id=")))
+        userId = RSStringByReplacingOccurrencesOfString(RSAutorelease(RSMutableCopy(RSAllocatorDefault, homelink)), RSSTR("http://www.renren.com/profile.do?id="), RSSTR(""));
+    else
+        userId = RSSTR("0");
+    return userId;
+}
+
+//- (id)analyzeFriend:(NSXMLElement *)friendInfo
+//{
+//    if (!friendInfo) return nil;
+//    NSXMLElement *avatar = [[friendInfo elementsForName:@"p"] lastObject];
+//    NSXMLElement *info = [[friendInfo elementsForName:@"div"] lastObject];
+//    NSXMLElement *actions = [[friendInfo elementsForName:@"ul"] lastObject];
+//    if (!avatar || !info || !actions) return nil;
+//    NSDictionary *avatarResult = [self _analyzeFriendForAvatar:avatar];
+//    NSDictionary *infoResult = [self _analyzeFriendForInfo:info];
+//
+//    RSBaseModel *model = [[RSBaseModel alloc] init];
+//    [model setHomePageURL:[NSURL URLWithString:[avatarResult objectForKey:_kCAHomePageLinkKey]]];
+//    [model setImageURL:[NSURL URLWithString:[avatarResult objectForKey:_kCAHeadImageLinkKey]]];
+//    [model setName:[infoResult objectForKey:_kCANameKey]];
+//    [model setSchoolName:[infoResult objectForKey:_kCASchoolKey]];
+//    [model setAccount:[self _analyzeFriendForAccountId:model]];
+//    return model;
+//}
+
+RSInline RSTypeRef analyzeFriend(RSXMLElementRef element) {
+    if (!element) return nil;
+    RSXMLElementRef avatar = RSArrayLastObject(RSXMLElementGetElementsForName(element, RSSTR("p")));
+    RSXMLElementRef info = RSArrayLastObject(RSXMLElementGetElementsForName(element, RSSTR("div")));
+    RSXMLElementRef actions = RSArrayLastObject(RSXMLElementGetElementsForName(element, RSSTR("ul")));
+    if (!avatar || !info ||!actions) return nil;
+    RSDictionaryRef avatarResult = analyzeFriendAvatar(avatar);
+    RSDictionaryRef infoResult = analyzeFriendForInfo(info);
+    RSRenrenFriendRef friend = RSAutorelease(RSRenrenFriendCreate(RSAllocatorDefault));
+    RSRenrenFriendSetHomePageURL(friend, RSURLWithString(RSDictionaryGetValue(avatarResult, RSSTR("homePageLink"))));
+    RSRenrenFriendSetImageURL(friend, RSURLWithString(RSDictionaryGetValue(avatarResult, RSSTR("headImageLink"))));
+    RSRenrenFriendSetName(friend, RSDictionaryGetValue(infoResult, RSSTR("name")));
+    RSRenrenFriendSetSchoolName(friend, RSDictionaryGetValue(infoResult, RSSTR("schoolName")));
+    RSRenrenFriendSetAccountID(friend, analyzeFriendForAccountID(friend));
+    RSLog(RSSTR("%p - %r(%r)"), friend, RSRenrenFriendGetName(friend), RSRenrenFriendGetAccountID(friend));
+//    sleep(2);
+    return friend;
+}
+
+RSInline RSArrayRef friendsFromElements(RSArrayRef elements) {
+    if (!elements || RSArrayGetCount(elements) == 0) return nil;
+    RSAbsoluteTime s = 0, e = 0;
+    RSShow(RSSTR("1  ---------------------------------------------------"));
+    s = RSAbsoluteTimeGetCurrent();
+    RSArrayRef friends = RSPerformBlockConcurrentCopyResults(RSArrayGetCount(elements), ^RSTypeRef(RSIndex idx) {
+        return analyzeFriend(RSArrayObjectAtIndex(elements, idx));
+    });
+    e = RSAbsoluteTimeGetCurrent();
+    RSLog(RSSTR("RSPerformBlockConcurrent cost %f"), e - s);
+    return RSAutorelease(friends);
+}
+
+RSInline RSUInteger friendNumberFromDocument(RSXMLDocumentRef document) {
+    return RSStringIntegerValue(RSXMLNodeGetValue(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSXMLDocumentGetRootElement(document), RSSTR("body")), 0), RSSTR("div")), 0), RSSTR("div")), 3), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("p")), 0), RSSTR("span")), 0)));
+}
+
+void dump() {
+//    RSUInteger pageNumber = 0;
+//    RSURLRef URL = urlForCoreDumpFriendListWithUserId(RSRenrenCoreAnalyzerGetUserId(analyzer), pageNumber);
+//    RSShow(URL);
+    //    RSDataRef data = RSDataWithURL(URL);
+    //    RSDataWriteToFile(data, RSFileManagerStandardizingPath(RSSTR("~/Desktop/renren.html")), RSWriteFileAutomatically);
+    //    RSXMLDocumentRef document = RSXMLDocumentCreateWithXMLData(RSAllocatorDefault, data, RSXMLDocumentTidyHTML);
+    RSXMLDocumentRef document = RSXMLDocumentCreateWithContentOfFile(RSAllocatorDefault, RSFileManagerStandardizingPath(RSSTR("~/Desktop/renren.html")), RSXMLDocumentTidyHTML);
+    if (document) {
+        RSShow(RSSTR("start"));
+        RSAutoreleaseBlock(^{
+            RSShow(RSNumberWithInteger(friendNumberFromDocument(document)));
+            RSShow(friendsFromElements(friendsElementsFromDocument(document)));
+        });
+        RSRelease(document);
+    }
+}
 
 typedef struct RSCoreAnalyzer {
     RSURLConnectionRef connection;
@@ -282,6 +467,8 @@ void RSCoreAnalyzerRelease(RSCoreAnalyzer analyzer) {
 
 int main (int argc, char **argv)
 {
+    dump();
+    return 0;
     RSXMLDocumentRef document = RSXMLDocumentCreateWithContentOfFile(RSAllocatorDefault, RSFileManagerStandardizingPath(RSSTR("~/Desktop/renren.html")), RSXMLDocumentTidyHTML);
     
     RSRelease(document);

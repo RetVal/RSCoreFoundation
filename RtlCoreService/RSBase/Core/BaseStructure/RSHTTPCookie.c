@@ -10,6 +10,10 @@
 
 #include <RSCoreFoundation/RSRuntime.h>
 #include <RSCoreFoundation/RSArchiver.h>
+#include <RSCoreFoundation/RSArchiverRoutine.h>
+#include <RSCoreFoundation/RSString+Extension.h>
+#include <RSCoreFoundation/RSStringNumberSupport.h>
+#include <RSCoreFoundation/RSNumber+Extension.h>
 
 RS_PUBLIC_CONST_STRING_DECL(RSHTTPCookieName, "name");
 RS_PUBLIC_CONST_STRING_DECL(RSHTTPCookieValue, "value");

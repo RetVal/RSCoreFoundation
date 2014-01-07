@@ -15,7 +15,9 @@
 #include <RSCoreFoundation/RSURL.h>
 #include <RSCoreFoundation/RSURLRequest.h>
 #include <RSCoreFoundation/RSURLResponse.h>
-
+#include <RSCoreFoundation/RSRunLoop.h>
+#include <RSCoreFoundation/RSError.h>
+#include <RSCoreFoundation/RSError+Extension.h>
 RS_EXTERN_C_BEGIN
 
 typedef struct __RSURLConnection *RSURLConnectionRef;

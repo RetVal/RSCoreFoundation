@@ -6,6 +6,8 @@
 //  Copyright (c) 2012 RetVal. All rights reserved.
 //
 
+#include <RSData.h>
+#include <RSData+Extension.h>
 #include <RSCoreFoundation/RSDictionary.h>
 #include <RSCoreFoundation/RSNil.h>
 #include <RSCoreFoundation/RSNotificationCenter.h>

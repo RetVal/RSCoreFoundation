@@ -197,9 +197,7 @@ RSExport void RSRunLoopTimerGetContext(RSRunLoopTimerRef timer, RSRunLoopTimerCo
 // As the user of the timer, you will have the best idea of what an appropriate tolerance for a timer may be. A general rule of thumb, though, is to set the tolerance to at least 10% of the interval, for a repeating timer. Even a small amount of tolerance will have a significant positive impact on the power usage of your application. The system may put a maximum value of the tolerance.
 RSExport RSTimeInterval RSRunLoopTimerGetTolerance(RSRunLoopTimerRef timer) RS_AVAILABLE(0_4);
 RSExport void RSRunLoopTimerSetTolerance(RSRunLoopTimerRef timer, RSTimeInterval tolerance) RS_AVAILABLE(0_4);
-
-    
-
+RSExport RSArrayRef RSPerformBlockConcurrentCopyResults(RSIndex performCount, RSTypeRef (^perform)(RSIndex idx)) RS_AVAILABLE(0_4);
 
 RSExport RSStringRef const RSRunLoopDefault RS_AVAILABLE(0_0);   // one source one thread mode.
 RSExport RSStringRef const RSRunLoopQueue RS_AVAILABLE(0_1);     // all sources run on one thread.

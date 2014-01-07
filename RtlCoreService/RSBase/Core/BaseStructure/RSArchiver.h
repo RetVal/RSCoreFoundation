@@ -12,6 +12,7 @@
 #include <RSCoreFoundation/RSBase.h>
 #include <RSCoreFoundation/RSData.h>
 #include <RSCoreFoundation/RSString.h>
+#include <RSCoreFoundation/RSString+Extension.h>
 
 RS_EXTERN_C_BEGIN
 

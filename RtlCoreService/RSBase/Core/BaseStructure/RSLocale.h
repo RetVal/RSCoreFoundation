@@ -20,6 +20,7 @@ typedef const struct __RSLocale *RSLocaleRef;
 RSExport RSTypeID RSLocaleGetTypeID();
 RSExport RSLocaleRef RSLocaleCopyCurrent(void);
 RSExport RSLocaleRef RSLocaleCreate(RSAllocatorRef allocator, RSStringRef identifier);
+RSExport RSStringRef RSLocaleGetIdentifier(RSLocaleRef locale);
 RSExport RSTypeRef RSLocaleGetValue(RSLocaleRef locale, RSStringRef key);
 
 typedef RS_ENUM(RSIndex, RSLocaleLanguageDirection) {

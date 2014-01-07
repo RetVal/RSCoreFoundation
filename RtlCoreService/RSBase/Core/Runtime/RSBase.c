@@ -10,6 +10,7 @@
 #include <RSCoreFoundation/RSNil.h>
 #include <RSCoreFoundation/RSRuntime.h>
 #include <RSCoreFoundation/RSDate.h>
+#include <RSCoreFoundation/RSNumber.h>
 #include <RSCoreFoundation/RSTimeZone.h>
 
 #include "../BaseStructure/RSPrivate/RSPrivateOperatingSystem/RSPrivateTask.h"
@@ -36,7 +37,8 @@ RSInline RSTypeID __RSGetTypeID(RSTypeRef obj)
 
 RSInline BOOL   __RSCheckInstanceISCustomReferenceType(RSTypeRef obj) {
     RSTypeID typeID = __RSGetTypeID(obj);
-    if (typeID == _RSRuntimeNotATypeID) HALTWithError(RSInvalidArgumentException, "the type of the object is not a registered class in runtime");
+    if (typeID == _RSRuntimeNotATypeID)
+        HALTWithError(RSInvalidArgumentException, "the type of the object is not a registered class in runtime");
     const RSRuntimeClass *cls = __RSRuntimeGetClassWithTypeID(typeID);
     if (cls && cls->refcount) return YES;
     return NO;

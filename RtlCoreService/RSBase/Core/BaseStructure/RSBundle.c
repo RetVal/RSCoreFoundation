@@ -19,6 +19,7 @@
 #include <RSCoreFoundation/RSPropertyList.h>
 #include <RSCoreFoundation/RSRuntime.h>
 #include <RSCoreFoundation/RSString.h>
+#include <RSCoreFoundation/RSSet.h>
 #include <stdio.h>
 
 #if defined(BINARY_SUPPORT_DYLD)

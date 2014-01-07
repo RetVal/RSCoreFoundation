@@ -23,5 +23,7 @@ RSExport void RSQueueEnqueue(RSQueueRef queue, RSTypeRef object) RS_AVAILABLE(0_
 RSExport RSTypeRef RSQueuePeekObject(RSQueueRef queue) RS_AVAILABLE(0_2);
 RSExport RSIndex RSQueueGetCapacity(RSQueueRef queue) RS_AVAILABLE(0_2);
 RSExport RSIndex RSQueueGetCount(RSQueueRef queue) RS_AVAILABLE(0_2);
+RSExport RSArrayRef RSQueueCopyCoreQueueUnsafe(RSQueueRef queue) RS_AVAILABLE(0_4);
+RSExport RSArrayRef RSQueueCopyCoreQueueSafe(RSQueueRef queue) RS_AVAILABLE(0_4);
 RS_EXTERN_C_END
 #endif

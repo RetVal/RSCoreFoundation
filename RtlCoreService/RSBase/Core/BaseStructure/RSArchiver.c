@@ -10,6 +10,19 @@
 
 #include <RSCoreFoundation/RSRuntime.h>
 #include <RSCoreFoundation/RSDictionary.h>
+#include <RSCoreFoundation/RSDictionary+Extension.h>
+#include <RSCoreFoundation/RSError.h>
+#include <RSCoreFoundation/RSNumber.h>
+#include <RSCoreFoundation/RSNumber+Extension.h>
+#include <RSCoreFoundation/RSCalendar.h>
+#include <RSCoreFoundation/RSTimeZone.h>
+#include <RSCoreFoundation/RSBinaryPropertyList.h>
+#include <RSCoreFoundation/RSPropertyList.h>
+#include <RSCoreFoundation/RSNil.h>
+#include <RSCoreFoundation/RSNotification.h>
+#include <RSCoreFoundation/RSError+Extension.h>
+#include <RSCoreFoundation/RSData+Extension.h>
+
 extern RSTypeRef __RSBPLCreateObjectWithData(RSDataRef data);
 extern RSDataRef __RSBPLCreateDataForObject(RSTypeRef obj);
 extern RSMutableDataRef __RSPropertyListCreateWithError(RSTypeRef root, __autorelease RSErrorRef* error);

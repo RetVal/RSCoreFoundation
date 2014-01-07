@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		30146C3B1878063C0086AFA0 /* RSRenrenFriend.c in Sources */ = {isa = PBXBuildFile; fileRef = 30146C391878063C0086AFA0 /* RSRenrenFriend.c */; };
 		30217B891875D18D00BC813A /* RSURL+Extension.c in Sources */ = {isa = PBXBuildFile; fileRef = 30217B881875D18D00BC813A /* RSURL+Extension.c */; };
 		30217B8B1875D19700BC813A /* RSURL+Extension.h in Headers */ = {isa = PBXBuildFile; fileRef = 30217B8A1875D19700BC813A /* RSURL+Extension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		304B3850186C36F300806E4B /* RSRegularExpression.c in Sources */ = {isa = PBXBuildFile; fileRef = 304B384E186C36F300806E4B /* RSRegularExpression.c */; };
@@ -75,7 +76,7 @@
 		412C1B3417AE76EB00F36F25 /* RSLocale.c in Sources */ = {isa = PBXBuildFile; fileRef = 412C1B3217AE76EB00F36F25 /* RSLocale.c */; };
 		412C1B3517AE76EB00F36F25 /* RSLocale.h in Headers */ = {isa = PBXBuildFile; fileRef = 412C1B3317AE76EB00F36F25 /* RSLocale.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		412C1B3817AF5CDC00F36F25 /* RSCharacterSet.c in Sources */ = {isa = PBXBuildFile; fileRef = 412C1B3617AF5CDC00F36F25 /* RSCharacterSet.c */; };
-		412C1B3917AF5CDC00F36F25 /* RSCharacterSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 412C1B3717AF5CDC00F36F25 /* RSCharacterSet.h */; };
+		412C1B3917AF5CDC00F36F25 /* RSCharacterSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 412C1B3717AF5CDC00F36F25 /* RSCharacterSet.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4130643E1769A24D00EFACC0 /* RSSocket.c in Sources */ = {isa = PBXBuildFile; fileRef = 4130643D1769A24D00EFACC0 /* RSSocket.c */; };
 		413064401769A25C00EFACC0 /* RSSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 4130643F1769A25C00EFACC0 /* RSSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		413C15971670BD4C003EDEB6 /* RSErrorPrivate.c in Sources */ = {isa = PBXBuildFile; fileRef = 413C15961670BD4C003EDEB6 /* RSErrorPrivate.c */; };
@@ -723,6 +724,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		30146C391878063C0086AFA0 /* RSRenrenFriend.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = RSRenrenFriend.c; path = Library/RSCFLibrary/RSRenrenCore/RSRenrenCore/RSRenrenFriend.c; sourceTree = SOURCE_ROOT; };
+		30146C3A1878063C0086AFA0 /* RSRenrenFriend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSRenrenFriend.h; path = Library/RSCFLibrary/RSRenrenCore/RSRenrenCore/RSRenrenFriend.h; sourceTree = SOURCE_ROOT; };
 		30217B881875D18D00BC813A /* RSURL+Extension.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "RSURL+Extension.c"; sourceTree = "<group>"; };
 		30217B8A1875D19700BC813A /* RSURL+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RSURL+Extension.h"; sourceTree = "<group>"; };
 		304B384E186C36F300806E4B /* RSRegularExpression.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRegularExpression.c; sourceTree = "<group>"; };
@@ -1862,9 +1865,9 @@
 		41704FF01647C713005E7FB5 /* BaseStructure */ = {
 			isa = PBXGroup;
 			children = (
+				41704FFD1647C713005E7FB5 /* RSPrivate */,
 				304B384E186C36F300806E4B /* RSRegularExpression.c */,
 				304B384F186C36F300806E4B /* RSRegularExpression.h */,
-				41704FFD1647C713005E7FB5 /* RSPrivate */,
 				418AED401813BED60001694B /* RSURL.c */,
 				418AED411813BED60001694B /* RSURL.h */,
 				4179CF96181F687B004B1334 /* RSURLRequest.c */,
@@ -2163,6 +2166,8 @@
 		41B0E3B7182F338200A5E00D /* runloop */ = {
 			isa = PBXGroup;
 			children = (
+				30146C391878063C0086AFA0 /* RSRenrenFriend.c */,
+				30146C3A1878063C0086AFA0 /* RSRenrenFriend.h */,
 				41B0E3B8182F338300A5E00D /* main.c */,
 				41B0E3BA182F338300A5E00D /* runloop.1 */,
 			);
@@ -2528,6 +2533,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				412C1B3917AF5CDC00F36F25 /* RSCharacterSet.h in Headers */,
 				304B3851186C36F300806E4B /* RSRegularExpression.h in Headers */,
 				30217B8B1875D19700BC813A /* RSURL+Extension.h in Headers */,
 				30F32B3B1860318300A45125 /* RSHTTPCookieStorage.h in Headers */,
@@ -2819,7 +2825,6 @@
 				4151C20317600E6500C9AC40 /* ucasemap.h in Headers */,
 				4101F34B18447BBA0090C212 /* insertion_mode.h in Headers */,
 				4151C20417600E6500C9AC40 /* ucat.h in Headers */,
-				412C1B3917AF5CDC00F36F25 /* RSCharacterSet.h in Headers */,
 				4151C20517600E6500C9AC40 /* uchar.h in Headers */,
 				4151C20617600E6500C9AC40 /* ucharstrie.h in Headers */,
 				4151C20717600E6500C9AC40 /* ucharstriebuilder.h in Headers */,
@@ -3493,6 +3498,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30146C3B1878063C0086AFA0 /* RSRenrenFriend.c in Sources */,
 				41B0E3B9182F338300A5E00D /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

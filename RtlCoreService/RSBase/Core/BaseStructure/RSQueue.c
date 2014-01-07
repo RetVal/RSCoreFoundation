@@ -202,3 +202,21 @@ RSExport RSIndex RSQueueGetCount(RSQueueRef queue)
     if (isAtom(queue)) RSSpinLockUnlock(&queue->_lock);
     return cnt;
 }
+
+RSExport RSArrayRef RSQueueCopyCoreQueueUnsafe(RSQueueRef queue) {
+    if (!queue) return nil;
+    __RSGenericValidInstance(queue, _RSQueueTypeID);
+    if (isAtom(queue)) RSSpinLockLock(&queue->_lock);
+    RSArrayRef results = RSRetain(queue->_queueCore);
+    if (isAtom(queue)) RSSpinLockUnlock(&queue->_lock);
+    return results;
+}
+
+RSExport RSArrayRef RSQueueCopyCoreQueueSafe(RSQueueRef queue) {
+    if (!queue) return nil;
+    __RSGenericValidInstance(queue, _RSQueueTypeID);
+    if (isAtom(queue)) RSSpinLockLock(&queue->_lock);
+    RSArrayRef results = RSCopy(RSAllocatorSystemDefault, queue->_queueCore);
+    if (isAtom(queue)) RSSpinLockUnlock(&queue->_lock);
+    return results;
+}

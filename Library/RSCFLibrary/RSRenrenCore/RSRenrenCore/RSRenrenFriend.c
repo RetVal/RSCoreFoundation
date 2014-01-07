@@ -55,7 +55,8 @@ static RSHashCode __RSRenrenFriendClassHash(RSTypeRef rs)
 
 static RSStringRef __RSRenrenFriendClassDescription(RSTypeRef rs)
 {
-    RSStringRef description = RSStringCreateWithFormat(RSAllocatorDefault, RSSTR("RSRenrenFriend %p"), rs);
+    RSRenrenFriendRef friend = (RSRenrenFriendRef)rs;
+    RSStringRef description = RSStringCreateWithFormat(RSAllocatorDefault, RSSTR("RSRenrenFriend <%p> %r(%r) home:%r head:%r school:%r"), friend, friend->_name, friend->_account, friend->_homePageURL, friend->_imageURL, friend->_schoolName);
     return description;
 }
 
@@ -93,9 +94,13 @@ RSExport RSTypeID RSRenrenFriendGetTypeID()
 
 static RSRenrenFriendRef __RSRenrenFriendCreateInstance(RSAllocatorRef allocator, RSTypeRef content)
 {
-    RSRenrenFriendRef instance = (RSRenrenFriendRef)__RSRuntimeCreateInstance(allocator, _RSRenrenFriendTypeID, sizeof(struct __RSRenrenFriend) - sizeof(RSRuntimeBase));
+    RSRenrenFriendRef instance = (RSRenrenFriendRef)__RSRuntimeCreateInstance(allocator, RSRenrenFriendGetTypeID(), sizeof(struct __RSRenrenFriend) - sizeof(RSRuntimeBase));
     
     return instance;
+}
+
+RSExport RSRenrenFriendRef RSRenrenFriendCreate(RSAllocatorRef allocator) {
+    return __RSRenrenFriendCreateInstance(allocator, nil);
 }
 
 RSExport RSStringRef RSRenrenFriendGetName(RSRenrenFriendRef friendModel) {

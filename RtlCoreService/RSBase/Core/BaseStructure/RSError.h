@@ -10,6 +10,8 @@
 #define RSCoreFoundation_RSError_h
 
 #include <RSCoreFoundation/RSErrorCode.h>
+#include <RSCoreFoundation/RSDictionary.h>
+
 RS_EXTERN_C_BEGIN
 typedef struct __RSError* RSErrorRef RS_AVAILABLE(0_0);
 

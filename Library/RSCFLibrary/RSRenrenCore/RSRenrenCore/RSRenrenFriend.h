@@ -16,6 +16,7 @@ RS_EXTERN_C_BEGIN
 typedef struct __RSRenrenFriend *RSRenrenFriendRef;
 
 RSExport RSTypeID RSRenrenFriendGetTypeID();
+RSExport RSRenrenFriendRef RSRenrenFriendCreate(RSAllocatorRef allocator);
 RSExport RSStringRef RSRenrenFriendGetName(RSRenrenFriendRef friendModel);
 RSExport RSURLRef RSRenrenFriendGetHomePageURL(RSRenrenFriendRef friendModel);
 RSExport RSURLRef RSRenrenFriendGetImageURL(RSRenrenFriendRef friendModel);

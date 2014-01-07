@@ -795,6 +795,11 @@ static BOOL    __RSNumberClassEqual(RSTypeRef obj1, RSTypeRef obj2)
     RSNumberType type1 = RSNumberGetType(obj1);
     RSNumberType type2 = RSNumberGetType(obj2);
     if (type1 != type2) return NO;
+    BOOL tagged1 = RS_IS_TAGGED_INT(obj1);
+    BOOL tagged2 = RS_IS_TAGGED_INT(obj2);
+    if (tagged1 && tagged2) {
+        return num1 == num2;
+    } else if (tagged1 == YES)
     switch (type1)
     {
         case RSNumberBoolean:

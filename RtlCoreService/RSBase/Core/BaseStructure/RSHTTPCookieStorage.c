@@ -7,9 +7,15 @@
 //
 
 #include "RSHTTPCookieStorage.h"
-
+#include <RSCoreFoundation/RSData+Extension.h>
+#include <RSCoreFoundation/RSDictionary+Extension.h>
 #include <RSCoreFoundation/RSRuntime.h>
 #include <RSCoreFoundation/RSArchiver.h>
+#include <RSCoreFoundation/RSArchiverRoutine.h>
+#include <RSCoreFoundation/RSBundle.h>
+#include <RSCoreFoundation/RSFileManager.h>
+#include <RSCoreFoundation/RSUUID.h>
+#include <RSCoreFoundation/RSNotificationCenter.h>
 #include "RSPrivate/RSPrivateOperatingSystem/RSPrivateFileSystem.h"
 
 RS_CONST_STRING_DECL(__RSHTTPCookieStoragePreferencePathTargetFormat, "~/Library/Cookies/RSCoreFoundation/%s/RSCookie.plist");

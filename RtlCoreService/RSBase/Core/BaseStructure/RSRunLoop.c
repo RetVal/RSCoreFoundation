@@ -8987,6 +8987,7 @@ RSExport void RSPerformBlockRepeatWithFlags(RSIndex performCount, RSPerformBlock
         });
     }
 }
+#include <RSCoreFoundation/RSThread.h>
 
 RSPrivate void *__RSRunLoopGetQueue(RSRunLoopRef rl)
 {

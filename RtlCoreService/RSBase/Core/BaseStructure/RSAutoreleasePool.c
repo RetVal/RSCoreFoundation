@@ -10,6 +10,7 @@
 #include <RSCoreFoundation/RSBase.h>
 #include <RSCoreFoundation/RSAutoreleasePool.h>
 #include <RSCoreFoundation/RSThread.h>
+#include <RSCoreFoundation/RSNil.h>
 #include <pthread.h>
 
 #include <RSCoreFoundation/RSRuntime.h>

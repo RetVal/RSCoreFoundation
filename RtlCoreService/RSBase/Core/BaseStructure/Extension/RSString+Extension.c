@@ -9,6 +9,7 @@
 #include <RSCoreFoundation/RSString.h>
 #include <RSCoreFoundation/RSData+Extension.h>
 #include <RSCoreFoundation/RSString+Extension.h>
+#include <RSCoreFoundation/RSURL.h>
 
 RSExport RSStringRef RSStringWithUTF8String(const char* nullTerminatingString)
 {
@@ -145,6 +146,15 @@ RSExport RSStringRef RSStringByReplacingOccurrencesOfString(RSStringRef string, 
     newString = RSCopy(RSAllocatorSystemDefault, RSStringReplace(copy, range, replacement));
     RSRelease(copy);
     return RSAutorelease(newString);
+}
+
+RSExport RSStringRef RSStringByTrimmingCharactersInSet(RSStringRef string, RSCharacterSetRef characterSet) {
+    if (!string || !characterSet) return nil;
+    RSMutableStringRef copy = RSMutableCopy(RSAllocatorSystemDefault, string);
+    RSStringTrimInCharacterSet(copy, characterSet);
+    RSStringRef result = RSAutorelease(RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("%r"), copy));
+    RSRelease(copy);
+    return result;
 }
 
 RSExport RSStringRef RSStringURLEncode(RSDictionaryRef dict) {

@@ -9,7 +9,7 @@
 #ifndef RSCoreFoundation_RSCharacterSet
 #define RSCoreFoundation_RSCharacterSet
 
-#include <RSCoreFoundation/RSCoreFoundation.h>
+#include <RSCoreFoundation/RSBase.h>
 
 RS_EXTERN_C_BEGIN
 

@@ -283,8 +283,14 @@ RSExport void __RSRuntimeUnregisterClass(RSTypeID classID)
 
 RSExport const RSRuntimeClass* __RSRuntimeGetClassWithTypeID(RSTypeID classID) {
     __RSRuntimeLockTable();
-    if (classID >= __RSRuntimeClassTableCount) HALTWithError(RSInvalidArgumentException, "the size of class table in runtime is overflow");
-    if (__RSRuntimeClassTable[classID] == nil) HALTWithError(RSInvalidArgumentException, "the class is not registered in runtime");
+    if (classID >= __RSRuntimeClassTableCount) {
+        __RSRuntimeUnlockTable();
+        HALTWithError(RSInvalidArgumentException, "the size of class table in runtime is overflow");
+    }
+    if (__RSRuntimeClassTable[classID] == nil) {
+        __RSRuntimeUnlockTable();
+        HALTWithError(RSInvalidArgumentException, "the class is not registered in runtime");
+    }
     const RSRuntimeClass *cls = (const RSRuntimeClass*)__RSRuntimeClassTable[classID];
     __RSRuntimeUnlockTable();
     return cls;
@@ -972,6 +978,7 @@ extern void __RSPropertyListInitialize();
 extern void __RSQueueInitialize();
 
 extern void __RSJSONSerializationInitialize();
+extern void __RSThreadInitialize();
 
 extern void ___RSISAPayloadInitialize();
 extern void __RSBundleInitialize();
@@ -1055,6 +1062,8 @@ RSExport __RS_INIT_ROUTINE(RSRuntimePriority) void RSCoreFoundationInitialize()
     __RSNotificationCenterInitialize();
     __RSNotificationInitialize();
     __RSObserverInitialize();
+    
+    __RSThreadInitialize();
     
     __RSPropertyListInitializeInitStatics();
     __RSBinaryPropertyListInitStatics();

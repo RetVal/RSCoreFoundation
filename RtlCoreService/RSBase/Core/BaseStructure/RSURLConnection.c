@@ -15,9 +15,11 @@
 #include "RSThread.h"
 
 #include <RSCoreFoundation/RSRuntime.h>
-#include <RSCoreFoundation/RSURL.h>
-#include <RSCoreFoundation/RSURLRequest.h>
-#include <RSCoreFoundation/RSRunLoop.h>
+#include <RSCoreFoundation/RSString+Extension.h>
+#include <RSCoreFoundation/RSHTTPCookieStorage.h>
+#include <RSCoreFoundation/RSNotificationCenter.h>
+#include <RSCoreFoundation/RSNumber.h>
+#include <RSCoreFoundation/RSStringNumberSupport.h>
 
 #include "RSPrivate/libcurl/include/curl/curl.h"
 

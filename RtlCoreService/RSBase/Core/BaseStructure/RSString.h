@@ -33,8 +33,8 @@ typedef RSIndex RSStringCompareFlags RS_AVAILABLE(0_0);
 typedef const struct __RSString* RSStringRef RS_AVAILABLE(0_0);
 typedef struct __RSString* RSMutableStringRef RS_AVAILABLE(0_0);
 
-//typedef const struct ___RSString *RSStringRef;
-//typedef struct ___RSString *RSMutableStringRef;
+#include <RSCoreFoundation/RSLocale.h>
+#include <RSCoreFoundation/RSCharacterSet.h>
 
 RSExport RSTypeID RSStringGetTypeID() RS_AVAILABLE(0_0);
 RSExport RSStringRef RSStringGetEmptyString() RS_AVAILABLE(0_0);
@@ -71,16 +71,18 @@ RSExport RSComparisonResult RSStringCompareCaseInsensitive(RSStringRef aString, 
 
 RSExport RSComparisonResult RSStringCompareWithOptionsAndLocale(RSStringRef string, RSStringRef string2, RSRange rangeToCompare, RSStringCompareFlags compareOptions, const void* locale) RS_AVAILABLE(0_0);
 RSExport BOOL RSStringFindWithOptions(RSStringRef aString, RSStringRef stringToFind, RSRange rangeToSearch, RSStringCompareFlags compareFlags, RSRange* result) RS_AVAILABLE(0_0);
-//
+
 RSExport BOOL RSStringFind(RSStringRef aString, RSStringRef stringToFind, RSRange rangeToSearch, RSRange* result) RS_AVAILABLE(0_0);
 RSExport RSRange *RSStringFindAll(RSStringRef aString, RSStringRef stringToFind, RSIndex *numberOfResult) RS_AVAILABLE(0_3);
-//
+
 RSExport void RSStringDelete(RSMutableStringRef aString, RSRange range) RS_AVAILABLE(0_0);
-//RSExport RSRange RSStringGetRangeWithSubString(RSStringRef aString, RSStringRef subString) RS_AVAILABLE(0_0);
-//
-//RSExport void RSStringMakeUpper(RSMutableStringRef aString, RSRange range) RS_AVAILABLE(0_0);
-//RSExport void RSStringMakeLower(RSMutableStringRef aString, RSRange range) RS_AVAILABLE(0_0);
-//RSExport void RSStringMakeCapital(RSMutableStringRef aString, RSRange range) RS_AVAILABLE(0_3);
+
+RSExport void RSStringTrim(RSMutableStringRef string, RSStringRef trimString) RS_AVAILABLE(0_4);
+RSExport void RSStringTrimWhitespace(RSMutableStringRef string) RS_AVAILABLE(0_4);
+RSExport void RSStringTrimInCharacterSet(RSMutableStringRef string, RSCharacterSetRef characterSet) RS_AVAILABLE(0_4);
+RSExport void RSStringLowercase(RSMutableStringRef string, RSLocaleRef locale) RS_AVAILABLE(0_4);
+RSExport void RSStringUppercase(RSMutableStringRef string, RSLocaleRef locale) RS_AVAILABLE(0_4);
+
 RSExport RSIndex RSStringGetBytes(RSStringRef str, RSRange range, RSStringEncoding encoding, uint8_t lossByte, BOOL isExternalRepresentation, void *buffer, RSIndex maxBufLen, RSIndex *usedBufLen) RS_AVAILABLE(0_0);
 RSExport void RSStringAppendString(RSMutableStringRef aString, RSStringRef append) RS_AVAILABLE(0_0);
 RSExport void RSStringAppendStringWithFormat(RSMutableStringRef aString, RSStringRef format,...) RS_AVAILABLE(0_0);
