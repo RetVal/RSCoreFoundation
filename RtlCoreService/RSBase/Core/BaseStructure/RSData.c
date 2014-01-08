@@ -16,6 +16,17 @@
 #include "RSPrivate/CString/RSPrivateBuffer.h"
 #include "RSPrivate/CString/RSPrivateStringFormat.h"
 
+#if defined(DEBUG)
+RSInline RSIndex __RSDataLength(RSDataRef obj);
+RSInline void __RSDataValidateRange(RSDataRef data, RSRange range, const char *func) {
+    RSAssert2(0 <= range.location && range.location <= __RSDataLength(data), __RSLogAssertion, "%s(): range.location index (%d) out of bounds", func, range.location);
+    RSAssert2(0 <= range.length, __RSLogAssertion, "%s(): length (%d) cannot be less than zero", func, range.length);
+    RSAssert2(range.location + range.length <= __RSDataLength(data), __RSLogAssertion, "%s(): ending index (%d) out of bounds", func, range.location + range.length);
+}
+#else
+#define __CFDataValidateRange(a,r,f)
+#endif
+
 typedef struct __RSISAPayload
 {
     RSRuntimeBase _base;
@@ -731,3 +742,10 @@ RSExport RSComparisonResult RSDataCompare(RSDataRef data1, RSDataRef data2)
     HALTWithError(RSInvalidArgumentException, "The data1 or data2 is not available.");
     return RSCompareEqualTo;
 }
+
+RSExport void RSDataGetBytes(RSDataRef data, RSRange range, uint8_t *buffer) {
+    RS_OBJC_FUNCDISPATCHV(_RSDataTypeID, void, (NSData *)data, getBytes:(void *)buffer range:NSMakeRange(range.location, range.length));
+    __RSDataValidateRange(data, range, __PRETTY_FUNCTION__);
+    memmove(buffer, RSDataGetBytesPtr(data) + range.location, range.length);
+}
+#undef __RSDataValidateRange

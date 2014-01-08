@@ -12,6 +12,7 @@ int main(int argc, const char * argv[])
 {
     if (4 != argc) {
         RSShow(RSSTR("RSRenrenDemo email password target-id"));
+        RSShow(RSSTR("RSRenrenDemo 登陆邮箱 登陆密码 目标用户ID // 给目标用户点150个赞"));
         return -1;
     }
     RSShow(RSStringWithUTF8String(argv[3]));
@@ -21,17 +22,17 @@ int main(int argc, const char * argv[])
             return;
         }
         RSShow(RSSTR("login success"));
-        extern void dump(RSRenrenCoreAnalyzerRef);
-        dump(analyzer);
-        RSRunLoopStop(RSRunLoopGetMain());
-//        RSRenrenCoreAnalyzerCreateEventContentsWithUserId(analyzer, RSStringWithUTF8String(argv[3]), 150, NO, ^(RSRenrenEventRef event) {
-//            RSShow(event);
-//            
+//        extern void dump(RSRenrenCoreAnalyzerRef);
+//        dump(analyzer);
+//        RSRunLoopStop(RSRunLoopGetMain());
+        RSRenrenCoreAnalyzerCreateEventContentsWithUserId(analyzer, RSStringWithUTF8String(argv[3]), 150, NO, ^(RSRenrenEventRef event) {
+            RSShow(event);
+            
 //            RSRenrenEventDo(event);
-//            sleep(2);
-//        }, ^(void) {
-//            RSRunLoopStop(RSRunLoopGetMain());
-//        });
+            sleep(2);
+        }, ^(void) {
+            RSRunLoopStop(RSRunLoopGetMain());
+        });
     });
     RSRenrenCoreAnalyzerStartLogin(analyzer);
     RSRunLoopRun();

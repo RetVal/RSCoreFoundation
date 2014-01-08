@@ -440,6 +440,28 @@ RSInline bool RSCharacterSetInlineBufferIsLongCharacterMember(RSCharacterSetInli
 #define RSCharacterSetInlineBufferIsLongCharacterMember(buffer, character) (RSCharacterSetIsLongCharacterMember(buffer->cset, character))
 #endif /* RS_INLINE */
 
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
+extern uint8_t __RS120293;
+extern uint8_t __RS120290;
+extern void __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__(void);
+#define CHECK_FOR_FORK() do { __RS120290 = true; if (__RS120293) __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__(); } while (0)
+#define CHECK_FOR_FORK_RET(...) do { CHECK_FOR_FORK(); if (__RS120293) return __VA_ARGS__; } while (0)
+#define HAS_FORKED() (__RS120293)
+#endif
+
+#if !defined(CHECK_FOR_FORK)
+#define CHECK_FOR_FORK() do { } while (0)
+#endif
+
+#if !defined(CHECK_FOR_FORK_RET)
+#define CHECK_FOR_FORK_RET(...) do { } while (0)
+#endif
+
+#if !defined(HAS_FORKED)
+#define HAS_FORKED() 0
+#endif
+
+
 typedef const void *	(*RSArrayRetainCallBack)(RSAllocatorRef allocator, const void *value);
 typedef void		(*RSArrayReleaseCallBack)(RSAllocatorRef allocator, const void *value);
 typedef RSStringRef	(*RSArrayCopyDescriptionCallBack)(const void *value);

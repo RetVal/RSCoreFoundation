@@ -111,7 +111,7 @@ static RSHashCode __RSRenrenEventClassHash(RSTypeRef rs)
 static RSStringRef __RSRenrenEventClassDescription(RSTypeRef rs)
 {
     RSRenrenEventRef event = (RSRenrenEventRef)rs;
-    RSStringRef description = RSStringCreateWithFormat(RSAllocatorDefault, RSSTR("RSRenrenEvent <%p> %r"), rs, event->_container);
+    RSStringRef description = RSStringCreateWithFormat(RSAllocatorDefault, RSSTR("RSRenrenEvent <%p> Mode:%r Container:%r"), rs, event->_mode, event->_container);
     return description;
 }
 

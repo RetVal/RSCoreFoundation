@@ -341,8 +341,10 @@ static void __RSReportBacktrace()
     __RSPrintBacktrace(samples + framesToSkip, frames - framesToSkip);
 }
 
-RSExport void RSCoreFoundationCrash()
+RSExport void RSCoreFoundationCrash(const char *crash)
 {
+    if (crash)
+        __RSCLog(RSLogLevelWarning, "%s\n", crash);
     __RSReportBacktrace();
     *(int *)(uintptr_t)0xbbadbeef = 0;
     // More reliable, but doesn't say BBADBEEF.

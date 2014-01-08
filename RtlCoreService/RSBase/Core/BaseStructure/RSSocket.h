@@ -26,7 +26,7 @@ typedef struct __RSSocket* RSSocketRef RS_AVAILABLE(0_0);
 typedef RS_ENUM(RSIndex, RSSocketError) {
     RSSocketSuccess = 0,
     RSSocketUnSuccess = -1L,
-    RSSocketTimeout = -2L
+    RSSocketTimeout = -2L,
 } RS_AVAILABLE(0_0);
 
 typedef struct {
@@ -37,24 +37,32 @@ typedef struct {
 } RSSocketSignature RS_AVAILABLE(0_0);
 
 typedef struct __RSSocketContext {
-    RSIndex vs;
+    RSIndex version;
     void* context;
     const void* (*retain)(const void*);
     void (*release)(const void*);
-    RSStringRef (*desciption)(const void*);
+    RSStringRef (*description)(const void*);
 }RSSocketContext RS_AVAILABLE(0_0);
 
 
 typedef RS_OPTIONS(RSOptionFlags, RSSocketCallBackType)
 {
-    RSSocketNoCallBack = 0x0,		// invalid socket
-    RSSocketReadCallBack = 0x1,	// recv call back
-    RSSocketWriteCallBack = 0x2,	// server call back
-    RSSocketDataCallBack = RSSocketReadCallBack | RSSocketWriteCallBack,	// ...
-    RSSocketConnectCallBack = 0x4,	// client call back
-    RSSocketAcceptCallBack = 0x8,	// send call back
-    RSSocketErrorCallBack = 0x10,	// somethings is wrong
+    RSSocketNoCallBack = 0,
+    RSSocketReadCallBack = 1,
+    RSSocketAcceptCallBack = 2,
+    RSSocketDataCallBack = 3,
+    RSSocketConnectCallBack = 4,
+    RSSocketWriteCallBack = 8
 } RS_AVAILABLE(0_0);
+    
+enum {
+    RSSocketAutomaticallyReenableReadCallBack = 1,
+    RSSocketAutomaticallyReenableAcceptCallBack = 2,
+    RSSocketAutomaticallyReenableDataCallBack = 3,
+    RSSocketAutomaticallyReenableWriteCallBack = 8,
+    RSSocketLeaveErrors = 64,
+    RSSocketCloseOnInvalidate = 128
+};
 
 typedef int RSSocketHandle RS_AVAILABLE(0_0);
 
@@ -92,5 +100,7 @@ RSExport BOOL RSSocketIsValid(RSSocketRef s) RS_AVAILABLE(0_0);
 
 RSExport RSSocketError RSSocketSendData(RSSocketRef s, RSDataRef address, RSDataRef data, RSTimeInterval timeout) RS_AVAILABLE(0_2);
 RSExport RSSocketError RSSocketRecvData(RSSocketRef s, RSMutableDataRef data) RS_AVAILABLE(0_2);
+    
+RSExport RSSocketError RSSocketUnregister(const RSSocketSignature *nameServerSignature, RSTimeInterval timeout, RSStringRef name);
 RS_EXTERN_C_END
 #endif

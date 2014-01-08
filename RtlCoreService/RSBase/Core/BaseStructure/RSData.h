@@ -20,6 +20,7 @@ RSExport const void* RSDataCopyBytes(RSDataRef data) RS_AVAILABLE(0_0);
 RSExport __autorelease void* RSDataMutableBytes(RSDataRef data) RS_AVAILABLE(0_4);
 RSExport void* RSDataGetMutableBytesPtr(RSDataRef data) RS_AVAILABLE(0_4);
 RSExport const void* RSDataGetBytesPtr(RSDataRef data) RS_AVAILABLE(0_0);
+RSExport void RSDataGetBytes(RSDataRef data, RSRange range, uint8_t *buffer) RS_AVAILABLE(0_4);
 RSExport void RSDataSetLength(RSMutableDataRef data, RSIndex extraLength) RS_AVAILABLE(0_3);
 RSExport void RSDataIncreaseLength(RSMutableDataRef data, RSIndex extraLength) RS_AVAILABLE(0_3);
 RSExport RSIndex RSDataGetLength(RSDataRef data) RS_AVAILABLE(0_0);

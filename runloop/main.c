@@ -465,9 +465,11 @@ void RSCoreAnalyzerRelease(RSCoreAnalyzer analyzer) {
     RSRelease(analyzer->token);
 }
 
+static void run_socket();
 int main (int argc, char **argv)
 {
-    dump();
+    run_socket();
+    RSRunLoopRun();
     return 0;
     RSXMLDocumentRef document = RSXMLDocumentCreateWithContentOfFile(RSAllocatorDefault, RSFileManagerStandardizingPath(RSSTR("~/Desktop/renren.html")), RSXMLDocumentTidyHTML);
     
@@ -480,4 +482,18 @@ int main (int argc, char **argv)
     RSCoreAnalyzerRelease(&analyzer);
     sleep(1);
     return 0;
+}
+
+static RSSocketRef run_sock = nil;
+
+static void _run_sock_callback(RSSocketRef s, RSSocketCallBackType type, RSDataRef address, const void *data, void *info) {
+    
+}
+
+static void run_socket() {
+    run_sock = RSSocketCreate(RSAllocatorDefault, PF_INET, SOCK_STREAM, IPPROTO_TCP, RSSocketWriteCallBack, _run_sock_callback, nil);
+    RSRunLoopSourceRef source = RSSocketCreateRunLoopSource(RSAllocatorDefault, run_sock, 0);
+    RSRunLoopAddSource(RSRunLoopGetCurrent(), source, RSRunLoopDefault);
+    RSRelease(source);
+    RSRunLoopRun();
 }

@@ -55,6 +55,47 @@ RSPrivate void __RSRuntimeMemoryBarrier()
     
 #endif
 }
+
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
+RSPrivate uint8_t __RS120290 = NO;
+RSPrivate uint8_t __RS120291 = NO;
+RSPrivate uint8_t __RS120293 = NO;
+RSPrivate char * __crashreporter_info__ = nil; // Keep this symbol, since it was exported and other things may be linking against it, like GraphicsServices.framework on iOS
+asm(".desc ___crashreporter_info__, 0x10");
+
+
+//  __01121__ AND __01123__ use for check fork
+static void __01121__(void) {
+    __RS120291 = pthread_is_threaded_np() ? YES : NO;
+}
+extern void RSCoreFoundationCrash(const char *crash);
+static void __01123__(void) {
+    // Ideally, child-side atfork handlers should be async-cancel-safe, as fork()
+    // is async-cancel-safe and can be called from signal handlers.  See also
+    // http://standards.ieee.org/reading/ieee/interp/1003-1c-95_int/pasc-1003.1c-37.html
+    // This is not a problem for RS.
+    if (__RS120290) {
+        __RS120293 = YES;
+#if DEPLOYMENT_TARGET_MACOSX
+        if (__RS120291) {
+            RSCoreFoundationCrash("*** multi-threaded process forked ***");
+        } else {
+            RSCoreFoundationCrash("*** single-threaded process forked ***");
+        }
+#endif
+    }
+}
+
+#define EXEC_WARNING_STRING_1 "The process has forked and you cannot use this CoreFoundation functionality safely. You MUST exec().\n"
+#define EXEC_WARNING_STRING_2 "Break on __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__() to debug.\n"
+
+RSPrivate void __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__(void) {
+    write(2, EXEC_WARNING_STRING_1, sizeof(EXEC_WARNING_STRING_1) - 1);
+    write(2, EXEC_WARNING_STRING_2, sizeof(EXEC_WARNING_STRING_2) - 1);
+    __HALT();
+}
+#endif
+
 static struct {
     RSCBuffer name;
     RSCBuffer value;
@@ -958,7 +999,7 @@ extern void __RSRunLoopSourceInitialize();
 extern void __RSRunLoopObserverInitialize();
 extern void __RSRunLoopTimerInitialize();
 
-extern void __RSSocketInitialize();
+//extern void __RSSocketInitialize();
 extern void __RSBasicHashInitialize();
 extern void __RSSetInitialize();
 extern void __RSErrorInitialize();
@@ -1010,6 +1051,8 @@ RSExport __RS_INIT_ROUTINE(RSRuntimePriority) void RSCoreFoundationInitialize()
     __RSRuntimeEnvironmentInitialize();
 	__RSDebugLevelInitialize();
     __RSRuntimeClassCacheInitize();
+    
+    pthread_atfork(__01121__, nil, __01123__);
     
     RSZeroMemory(__RSRuntimeClassTable, sizeof(__RSRuntimeClassTable));
     
@@ -1071,7 +1114,7 @@ RSExport __RS_INIT_ROUTINE(RSRuntimePriority) void RSCoreFoundationInitialize()
     
     __RSArchiverInitialize();
     
-    __RSSocketInitialize();
+//    __RSSocketInitialize();
     
     __RSURLInitialize();
     __RSURLRequestInitialize();
