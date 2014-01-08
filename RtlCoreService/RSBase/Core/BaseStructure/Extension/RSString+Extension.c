@@ -157,12 +157,66 @@ RSExport RSStringRef RSStringByTrimmingCharactersInSet(RSStringRef string, RSCha
     return result;
 }
 
-RSExport RSStringRef RSStringURLEncode(RSDictionaryRef dict) {
-    RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorDefault, RSDictionaryGetCount(dict));
-    RSDictionaryApplyBlock(dict, ^(const void *key, const void *value, BOOL *stop) {
-        RSArrayAddObject(array, RSStringWithFormat(RSSTR("%r=%r"), RSAutorelease(RSURLCreateStringByAddingPercentEscapes(RSAllocatorDefault, key, nil, RSSTR("!*'();:@&=+$,/?%#[]"), RSStringEncodingUTF8)), RSAutorelease(RSURLCreateStringByAddingPercentEscapes(RSAllocatorDefault, value, nil, RSSTR("!*'();:@&=+$,/?%#[]"), RSStringEncodingUTF8))));
+/*
+ NSMutableArray *parts = [[NSMutableArray alloc] init];
+ for (NSString *key in dictionary) {
+ id encodedValue = dictionary[key];//([dictionary[key] isKindOfClass:[NSString class]]) ? [dictionary[key] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] : ;
+ if ([encodedValue isKindOfClass:[NSDictionary class]])
+ {
+ encodedValue = [NSJSONSerialization dataWithJSONObject:encodedValue options:NSJSONWritingPrettyPrinted error:nil];
+ encodedValue = [[[NSString alloc] initWithData:encodedValue encoding:NSUTF8StringEncoding] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] ? : encodedValue;
+ }
+ else if ([encodedValue isKindOfClass:[NSString class]]) encodedValue = [dictionary[key] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+ else if ([encodedValue isKindOfClass:[NSNumber class]]) encodedValue = encodedValue;
+ else if ([encodedValue isKindOfClass:[NSData class]]) encodedValue = [[NSString alloc] initWithData:encodedValue encoding:NSUTF8StringEncoding] ?: encodedValue;
+ else if ([encodedValue isKindOfClass:[NSArray class]]) {
+ encodedValue = [NSJSONSerialization dataWithJSONObject:encodedValue options:NSJSONWritingPrettyPrinted error:nil];
+ encodedValue = [[[NSString alloc] initWithData:encodedValue encoding:NSUTF8StringEncoding] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] ? : encodedValue;;
+ }
+ NSString *encodedKey = [key stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+ NSString *part = [NSString stringWithFormat: @"%@=%@", encodedKey, encodedValue];
+ [parts addObject:part];
+ }
+ NSString *encodedDictionary = [parts componentsJoinedByString:@"&"];
+ return encodedDictionary;
+ */
+#include <RSCoreFoundation/RSJSONSerialization.h>
+RSExport RSStringRef RSStringByAddingPercentEscapesUsingEncoding(RSStringRef string, RSStringEncoding encoding) {
+    return RSAutorelease(RSURLCreateStringByAddingPercentEscapes(RSAllocatorDefault, string, nil, RSSTR("!*'();:@&=+$,/?%#[]"), encoding));
+}
+
+RSExport RSStringRef RSStringURLEncode(RSDictionaryRef dictionary) {
+    RSMutableArrayRef parts = RSArrayCreateMutable(RSAllocatorSystemDefault, RSDictionaryGetCount(dictionary));
+    RSDictionaryApplyBlock(dictionary, ^(const void *key, const void *value, BOOL *stop) {
+        RSTypeRef encodedValue = value;
+        if (RSGetTypeID(encodedValue) == RSDictionaryGetTypeID()) {
+            RSTypeRef tmp = RSJSONSerializationCreateData(RSAllocatorSystemDefault, encodedValue);
+            encodedValue = RSStringByAddingPercentEscapesUsingEncoding(RSStringWithData(tmp, RSStringEncodingUTF8), RSStringEncodingUTF8) ? : encodedValue;
+            RSRelease(tmp);
+        } else if (RSGetTypeID(encodedValue) == RSStringGetTypeID()){
+            encodedValue = RSStringByAddingPercentEscapesUsingEncoding(encodedValue, RSStringEncodingUTF8);
+        } else if (RSGetTypeID(encodedValue) == RSNumberGetTypeID()) {
+            encodedValue = encodedValue;
+        } else if (RSGetTypeID(encodedValue) == RSDataGetTypeID()) {
+            encodedValue = RSStringWithData(encodedValue, RSStringEncodingUTF8) ? : encodedValue;
+        } else if (RSGetTypeID(encodedValue) == RSArrayGetTypeID()) {
+            RSTypeRef tmp = RSJSONSerializationCreateData(RSAllocatorSystemDefault, encodedValue);
+            encodedValue = RSStringByAddingPercentEscapesUsingEncoding(RSStringWithData(tmp, RSStringEncodingUTF8), RSStringEncodingUTF8) ? : encodedValue;
+            RSRelease(tmp);
+        }
+        RSStringRef encodedKey = RSStringByAddingPercentEscapesUsingEncoding(key, RSStringEncodingUTF8);
+        RSStringRef part = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("%r=%r"), encodedKey, encodedValue);
+        RSArrayAddObject(parts, part);
+        RSRelease(part);
     });
-    RSStringRef str = RSStringCreateByCombiningStrings(RSAllocatorDefault, array, RSSTR("&"));
-    RSRelease(array);
-    return RSAutorelease(str);
+    RSStringRef encodedDictionary = RSStringCreateByCombiningStrings(RSAllocatorSystemDefault, parts, RSSTR("&"));
+    RSRelease(parts);
+    return RSAutorelease(encodedDictionary);
+//    RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorDefault, RSDictionaryGetCount(dict));
+//    RSDictionaryApplyBlock(dict, ^(const void *key, const void *value, BOOL *stop) {
+//        RSArrayAddObject(array, RSStringWithFormat(RSSTR("%r=%r"), RSAutorelease(RSURLCreateStringByAddingPercentEscapes(RSAllocatorDefault, key, nil, RSSTR("!*'();:@&=+$,/?%#[]"), RSStringEncodingUTF8)), RSAutorelease(RSURLCreateStringByAddingPercentEscapes(RSAllocatorDefault, value, nil, RSSTR("!*'();:@&=+$,/?%#[]"), RSStringEncodingUTF8))));
+//    });
+//    RSStringRef str = RSStringCreateByCombiningStrings(RSAllocatorDefault, array, RSSTR("&"));
+//    RSRelease(array);
+//    return RSAutorelease(str);
 }

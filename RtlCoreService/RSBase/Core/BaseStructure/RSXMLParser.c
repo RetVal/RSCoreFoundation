@@ -1062,42 +1062,49 @@ static void __RSXMLNodeGenericValidInstance(RSTypeRef obj)
 
 RSExport RSStringRef RSXMLNodeGetName(RSXMLNodeRef node)
 {
+    if (!node) return nil;
     __RSXMLNodeGenericValidInstance(node);
     return __RSXMLNodeGetName(node);
 }
 
 RSExport void RSXMLNodeSetName(RSXMLNodeRef node, RSStringRef name)
 {
+    if (!node) return;
     __RSXMLNodeGenericValidInstance(node);
     __RSXMLNodeSetName(node, name);
 }
 
 RSExport RSTypeRef RSXMLNodeGetValue(RSXMLNodeRef node)
 {
+    if (!node) return nil;
     __RSXMLNodeGenericValidInstance(node);
     return __RSXMLNodeGetValue(node);
 }
 
 RSExport void RSXMLNodeSetObjectValue(RSXMLNodeRef node, RSTypeRef value)
 {
+    if (!node) return ;
     __RSXMLNodeGenericValidInstance(node);
     __RSXMLNodeSetObjectValue(node, value);
 }
 
 RSExport RSXMLNodeRef RSXMLNodeGetParent(RSXMLNodeRef node)
 {
+    if (!node) return nil;
     __RSXMLNodeGenericValidInstance(node);
     return __RSXMLNodeGetParent(node);
 }
 
 RSExport RSUInteger RSXMLNodeGetNodeTypeId(RSXMLNodeRef node)
 {
+    if (!node) return 0;
     __RSXMLNodeGenericValidInstance(node);
     return __RSXMLNodeGetNodeTypeId(node);
 }
 
 RSExport RSStringRef RSXMLNodeGetStringValue(RSXMLNodeRef node)
 {
+    if (!node) return nil;
     __RSXMLNodeGenericValidInstance(node);
     return RSAutorelease(RSDescription(__RSXMLNodeGetValue(node)));
 }

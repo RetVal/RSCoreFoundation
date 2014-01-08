@@ -10,3 +10,4 @@
 
 #include <RSRenrenCore/RSRenrenCoreAnalyzer.h>
 #include <RSRenrenCore/RSRenrenEvent.h>
+#include <RSRenrenCore/RSRenrenFriend.h>

@@ -167,8 +167,8 @@ static void __RSURLConnectionCoreSetupPostBehaviorIfNecessary(RSURLConnectionRef
     if (!connection || !request || NO == RSEqual(RSSTR("POST"), RSURLRequestGetHTTPMethod(request))) return;
     void *core = __RSURLConnectionCoreGet(connection);
     curl_easy_setopt(core, CURLOPT_POST, 1);
-    curl_easy_setopt(core, CURLOPT_POSTFIELDS, RSStringGetUTF8String(RSStringWithData(RSURLRequestGetHTTPBody(request), RSStringEncodingUTF8)));
-    
+    curl_easy_setopt(core, CURLOPT_POSTFIELDS, __RSAutoReleaseISA(RSAllocatorSystemDefault, (ISA)RSDataCopyBytes(RSURLRequestGetHTTPBody(request))));
+//    curl_easy_setopt(core, CURLOPT_HTTPHEADER, )
     RSStringRef sizeStr = RSDictionaryGetValue(RSURLRequestGetHeaderField(request), __RSHTTPMessageContentLengthHeader);
     if (sizeStr) {
         RSDictionaryRemoveValue((RSMutableDictionaryRef)RSURLRequestGetHeaderField(request), __RSHTTPMessageContentLengthHeader);
@@ -201,7 +201,7 @@ RSInline void __RSURLConnectionCoreSetupHTTPHeaderFieldIfNecessary(RSURLConnecti
         }
         RSRelease(keys);
         RSRelease(values);
-
+//        chunk = curl_slist_append(chunk, RSStringGetUTF8String(RSStringWithFormat(RSSTR("Expect: "))));
         curl_easy_setopt(core, CURLOPT_HTTPHEADER, chunk);
         void *org = __RSURLConnectionCoreSetupChunk(connection, chunk);
         if (org != chunk) curl_slist_free_all(org);
@@ -303,6 +303,7 @@ static void __RSURLConnectionCoreSetupDefault(RSURLConnectionRef connection, con
     assert(core);
     curl_easy_setopt(core, CURLOPT_HEADER, 0);
     curl_easy_setopt(core, CURLOPT_USERAGENT, userAgent ? : __RSURLConnectionDefaultUserAgent);
+    curl_easy_setopt(core, CURLOPT_FAILONERROR, 1);
 //    curl_easy_setopt(core, CURLOPT_ACCEPT_ENCODING, "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
     
     RSMutableDictionaryRef header = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
@@ -343,7 +344,6 @@ static void __RSURLConnectionFinishPerform(RSURLConnectionRef connection) {
             connection->_response = RSURLResponseCreateWithData(RSAllocatorSystemDefault, RSURLRequestGetURL(RSURLConnectionGetCurrentRequest(connection)), connection->_responseHeader);
         }
     }
-    
 }
 
 

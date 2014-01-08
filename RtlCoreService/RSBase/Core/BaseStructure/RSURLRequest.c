@@ -103,7 +103,7 @@ static RSHashCode __RSURLRequestClassHash(RSTypeRef rs)
 static RSStringRef __RSURLRequestClassDescription(RSTypeRef rs)
 {
     RSURLRequestRef request = (RSURLRequestRef)rs;
-    RSStringRef description = RSStringCreateWithFormat(RSAllocatorDefault, RSSTR("<RSURLRequest %p> {URL: %R}"), request, request->_url);
+    RSStringRef description = RSStringCreateWithFormat(RSAllocatorDefault, RSSTR("<RSURLRequest %p> {URL: %R} - Method : %r\nheader field - %r\n body - %r"), request, request->_url, request->_HTTPMethod, request->_headerFields, request->_HTTPBody);
     return description;
 }
 

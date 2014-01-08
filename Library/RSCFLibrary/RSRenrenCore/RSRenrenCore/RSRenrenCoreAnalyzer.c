@@ -433,3 +433,215 @@ void dump(RSRenrenCoreAnalyzerRef analyzer) {
         RSRelease(document);
     }
 }
+
+#pragma mark -
+#pragma mark Upload Image
+
+RSExport void RSRenrenCoreAnalyzerUploadImage(RSRenrenCoreAnalyzerRef analyzer, RSDataRef imageData, RSStringRef description, RSDictionaryRef (^selectAlbum)(RSArrayRef albumList), void (^complete)(RSTypeRef photo, BOOL success)) {
+    if (!analyzer || !imageData) return;
+    __RSGenericValidInstance(analyzer, _RSRenrenCoreAnalyzerTypeID);
+    RSShow(RSRenrenCoreAnalyzerGetToken(analyzer));
+    RSAutoreleaseBlock(^{
+        RSStringRef parent_formCallback = RSSTR("parent.formCallback");
+        RSStringRef uploadFilePath = RSFileManagerStandardizingPath(RSSTR("~/Pictures/PJ/35a5ab5906177b4e79f731c7a09a976e.jpg"));
+        RSMutableDictionaryRef requestProperty = RSAutorelease(RSDictionaryCreateMutable(RSAllocatorDefault, 0, RSDictionaryRSTypeContext));
+        RSMutableArrayRef albumCollection = RSAutorelease(RSArrayCreateMutable(RSAllocatorDefault, 0));
+        RSStringRef urlString = RSSTR("http://upload.renren.com/addphotoPlain.do");
+        RSXMLDocumentRef document = RSAutorelease(RSXMLDocumentCreateWithXMLData(RSAllocatorDefault, RSDataWithURL(RSURLWithString(urlString)), RSXMLDocumentTidyHTML));
+        RSXMLElementRef body = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSXMLDocumentGetRootElement(document), RSSTR("body")), 0);
+        if (!document) return;
+        RSArrayRef subElements = RSXMLElementGetElementsForName(body, RSSTR("div"));
+        if (!subElements) return;
+        if (RSArrayGetCount(subElements) != 4) return;
+        if (!RSEqual(RSXMLNodeGetValue(RSXMLElementGetAttributeForName(RSArrayObjectAtIndex(subElements, 3), RSSTR("id"))), RSSTR("container-for-buddylist"))) return;
+        RSXMLElementRef div = RSArrayObjectAtIndex(subElements, 3);
+        div = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(div, RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 2);
+        div = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(div, RSSTR("div")), 1);
+        if (!RSEqual(RSXMLNodeGetValue(RSXMLElementGetAttributeForName(div, RSSTR("id"))), RSSTR("single-column"))) return;
+        RSXMLElementRef form = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(div, RSSTR("form")), 0);
+        if (!RSEqual(RSXMLNodeGetValue(RSXMLElementGetAttributeForName(form, RSSTR("target"))), RSSTR("uploadPlainIframe"))) return;
+        RSDictionarySetValue(requestProperty, RSSTR("method"), RSXMLNodeGetValue(RSXMLElementGetAttributeForName(form, RSSTR("method"))));
+        RSDictionarySetValue(requestProperty, RSSTR("action"), RSXMLNodeGetValue(RSXMLElementGetAttributeForName(form, RSSTR("action"))));
+        RSDictionarySetValue(requestProperty, RSSTR("enctype"), RSXMLNodeGetValue(RSXMLElementGetAttributeForName(form, RSSTR("enctype"))));
+        RSShow(requestProperty);
+        RSArrayRef albumlist = RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(form, RSSTR("p")), 0), RSSTR("span")), 0), RSSTR("select")), 0), RSSTR("option"));
+        RSArrayApplyBlock(albumlist, RSMakeRange(0, RSArrayGetCount(albumlist)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+            RSXMLElementRef album = value;
+            RSMutableDictionaryRef dict = RSAutorelease(RSMutableCopy(RSAllocatorDefault, RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorDefault, RSXMLNodeGetValue(RSXMLElementGetAttributeForName(album, RSSTR("value"))), RSSTR("id"), RSXMLNodeGetValue((RSXMLNodeRef)album), RSSTR("name"), NULL))));
+            if (RSEqual(RSXMLNodeGetValue(RSXMLElementGetAttributeForName(album, RSSTR("disabled"))), RSSTR("disabled")))
+                RSDictionarySetValue(dict, RSSTR("disabled"), RSBooleanTrue);
+            RSArrayAddObject(albumCollection, dict);
+        });
+        RSDictionaryRef album = nil;
+        if (selectAlbum) album = selectAlbum(albumCollection);
+        else album = RSArrayGetCount(albumCollection) ? RSArrayObjectAtIndex(albumCollection, 0) : nil;
+        if (!album) return;
+        if (RSNotFound == RSArrayIndexOfObject(albumCollection, album)) return;
+        RSStringRef albumId = RSDictionaryGetValue(album, RSSTR("id"));
+        RSArrayRef files = RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(form, RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("p"));
+        RSMutableArrayRef filesCollection = RSAutorelease(RSArrayCreateMutable(RSAllocatorDefault, 0));
+        RSArrayApplyBlock(files, RSMakeRange(0, RSArrayGetCount(files)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+            RSXMLElementRef file = value;
+            RSArrayRef inputs = RSXMLElementGetElementsForName(file, RSSTR("input"));
+            if (RSArrayGetCount(inputs)) {
+                RSXMLElementRef input = RSArrayObjectAtIndex(inputs, 0);
+                if (RSEqual(RSXMLNodeGetValue(RSXMLElementGetAttributeForName(input, RSSTR("input"))), RSSTR("file"))) {
+                    RSArrayAddObject(filesCollection, RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorDefault, RSXMLNodeGetValue(RSXMLElementGetAttributeForName(input, RSSTR("name"))), RSSTR("name"), RSSTR(""), RSSTR("filename"), NULL)));
+                }
+            }
+        });
+        if (RSArrayGetCount(filesCollection)) {
+            RSDictionarySetValue((RSMutableDictionaryRef)RSArrayObjectAtIndex(filesCollection, 0), RSSTR("filename"), uploadFilePath);
+        } else {
+            RSArrayAddObject(filesCollection, RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorDefault, RSXMLNodeGetValue(RSXMLElementGetAttributeForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(files, 0), RSSTR("input")), 0), RSSTR("name"))), RSSTR("name"), uploadFilePath, RSSTR("filename"), NULL)));
+        }
+        RSMutableURLRequestRef request = RSAutorelease(RSURLRequestCreateMutable(RSAllocatorDefault, RSURLWithString(RSDictionaryGetValue(requestProperty, RSSTR("action")))));
+        RSStringRef boundary = RSSTR("----WebKitFormBoundaryRJUGdi7326XY1u1b");
+        RSMutableDataRef postData = RSAutorelease(RSDataCreateMutable(RSAllocatorDefault, 0));
+        RSDataAppend(postData, RSDataWithString(RSStringWithFormat(RSSTR("--%r\r\nContent-Disposition: form-data; name=\"%r\"\r\n\r\n%r\r\n"), boundary, RSSTR("id"), albumId), RSStringEncodingUTF8));
+        RSArrayApplyBlock(filesCollection, RSMakeRange(0, RSArrayGetCount(filesCollection)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+            RSDictionaryRef file = value;
+            if (RSStringGetLength(RSDictionaryGetValue(file, RSSTR("filename")))) {
+                RSDataAppend(postData, RSDataWithString(RSStringWithFormat(RSSTR("--%r\r\n"), boundary), RSStringEncodingUTF8));
+                RSDataAppend(postData, RSDataWithString(RSStringWithFormat(RSSTR("Content-Disposition: form-data; name=\"%r\"; filename=\"%r\"\r\n"), RSDictionaryGetValue(file, RSSTR("name")), RSFileManagerFileFullName(RSFileManagerGetDefault(), uploadFilePath)), RSStringEncodingUTF8));
+                RSDataAppend(postData, RSDataWithString(RSSTR("Content-Type: image/jpeg\r\n\r\n"), RSStringEncodingUTF8));
+                RSDataAppend(postData, imageData);
+                RSDataAppend(postData, RSDataWithString(RSSTR("\r\n"), RSStringEncodingUTF8));
+            }
+        });
+        RSDataAppend(postData, RSDataWithString(RSStringWithFormat(RSSTR("--%r\r\nContent-Disposition: form-data; name=\"privacyParams\"\r\n\r\n%r\r\n"), boundary, RSSTR("{\"sourceControl\":99}")), RSStringEncodingUTF8));
+        RSDataAppend(postData, RSDataWithString(RSStringWithFormat(RSSTR("--%r\r\nContent-Disposition: form-data; name=\"callback\"\r\n\r\n%r\r\n"), boundary, RSSTR("parent.formCallback")), RSStringEncodingUTF8));
+        RSDataAppend(postData, RSDataWithString(RSStringWithFormat(RSSTR("--%r--\r\r\n"), boundary), RSStringEncodingUTF8));
+        RSStringRef postLength = RSStringWithFormat(RSSTR("%ld"), RSDataGetLength(postData));
+        RSURLRequestSetHeaderFieldValue(request, RSSTR("Accept"), RSSTR("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"));
+        RSURLRequestSetHeaderFieldValue(request, RSSTR("Referer"), RSSTR("http://upload.renren.com/addphotoPlain.do"));
+        RSURLRequestSetHeaderFieldValue(request, RSSTR("Origin"), RSSTR("http://upload.renren.com"));
+        RSURLRequestSetHeaderFieldValue(request, RSSTR("User-Agent"), RSSTR("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9) AppleWebKit/537.71 (KHTML, like Gecko) Version/7.0 Safari/537.71"));
+        RSURLRequestSetHeaderFieldValue(request, RSSTR("DNT"), RSSTR("1"));
+        RSURLRequestSetHeaderFieldValue(request, RSSTR("Content-Type"), RSStringWithFormat(RSSTR("multipart/form-data; boundary=%r"), boundary));
+        RSURLRequestSetHeaderFieldValue(request, RSSTR("Content-Length"), postLength);
+        RSURLRequestSetHTTPMethod(request, RSSTR("POST"));
+        RSURLRequestSetHTTPBody(request, postData);
+        RSURLResponseRef response = nil;
+        RSErrorRef error = nil;
+        RSShow(request);
+        RSShow(RSStringWithData(RSURLRequestGetHTTPBody(request), RSStringEncodingUTF8));
+        const char * ptr __unused = RSStringGetUTF8String(RSStringWithData(RSURLRequestGetHTTPBody(request), RSStringEncodingUTF8));
+        RSDataRef data = RSURLConnectionSendSynchronousRequest(request, &response, &error);
+        if (error) RSShow(error);
+        RSLog(RSSTR("status code = %ld"), RSURLResponseGetStatusCode(response));
+        RSStringRef des = data ? RSStringWithData(data, RSStringEncodingUTF8) : RSSTR("");
+        RSShow(des);
+        if (200 != RSURLResponseGetStatusCode(response) && 100 != RSURLResponseGetStatusCode(response)) return;
+        RSXMLDocumentRef jumpScript = RSAutorelease(RSXMLDocumentCreateWithXMLData(RSAllocatorDefault, data, RSXMLDocumentTidyHTML));
+        if (!jumpScript) return;
+        RSXMLElementRef head = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSXMLDocumentGetRootElement(jumpScript), RSSTR("head")), 0);
+        if (!head) return;
+        RSXMLElementRef script = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(head, RSSTR("script")), 0);
+        if (!RSEqual(RSXMLNodeGetValue(RSXMLElementGetAttributeForName(script, RSSTR("type"))), RSSTR("text/javascript"))) return;
+        if (10 < RSStringRangeOfString(RSXMLNodeGetValue((RSXMLNodeRef)script), RSSTR("document.domain = \"renren.com\";")).location) return;
+        RSStringRef value = RSXMLNodeGetValue((RSXMLNodeRef)script);
+        RSRange range = RSStringRangeOfString(value, RSStringWithFormat(RSSTR("%r("), parent_formCallback));
+        value = RSStringWithSubstring(value, RSMakeRange(range.location + range.length, RSStringGetLength(value) - range.location - range.length));
+        range = RSStringRangeOfString(value, RSSTR(");"));
+        value = RSStringWithSubstring(value, RSMakeRange(0, range.location));
+        RSTypeRef dict = RSAutorelease(RSJSONSerializationCreateWithJSONData(RSAllocatorDefault, RSDataWithString(value, RSStringEncodingUTF8)));
+        if (!dict) return;
+        RSMutableDictionaryRef post = RSAutorelease(RSDictionaryCreateMutable(RSAllocatorDefault, 0, RSDictionaryRSTypeContext));
+        RSURLRef saveURL = RSURLWithString(RSStringWithFormat(RSSTR("http://upload.renren.com/upload/%r/photo/save"), RSRenrenCoreAnalyzerGetUserId(analyzer)));
+        RSDictionarySetValue(post, RSSTR("flag"), RSSTR("0/"));
+        RSDictionarySetValue(post, RSSTR("album.id"), albumId);
+        RSDictionarySetValue(post, RSSTR("album.description"), description);
+        RSDictionarySetValue(post, RSSTR("privacyParams"), RSSTR("{\"sourceControl\":99}"));
+        RSDictionarySetValue(post, RSSTR("photos"), RSDictionaryGetValue(dict, RSSTR("files")));
+        RSMutableURLRequestRef saveRequest = RSAutorelease(RSURLRequestCreateMutable(RSAllocatorDefault, saveURL));
+        RSURLRequestSetHeaderFieldValue(saveRequest, RSSTR("Accept"), RSSTR("text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"));
+        RSURLRequestSetHeaderFieldValue(saveRequest, RSSTR("Content-Type"), RSSTR("application/x-www-form-urlencoded"));
+        RSURLRequestSetHTTPMethod(saveRequest, RSSTR("POST"));
+        RSDataRef savePostData = RSDataWithString(RSStringURLEncode(post), RSStringEncodingUTF8);
+        RSURLRequestSetHTTPBody(saveRequest, savePostData);
+        RSURLRequestSetHeaderFieldValue(saveRequest, RSSTR("Content-Length"), RSStringWithFormat(RSSTR("%ld"), RSDataGetLength(savePostData)));
+        RSURLRequestSetHeaderFieldValue(saveRequest, RSSTR("Origin"), RSSTR("http://upload.renren.com"));
+        RSURLRequestSetHeaderFieldValue(saveRequest, RSSTR("Referer"), RSSTR("http://upload.renren.com/addphotoPlain.do"));
+        RSURLRequestSetHeaderFieldValue(saveRequest, RSSTR("Connection"), RSSTR("keep-alive"));
+        data = RSURLConnectionSendSynchronousRequest(saveRequest, &response, &error);
+        if (RSURLResponseGetStatusCode(response) != 200 && RSURLResponseGetStatusCode(response) != 100) return;
+        RSShow(response);
+        RSXMLDocumentRef publishDocument = RSAutorelease(RSXMLDocumentCreateWithXMLData(RSAllocatorDefault, data, RSXMLDocumentTidyHTML));
+        if (!publishDocument) return;
+        body = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSXMLDocumentGetRootElement(publishDocument), RSSTR("body")), 0);
+        if (!RSEqual(RSXMLNodeGetValue(RSXMLElementGetAttributeForName(body, RSSTR("id"))), RSSTR("pageAlbum"))) return;
+        div = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(body, RSSTR("div")), 0), RSSTR("div")), 3), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0);
+        
+        if (!RSEqual(RSXMLNodeGetValue(RSXMLElementGetAttributeForName(div, RSSTR("id"))), RSSTR("content"))) return;
+        form = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(div, RSSTR("form")), 0);
+        if (!RSEqual(RSXMLNodeGetValue(RSXMLElementGetAttributeForName(form, RSSTR("id"))), RSSTR("albumEditForm"))) return;
+        div = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(form, RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 1), RSSTR("div")), 0), RSSTR("div")), 0);
+        RSArrayRef inputs = RSXMLElementGetElementsForName(div, RSSTR("input"));
+        RSTypeRef aid = RSXMLNodeGetValue(RSXMLElementGetAttributeForName(RSArrayObjectAtIndex(inputs, 0), RSSTR("value")));
+        if (!aid) return;
+        RSRenrenCoreAnalyzerPublicPhoto(analyzer, albumId, aid, description, complete);
+        // wait for public
+    });
+}
+
+RSExport void RSRenrenCoreAnalyzerPublicPhoto(RSRenrenCoreAnalyzerRef analyzer, RSStringRef albumId, RSStringRef photoId, RSStringRef description, void (^complete)(RSTypeRef photoId, BOOL success)) {
+    if (!analyzer || !albumId || !photoId) return;
+    __RSGenericValidInstance(analyzer, _RSRenrenCoreAnalyzerTypeID);
+    RSAutoreleaseBlock(^{
+        RSStringRef publishString = RSStringWithFormat(RSSTR("http://upload.renren.com/upload/%r/album-%r/editPhotoList"), RSRenrenCoreAnalyzerGetUserId(analyzer), albumId);
+        RSShow(publishString);
+        RSURLRef publishURL = RSURLWithString(publishString);
+        RSMutableURLRequestRef publishRequest = RSAutorelease(RSURLRequestCreateMutable(RSAllocatorDefault, publishURL));
+        RSStringRef boundary = RSSTR("----WebKitFormBoundaryKueLOdoAgrkoekBu");
+        RSMutableDataRef postData = RSAutorelease(RSDataCreateMutable(RSAllocatorDefault, 0));
+        RSStringRef standardFormat = RSSTR("--%r\r\nContent-Disposition: form-data; name=\"%r\"\r\n\r\n%r\r\n");
+        void (^appendData)(RSStringRef key, RSStringRef value) = ^(RSStringRef key, RSStringRef value) {
+            RSDataAppend(postData, RSDataWithString(RSStringWithFormat(standardFormat, boundary, key, value), RSStringEncodingUTF8));
+        };
+        appendData(RSSTR("id"), photoId);
+        appendData(RSSTR("publishFeed"), RSSTR("true"));
+        appendData(RSSTR("title"), description);
+        appendData(RSSTR("requestToken"), RSDictionaryGetValue(RSRenrenCoreAnalyzerGetToken(analyzer), RSSTR("requestToken")));
+        appendData(RSSTR("_rtk"), RSDictionaryGetValue(RSRenrenCoreAnalyzerGetToken(analyzer), RSSTR("_rtk")));
+        RSDataAppend(postData, RSDataWithString(RSStringWithFormat(RSSTR("--%r--\r\n"), boundary), RSStringEncodingUTF8));
+        RSDataRef data = nil;
+        RSURLRequestSetHTTPBody(publishRequest, postData);
+        RSURLRequestSetHeaderFieldValue(publishRequest, RSSTR("Connection"), RSSTR("keep-alive"));
+        RSURLRequestSetHeaderFieldValue(publishRequest, RSSTR("Origin"), RSSTR("http://upload.renren.com"));
+        RSURLRequestSetHeaderFieldValue(publishRequest, RSSTR("User-Agent"), RSSTR("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.69 Safari/537.36"));
+        RSURLRequestSetHeaderFieldValue(publishRequest, RSSTR("Content-Type"), RSStringWithFormat(RSSTR("multipart/form-data; boundary=%r"), boundary));
+        RSURLRequestSetHeaderFieldValue(publishRequest, RSSTR("Content-Length"), RSStringWithFormat(RSSTR("%ld"), RSDataGetLength(postData)));
+        RSURLRequestSetHTTPMethod(publishRequest, RSSTR("POST"));
+        RSURLResponseRef response = nil;
+        RSErrorRef error = nil;
+        data = RSURLConnectionSendSynchronousRequest(publishRequest, &response, &error);
+        complete(photoId, error == nil && RSURLResponseGetStatusCode(response) == 200);
+    });
+}
+//_token[@"channel"] = @"renren";
+//_token[@"hostid"] = [_analyzer userId];
+//token[@"content"] = [NSString stringWithFormat:@"%@(%d)", [[self statusContent] text] ,++idx];
+//
+//request = [RSCoreAnalyzer requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://shell.renren.com/%@/status", [_analyzer userId]]] postInfomation:token];
+//NSError *error = nil;
+//NSHTTPURLResponse *httpResponse = nil;
+//NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&httpResponse error:&error];
+RSExport void RSRenrenCoreAnalyzerPublicStatus(RSRenrenCoreAnalyzerRef analyzer, RSStringRef content) {
+    if (!analyzer || !content) return;
+    __RSGenericValidInstance(analyzer, _RSRenrenCoreAnalyzerTypeID);
+    RSMutableDictionaryRef token = RSAutorelease(RSMutableCopy(RSAllocatorSystemDefault, RSRenrenCoreAnalyzerGetToken(analyzer)));
+    RSDictionarySetValue(token, RSSTR("content"), content);
+    RSDictionarySetValue(token, RSSTR("channel"), RSSTR("renren"));
+    RSDictionarySetValue(token, RSSTR("hostid"), RSRenrenCoreAnalyzerGetUserId(analyzer));
+    RSMutableURLRequestRef request = RSAutorelease(RSURLRequestCreateMutable(RSAllocatorSystemDefault, RSURLWithString(RSStringWithFormat(RSSTR("http://shell.renren.com/%r/status"), RSRenrenCoreAnalyzerGetUserId(analyzer)))));
+    RSDataRef data = RSDataWithString(RSStringURLEncode(token), RSStringEncodingUTF8);
+    RSURLRequestSetHTTPBody(request, data);
+    RSURLRequestSetHTTPMethod(request, RSSTR("POST"));
+    RSURLRequestSetHeaderFieldValue(request, RSSTR("Content-Length"), RSStringWithFormat(RSSTR("%r"), RSNumberWithInteger(RSDataGetLength(data))));
+    RSURLRequestSetHeaderFieldValue(request, RSSTR("Content-Type"), RSSTR("application/x-www-form-urlencoded charset=utf-8"));
+    RSURLResponseRef response = nil;
+    RSErrorRef error = nil;
+    data = RSURLConnectionSendSynchronousRequest(request, &response, &error);
+    if (error) RSShow(error);
+}

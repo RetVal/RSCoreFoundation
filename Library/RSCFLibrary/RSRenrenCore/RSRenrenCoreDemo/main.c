@@ -25,14 +25,29 @@ int main(int argc, const char * argv[])
 //        extern void dump(RSRenrenCoreAnalyzerRef);
 //        dump(analyzer);
 //        RSRunLoopStop(RSRunLoopGetMain());
-        RSRenrenCoreAnalyzerCreateEventContentsWithUserId(analyzer, RSStringWithUTF8String(argv[3]), 150, NO, ^(RSRenrenEventRef event) {
-            RSShow(event);
-            
-//            RSRenrenEventDo(event);
-            sleep(2);
-        }, ^(void) {
-            RSRunLoopStop(RSRunLoopGetMain());
-        });
+//        RSRenrenCoreAnalyzerCreateEventContentsWithUserId(analyzer, RSStringWithUTF8String(argv[3]), 150, NO, ^(RSRenrenEventRef event) {
+//            RSShow(event);
+//            
+////            RSRenrenEventDo(event);
+//            sleep(2);
+//        }, ^(void) {
+//            RSRunLoopStop(RSRunLoopGetMain());
+//        });
+//        RSRenrenCoreAnalyzerUploadImage(analyzer, RSDataWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/upload.jpg"))), RSSTR("upload by RSCoreFoundation"), ^RSDictionaryRef(RSArrayRef albumList) {
+//            BOOL (^PE)(RSDictionaryRef dict) = ^BOOL (RSDictionaryRef dict) {
+//                return RSStringHasPrefix(RSDictionaryGetValue(dict, RSSTR("name")), RSSTR("二次元"));
+//            };
+//            __block RSIndex retIdx = 0;
+//            RSArrayApplyBlock(albumList, RSMakeRange(0, RSArrayGetCount(albumList)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+//                *isStop = PE(value) ? retIdx = idx, YES : NO;
+//            });
+//            return RSArrayObjectAtIndex(albumList, retIdx);
+//        }, ^(RSTypeRef photo, BOOL success) {
+//            RSShow(photo);
+//            RSRunLoopStop(RSRunLoopGetMain());
+//        });
+        RSRenrenCoreAnalyzerPublicStatus(analyzer, RSSTR("sent by RSCoreFoundation"));
+        RSRunLoopStop(RSRunLoopGetMain());
     });
     RSRenrenCoreAnalyzerStartLogin(analyzer);
     RSRunLoopRun();

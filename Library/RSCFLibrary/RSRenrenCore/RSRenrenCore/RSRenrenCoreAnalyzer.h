@@ -27,5 +27,10 @@ RSExport RSStringRef RSRenrenCoreAnalyzerGetUserId(RSRenrenCoreAnalyzerRef analy
 RSExport RSStringRef RSRenrenCoreAnalyzerGetEmail(RSRenrenCoreAnalyzerRef analyzer);
 RSExport RSTypeRef RSRenrenCoreAnalyzerGetToken(RSRenrenCoreAnalyzerRef analyzer);
 RSExport RSURLResponseRef RSRenrenCoreAnalyzerGetResponse(RSRenrenCoreAnalyzerRef analyzer);
+
+RSExport void RSRenrenCoreAnalyzerUploadImage(RSRenrenCoreAnalyzerRef analyzer, RSDataRef imageData, RSStringRef description, RSDictionaryRef (^selectAlbum)(RSArrayRef albumList), void (^complete)(RSTypeRef photo, BOOL success));
+
+RSExport void RSRenrenCoreAnalyzerPublicPhoto(RSRenrenCoreAnalyzerRef analyzer, RSStringRef albumId, RSStringRef photoId, RSStringRef description, void (^complete)(RSTypeRef photoId, BOOL success));
+RSExport void RSRenrenCoreAnalyzerPublicStatus(RSRenrenCoreAnalyzerRef analyzer, RSStringRef content);
 RS_EXTERN_C_END
 #endif 

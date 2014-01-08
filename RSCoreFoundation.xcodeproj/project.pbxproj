@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		30146C3B1878063C0086AFA0 /* RSRenrenFriend.c in Sources */ = {isa = PBXBuildFile; fileRef = 30146C391878063C0086AFA0 /* RSRenrenFriend.c */; };
 		30217B891875D18D00BC813A /* RSURL+Extension.c in Sources */ = {isa = PBXBuildFile; fileRef = 30217B881875D18D00BC813A /* RSURL+Extension.c */; };
 		30217B8B1875D19700BC813A /* RSURL+Extension.h in Headers */ = {isa = PBXBuildFile; fileRef = 30217B8A1875D19700BC813A /* RSURL+Extension.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3049CF4A187D2A6D00B7D95F /* RSRenrenCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3049CF49187D2A6D00B7D95F /* RSRenrenCore.framework */; };
 		304B3850186C36F300806E4B /* RSRegularExpression.c in Sources */ = {isa = PBXBuildFile; fileRef = 304B384E186C36F300806E4B /* RSRegularExpression.c */; };
 		304B3851186C36F300806E4B /* RSRegularExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 304B384F186C36F300806E4B /* RSRegularExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3098391E1868818400398AC3 /* RSRawHashTable.c in Sources */ = {isa = PBXBuildFile; fileRef = 3098391C1868818400398AC3 /* RSRawHashTable.c */; };
@@ -724,10 +724,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		30146C391878063C0086AFA0 /* RSRenrenFriend.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = RSRenrenFriend.c; path = Library/RSCFLibrary/RSRenrenCore/RSRenrenCore/RSRenrenFriend.c; sourceTree = SOURCE_ROOT; };
-		30146C3A1878063C0086AFA0 /* RSRenrenFriend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSRenrenFriend.h; path = Library/RSCFLibrary/RSRenrenCore/RSRenrenCore/RSRenrenFriend.h; sourceTree = SOURCE_ROOT; };
 		30217B881875D18D00BC813A /* RSURL+Extension.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "RSURL+Extension.c"; sourceTree = "<group>"; };
 		30217B8A1875D19700BC813A /* RSURL+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RSURL+Extension.h"; sourceTree = "<group>"; };
+		3049CF49187D2A6D00B7D95F /* RSRenrenCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RSRenrenCore.framework; path = Library/RSCFLibrary/RSRenrenCore/Build/Products/Debug/RSRenrenCore.framework; sourceTree = "<group>"; };
 		304B384E186C36F300806E4B /* RSRegularExpression.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRegularExpression.c; sourceTree = "<group>"; };
 		304B384F186C36F300806E4B /* RSRegularExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRegularExpression.h; sourceTree = "<group>"; };
 		3098391C1868818400398AC3 /* RSRawHashTable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRawHashTable.c; sourceTree = "<group>"; };
@@ -1441,6 +1440,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3049CF4A187D2A6D00B7D95F /* RSRenrenCore.framework in Frameworks */,
 				41B0E3C7182F434000A5E00D /* CoreFoundation.framework in Frameworks */,
 				41B0E3C1182F33A200A5E00D /* RSCoreFoundation.framework in Frameworks */,
 				41B0E3C9182FE1FA00A5E00D /* MobileDevice.framework in Frameworks */,
@@ -1769,6 +1769,7 @@
 		4158D55C1625C4C60070E69F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3049CF49187D2A6D00B7D95F /* RSRenrenCore.framework */,
 				30F9A85718752F27006EC81B /* libicucore.dylib */,
 				30F9A85518752AEE006EC81B /* libicui18n.51.1.dylib */,
 				30F9A85318752AB7006EC81B /* libicui18n.51.1.dylib */,
@@ -2166,8 +2167,6 @@
 		41B0E3B7182F338200A5E00D /* runloop */ = {
 			isa = PBXGroup;
 			children = (
-				30146C391878063C0086AFA0 /* RSRenrenFriend.c */,
-				30146C3A1878063C0086AFA0 /* RSRenrenFriend.h */,
 				41B0E3B8182F338300A5E00D /* main.c */,
 				41B0E3BA182F338300A5E00D /* runloop.1 */,
 			);
@@ -3498,7 +3497,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30146C3B1878063C0086AFA0 /* RSRenrenFriend.c in Sources */,
 				41B0E3B9182F338300A5E00D /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3955,6 +3953,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+					"/SourceCache/Library/RSCoreFoundation-1400/Library/RSCFLibrary/RSRenrenCore/Build/Products/Debug",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -3982,6 +3981,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+					"/SourceCache/Library/RSCoreFoundation-1400/Library/RSCFLibrary/RSRenrenCore/Build/Products/Debug",
 				);
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
