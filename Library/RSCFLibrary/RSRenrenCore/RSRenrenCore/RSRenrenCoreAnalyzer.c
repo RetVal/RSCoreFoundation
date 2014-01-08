@@ -619,14 +619,7 @@ RSExport void RSRenrenCoreAnalyzerPublicPhoto(RSRenrenCoreAnalyzerRef analyzer, 
         complete(photoId, error == nil && RSURLResponseGetStatusCode(response) == 200);
     });
 }
-//_token[@"channel"] = @"renren";
-//_token[@"hostid"] = [_analyzer userId];
-//token[@"content"] = [NSString stringWithFormat:@"%@(%d)", [[self statusContent] text] ,++idx];
-//
-//request = [RSCoreAnalyzer requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://shell.renren.com/%@/status", [_analyzer userId]]] postInfomation:token];
-//NSError *error = nil;
-//NSHTTPURLResponse *httpResponse = nil;
-//NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&httpResponse error:&error];
+
 RSExport void RSRenrenCoreAnalyzerPublicStatus(RSRenrenCoreAnalyzerRef analyzer, RSStringRef content) {
     if (!analyzer || !content) return;
     __RSGenericValidInstance(analyzer, _RSRenrenCoreAnalyzerTypeID);
