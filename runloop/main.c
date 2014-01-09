@@ -9,6 +9,11 @@
 #include <RSCoreFoundation/RSCoreFoundation.h>
 #include <RSRenrenCore/RSRenrenCore.h>
 
+void timer(void (^fn)()) {
+    RSAbsoluteTime at1 = RSAbsoluteTimeGetCurrent();
+    fn();
+    RSLog(RSSTR("Elapsed time %f msecs"), 1000.0 * (RSAbsoluteTimeGetCurrent() - at1));
+}
 
 int main(int argc, const char * argv[])
 {

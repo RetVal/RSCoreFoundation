@@ -2430,8 +2430,8 @@ RSExport BOOL RSArrayContainsObject(RSArrayRef array, RSRange range, const void 
 
 const void *RSArrayObjectAtIndex(RSArrayRef array, RSIndex idx)
 {
+    if (!array) return nil;
     __RSGenericValidInstance(array, __RSArrayTypeID);
-    
     return __RSArrayGetBucketAtIndex(array, idx)->_item;
 }
 

@@ -32,5 +32,7 @@ RSExport void RSRenrenCoreAnalyzerUploadImage(RSRenrenCoreAnalyzerRef analyzer, 
 
 RSExport void RSRenrenCoreAnalyzerPublicPhoto(RSRenrenCoreAnalyzerRef analyzer, RSStringRef albumId, RSStringRef photoId, RSStringRef description, void (^complete)(RSTypeRef photoId, BOOL success));
 RSExport void RSRenrenCoreAnalyzerPublicStatus(RSRenrenCoreAnalyzerRef analyzer, RSStringRef content);
+RSExport void RSRenrenCoreAnalyzerCreateReply(RSRenrenCoreAnalyzerRef analyzer, RSStringRef content, RSStringRef type, RSStringRef entryId, RSStringRef owner, RSStringRef style, RSStringRef replyRef);
+RSExport void s(RSRenrenCoreAnalyzerRef analyzer, RSStringRef content, RSStringRef unlockId) ;
 RS_EXTERN_C_END
 #endif 

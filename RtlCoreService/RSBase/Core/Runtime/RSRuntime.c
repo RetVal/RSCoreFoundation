@@ -257,6 +257,7 @@ static void __RSDebugLevelDeallocate()
             lseek(____RSRuntimeDebugLevelLogContext._handle, 0, SEEK_SET);
             read(____RSRuntimeDebugLevelLogContext._handle, buf, size);
             write(fd, buf, size);
+            free(buf);
             close(fd);
         }
 	}

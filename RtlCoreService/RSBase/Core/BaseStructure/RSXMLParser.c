@@ -1350,6 +1350,7 @@ static RSMutableArrayRef __RSXMLElementGetElementsForName(RSXMLElementRef elemen
 
 RSExport RSArrayRef RSXMLElementGetElementsForName(RSXMLElementRef element, RSStringRef name)
 {
+    if (!element) return nil;
     __RSGenericValidInstance(element, _RSXMLElementTypeID);
     RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
     return RSAutorelease(__RSXMLElementGetElementsForName(element, array, name));

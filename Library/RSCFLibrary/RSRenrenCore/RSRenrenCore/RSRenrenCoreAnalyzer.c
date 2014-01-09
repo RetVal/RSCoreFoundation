@@ -412,7 +412,47 @@ RSInline RSArrayRef friendsFromElements(RSArrayRef elements) {
     return RSAutorelease(friends);
 }
 
+#include <Block.h>
+
+typedef RSXMLElementRef(^__RSXMLElmentBlock)(RSXMLElementRef element, RSStringRef name,
+                                             RSIndex cnt, ...);
+
+static __RSXMLElmentBlock __RSXMLElementRecurName(RSXMLElementRef (^sel)(RSXMLElementRef element, RSStringRef name, RSIndex idx)) {
+    return Block_copy(^RSXMLElementRef (RSXMLElementRef element, RSStringRef name,
+                                        RSIndex cnt, ...) {
+        if (cnt == 0) return nil;
+        RSMutableTypeRef coll = RSAutorelease(RSArrayCreateMutable(RSAllocatorDefault, cnt));
+        va_list ap;
+        va_start(ap, cnt);
+        for (RSIndex idx = 0; idx < cnt; idx++) {
+            int offset = va_arg(ap, int);
+            RSArrayAddObject(coll, RSNumberWithInteger(offset));
+        }
+        va_end(ap);
+        
+        if (RSArrayGetCount(coll)) {
+            return ^RSXMLElementRef (RSXMLElementRef element, RSStringRef name, RSArrayRef callIdx) {
+                __block RSXMLElementRef ret = element;
+                RSArrayApplyBlock(callIdx, RSMakeRange(0, RSArrayGetCount(callIdx)),
+                                  ^(const void *value, RSUInteger idx, BOOL *isStop) {
+                                      ret = ^RSXMLElementRef (RSXMLElementRef element, RSStringRef name, RSIndex idx) {
+                                          return sel(element, name, idx);
+                                      }(ret, name, RSNumberIntegerValue(value));
+                                  });
+                return ret;
+            }(element, name, coll);
+        }
+        return nil;
+    });
+}
+
 RSInline RSUInteger friendNumberFromDocument(RSXMLDocumentRef document) {
+    
+    return RSStringUnsignedIntegerValue(RSXMLNodeGetValue((RSXMLNodeRef)RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(__RSXMLElementRecurName(^RSXMLElementRef(RSXMLElementRef element, RSStringRef name, RSIndex idx) {
+        return RSArrayObjectAtIndex(RSXMLElementGetElementsForName(element, name), idx);
+    })(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSXMLDocumentGetRootElement(document), RSSTR("body")), 0),
+       RSSTR("div"), 8, 0, 3, 0, 0, 0, 0, 0, 0), RSSTR("p")), 0), RSSTR("span")), 0)));
+    
     return RSStringIntegerValue(RSXMLNodeGetValue(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSXMLDocumentGetRootElement(document), RSSTR("body")), 0), RSSTR("div")), 0), RSSTR("div")), 3), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("p")), 0), RSSTR("span")), 0)));
 }
 
@@ -455,7 +495,10 @@ RSExport void RSRenrenCoreAnalyzerUploadImage(RSRenrenCoreAnalyzerRef analyzer, 
         if (RSArrayGetCount(subElements) != 4) return;
         if (!RSEqual(RSXMLNodeGetValue(RSXMLElementGetAttributeForName(RSArrayObjectAtIndex(subElements, 3), RSSTR("id"))), RSSTR("container-for-buddylist"))) return;
         RSXMLElementRef div = RSArrayObjectAtIndex(subElements, 3);
-        div = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(div, RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 2);
+        div = __RSXMLElementRecurName(^RSXMLElementRef(RSXMLElementRef element, RSStringRef name, RSIndex idx) {
+            return RSArrayObjectAtIndex(RSXMLElementGetElementsForName(element, name), idx);
+        })(div, RSSTR("div"), 8, 0, 0, 0, 0, 0, 0, 0, 2);
+        
         div = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(div, RSSTR("div")), 1);
         if (!RSEqual(RSXMLNodeGetValue(RSXMLElementGetAttributeForName(div, RSSTR("id"))), RSSTR("single-column"))) return;
         RSXMLElementRef form = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(div, RSSTR("form")), 0);
@@ -571,12 +614,19 @@ RSExport void RSRenrenCoreAnalyzerUploadImage(RSRenrenCoreAnalyzerRef analyzer, 
         if (!publishDocument) return;
         body = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSXMLDocumentGetRootElement(publishDocument), RSSTR("body")), 0);
         if (!RSEqual(RSXMLNodeGetValue(RSXMLElementGetAttributeForName(body, RSSTR("id"))), RSSTR("pageAlbum"))) return;
-        div = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(body, RSSTR("div")), 0), RSSTR("div")), 3), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 0);
+
+        div = __RSXMLElementRecurName(^RSXMLElementRef(RSXMLElementRef element, RSStringRef name, RSIndex idx) {
+            return RSArrayObjectAtIndex(RSXMLElementGetElementsForName(element, name), idx);
+        })(body, RSSTR("div"), 7, 0, 3, 0, 0, 0, 0, 0);
         
         if (!RSEqual(RSXMLNodeGetValue(RSXMLElementGetAttributeForName(div, RSSTR("id"))), RSSTR("content"))) return;
         form = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(div, RSSTR("form")), 0);
         if (!RSEqual(RSXMLNodeGetValue(RSXMLElementGetAttributeForName(form, RSSTR("id"))), RSSTR("albumEditForm"))) return;
-        div = RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(form, RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 1), RSSTR("div")), 0), RSSTR("div")), 0);
+        div = __RSXMLElementRecurName( ^RSXMLElementRef(RSXMLElementRef element, RSStringRef name, RSIndex idx) {
+            return RSArrayObjectAtIndex(RSXMLElementGetElementsForName(element, name), idx);
+        })(form, RSSTR("div"), 5, 0, 0, 1, 0, 0);
+        
+        RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(RSArrayObjectAtIndex(RSXMLElementGetElementsForName(form, RSSTR("div")), 0), RSSTR("div")), 0), RSSTR("div")), 1), RSSTR("div")), 0), RSSTR("div")), 0);
         RSArrayRef inputs = RSXMLElementGetElementsForName(div, RSSTR("input"));
         RSTypeRef aid = RSXMLNodeGetValue(RSXMLElementGetAttributeForName(RSArrayObjectAtIndex(inputs, 0), RSSTR("value")));
         if (!aid) return;
@@ -638,3 +688,55 @@ RSExport void RSRenrenCoreAnalyzerPublicStatus(RSRenrenCoreAnalyzerRef analyzer,
     data = RSURLConnectionSendSynchronousRequest(request, &response, &error);
     if (error) RSShow(error);
 }
+
+RSExport void RSRenrenCoreAnalyzerCreateReply(RSRenrenCoreAnalyzerRef analyzer, RSStringRef content, RSStringRef type, RSStringRef entryId, RSStringRef owner, RSStringRef style, RSStringRef replyRef) {
+    RSMutableURLRequestRef request = RSAutorelease(RSURLRequestCreateMutable(RSAllocatorDefault, RSURLWithString(RSSTR("http://comment.renren.com/comment/xoa2/create"))));
+    RSURLRequestSetHTTPMethod(request, RSSTR("POST"));
+    RSMutableDictionaryRef dict = RSAutorelease(RSDictionaryCreateMutable(RSAllocatorDefault, 0, RSDictionaryRSTypeContext));
+    RSDictionarySetValue(dict, RSSTR("content"), content);
+    RSDictionarySetValue(dict, RSSTR("type"), type);
+    RSDictionarySetValue(dict, RSSTR("entryId"), entryId);
+    RSDictionarySetValue(dict, RSSTR("entryOwnerId"), owner);
+    RSDictionarySetValue(dict, RSSTR("t"), RSSTR("3"));
+    RSDictionarySetValue(dict, RSSTR("stype"), style);
+    RSDictionarySetValue(dict, RSSTR("replyref"), replyRef);
+    RSDictionarySetValue(dict, RSSTR("requestToken"), RSDictionaryGetValue(RSRenrenCoreAnalyzerGetToken(analyzer), RSSTR("requestToken")));
+    RSDictionarySetValue(dict, RSSTR("_rtk"), RSDictionaryGetValue(RSRenrenCoreAnalyzerGetToken(analyzer), RSSTR("_rtk")));
+    RSURLRequestSetHTTPBody(request, RSDataWithString(RSStringURLEncode(dict), RSStringEncodingUTF8));
+    RSURLRequestSetHeaderFieldValue(request, RSSTR("Referer"), RSSTR("http://comment.renren.com/ajaxproxy.htm"));
+    RSURLRequestSetHeaderFieldValue(request, RSSTR("Origin"), RSSTR("http://comment.renren.com"));
+    RSURLRequestSetHeaderFieldValue(request, RSSTR("X-Requested-With"), RSSTR("XMLHttpRequest"));
+    RSURLRequestSetHeaderFieldValue(request, RSSTR("User-Agent"), RSSTR("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.69 Safari/537.36"));
+    RSURLRequestSetHeaderFieldValue(request, RSSTR("DNT"), RSSTR("1"));
+    RSURLRequestSetHeaderFieldValue(request, RSSTR("Content-Type"), RSSTR("application/x-www-form-urlencoded"));
+    RSURLResponseRef response = nil;
+    RSDataRef data = RSURLConnectionSendSynchronousRequest(request, &response, nil);
+    RSShow(response);
+    RSShow(RSStringWithData(data, RSStringEncodingUTF8));
+}
+
+RSExport void RSRenrenCoreAnalyzerCommitComment(RSRenrenCoreAnalyzerRef analyzer, RSStringRef doingId, RSStringRef source);
+
+RSExport void s(RSRenrenCoreAnalyzerRef analyzer, RSStringRef content, RSStringRef unlockId) {
+    RSMutableURLRequestRef request = RSAutorelease(RSURLRequestCreateMutable(RSAllocatorDefault, RSURLWithString(RSSTR("http://renpin.renren.com/action/publish"))));
+    RSURLRequestSetHTTPMethod(request, RSSTR("POST"));
+    RSURLRequestSetHeaderFieldValue(request, RSSTR("Referer"), RSSTR("http://renpin.renren.com/ajaxproxy.htm"));
+    RSURLRequestSetHeaderFieldValue(request, RSSTR("Origin"), RSSTR("http://renpin.renren.com"));
+    RSURLRequestSetHeaderFieldValue(request, RSSTR("X-Requested-With"), RSSTR("XMLHttpRequest"));
+    RSURLRequestSetHeaderFieldValue(request, RSSTR("User-Agent"), RSSTR("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.69 Safari/537.36"));
+    RSURLRequestSetHeaderFieldValue(request, RSSTR("DNT"), RSSTR("1"));
+    RSURLRequestSetHeaderFieldValue(request, RSSTR("Content-Type"), RSSTR("application/x-www-form-urlencoded"));
+    RSMutableDictionaryRef dict = RSAutorelease(RSDictionaryCreateMutable(RSAllocatorDefault, 0, RSDictionaryRSTypeContext));
+    RSDictionarySetValue(dict, RSSTR("content"), RSSTR("content"));
+    RSDictionarySetValue(dict, RSSTR("unlockid"), unlockId);
+    RSDictionarySetValue(dict, RSSTR("from"), RSSTR("1"));
+    RSDictionarySetValue(dict, RSSTR("requestToken"), RSDictionaryGetValue(RSRenrenCoreAnalyzerGetToken(analyzer), RSSTR("requestToken")));
+    RSDictionarySetValue(dict, RSSTR("_rtk"), RSDictionaryGetValue(RSRenrenCoreAnalyzerGetToken(analyzer), RSSTR("_rtk")));
+    RSURLRequestSetHTTPBody(request, RSDataWithString(RSStringURLEncode(dict), RSStringEncodingUTF8));
+    
+    RSURLResponseRef response = nil;
+    RSDataRef data = RSURLConnectionSendSynchronousRequest(request, &response, nil);
+    RSShow(response);
+    RSShow(RSStringWithData(data, RSStringEncodingUTF8));
+}
+

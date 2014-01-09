@@ -450,6 +450,7 @@ static RSStringRef nameForProcessWithPID(pid_t pidNum)
     else {
         returnString = RSStringWithUTF8String(stringPtr);
     }
+    free(args);
     return returnString;
 }
 

@@ -33,21 +33,25 @@ int main(int argc, const char * argv[])
 //        }, ^(void) {
 //            RSRunLoopStop(RSRunLoopGetMain());
 //        });
-//        RSRenrenCoreAnalyzerUploadImage(analyzer, RSDataWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/upload.jpg"))), RSSTR("upload by RSCoreFoundation"), ^RSDictionaryRef(RSArrayRef albumList) {
-//            BOOL (^PE)(RSDictionaryRef dict) = ^BOOL (RSDictionaryRef dict) {
-//                return RSStringHasPrefix(RSDictionaryGetValue(dict, RSSTR("name")), RSSTR("二次元"));
-//            };
-//            __block RSIndex retIdx = 0;
-//            RSArrayApplyBlock(albumList, RSMakeRange(0, RSArrayGetCount(albumList)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
-//                *isStop = PE(value) ? retIdx = idx, YES : NO;
-//            });
-//            return RSArrayObjectAtIndex(albumList, retIdx);
-//        }, ^(RSTypeRef photo, BOOL success) {
-//            RSShow(photo);
-//            RSRunLoopStop(RSRunLoopGetMain());
-//        });
-        RSRenrenCoreAnalyzerPublicStatus(analyzer, RSSTR("sent by RSCoreFoundation"));
-        RSRunLoopStop(RSRunLoopGetMain());
+        RSRenrenCoreAnalyzerUploadImage(analyzer, RSDataWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/upload.jpg"))), RSSTR("upload by RSCoreFoundation"), ^RSDictionaryRef(RSArrayRef albumList) {
+            BOOL (^PE)(RSDictionaryRef dict) = ^BOOL (RSDictionaryRef dict) {
+                return RSStringHasPrefix(RSDictionaryGetValue(dict, RSSTR("name")), RSSTR("二次元"));
+            };
+            __block RSIndex retIdx = 0;
+            RSArrayApplyBlock(albumList, RSMakeRange(0, RSArrayGetCount(albumList)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+                *isStop = PE(value) ? retIdx = idx, YES : NO;
+            });
+            return RSArrayObjectAtIndex(albumList, retIdx);
+        }, ^(RSTypeRef photo, BOOL success) {
+            RSShow(photo);
+            RSRunLoopStop(RSRunLoopGetMain());
+        });
+//        RSRenrenCoreAnalyzerPublicStatus(analyzer, RSSTR("sent by RSCoreFoundation"));
+//        for (RSUInteger idx = 0; idx < 20; idx++) {
+//            s(analyzer, RSSTR("test"), RSAutorelease(RSDescription(RSNumberWithInteger(idx))));
+//        }
+//        RSRenrenCoreAnalyzerReply(analyzer, RSSTR("baga"), RSSTR("status"), RSSTR("5112882888"), RSSTR("254788288"), RSSTR("502"), RSSTR("newsfeed"));
+//        RSRunLoopStop(RSRunLoopGetMain());
     });
     RSRenrenCoreAnalyzerStartLogin(analyzer);
     RSRunLoopRun();
