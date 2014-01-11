@@ -107,7 +107,7 @@ static RSMutableDictionaryRef token(RSStringRef uid) {
     __block RSStringRef requestToken = nil, _rtk = nil;
     RSAutoreleaseBlock(^{
         RSStringRef str = RSStringWithData(RSDataWithURL(RSURLWithString(RSStringWithFormat(RSSTR("http://www.renren.com/%r"), uid))), RSStringEncodingUTF8);
-        RSStringWriteToFile(str, RSFileManagerStandardizingPath(RSSTR("~/Desktop/renren.html")), RSWriteFileAutomatically);
+//        RSStringWriteToFile(str, RSFileManagerStandardizingPath(RSSTR("~/Desktop/renren.html")), RSWriteFileAutomatically);
         RSRange range = RSStringRangeOfString(str, RSSTR("get_check:'"));
         str = RSStringWithSubstring(str, RSMakeRange(range.location + range.length, RSStringGetLength(str) - range.location - range.length - 1));
         range = RSStringRangeOfString(str, RSSTR("'"));
@@ -179,6 +179,7 @@ static RSStringRef __buildURLString(RSStringRef baseString, RSStringRef domain, 
     RSStringRef const _password = RSSTR("password=");
     RSStringRef const _account = RSSTR("email=");
     RSStringRef urlString = RSStringWithFormat(RSSTR("%r%r%r%r%r%r%r%r%r%r%r"), _origURL, baseString, _append, _domain, domain, _append, _password, password, _append, _account, account);
+    RSShow(urlString);
     return urlString;
 }
 
@@ -192,6 +193,7 @@ static RSRenrenCoreAnalyzerRef __RSRenrenCoreAnalyzerCreateInstance(RSAllocatorR
     RSURLRequestSetHTTPMethod(request, RSSTR("POST"));
     RSURLRequestSetHeaderFieldValue(request, RSSTR("Content-Length"), RSStringWithFormat(RSSTR("%ld"), RSDataGetLength(postData)));
     RSURLRequestSetHeaderFieldValue(request, RSSTR("Content-Type"), RSSTR("application/x-www-form-urlencoded"));
+    RSURLRequestSetHeaderFieldValue(request, RSSTR("debug"), RSBooleanTrue);
     RSURLRequestSetHTTPBody(request, postData);
     
     struct RSURLConnectionDelegate delegate = {
