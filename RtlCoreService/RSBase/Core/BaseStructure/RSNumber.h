@@ -106,6 +106,7 @@ RSExport unsigned long RSNumberUnsignedLongValue(RSNumberRef aValue) RS_AVAILABL
 RSExport long long RSNumberLongLongValue(RSNumberRef aValue) RS_AVAILABLE(0_4);
 RSExport unsigned long long RSNumberUnsignedLongLongValue(RSNumberRef aValue) RS_AVAILABLE(0_4);
 RSExport float RSNumberFloatValue(RSNumberRef aValue) RS_AVAILABLE(0_4);
+RSExport double RSNumberDoubleValue(RSNumberRef aValue) RS_AVAILABLE(0_4);
 RSExport BOOL RSNumberBooleanValue(RSNumberRef aValue) RS_AVAILABLE(0_4);
 RSExport RSFloat RSNumberRSFloatValue(RSNumberRef aValue) RS_AVAILABLE(0_4);
 RSExport RSInteger RSNumberIntegerValue(RSNumberRef aValue) RS_AVAILABLE(0_4);

@@ -17,6 +17,9 @@ void timer(void (^fn)()) {
 
 int main(int argc, const char * argv[])
 {
+    RSNumberFloatValue(nil);
+    RSShow(RSNumberWithFloat(0.3 - 0.2));
+    return 0;
     if (4 != argc) {
         RSShow(RSSTR("RSRenrenDemo email password target-id"));
         RSShow(RSSTR("RSRenrenDemo 登陆邮箱 登陆密码 目标用户ID // 给目标用户点150个赞"));
@@ -32,14 +35,12 @@ int main(int argc, const char * argv[])
         //        extern void dump(RSRenrenCoreAnalyzerRef);
         //        dump(analyzer);
         //        RSRunLoopStop(RSRunLoopGetMain());
-        //        RSRenrenCoreAnalyzerCreateEventContentsWithUserId(analyzer, RSStringWithUTF8String(argv[3]), 150, NO, ^(RSRenrenEventRef event) {
-        //            RSShow(event);
-        //
-        ////            RSRenrenEventDo(event);
-        //            sleep(2);
-        //        }, ^(void) {
-        //            RSRunLoopStop(RSRunLoopGetMain());
-        //        });
+            RSRenrenCoreAnalyzerCreateEventContentsWithUserId(analyzer, RSStringWithUTF8String(argv[3]), 200, YES, ^(RSRenrenEventRef event) {
+                RSRenrenEventDo(event);
+                sleep(3);
+            }, ^(void) {
+                RSRunLoopStop(RSRunLoopGetMain());
+            });
 //        RSRenrenCoreAnalyzerUploadImage(analyzer, RSDataWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/upload.jpg"))), RSSTR("upload by RSCoreFoundation"), ^RSDictionaryRef(RSArrayRef albumList) {
 //            BOOL (^PE)(RSDictionaryRef dict) = ^BOOL (RSDictionaryRef dict) {
 //                return RSStringHasPrefix(RSDictionaryGetValue(dict, RSSTR("name")), RSSTR("二次元"));

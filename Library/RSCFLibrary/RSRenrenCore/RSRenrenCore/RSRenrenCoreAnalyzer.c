@@ -193,7 +193,7 @@ static RSRenrenCoreAnalyzerRef __RSRenrenCoreAnalyzerCreateInstance(RSAllocatorR
     RSURLRequestSetHTTPMethod(request, RSSTR("POST"));
     RSURLRequestSetHeaderFieldValue(request, RSSTR("Content-Length"), RSStringWithFormat(RSSTR("%ld"), RSDataGetLength(postData)));
     RSURLRequestSetHeaderFieldValue(request, RSSTR("Content-Type"), RSSTR("application/x-www-form-urlencoded"));
-    RSURLRequestSetHeaderFieldValue(request, RSSTR("debug"), RSBooleanTrue);
+//    RSURLRequestSetHeaderFieldValue(request, RSSTR("debug"), RSBooleanTrue);
     RSURLRequestSetHTTPBody(request, postData);
     
     struct RSURLConnectionDelegate delegate = {

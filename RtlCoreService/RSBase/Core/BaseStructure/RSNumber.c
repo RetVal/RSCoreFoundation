@@ -581,6 +581,13 @@ RSExport float RSNumberFloatValue(RSNumberRef aValue) {
     return 0;
 }
 
+RSExport double RSNumberDoubleValue(RSNumberRef aValue) {
+    if (!aValue) return 0;
+    double value = 0;
+    if (RSNumberGetType(aValue) == RSNumberDouble && RSNumberGetValue(aValue, &value)) return value;
+    return 0;
+}
+
 RSExport BOOL RSNumberBooleanValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     BOOL value = 0;
