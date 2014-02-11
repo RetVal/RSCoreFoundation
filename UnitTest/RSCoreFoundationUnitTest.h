@@ -10,5 +10,5 @@
 #define RSCoreFoundation_RSCoreFoundationUnitTest_h
 
 #include <RSCoreFoundation/RSCoreFoundation.h>
-
+int rs_ut_main();
 #endif

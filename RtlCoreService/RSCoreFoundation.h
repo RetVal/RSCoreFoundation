@@ -70,4 +70,6 @@
 #include <RSCoreFoundation/RSURL+Extension.h>
 
 #include <RSCoreFoundation/RSProcessInfo.h>
+
+#include <RSCoreFoundation/RSFunctional.h>
 RSExport void RSCoreFoundationCrash(const char *crash);

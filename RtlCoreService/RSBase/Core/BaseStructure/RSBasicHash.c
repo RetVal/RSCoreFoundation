@@ -3183,48 +3183,6 @@ RSPrivate RSStringRef RSBasicHashDescription(RSConstBasicHashRef ht, BOOL detail
         RSStringAppendStringWithFormat(result, RSSTR("%rvalues ptr = %p, keys ptr = %p, counts ptr = %p, hashes ptr = %p,\n"), prefix, __RSBasicHashGetValues(ht), ((ht->bits.keys_offset) ? __RSBasicHashGetKeys(ht) : nil), ((ht->bits.counts_offset) ? __RSBasicHashGetCounts(ht) : nil), (__RSBasicHashHasHashCache(ht) ? __RSBasicHashGetHashes(ht) : nil));
     }
 //    RSStringAppendStringWithFormat(result, RSSTR("%rentries =>\n"), prefix);
-    
-    __block RSMutableArrayRef keys = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
-    __block RSMutableArrayRef values = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
-    
-    RSBasicHashApplyBlock(ht, ^BOOL(RSBasicHashBucket bkt, BOOL *stop) {
-        RSStringRef kDesc = nil;
-        if (!describeElements) {
-            if (ht->bits.keys_offset) {
-                kDesc = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<%p>"), (void *)bkt.weak_key);
-            }
-        } else {
-            if (ht->bits.keys_offset) {
-                kDesc = __RSBasicHashDescKey(ht, bkt.weak_key);
-            }
-        }
-        
-        RSArrayAddObject(keys, kDesc);
-        
-        if (kDesc) RSRelease(kDesc);
-        return YES;
-    });
-    
-    RSUInteger cnt = RSArrayGetCount(keys);
-
-    RSArraySort(keys, RSOrderedAscending, (RSComparatorFunction)RSStringCompare, nil);
-    
-    RSArrayApplyBlock(keys, RSMakeRange(0, cnt), ^(const void *value, RSUInteger idx, BOOL *isStop) {
-        RSBasicHashBucket bkt = RSBasicHashFindBucket(ht, (uintptr_t)value);
-        RSTypeRef v = (0 < bkt.count ? (RSTypeRef)bkt.weak_value : 0);
-        v = v ? __RSBasicHashDescValue(ht, bkt.weak_value) : RSSTR("Null");
-        RSArrayAddObject(values, v);
-        if (v) RSRelease(v);
-    });
-    
-    for (RSUInteger idx = 0; idx < cnt; idx++) {
-        RSStringAppendStringWithFormat(result, RSSTR("%r%r = %r\n"), entryPrefix, RSArrayObjectAtIndex(keys, idx), RSArrayObjectAtIndex(values, idx));
-    }
-    RSRelease(keys);
-    RSRelease(values);
-    
-    RSStringAppendStringWithFormat(result, RSSTR("%r}"), prefix);
-    return result;
     RSBasicHashApply(ht, ^(RSBasicHashBucket bkt) {
         RSStringRef vDesc = nil, kDesc = nil;
         if (!describeElements) {
@@ -3238,15 +3196,16 @@ RSPrivate RSStringRef RSBasicHashDescription(RSConstBasicHashRef ht, BOOL detail
                 kDesc = __RSBasicHashDescKey(ht, bkt.weak_key);
             }
         }
-        if (ht->bits.keys_offset && ht->bits.counts_offset) {
-            RSStringAppendStringWithFormat(result, RSSTR("%r%ld : %r = %r (%ld)\n"), entryPrefix, bkt.idx, kDesc, vDesc, bkt.count);
-        } else if (ht->bits.keys_offset) {
-            RSStringAppendStringWithFormat(result, RSSTR("%r%ld : %r = %r\n"), entryPrefix, bkt.idx, kDesc, vDesc);
-        } else if (ht->bits.counts_offset) {
-            RSStringAppendStringWithFormat(result, RSSTR("%r%ld : %r (%ld)\n"), entryPrefix, bkt.idx, vDesc, bkt.count);
-        } else {
-            RSStringAppendStringWithFormat(result, RSSTR("%r%ld : %r\n"), entryPrefix, bkt.idx, vDesc);
-        }
+//        if (ht->bits.keys_offset && ht->bits.counts_offset) {
+//            RSStringAppendStringWithFormat(result, RSSTR("%r%ld : %r = %r (%ld)\n"), entryPrefix, bkt.idx, kDesc, vDesc, bkt.count);
+//        } else if (ht->bits.keys_offset) {
+//            RSStringAppendStringWithFormat(result, RSSTR("%r%ld : %r = %r\n"), entryPrefix, bkt.idx, kDesc, vDesc);
+//        } else if (ht->bits.counts_offset) {
+//            RSStringAppendStringWithFormat(result, RSSTR("%r%ld : %r (%ld)\n"), entryPrefix, bkt.idx, vDesc, bkt.count);
+//        } else {
+//            RSStringAppendStringWithFormat(result, RSSTR("%r%ld : %r\n"), entryPrefix, bkt.idx, vDesc);
+//        }
+        RSStringAppendStringWithFormat(result, RSSTR("%r%r : %r\n"), entryPrefix, kDesc, vDesc);
         if (kDesc) RSRelease(kDesc);
         if (vDesc) RSRelease(vDesc);
         return (BOOL)true;

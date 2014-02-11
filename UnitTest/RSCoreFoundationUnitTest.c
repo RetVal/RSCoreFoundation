@@ -27,7 +27,7 @@ static BOOL unit_test_runperform(RSErrorRef *error)
     });
     RSPerformBlockInBackGroundWaitUntilDone(^{
         RSPerformBlockInBackGround(^{
-            RSLog(RSSocketGetLocalIp());
+            RSShow(RSCoreFoundationDidFinishLoadingNotification);
         });
     });
     return YES;
@@ -189,7 +189,7 @@ static BOOL unit_test_json(RSErrorRef *error)
 struct __UTFunction _func_table[] = {unit_test_plist, unit_test_string, unit_test_runperform, unit_test_timer};
 
 static unsigned int _kSizeOfF = sizeof(_func_table)/ sizeof(struct __UTFunction);
-int rs_ut_main() RS_INIT_ROUTINE;
+ 
 int rs_ut_main()
 {
     BOOL result = YES;

@@ -33,6 +33,15 @@ RSExport void RSShow(RSTypeRef obj) RS_AVAILABLE(0_0);
 
 RSExport RSStringRef RSStringFromRSRange(RSRange range) RS_AVAILABLE(0_3);
 RSExport RSStringRef RSClassNameFromInstance(RSTypeRef id) RS_AVAILABLE(0_3);
+
+RSExport RSClass RSClassFromInstance(RSTypeRef id) RS_AVAILABLE(0_4);
+RSExport RSClass RSClassGetWithName(RSStringRef name) RS_AVAILABLE(0_4);
+
+RSExport RSStringRef RSClassGetName(RSClass cls) RS_AVAILABLE(0_4);
+RSExport RSTypeID RSClassGetTypeID(RSClass cls) RS_AVAILABLE(0_4);
+RSExport BOOL RSInstanceIsMemberOfClass(RSTypeRef id, RSClass cls) RS_AVAILABLE(0_4);
+
+RSExport RSStringRef RSClassGetNameWithInstance(RSTypeRef id) RS_AVAILABLE(0_4);
 /****************************************************************************/
 extern const unsigned char RSCoreFoundationVersionString[] RS_AVAILABLE(0_0);
 extern const double RSCoreFoundationVersionNumber RS_AVAILABLE(0_0);

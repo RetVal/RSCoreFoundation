@@ -796,6 +796,7 @@ static BOOL    __RSNumberClassEqual(RSTypeRef obj1, RSTypeRef obj2)
 {
     if (obj1 == nil) HALTWithError(RSInvalidArgumentException, "the obj1 is nil");
     if (obj2 == nil) HALTWithError(RSInvalidArgumentException, "the obj2 is nil");
+    return RSCompareEqualTo == RSNumberCompare(obj1, obj2, nil);
     // the object is RSNumber
     RSNumberRef num1 = (RSNumberRef)obj1;
     RSNumberRef num2 = (RSNumberRef)obj2;
@@ -844,6 +845,11 @@ static BOOL    __RSNumberClassEqual(RSTypeRef obj1, RSTypeRef obj2)
 
 static RSHashCode __RSNumberClassHash(RSTypeRef rs)
 {
+    if (RS_IS_TAGGED_INT(rs)) {
+        RSHashCode hc = 0;
+        RSNumberGetValue(rs, &hc);
+        return hc;
+    }
     return (RSHashCode)(((RSNumberRef)rs)->_number._pay._int64);
 }
 
@@ -1346,88 +1352,126 @@ RSExport BOOL RSNumberGetValue(RSNumberRef aNumber, void *value)
     return YES;
 }
 
+RSInline BOOL __RSNumberTypeIsFloatGroup(RSNumberType t) {
+    return (t == RSNumberFloat || t == RSNumberFloat32 || t == RSNumberFloat64 || t == RSNumberDouble);
+}
+
+RSInline BOOL __RSNumberTypeIsIntGroup(RSNumberType t) {
+    return (t == RSNumberSInt16 || t == RSNumberSInt32 || t == RSNumberSInt64 || t == RSNumberSInt8 || t == RSNumberChar);
+}
+
+RSInline BOOL __RSNumberIsSameGroup(RSNumberType t1, RSNumberType t2) {
+    if (t1 == t2) return YES;
+    BOOL is_t1_floating = __RSNumberTypeIsFloatGroup(t1);
+    if (is_t1_floating && __RSNumberTypeIsFloatGroup(t2)) return YES;
+    else if (!__RSNumberTypeIsFloatGroup(t2) && t2 != RSNumberBoolean) return YES;
+    return NO;
+}
+
+RSInline BOOL __RSNumberTypeIsSpecialPayload(RSNumberType t) {
+    return (t == RSNumberRSRange || t == RSNumberPointer || t == RSNumberString);
+}
+
 RSExport RSComparisonResult RSNumberCompare(RSNumberRef aNumber, RSNumberRef other, void *context)
 {
     if (aNumber == nil || other == nil) HALTWithError(RSInvalidArgumentException, "");
     __RSGenericValidInstance(aNumber, __RSNumberTypeID);
     __RSGenericValidInstance(other, __RSNumberTypeID);
     RSNumberType numberType = RSNumberGetType(aNumber);
-    if (RS_IS_TAGGED_INT(aNumber) && RS_IS_TAGGED_INT(other))
-    {
+    if (RS_IS_TAGGED_INT(aNumber) && RS_IS_TAGGED_INT(other)) {
         int64_t value1 = 0, value2 = 0;
         BOOL f1 = RSNumberGetValue(aNumber, &value1);
         BOOL f2 = RSNumberGetValue(other, &value2);
-        if (f1 && f2)
-        {
+        if (f1 && f2) {
             if (value1 > value2) return RSCompareGreaterThan;
             if (value1 < value2) return RSCompareLessThan;
             return RSCompareEqualTo;
         }
     }
     
-    if (numberType == RSNumberGetType(other))
-    {
-        struct __RSBaseNumber pay1 = aNumber->_number;
-        struct __RSBaseNumber pay2 = other->_number;
-        switch (numberType)
-        {
-            case RSNumberChar:
-                if (pay1._pay._char > pay2._pay._char) return RSCompareGreaterThan;
-                else if (pay1._pay._char < pay2._pay._char) return RSCompareLessThan;
-                break;
-            case RSNumberBoolean:
-                if (pay1._pay._bool == pay2._pay._bool) return RSCompareEqualTo;
-                else if (pay1._pay._bool == YES) return RSCompareGreaterThan;
-                break;
-            case RSNumberInt:
-                if (pay1._pay._int > pay2._pay._int) return RSCompareGreaterThan;
-                else if (pay1._pay._int < pay2._pay._int) return RSCompareLessThan;
-                break;
-            case RSNumberLong:
-                if (pay1._pay._long > pay2._pay._long) return RSCompareGreaterThan;
-                else if (pay1._pay._long < pay2._pay._long) return RSCompareLessThan;
-                break;
-            case RSNumberFloat:
-                if (pay1._pay._float > pay2._pay._float) return RSCompareGreaterThan;
-                else if (pay1._pay._float < pay2._pay._float) return RSCompareLessThan;
-                break;
-            case RSNumberDouble:
-                if (pay1._pay._double > pay2._pay._double) return RSCompareGreaterThan;
-                else if (pay1._pay._double < pay2._pay._double) return RSCompareLessThan;
-                break;
-            case RSNumberLonglong:
-                if (pay1._pay._longlong > pay2._pay._longlong) return RSCompareGreaterThan;
-                else if (pay1._pay._longlong < pay2._pay._longlong) return RSCompareLessThan;
-                break;
-            case RSNumberRSRange:
+    RSNumberType otherNumberType = RSNumberGetType(other);
+    BOOL isSameGroup = __RSNumberIsSameGroup(numberType, otherNumberType);
+    if (isSameGroup) {
+        if (__RSNumberTypeIsFloatGroup(numberType)) {
+            double n1 = 0.0f, n2 = 0.0f;
+            if (RSNumberGetValue(aNumber, &n1) && RSNumberGetValue(other, &n2)) {
+                if (isnan(n1) && isnan(n2)) return RSCompareEqualTo;
+                double s1 = copysign(1.0, n1);
+                double s2 = copysign(1.0, n2);
+                if (isnan(n1)) return (s2 < 0.0) ? RSCompareGreaterThan : RSCompareLessThan;
+                if (isnan(n2)) return (s1 < 0.0) ? RSCompareLessThan : RSCompareGreaterThan;
+                // at this point, we know we don't have any NaNs
+                if (s1 < s2) return RSCompareLessThan;
+                if (s2 < s1) return RSCompareGreaterThan;
+                // at this point, we know the signs are the same; do not combine these tests
+                if (n1 < n2) return RSCompareLessThan;
+                if (n2 < n1) return RSCompareGreaterThan;
+                return RSCompareEqualTo;
+            }
+        } else if (__RSNumberTypeIsIntGroup(numberType)){
+            int64_t n1 = 0, n2 = 0;
+            if (RSNumberGetValue(aNumber, &n1) && RSNumberGetValue(other, &n2)) {
+                if (n1 > n2) return RSCompareGreaterThan;
+                if (n1 < n2) return RSCompareLessThan;
+                return RSCompareEqualTo;
+            }
+        } else {
+            struct __RSBaseNumber pay1 = aNumber->_number;
+            struct __RSBaseNumber pay2 = other->_number;
+            if (otherNumberType == RSNumberRSRange) {
                 if (pay1._pay._range.location > pay2._pay._range.location) return RSCompareGreaterThan;
                 else if (pay1._pay._range.location < pay2._pay._range.location) return RSCompareLessThan;
-                break;
-            case RSNumberPointer:
+                return RSCompareEqualTo;
+            } else if (otherNumberType == RSNumberPointer) {
                 if (pay1._pay._pointer > pay2._pay._pointer) return RSCompareGreaterThan;
                 else if (pay1._pay._pointer < pay2._pay._pointer) return RSCompareLessThan;
-                break;
-            case RSNumberString:
+                return RSCompareEqualTo;
+            } else if (otherNumberType == RSNumberString) {
                 return RSStringCompare(pay1._pay._string, pay2._pay._string, nil);
-//            case RSNumberUnsignedInt:
-//                if (pay1._pay._uint > pay2._pay._uint) return RSCompareGreaterThan;
-//                else if (pay1._pay._uint < pay2._pay._uint) return RSCompareLessThan;
-//                break;
-//            case RSNumberUnsignedLong:
-//                if (pay1._pay._ulong > pay2._pay._ulong) return RSCompareGreaterThan;
-//                else if (pay1._pay._ulong < pay2._pay._ulong) return RSCompareLessThan;
-//                break;
-//            case RSNumberUnsignedLonglong:
-//                if (pay1._pay._ulonglong > pay2._pay._ulonglong) return RSCompareGreaterThan;
-//                else if (pay1._pay._ulonglong < pay2._pay._ulonglong) return RSCompareLessThan;
-//                break;
-            default:
-                break;
+            }
         }
-        return RSCompareEqualTo;
-    }
-    else
-    {
+    } else {
+        if (!(__RSNumberTypeIsSpecialPayload(numberType) || __RSNumberTypeIsSpecialPayload(otherNumberType))) {
+            if (__RSNumberTypeIsFloatGroup(numberType)) {
+                double n1 = 0.0f, n2 = 0.0f;
+                RSNumberGetValue(aNumber, &n1);
+                int64_t l1 = 0;
+                RSNumberGetValue(other, &l1);
+                n2 = (double)l1;
+                
+                if (isnan(n1) && isnan(n2)) return RSCompareEqualTo;
+                double s1 = copysign(1.0, n1);
+                double s2 = copysign(1.0, n2);
+                if (isnan(n1)) return (s2 < 0.0) ? RSCompareGreaterThan : RSCompareLessThan;
+                if (isnan(n2)) return (s1 < 0.0) ? RSCompareLessThan : RSCompareGreaterThan;
+                // at this point, we know we don't have any NaNs
+                if (s1 < s2) return RSCompareLessThan;
+                if (s2 < s1) return RSCompareGreaterThan;
+                // at this point, we know the signs are the same; do not combine these tests
+                if (n1 < n2) return RSCompareLessThan;
+                if (n2 < n1) return RSCompareGreaterThan;
+                return RSCompareEqualTo;
+            } else if (__RSNumberTypeIsFloatGroup(otherNumberType)) {
+                double n1 = 0.0f, n2 = 0.0f;
+                RSNumberGetValue(other, &n1);
+                int64_t l1 = 0;
+                RSNumberGetValue(aNumber, &l1);
+                n2 = (double)l1;
+                
+                if (isnan(n1) && isnan(n2)) return RSCompareEqualTo;
+                double s1 = copysign(1.0, n1);
+                double s2 = copysign(1.0, n2);
+                if (isnan(n1)) return (s2 < 0.0) ? RSCompareGreaterThan : RSCompareLessThan;
+                if (isnan(n2)) return (s1 < 0.0) ? RSCompareLessThan : RSCompareGreaterThan;
+                // at this point, we know we don't have any NaNs
+                if (s1 < s2) return RSCompareLessThan;
+                if (s2 < s1) return RSCompareGreaterThan;
+                // at this point, we know the signs are the same; do not combine these tests
+                if (n1 < n2) return RSCompareLessThan;
+                if (n2 < n1) return RSCompareGreaterThan;
+                return RSCompareEqualTo;
+            }
+        }
         int result = __builtin_memcmp(&aNumber->_number, &other->_number, sizeof(struct __RSBaseNumber));
         if (result > 0) return RSCompareGreaterThan;
         else if (result < 0) return RSCompareLessThan;
@@ -1439,7 +1483,7 @@ RSExport RSComparisonResult RSNumberCompare(RSNumberRef aNumber, RSNumberRef oth
 RSExport BOOL RSNumberIsFloatType(RSNumberRef aNumber)
 {
     __RSGenericValidInstance(aNumber, __RSNumberTypeID);
-    return __RSNumberISFloatType(aNumber);
+    return __RSNumberTypeIsFloatGroup(RSNumberGetType(aNumber));
 }
 
 RSExport BOOL RSNumberIsBooleanType(RSNumberRef aNumber)

@@ -16,6 +16,7 @@
 #include "BaseStructure/RSPrivate/CString/RSStringInlineBuffer.h"
 #include "BaseStructure/RSPrivate/CString/RSString/RSFoundationEncoding.h"
 
+#include <dispatch/dispatch.h>
 #define RSDictionaryBasicHash   1
 #define RSDictionaryRBTree      2
 #define RSDictionaryCoreSelector RSDictionaryBasicHash
@@ -474,6 +475,7 @@ typedef struct {
     RSArrayEqualCallBack		equal;
 } RSArrayCallBacks;
 RSExport RSMutableArrayRef __RSArrayCreateMutable0(RSAllocatorRef allocator, RSIndex capacity, const RSArrayCallBacks *callBacks);
+RSPrivate RSArrayRef __RSArrayCreateWithArguments(va_list arguments, RSInteger maxCount);
 enum {
     RSCompareIgnoreNonAlphanumeric = (1UL << 16), // Ignores characters NOT in kRSCharacterSetAlphaNumeric
 };

@@ -69,8 +69,8 @@ typedef int RSSocketHandle RS_AVAILABLE(0_0);
 
 typedef void (*RSSocketCallBack)(RSSocketRef s, RSSocketCallBackType type, RSDataRef address, const void *data, void *info) RS_AVAILABLE(0_0);
 
-RSExport RSStringRef RSSocketGetLocalIp() RS_AVAILABLE(0_0);
-RSExport RSStringRef RSSocketGetLocalName() RS_AVAILABLE(0_0);
+RSExport RSStringRef RSSocketGetLocalIp() RS_AVAILABLE_BUT_DEPRECATED(0_0, 0_4);
+RSExport RSStringRef RSSocketGetLocalName() RS_AVAILABLE_BUT_DEPRECATED(0_0, 0_4);
 
 RSExport RSTypeID RSSocketGetTypeID() RS_AVAILABLE(0_0);
 

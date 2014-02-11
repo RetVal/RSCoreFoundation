@@ -7,13 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		300CB71218992D16004298E2 /* RSFunctional.c in Sources */ = {isa = PBXBuildFile; fileRef = 300CB71118992D16004298E2 /* RSFunctional.c */; };
+		300CB714189932A6004298E2 /* RSFunctional.h in Headers */ = {isa = PBXBuildFile; fileRef = 300CB713189932A6004298E2 /* RSFunctional.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		300CB717189A3349004298E2 /* RSList.c in Sources */ = {isa = PBXBuildFile; fileRef = 300CB715189A3349004298E2 /* RSList.c */; };
+		300CB718189A3349004298E2 /* RSList.h in Headers */ = {isa = PBXBuildFile; fileRef = 300CB716189A3349004298E2 /* RSList.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30217B891875D18D00BC813A /* RSURL+Extension.c in Sources */ = {isa = PBXBuildFile; fileRef = 30217B881875D18D00BC813A /* RSURL+Extension.c */; };
 		30217B8B1875D19700BC813A /* RSURL+Extension.h in Headers */ = {isa = PBXBuildFile; fileRef = 30217B8A1875D19700BC813A /* RSURL+Extension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3049CF4A187D2A6D00B7D95F /* RSRenrenCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3049CF49187D2A6D00B7D95F /* RSRenrenCore.framework */; };
 		304B3850186C36F300806E4B /* RSRegularExpression.c in Sources */ = {isa = PBXBuildFile; fileRef = 304B384E186C36F300806E4B /* RSRegularExpression.c */; };
 		304B3851186C36F300806E4B /* RSRegularExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 304B384F186C36F300806E4B /* RSRegularExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		305EC3B7189E14F00025E664 /* RSKVBucket.c in Sources */ = {isa = PBXBuildFile; fileRef = 305EC3B5189E14F00025E664 /* RSKVBucket.c */; };
+		305EC3B8189E14F00025E664 /* RSKVBucket.h in Headers */ = {isa = PBXBuildFile; fileRef = 305EC3B6189E14F00025E664 /* RSKVBucket.h */; };
 		3098391E1868818400398AC3 /* RSRawHashTable.c in Sources */ = {isa = PBXBuildFile; fileRef = 3098391C1868818400398AC3 /* RSRawHashTable.c */; };
 		3098391F1868818400398AC3 /* RSRawHashTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 3098391D1868818400398AC3 /* RSRawHashTable.h */; };
+		30A15D3918A9C5170055B9A1 /* RSCoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4158D55A1625C4C60070E69F /* RSCoreFoundation.framework */; };
+		30A4B615189E029800DF6FA4 /* RSMultidimensionalDictionary.c in Sources */ = {isa = PBXBuildFile; fileRef = 30A4B613189E029800DF6FA4 /* RSMultidimensionalDictionary.c */; };
+		30A4B616189E029800DF6FA4 /* RSMultidimensionalDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 30A4B614189E029800DF6FA4 /* RSMultidimensionalDictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30D845901875164C004DEBE0 /* regex.h in Headers */ = {isa = PBXBuildFile; fileRef = 30D8458F1875164C004DEBE0 /* regex.h */; };
 		30F32B3A1860318300A45125 /* RSHTTPCookieStorage.c in Sources */ = {isa = PBXBuildFile; fileRef = 30F32B381860318300A45125 /* RSHTTPCookieStorage.c */; };
 		30F32B3B1860318300A45125 /* RSHTTPCookieStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F32B391860318300A45125 /* RSHTTPCookieStorage.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -254,7 +263,6 @@
 		4159783016DFBD6200726AAA /* RSFileManagerPathSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = 41F90C8116DFBB38005CDC45 /* RSFileManagerPathSupport.c */; };
 		415A2FEE171C48B20080373A /* RSCoreFoundationUnitTest.c in Sources */ = {isa = PBXBuildFile; fileRef = 415A2FED171C48B20080373A /* RSCoreFoundationUnitTest.c */; };
 		415A2FF0171C48BD0080373A /* RSCoreFoundationUnitTest.h in Headers */ = {isa = PBXBuildFile; fileRef = 415A2FEF171C48BD0080373A /* RSCoreFoundationUnitTest.h */; };
-		415A2FF2171C48F00080373A /* RSCoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 415A2FF1171C48F00080373A /* RSCoreFoundation.framework */; };
 		415D57DD17BE265C00FE3E9D /* RSProcessInfo.c in Sources */ = {isa = PBXBuildFile; fileRef = 415D57DB17BE265C00FE3E9D /* RSProcessInfo.c */; };
 		415D57DE17BE265C00FE3E9D /* RSProcessInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 415D57DC17BE265C00FE3E9D /* RSProcessInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		41667C2A16C8BBCF008B9648 /* RSBundle.c in Sources */ = {isa = PBXBuildFile; fileRef = 41667C2916C8BBCF008B9648 /* RSBundle.c */; };
@@ -724,13 +732,21 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		300CB71118992D16004298E2 /* RSFunctional.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSFunctional.c; sourceTree = "<group>"; };
+		300CB713189932A6004298E2 /* RSFunctional.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSFunctional.h; sourceTree = "<group>"; };
+		300CB715189A3349004298E2 /* RSList.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSList.c; sourceTree = "<group>"; };
+		300CB716189A3349004298E2 /* RSList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSList.h; sourceTree = "<group>"; };
 		30217B881875D18D00BC813A /* RSURL+Extension.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "RSURL+Extension.c"; sourceTree = "<group>"; };
 		30217B8A1875D19700BC813A /* RSURL+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RSURL+Extension.h"; sourceTree = "<group>"; };
 		3049CF49187D2A6D00B7D95F /* RSRenrenCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RSRenrenCore.framework; path = Library/RSCFLibrary/RSRenrenCore/Build/Products/Debug/RSRenrenCore.framework; sourceTree = "<group>"; };
 		304B384E186C36F300806E4B /* RSRegularExpression.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRegularExpression.c; sourceTree = "<group>"; };
 		304B384F186C36F300806E4B /* RSRegularExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRegularExpression.h; sourceTree = "<group>"; };
+		305EC3B5189E14F00025E664 /* RSKVBucket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSKVBucket.c; sourceTree = "<group>"; };
+		305EC3B6189E14F00025E664 /* RSKVBucket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSKVBucket.h; sourceTree = "<group>"; };
 		3098391C1868818400398AC3 /* RSRawHashTable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRawHashTable.c; sourceTree = "<group>"; };
 		3098391D1868818400398AC3 /* RSRawHashTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRawHashTable.h; sourceTree = "<group>"; };
+		30A4B613189E029800DF6FA4 /* RSMultidimensionalDictionary.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSMultidimensionalDictionary.c; sourceTree = "<group>"; };
+		30A4B614189E029800DF6FA4 /* RSMultidimensionalDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSMultidimensionalDictionary.h; sourceTree = "<group>"; };
 		30D8458F1875164C004DEBE0 /* regex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = regex.h; sourceTree = "<group>"; };
 		30F32B381860318300A45125 /* RSHTTPCookieStorage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSHTTPCookieStorage.c; sourceTree = "<group>"; };
 		30F32B391860318300A45125 /* RSHTTPCookieStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSHTTPCookieStorage.h; sourceTree = "<group>"; };
@@ -986,7 +1002,6 @@
 		415A2FE8171C485E0080373A /* libRSCoreFoundationUnitTest.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libRSCoreFoundationUnitTest.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		415A2FED171C48B20080373A /* RSCoreFoundationUnitTest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = RSCoreFoundationUnitTest.c; path = UnitTest/RSCoreFoundationUnitTest.c; sourceTree = SOURCE_ROOT; };
 		415A2FEF171C48BD0080373A /* RSCoreFoundationUnitTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSCoreFoundationUnitTest.h; path = UnitTest/RSCoreFoundationUnitTest.h; sourceTree = SOURCE_ROOT; };
-		415A2FF1171C48F00080373A /* RSCoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RSCoreFoundation.framework; path = /Users/retval8237/Library/Frameworks/RSCoreFoundation.framework; sourceTree = "<absolute>"; };
 		415D57DB17BE265C00FE3E9D /* RSProcessInfo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = RSProcessInfo.c; path = RtlCoreService/RSKit/RSProcessInfo.c; sourceTree = SOURCE_ROOT; };
 		415D57DC17BE265C00FE3E9D /* RSProcessInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSProcessInfo.h; path = RtlCoreService/RSKit/RSProcessInfo.h; sourceTree = SOURCE_ROOT; };
 		4162E42A17CA5B9700CB9C6F /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -1415,7 +1430,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				415A2FF2171C48F00080373A /* RSCoreFoundation.framework in Frameworks */,
+				30A15D3918A9C5170055B9A1 /* RSCoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1459,6 +1474,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		300CB71018992CF4004298E2 /* FP */ = {
+			isa = PBXGroup;
+			children = (
+				305EC3B5189E14F00025E664 /* RSKVBucket.c */,
+				305EC3B6189E14F00025E664 /* RSKVBucket.h */,
+				30A4B613189E029800DF6FA4 /* RSMultidimensionalDictionary.c */,
+				30A4B614189E029800DF6FA4 /* RSMultidimensionalDictionary.h */,
+				300CB715189A3349004298E2 /* RSList.c */,
+				300CB716189A3349004298E2 /* RSList.h */,
+				300CB71118992D16004298E2 /* RSFunctional.c */,
+				300CB713189932A6004298E2 /* RSFunctional.h */,
+			);
+			name = FP;
+			path = RSBase/FP;
+			sourceTree = "<group>";
+		};
 		4101F32A18447BBA0090C212 /* gumbo */ = {
 			isa = PBXGroup;
 			children = (
@@ -1803,6 +1834,7 @@
 		4158D5631625C4C60070E69F /* RSCoreFoundation */ = {
 			isa = PBXGroup;
 			children = (
+				300CB71018992CF4004298E2 /* FP */,
 				415D57DA17BE265C00FE3E9D /* RSKit */,
 				4151C10717600E6500C9AC40 /* icu */,
 				41704FEF1647C713005E7FB5 /* FunctionSupport */,
@@ -1838,7 +1870,6 @@
 			children = (
 				415A2FED171C48B20080373A /* RSCoreFoundationUnitTest.c */,
 				415A2FEF171C48BD0080373A /* RSCoreFoundationUnitTest.h */,
-				415A2FF1171C48F00080373A /* RSCoreFoundation.framework */,
 			);
 			name = UnitTest;
 			sourceTree = "<group>";
@@ -2532,7 +2563,10 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				300CB714189932A6004298E2 /* RSFunctional.h in Headers */,
+				30A4B616189E029800DF6FA4 /* RSMultidimensionalDictionary.h in Headers */,
 				412C1B3917AF5CDC00F36F25 /* RSCharacterSet.h in Headers */,
+				300CB718189A3349004298E2 /* RSList.h in Headers */,
 				304B3851186C36F300806E4B /* RSRegularExpression.h in Headers */,
 				30217B8B1875D19700BC813A /* RSURL+Extension.h in Headers */,
 				30F32B3B1860318300A45125 /* RSHTTPCookieStorage.h in Headers */,
@@ -2644,6 +2678,7 @@
 				41FE75971822B9A600E5E581 /* curlbuild.h in Headers */,
 				4170505C1647C713005E7FB5 /* RSHashSHA-2.h in Headers */,
 				41FE76191822B9A600E5E581 /* inet_ntop.h in Headers */,
+				305EC3B8189E14F00025E664 /* RSKVBucket.h in Headers */,
 				417050671647C713005E7FB5 /* RSMathNumber.h in Headers */,
 				417050691647C713005E7FB5 /* RSMath.h in Headers */,
 				4174EC131649400B004F3435 /* RSPrivateTimeZoneNames.h in Headers */,
@@ -3377,6 +3412,7 @@
 				4101F34C18447BBA0090C212 /* parser.c in Sources */,
 				41FE75BE1822B9A600E5E581 /* content_encoding.c in Sources */,
 				41FE761C1822B9A600E5E581 /* krb4.c in Sources */,
+				300CB717189A3349004298E2 /* RSList.c in Sources */,
 				41D9377E17A5852C004E5E0F /* RSICUConverters.c in Sources */,
 				41D9376317A53AF3004E5E0F /* RSUniChar.c in Sources */,
 				41FE70C016CF7C5B00BDB467 /* RSPrivateShell.c in Sources */,
@@ -3405,18 +3441,21 @@
 				41FE75E71822B9A600E5E581 /* dict.c in Sources */,
 				4102DD31174218C800A09614 /* RSStringScanner.c in Sources */,
 				41FE75F21822B9A600E5E581 /* formdata.c in Sources */,
+				300CB71218992D16004298E2 /* RSFunctional.c in Sources */,
 				413CD61F18422EA3006FA3E5 /* RSURLResponse.c in Sources */,
 				41FE764A1822B9A600E5E581 /* openldap.c in Sources */,
 				41FE76571822B9A600E5E581 /* rawstr.c in Sources */,
 				41FE76551822B9A600E5E581 /* qssl.c in Sources */,
 				4101F34E18447BBA0090C212 /* string_buffer.c in Sources */,
 				4102DD35174221F500A09614 /* RSPrivateFileSystem.c in Sources */,
+				30A4B615189E029800DF6FA4 /* RSMultidimensionalDictionary.c in Sources */,
 				41FE75F91822B9A600E5E581 /* getinfo.c in Sources */,
 				4101F35718447BBA0090C212 /* utf8.c in Sources */,
 				41FE76781822B9A600E5E581 /* speedcheck.c in Sources */,
 				41FE76711822B9A600E5E581 /* smtp.c in Sources */,
 				41076EED1743574000B10C8F /* RSPrivateTask.c in Sources */,
 				41FBBE8F17460EFA00210DB9 /* RSException.c in Sources */,
+				305EC3B7189E14F00025E664 /* RSKVBucket.c in Sources */,
 				41FE763B1822B9A600E5E581 /* mprintf.c in Sources */,
 				41FE76061822B9A600E5E581 /* hostip6.c in Sources */,
 				41FE76531822B9A600E5E581 /* progress.c in Sources */,
@@ -3729,7 +3768,6 @@
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Frameworks",
 					"$(SDKROOT)/usr/lib/system",
-					"/SourceCache/Library/ICU-511.25/build/lib",
 				);
 				PRODUCT_NAME = RSCoreFoundation;
 				SDKROOT = macosx10.9;
@@ -3799,7 +3837,6 @@
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Frameworks",
 					"$(SDKROOT)/usr/lib/system",
-					"/SourceCache/Library/ICU-511.25/build/lib",
 				);
 				PRODUCT_NAME = RSCoreFoundation;
 				SDKROOT = macosx10.9;
@@ -3815,10 +3852,6 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				EXECUTABLE_PREFIX = lib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					/Users/retval8237/Library/Frameworks,
-				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -3831,10 +3864,6 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				EXECUTABLE_PREFIX = lib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					/Users/retval8237/Library/Frameworks,
-				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

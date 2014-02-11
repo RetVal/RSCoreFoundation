@@ -590,7 +590,7 @@ RSExport RSTypeRef __RSRuntimeRetain(RSTypeRef obj, BOOL try) {
         RSIndex ref = 0;
         RSIndex before = 0;
 #if __LP64__
-        if (((RSRuntimeBase*)obj)->_rsinfo._special)
+        if (__RSRuntimeIsInstanceSpecial(obj))
             return obj;
         do
         {
@@ -969,7 +969,7 @@ RSExport RSTypeID __RSRuntimeGetClassTypeIDWithName(const char *name) {
         return ID;
     __RSRuntimeLockTable();
     for (RSTypeID idx = 0; idx < __RSRuntimeClassTableCount; idx++) {
-        if (__RSRuntimeClassTable[idx]->className && 0 == strcmp(name, __RSRuntimeClassTable[idx]->className)) {
+        if (__RSRuntimeClassTable[idx] && __RSRuntimeClassTable[idx]->className && 0 == strcmp(name, __RSRuntimeClassTable[idx]->className)) {
             ID = idx;
             break;
         }

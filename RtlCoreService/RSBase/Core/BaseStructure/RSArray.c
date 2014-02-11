@@ -2981,4 +2981,15 @@ RSIndex RSArrayIndexOfObject(RSArrayRef array, RSTypeRef object)
 {
     return RSArrayGetFirstIndexOfObject(array, RSMakeRange(0, RSArrayGetCount(array)), object);
 }
+
+RSPrivate RSArrayRef __RSArrayCreateWithArguments(va_list arguments, RSInteger maxCount) {
+    RSTypeRef key = va_arg(arguments, RSTypeRef);
+    RSMutableArrayRef keys = key ? RSArrayCreateMutable(RSAllocatorSystemDefault, 0) : nil;
+    RSUInteger idx = 0;
+    for (; key && idx < maxCount; idx++) {
+        RSArrayAddObject(keys, key);
+        key = va_arg(arguments, RSTypeRef);
+    }
+    return keys;
+}
 #endif

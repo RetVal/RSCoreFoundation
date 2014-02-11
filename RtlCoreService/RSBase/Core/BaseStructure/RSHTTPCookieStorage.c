@@ -178,9 +178,13 @@ static void __RSHTTPCookieStorageDeallocate(RSNotificationRef notification);
 
 static RSTypeID _RSHTTPCookieStorageTypeID = _RSRuntimeNotATypeID;
 
+#include <dispatch/dispatch.h>
+
 RSExport RSTypeID RSHTTPCookieStorageGetTypeID() {
-    if (!_RSHTTPCookieStorageTypeID)
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
         RSHTTPCookieStorageGetSharedStorage();
+    });
     return _RSHTTPCookieStorageTypeID;
 }
 
