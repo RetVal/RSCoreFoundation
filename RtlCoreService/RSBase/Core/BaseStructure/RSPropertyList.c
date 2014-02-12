@@ -3412,6 +3412,7 @@ static RSStringRef __RSPropertyListClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSPropertyListClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSPropertyList",
     __RSPropertyListClassInit,
     __RSPropertyListClassCopy,

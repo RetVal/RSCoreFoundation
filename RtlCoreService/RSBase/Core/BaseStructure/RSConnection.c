@@ -56,6 +56,7 @@ static RSStringRef ____RSConnectionPreBufferClassDescription(RSTypeRef rs)
 static RSRuntimeClass ____RSConnectionPreBufferClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "__RSConnectionPreBuffer",
     nil,
     nil,
@@ -231,6 +232,7 @@ static RSRuntimeClass ____RSConnectionReadPacketClass =
 {
     _RSRuntimeScannedObject,
     "__RSConnectionReadPacket",
+    0,
     nil,
     ____RSConnectionReadPacketClassCopy,
     ____RSConnectionReadPacketClassDeallocate,
@@ -510,6 +512,7 @@ static RSRuntimeClass ____RSConnectionWritePacketClass =
 {
     _RSRuntimeScannedObject,
     "__RSConnectionWritePacket",
+    0,
     nil,
     nil,
     ____RSConnectionWritePacketClassDeallocate,
@@ -574,6 +577,7 @@ static RSRuntimeClass ____RSConnectionSpecialPacketClass =
 {
     _RSRuntimeScannedObject,
     "__RSConnectionSpecialPacket",
+    0,
     nil,
     nil,
     ____RSConnectionSpecialPacketClassDeallocate,
@@ -781,6 +785,7 @@ static RSStringRef __RSConnectionClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSConnectionClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSConnection",
     __RSConnectionClassInit,
     nil,

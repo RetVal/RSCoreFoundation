@@ -16,8 +16,10 @@ RS_EXTERN_C_BEGIN
 
 typedef RSTypeRef RSCollectionRef;
 
+// RSList, RSArray
+
 RSExport RSCollectionRef RSMap(RSCollectionRef coll, RSTypeRef (^fn)(RSTypeRef obj));
-RSExport RSTypeRef RSReduce(RSTypeRef (^fn)(RSTypeRef a, RSTypeRef b), RSCollectionRef coll);
+RSExport RSTypeRef RSReduce(RSCollectionRef coll, RSTypeRef (^fn)(RSTypeRef a, RSTypeRef b));
 
 RSExport RSCollectionRef RSNext(RSCollectionRef coll);
 RSExport RSTypeRef RSFirst(RSCollectionRef coll);
@@ -25,6 +27,11 @@ RSExport RSTypeRef RSSecond(RSCollectionRef coll);
 
 RSExport RSCollectionRef RSConjoin(RSCollectionRef coll, RSTypeRef value);
 RSExport RSCollectionRef RSReverse(RSCollectionRef coll);
+
+RSExport RSCollectionRef RSFilter(RSCollectionRef coll, BOOL (^pred)(RSTypeRef x));
+RSExport RSCollectionRef RSDrop(RSCollectionRef coll, RSIndex n);
+
+RSCollectionRef RSMerge(RSCollectionRef a, RSCollectionRef b, ...);
 RS_EXTERN_C_END
 
 #endif

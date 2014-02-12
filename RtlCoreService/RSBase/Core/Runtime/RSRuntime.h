@@ -46,10 +46,11 @@ typedef struct __RSRuntimeBaseInfo
 #if __LP64__
     RSBitU32 _rsinfo    :8;   // reserved for runtime (at least 5 bits)
     RSBitU32 _objId     :10;  // reserved for runtime
-    RSBitU32 _reserved2 :2;
+    RSBitU32 _special   :1;   // never retain/releases
+    RSBitU32 _reserved2 :1;
     RSBitU32 _rsinfo1   :8;   // class self
     RSBitU32 _reserved  :3;   // class self (at least 3 bits)
-    RSBitU32 _special   :1;   // never retain/releases
+    RSBitU32 _reserved3 :1;
 #else
     RSBitU32 _rc        :7;   // reference count in 32 bits.
     RSBitU32 _special   :1;   // never retain/releases
@@ -141,6 +142,19 @@ RSInline BOOL __RSAllocatorIsSystemDefault(RSTypeRef base)
 {
     return (((RSRuntimeBase*)base)->_rsinfo._rsinfo & (1<<5)) == (1 << 5);
 }
+
+RSInline void __RSRuntimeSetInstanceAsClass(RSTypeRef base) {
+    ((RSRuntimeBase *)base)->_rsinfo._rsinfo |= (1 << 6);
+}
+
+RSInline void __RSRuntimeUnsetInstanceAsClass(RSTypeRef base) {
+    ((RSRuntimeBase *)base)->_rsinfo._rsinfo &= ~(1 << 6);
+}
+
+RSInline BOOL __RSRuntimeInstanceIsClass(RSTypeRef base) {
+    return !((uintptr_t)(base) & 0x1) && (((RSRuntimeBase *)base)->_rsinfo._rsinfo & (1 << 6)) == (1 << 6);
+}
+
 #if __LP64__
 #define RSRuntimeBaseDefault(...)\
     ._base._rsisa = 0,\
@@ -180,10 +194,24 @@ RSInline BOOL __RSAllocatorIsSystemDefault(RSTypeRef base)
 
 typedef struct __RSRuntimeClassVersion
 {
-    RSIndex reftype : 4;
-    RSIndex extraSize : 11;
-    RSIndex reserved : sizeof(RSIndex)*8 - 25;
-    RSIndex Id : 10;
+    RSPointer _rsinfo;
+#if __LP64__
+    RSIndex info       :8;   // reserved for runtime (at least 7 bits)
+    RSIndex Id         :10;  // reserved for runtime
+    RSIndex _special   :1;   // never retain/releases
+    RSIndex _reserved2 :1;
+    RSIndex _rsinfo1   :8;   // class self
+    RSIndex reftype    :4;   // class self (at least 3 bits)
+    RSIndex reserved : sizeof(RSIndex)*8 - 32;
+#else
+    RSIndex _rc        :7;   // reference count in 32 bits.
+    RSIndex _special   :1;   // never retain/releases
+    RSIndex Id         :10;  // reserved for runtime
+    RSIndex info       :7;   // reserved for runtime
+    RSIndex reserved   :3;
+    RSIndex reftype    :4;   // class self
+    RSIndex reserved : sizeof(RSIndex)*8 - 32;
+#endif
 }RSRuntimeClassVersion;
 
 typedef void (*RSRuntimeClassInit)(RSTypeRef obj);
@@ -197,6 +225,7 @@ typedef RSUInteger (*RSRuntimeClassRefcount)(intptr_t op, RSTypeRef obj);
 typedef struct __RSRuntimeClass
 {
     RSIndex version;                //RSRuntimeClassVersion version;
+    RSIndex reserved;
     const char *className;          // must be a pure ASCII string, nul-terminated
     RSRuntimeClassInit init;           // to support RSCreateInstance, can not be nil
     RSRuntimeClassCopy copy;           // may be nil
@@ -288,7 +317,7 @@ RSExport void      __RSRuntimeDeallocate(RSTypeRef obj)  RS_AVAILABLE(0_0);
 
 RSExport ISA __RSRuntimeRSObject(RSTypeRef obj)  RS_AVAILABLE(0_0);
 RSExport void __RSRuntimeSetInstanceSpecial(RSTypeRef obj, BOOL special) RS_AVAILABLE(0_0);
-RSExport BOOL __RSRuntimeIsInstanceSpecial(RSTypeRef rs) RS_AVAILABLE(0_3);
+RSExport BOOL __RSRuntimeInstanceIsSpecial(RSTypeRef rs) RS_AVAILABLE(0_3);
 extern void RSDeallocateInstance(RSTypeRef obj)  RS_AVAILABLE(0_0);
 
 RSExport ISA       __RSRuntimeRetainAutorelease(RSTypeRef obj) RS_AVAILABLE(0_2);

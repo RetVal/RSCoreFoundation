@@ -927,6 +927,7 @@ static RSStringRef __RSNumberClassDescription(RSTypeRef obj)
 
 static  RSRuntimeClass __RSNumberClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSNumber",
     nil,
     __RSNumberClassCopy,

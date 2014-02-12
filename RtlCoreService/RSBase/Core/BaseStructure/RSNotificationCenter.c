@@ -93,6 +93,7 @@ static RSHashCode __RSNotificationClassHash(RSTypeRef rs)
 static const RSRuntimeClass __RSNotificationClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSNotification",
     __RSNotificationClassInit,
     __RSNotificationClassCopy,
@@ -279,6 +280,7 @@ static RSHashCode __RSObserverClassHash(RSTypeRef rs)
 
 static const RSRuntimeClass __RSObserverClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSObserver",
     __RSObserverClassInit,
     nil,
@@ -481,6 +483,7 @@ static RSHashCode __RSNotificationCenterClassHash(RSTypeRef rs)
 
 static const RSRuntimeClass __RSNotificationCenterClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSNotificationCenter",
     __RSNotificationCenterClassInit,
     nil,
@@ -960,6 +963,7 @@ static RSStringRef __RSDistributedNotificationCenterClassDescription(RSTypeRef r
 static RSRuntimeClass __RSDistributedNotificationCenterClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSDistributedNotificationCenter",
     __RSDistributedNotificationCenterClassInit,
     __RSDistributedNotificationCenterClassCopy,

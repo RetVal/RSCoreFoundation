@@ -111,6 +111,7 @@ static void __RSCalendarDeallocate(RSTypeRef obj)
 
 static RSRuntimeClass __RSCalendarClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSCalendar",
     nil,
     nil,

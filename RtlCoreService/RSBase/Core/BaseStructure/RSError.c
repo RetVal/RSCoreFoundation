@@ -88,6 +88,7 @@ static RSHashCode __RSErrorClassHash(RSTypeRef obj)
 
 static RSRuntimeClass __RSErrorClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSError",
     __RSErrorClassInit,
     nil,

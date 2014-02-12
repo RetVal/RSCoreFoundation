@@ -2335,6 +2335,7 @@ static RSStringRef __RSLocaleClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSLocaleClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSLocale",
     __RSLocaleClassInit,
     __RSLocaleClassCopy,

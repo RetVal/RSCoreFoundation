@@ -284,6 +284,7 @@ static RSStringRef __RSThreadClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSThreadClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSRepeatTaskThread",
     __RSThreadClassInit,
     nil,
@@ -475,6 +476,7 @@ static RSStringRef __RSRepeatTaskThreadClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSRepeatTaskThreadClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSRepeatTaskThread",
     __RSRepeatTaskThreadClassInit,
     nil,
@@ -585,6 +587,7 @@ static RSStringRef __RSThreadPoolClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSThreadPoolClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSThreadPool",
     __RSThreadPoolClassInit,
     nil,

@@ -123,6 +123,7 @@ static RSStringRef __RSExceptionClassDescription(RSTypeRef rs)
 
 static RSRuntimeClass __RSExceptionClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSException",
     nil,
     nil,

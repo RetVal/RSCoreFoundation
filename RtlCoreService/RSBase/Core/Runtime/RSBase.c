@@ -142,11 +142,13 @@ RSExport void RSRelease(RSTypeRef obj)
 
 RSExport RSMutableTypeRef RSAutorelease(RSTypeRef obj)
 {
-    if (obj == nil || RS_IS_TAGGED_OBJ(obj)) return (RSMutableTypeRef)obj;
+    if (obj == nil || RS_IS_TAGGED_OBJ(obj) || __RSRuntimeInstanceIsClass(obj) || __RSRuntimeInstanceIsStackValue(obj) || __RSRuntimeInstanceIsSpecial(obj))
+        return (RSMutableTypeRef)obj;
     __RSRuntimeCheckInstanceAvailable(obj);
+    
     if (__RSGetTypeID(obj) == RSAutoreleasePoolGetTypeID())
         HALTWithError(RSInvalidArgumentException, "RSAutoreleasePool can not add itself to the pool!");
-    if (__RSRuntimeInstanceIsStackValue(obj) || __RSRuntimeIsInstanceSpecial(obj)) return (RSMutableTypeRef)obj;
+    if (__RSRuntimeInstanceIsStackValue(obj) || __RSRuntimeInstanceIsSpecial(obj)) return (RSMutableTypeRef)obj;
 #if __RSRuntimeDebugPreference 
     if (___RSDebugLogPreference._RSRuntimeCheckAutoreleaseFlag) {
         if (__RSIsAutorelease(obj) && RSGetRetainCount(obj) == 1) {
@@ -162,7 +164,7 @@ RSExport RSMutableTypeRef RSAutorelease(RSTypeRef obj)
 RSExport RSIndex RSGetRetainCount(RSTypeRef obj)
 {
     if (obj == nil) return 0;
-    if (RS_IS_TAGGED_OBJ(obj)) return 1;
+    if (RS_IS_TAGGED_OBJ(obj) || __RSRuntimeInstanceIsSpecial(obj) || __RSRuntimeInstanceIsClass(obj)) return 1;
     __RSRuntimeCheckInstanceAvailable(obj);
     RSIndex ref = 0;
     if (__RSCheckInstanceISCustomReferenceType(obj)) {
@@ -190,6 +192,9 @@ RSExport BOOL RSEqual(RSTypeRef obj1, RSTypeRef obj2)
     RSTypeID ID1 = __RSGetTypeID(obj1);
     RSTypeID ID2 = __RSGetTypeID(obj2);
     if (ID1 != ID2) { return NO; }
+    
+    if (__RSRuntimeInstanceIsClass(obj1) || __RSRuntimeInstanceIsClass(obj2))
+        return NO;
     
     RSRuntimeClassEqual equal = __RSRuntimeGetClassWithTypeID(ID1)->equal;
     if (equal) {
@@ -229,6 +234,9 @@ RSExport RSHashCode RSHash(RSTypeRef obj)
     if (obj == nil) return 0;
 //    if (RS_IS_TAGGED_OBJ(obj)) return (RSHashCode)obj;
     __RSRuntimeCheckInstanceAvailable(obj);
+    
+    if (__RSRuntimeInstanceIsClass(obj)) return (RSHashCode)obj;
+    
     RSTypeID id = __RSGetTypeID(obj);
     RSRuntimeClassHash hash = __RSRuntimeGetClassWithTypeID(id)->hash;
     if (hash) {
@@ -239,6 +247,8 @@ RSExport RSHashCode RSHash(RSTypeRef obj)
 void RSDeallocateInstance(RSTypeRef obj)
 {
     if (nil == obj) HALTWithError(RSInvalidArgumentException, "the object is nil");
+    if (__RSRuntimeInstanceIsClass(obj)) return;
+    
     RSTypeID id = _RSRuntimeNotATypeID;
     if ((id = RSGetTypeID(obj)) == _RSRuntimeNotATypeID) HALTWithError(RSInvalidArgumentException, "the object is not available");
     RSRuntimeClass* cls = (RSRuntimeClass*)__RSRuntimeGetClassWithTypeID(id);
@@ -254,6 +264,9 @@ void RSDeallocateInstance(RSTypeRef obj)
 RSExport RSTypeRef RSCopy(RSAllocatorRef allocator, RSTypeRef obj)
 {
     if (nil == obj) return nil; //HALTWithError(RSInvalidArgumentException, "the object is nil");
+    
+    if (__RSRuntimeInstanceIsClass(obj)) return obj;
+    
     RSIndex id = _RSRuntimeNotATypeID;
     if ((id = RSGetTypeID(obj)) == _RSRuntimeNotATypeID) HALTWithError(RSInvalidArgumentException, "the object is not available");
     RSRuntimeClass* cls = (RSRuntimeClass*)__RSRuntimeGetClassWithTypeID(id);
@@ -269,6 +282,9 @@ RSExport RSTypeRef RSCopy(RSAllocatorRef allocator, RSTypeRef obj)
 RSExport RSMutableTypeRef RSMutableCopy(RSAllocatorRef allocator, RSTypeRef obj)
 {
     if (nil == obj) return nil; //HALTWithError(RSInvalidArgumentException, "the object is nil");
+    
+    if (__RSRuntimeInstanceIsClass(obj)) return (RSMutableTypeRef)obj;
+    
     RSIndex id = _RSRuntimeNotATypeID;
     if ((id = RSGetTypeID(obj)) == _RSRuntimeNotATypeID) HALTWithError(RSInvalidArgumentException, "the object is not available");
     RSRuntimeClass* cls = (RSRuntimeClass*)__RSRuntimeGetClassWithTypeID(id);
@@ -286,6 +302,10 @@ RSExport RSStringRef RSDescription(RSTypeRef obj)
 {
     if (nil == obj) obj = RSNil;
     __RSRuntimeCheckInstanceAvailable(obj);
+    
+    if (!RS_IS_TAGGED_OBJ(obj) && __RSRuntimeInstanceIsClass(obj))
+        return RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("RSClass %s"), ((RSRuntimeClass *)obj)->className);
+    
     RSRuntimeClass* cls = (RSRuntimeClass*)__RSRuntimeGetClassWithTypeID(__RSGetTypeID(obj));
     if (cls->description)
     {
@@ -308,10 +328,11 @@ RSExport void RSLog(RSStringRef format,...)
     RSRelease(format);
 }
 
-RSExport void RSShow(RSTypeRef obj)
+RSExport RSTypeRef RSShow(RSTypeRef obj)
 {
     if (nil == obj) obj = RSNil;
     RSLog(RSSTR("%R"), obj);
+    return obj;
 }
 
 RSExport RSStringRef RSStringFromRSRange(RSRange range)
@@ -320,35 +341,42 @@ RSExport RSStringRef RSStringFromRSRange(RSRange range)
 }
 
 #pragma mark -
-#pragma mark RSClass API
+#pragma mark RSClassRef API
 RSExport RSStringRef RSClassNameFromInstance(RSTypeRef id)
 {
     return RSClassGetName(RSClassFromInstance(id));
 }
 
-RSExport RSStringRef RSClassGetName(RSClass cls) {
+RSExport RSStringRef RSClassGetName(RSClassRef cls) {
     if (!cls) return nil;
     return RSAutorelease(RSStringCreateWithCString(RSAllocatorSystemDefault, ((RSRuntimeClass *)cls)->className, RSStringEncodingUTF8));
 }
 
-RSExport RSTypeID RSClassGetTypeID(RSClass cls) {
+RSExport RSTypeID RSClassGetTypeID(RSClassRef cls) {
     if (!cls) return _RSRuntimeNotATypeID;
     return __RSRuntimeGetClassTypeID(cls);
 }
 
-RSExport BOOL RSInstanceIsMemberOfClass(RSTypeRef id, RSClass cls) {
+RSExport BOOL RSInstanceIsMemberOfClass(RSTypeRef id, RSClassRef cls) {
     return RSClassGetTypeID(cls) == RSGetTypeID(id);
 }
 
-RSExport RSClass RSClassFromInstance(RSTypeRef id) {
+RSExport RSClassRef RSClassFromInstance(RSTypeRef id) {
     if (id == nil) return nil;
     __RSRuntimeCheckInstanceAvailable(id);
+    
+    if (__RSRuntimeInstanceIsClass(id)) return id;
+    
     return __RSRuntimeGetClassWithTypeID(__RSGetTypeID(id));
 }
 
-RSExport RSClass RSClassGetWithName(RSStringRef name) {
+RSExport RSClassRef RSClassGetWithName(RSStringRef name) {
+    return RSClassGetWithUTF8String(RSStringGetUTF8String(name));
+}
+
+RSExport RSClassRef RSClassGetWithUTF8String(const char *name) {
     if (!name) return nil;
-    RSTypeID ID = __RSRuntimeGetClassTypeIDWithName(RSStringGetUTF8String(name));
+    RSTypeID ID = __RSRuntimeGetClassTypeIDWithName(name);
     if (ID) return __RSRuntimeGetClassWithTypeID(ID);
     return nil;
 }

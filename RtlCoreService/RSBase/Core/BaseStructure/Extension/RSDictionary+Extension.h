@@ -27,5 +27,11 @@ RSExport RSDictionaryRef RSDictionaryCreateWithData(RSAllocatorRef allocator, RS
 RSExport BOOL RSDictionaryWriteToFile(RSDictionaryRef dictionary, RSStringRef path, RSWriteFileMode mode) RS_AVAILABLE(0_3);
 RSExport BOOL RSDictionaryWriteToFileWithError(RSDictionaryRef dictionary, RSStringRef path, RSErrorRef *error) RS_AVAILABLE(0_3);
 
+RSExport RSTypeRef RSDictionaryGetValueForKeyPath(RSDictionaryRef dictionary, RSStringRef keyPath) RS_AVAILABLE(0_4);
+RSExport RSTypeRef RSDictionaryGetValueForKeys(RSDictionaryRef dictionary, RSArrayRef keys) RS_AVAILABLE(0_4);
+
+RSExport void RSDictionarySetValueForKeyPath(RSMutableDictionaryRef dictionary, RSStringRef keyPath, RSTypeRef value) RS_AVAILABLE(0_4);
+RSExport void RSDictionarySetValueForKeys(RSMutableDictionaryRef dictionary, RSArrayRef keys, RSTypeRef value) RS_AVAILABLE(0_4);
+
 RS_EXTERN_C_END
 #endif

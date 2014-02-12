@@ -33,6 +33,7 @@ static RSStringRef __RSRegularExpressionClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSRegularExpressionClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSRegularExpression",
     nil,
     nil,

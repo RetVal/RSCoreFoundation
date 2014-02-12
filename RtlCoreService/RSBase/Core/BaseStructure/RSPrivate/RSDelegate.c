@@ -54,6 +54,7 @@ static RSStringRef __RSDelegateClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSDelegateClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSDelegate",
     nil,
     __RSDelegateClassCopy,

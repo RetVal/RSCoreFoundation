@@ -12,6 +12,8 @@
 #include "RSKVBucket.h"
 #include "RSMultidimensionalDictionary.h"
 
+static RSDictionaryRef __RSListPreferences = nil;   // read only
+
 typedef const struct __RSNode *RSNodeRef;
 struct __RSNode {
     RSRuntimeBase _base;
@@ -32,6 +34,7 @@ static void __RSNodePoolInitialize() {
     RSSyncUpdateBlock(&__RSNodePoolLock, ^{
         if (!__RSNodePool) {
             __RSNodePool = RSMultidimensionalDictionaryCreate(RSAllocatorSystemDefault, 2); // create 2 dimensional dictionary [[value, next], node]
+            __RSListPreferences = RSDictionaryCreateWithContentOfPath(RSAllocatorSystemDefault, RSFileManagerStandardizingPath(RSSTR("~/Library/Preferences/com.retval.RSCoreFoundation.list.node.plist")));
         }
     });
 }
@@ -43,13 +46,14 @@ static void __RSNodePoolDeallocate() {
             RSDictionaryRef dimension = RSMultidimensionalDictionaryGetDimensionEntry(__RSNodePool);
             RSDictionaryApplyBlock(dimension, ^(const void *key1, const void *nd_dimension, BOOL *stop) {
                 RSDictionaryApplyBlock(nd_dimension, ^(const void *key2, const void *value, BOOL *stop) {
-                    RSLog(RSSTR("dimension1 -> %r, dimension2 -> %r (%r - rc -> %lld)"), key1, key2, value, RSGetRetainCount(value));
+//                    RSLog(RSSTR("dimension1 -> %r, dimension2 -> %r (%r - rc -> %lld)"), key1, key2, value, RSGetRetainCount(value));
                     __RSRuntimeSetInstanceSpecial(value, NO);
                 });
             });
-            RSShow(__RSNodePool);
+//            RSShow(__RSNodePool);
             RSRelease(__RSNodePool);
             __RSNodePool = nil;
+            RSRelease(__RSListPreferences);
         }
     });
 }
@@ -89,14 +93,17 @@ static BOOL __RSNodeClassEqual(RSTypeRef rs1, RSTypeRef rs2)
 static RSStringRef __RSNodeClassDescription(RSTypeRef rs)
 {
     RSNodeRef node = (RSNodeRef)rs;
-    RSStringRef description = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("(%r -> %r)"), node->_value, node->_next);
-    return description;
+    if (YES == RSNumberBooleanValue(RSDictionaryGetValue(__RSListPreferences, RSSTR("Node")))) {
+        RSStringRef description = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("(%r -> %r)"), node->_value, node->_next);
+        return description;
+    }
     return RSDescription(node->_value);
 }
 
 static RSRuntimeClass __RSNodeClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSNode",
     nil,
     nil,
@@ -137,7 +144,7 @@ RSInline RSNodeRef __RSNodeSetupNext(RSNodeRef node, RSNodeRef next) {
     struct __RSNode *mutableNode = (struct __RSNode *)node;
 //    if (mutableNode->_next) RSRelease(mutableNode->_next);
 //    mutableNode->_next = RSRetain(next);
-    if (next && __RSRuntimeIsInstanceSpecial(next)) {
+    if (next && __RSRuntimeInstanceIsSpecial(next)) {
         __RSRuntimeSetInstanceSpecial(next, NO);
         RSRetain(next);
         __RSRuntimeSetInstanceSpecial(next, YES);
@@ -254,6 +261,7 @@ static RSStringRef __RSListClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSListClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSList",
     nil,
     nil,
@@ -342,11 +350,11 @@ RSExport RSListRef RSListCreate(RSAllocatorRef allocator, RSTypeRef a, ...) {
     return list;
 }
 
-RSExport void RSListApplyBlock(RSListRef list, void (^fn)(RSTypeRef node)) {
+RSExport void RSListApplyBlock(RSListRef list, void (^fn)(RSTypeRef value)) {
     if (!list || !fn) return;
     __RSGenericValidInstance(list, _RSListTypeID);
     RSNodeRef node = list->_head;
-    for (RSUInteger idx = 1; idx < list->_count; idx++) {
+    for (RSUInteger idx = 0; node && idx < list->_count; idx++) {
         fn(__RSNodeGetValue(node));
         node = node->_next;
     }
@@ -361,6 +369,25 @@ RSExport RSListRef RSListCreateWithArray(RSAllocatorRef allocator, RSArrayRef ar
     return instance;
 }
 
+RSExport RSIndex RSListGetCount(RSListRef list) {
+    if (!list) return 0;
+    __RSGenericValidInstance(list, _RSListTypeID);
+    return list->_count;
+}
+
+RSExport RSListRef RSListCreateDrop(RSAllocatorRef allocator, RSListRef list, RSIndex n) {
+    if (!list || RSListGetCount(list) < n) return nil;
+    else if (RSListGetCount(list) == n) return __RSListCreateEmpty(allocator);
+    struct __RSList *rst = __RSListCreateEmpty(allocator);
+    RSUInteger cnt = list->_count - n;
+    rst->_head = list->_head;
+    while (cnt) {
+        rst->_head = rst->_head->_next;
+        cnt--;
+    }
+    return rst;
+}
+
 RSPrivate RSArrayRef RSListDumpValueToArray(RSListRef list) {
     if (!list || list == (RSListRef)RSNil) return nil;
     RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorSystemDefault, list->_count);
@@ -370,8 +397,6 @@ RSPrivate RSArrayRef RSListDumpValueToArray(RSListRef list) {
     }
     return array;
 }
-
-
 
 #pragma mark -
 

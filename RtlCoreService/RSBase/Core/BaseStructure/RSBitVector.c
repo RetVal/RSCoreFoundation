@@ -149,6 +149,7 @@ static RSStringRef __RSBitVectorClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSBitVectorClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSBitVector",
     __RSBitVectorClassInit,
     __RSBitVectorClassCopy,

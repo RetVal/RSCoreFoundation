@@ -191,6 +191,7 @@ static RSStringRef __RSFileHandleClassDescription(RSTypeRef rs)
 
 static RSRuntimeClass __RSFileHandleClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSFileHandle",
     __RSFileHandleClassInit,
     __RSFileHandleClassCopy,
@@ -643,6 +644,7 @@ static RSStringRef __RSFileWrapperClassDescription(RSTypeRef rs)
 
 static RSRuntimeClass __RSFileWrapperClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSFileWrapper",
     __RSFileWrapperClassInit,
     __RSFileWrapperClassCopy,
@@ -802,6 +804,7 @@ static RSStringRef __RSFileManagerClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSFileManagerClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSFileManager",
     __RSFileManagerClassInit,
     __RSFileManagerClassCopy,
@@ -1417,6 +1420,7 @@ static RSStringRef __RSFileWatcherClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSFileWatcherClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSFileWatcher",
     __RSFileWatcherClassInit,
     __RSFileWatcherClassCopy,

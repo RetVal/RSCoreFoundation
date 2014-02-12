@@ -29,17 +29,18 @@ RSExport RSAllocatorRef RSGetAllocator(RSTypeRef obj) RS_AVAILABLE(0_0);
 RSExport RSIndex RSGetInstanceSize(RSTypeRef obj) RS_AVAILABLE(0_0);
 
 RSExport void RSLog(RSStringRef format,...) RS_AVAILABLE(0_0);
-RSExport void RSShow(RSTypeRef obj) RS_AVAILABLE(0_0);
+RSExport RSTypeRef RSShow(RSTypeRef obj) RS_AVAILABLE(0_0);
 
 RSExport RSStringRef RSStringFromRSRange(RSRange range) RS_AVAILABLE(0_3);
 RSExport RSStringRef RSClassNameFromInstance(RSTypeRef id) RS_AVAILABLE(0_3);
 
-RSExport RSClass RSClassFromInstance(RSTypeRef id) RS_AVAILABLE(0_4);
-RSExport RSClass RSClassGetWithName(RSStringRef name) RS_AVAILABLE(0_4);
+RSExport RSClassRef RSClassFromInstance(RSTypeRef id) RS_AVAILABLE(0_4);
+RSExport RSClassRef RSClassGetWithName(RSStringRef name) RS_AVAILABLE(0_4);
+RSExport RSClassRef RSClassGetWithUTF8String(const char *name) RS_AVAILABLE(0_4);
 
-RSExport RSStringRef RSClassGetName(RSClass cls) RS_AVAILABLE(0_4);
-RSExport RSTypeID RSClassGetTypeID(RSClass cls) RS_AVAILABLE(0_4);
-RSExport BOOL RSInstanceIsMemberOfClass(RSTypeRef id, RSClass cls) RS_AVAILABLE(0_4);
+RSExport RSStringRef RSClassGetName(RSClassRef cls) RS_AVAILABLE(0_4);
+RSExport RSTypeID RSClassGetTypeID(RSClassRef cls) RS_AVAILABLE(0_4);
+RSExport BOOL RSInstanceIsMemberOfClass(RSTypeRef id, RSClassRef cls) RS_AVAILABLE(0_4);
 
 RSExport RSStringRef RSClassGetNameWithInstance(RSTypeRef id) RS_AVAILABLE(0_4);
 /****************************************************************************/

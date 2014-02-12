@@ -2625,6 +2625,7 @@ static RSStringRef __RSURLResponseClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSURLResponseClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSURLResponse",
     __RSURLResponseClassInit,
     __RSURLResponseClassCopy,

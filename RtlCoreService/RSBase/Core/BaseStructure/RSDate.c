@@ -304,6 +304,7 @@ static  RSStringRef __RSDateClassDescription(RSTypeRef obj)
 struct  __RSRuntimeClass __RSDateClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSDate",
     __RSDateClassInit,
     __RSDateClassCopy,

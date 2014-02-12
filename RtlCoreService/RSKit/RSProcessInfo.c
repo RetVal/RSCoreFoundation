@@ -115,6 +115,7 @@ static RSStringRef __RSProcessInfoClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSProcessInfoClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSProcessInfo",
     nil,
     __RSProcessInfoClassCopy,

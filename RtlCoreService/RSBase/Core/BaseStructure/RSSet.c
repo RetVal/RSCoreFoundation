@@ -86,6 +86,7 @@ static RSTypeID __RSSetTypeID = _RSRuntimeNotATypeID;
 
 static const RSRuntimeClass __RSSetClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSSet",
     nil,        // init
     __RSSetClassCopy,        // copy

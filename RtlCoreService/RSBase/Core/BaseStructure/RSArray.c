@@ -327,6 +327,7 @@ static RSStringRef __RSArrayClassDescription(RSTypeRef obj)
 static RSRuntimeClass __RSArrayClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSArray",
     __RSArrayClassInit,
     __RSArrayClassCopy,
@@ -1524,6 +1525,7 @@ static BOOL __RSArrayClassEqual(RSTypeRef rs1, RSTypeRef rs2)
 static RSRuntimeClass __RSArrayClass  =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSArray",
     nil,
     __RSArrayClassCopy,
@@ -2123,6 +2125,7 @@ static RSTypeID __RSArrayTypeID = _RSRuntimeNotATypeID;
 
 static const RSRuntimeClass __RSArrayClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSArray",
     nil,	// init
     __RSArrayClassCopy,

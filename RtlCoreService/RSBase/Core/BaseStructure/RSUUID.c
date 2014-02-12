@@ -42,6 +42,7 @@ static RSStringRef __RSUUIDDescription(RSTypeRef obj)
 
 static const RSRuntimeClass __RSUUIDClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSUUID",
     nil,
     __RSUUIDCopy,

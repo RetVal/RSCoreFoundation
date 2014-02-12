@@ -359,6 +359,7 @@ RS_CONST_STRING_DECL(_RSEmptyString, "");
 //
 //static RSRuntimeClass __RSStringClass = {
 //    _RSRuntimeScannedObject,
+//    0,
 //    "RSString",
 //    __RSStringClassInit,
 //    __RSStringClassCopy,
@@ -1599,7 +1600,7 @@ RSInline BOOL __RSStrIsEightBit(RSStringRef str)           { return (RSRuntimeCl
 RSInline BOOL __RSStrHasNullByte(RSStringRef str)          { return (RSRuntimeClassBaseFiled(str) & __RSHasNullByteMask) == __RSHasNullByte;}
 RSInline BOOL __RSStrHasLengthByte(RSStringRef str)        { return (RSRuntimeClassBaseFiled(str) & __RSHasLengthByteMask) == __RSHasLengthByte;}
 RSInline BOOL __RSStrHasExplicitLength(RSStringRef str)    { return (RSRuntimeClassBaseFiled(str) & (__RSIsMutableMask | __RSHasLengthByteMask)) != __RSHasLengthByte;}    // Has explicit length if (1) mutable or (2) not mutable and no length byte
-RSInline BOOL __RSStrIsConstant(RSStringRef str)           { return __RSRuntimeIsInstanceSpecial(str);}
+RSInline BOOL __RSStrIsConstant(RSStringRef str)           { return __RSRuntimeInstanceIsSpecial(str);}
 RSInline RSBitU32 __RSStrSkipAnyLengthByte(RSStringRef str){ return ((RSRuntimeClassBaseFiled(str) & __RSHasLengthByteMask) == __RSHasLengthByte) ? 1 : 0;}    // Number of bytes to skip over the length byte in the contents
 RSInline const void* __RSStrContents(RSStringRef str) {
     if (__RSStrIsInline(str)) {
@@ -2279,7 +2280,7 @@ static void __RSStringDeallocate(RSTypeRef RS)
 //    RSAssert1(__RSConstantStringTableBeingFreed || !__RSStrIsConstantString((RSStringRef)RS), __RSLogAssertion, "Tried to deallocate RSSTR(\"%R\")", str);
 //    if (!__RSConstantStringTableBeingFreed)
 //    {
-//        if (!(__RSRuntimeInstanceIsStackValue(str) || __RSRuntimeIsInstanceSpecial(str)) && __RSStrIsConstantString(str))
+//        if (!(__RSRuntimeInstanceIsStackValue(str) || __RSRuntimeInstanceIsSpecial(str)) && __RSStrIsConstantString(str))
 //            __RSCLog(RSLogLevelNotice, "constant string deallocate\n");
 //    }
     if (!__RSStrIsInline(str))
@@ -4088,6 +4089,7 @@ typedef RSTypeRef (*RS_STRING_CREATE_COPY)(RSAllocatorRef alloc, RSTypeRef theSt
 
 static const RSRuntimeClass __RSStringClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSString",
     nil,      // init
     __RSStringCopy,

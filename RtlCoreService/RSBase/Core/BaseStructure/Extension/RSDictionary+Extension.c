@@ -74,3 +74,62 @@ RSExport BOOL RSDictionaryWriteToFileWithError(RSDictionaryRef dictionary, RSStr
     }
     return result;
 }
+
+RS_CONST_STRING_DECL(__RSDictionayKeyPathSeparatingStrings, ".");
+RSExport RSTypeRef RSDictionaryGetValueForKeyPath(RSDictionaryRef dictionary, RSStringRef keyPath) {
+    if (!dictionary) return nil;
+    RSTypeRef rst = nil;
+    RSArrayRef keys = RSStringCreateArrayBySeparatingStrings(RSAllocatorSystemDefault, keyPath, __RSDictionayKeyPathSeparatingStrings);
+    rst = RSDictionaryGetValueForKeys(dictionary, keys);
+    RSRelease(keys);
+    return rst;
+}
+
+RSExport RSTypeRef RSDictionaryGetValueForKeys(RSDictionaryRef dictionary, RSArrayRef keys) {
+    if (nil == dictionary || !keys || !RSArrayGetCount(keys)) return nil;
+    RSTypeRef rst = nil;
+    RSClassRef dictClass = RSClassGetWithUTF8String("RSDictionary");
+    RSUInteger cnt = RSArrayGetCount(keys);
+    RSDictionaryRef tmp = dictionary;
+    for (RSUInteger idx = 0; idx < cnt; idx++) {
+        if (RSInstanceIsMemberOfClass(tmp, dictClass)) {
+            tmp = RSDictionaryGetValue(tmp, RSArrayObjectAtIndex(keys, idx));
+        } else {
+            return nil;
+        }
+    }
+    return rst = tmp;
+}
+
+RSExport void RSDictionarySetValueForKeyPath(RSMutableDictionaryRef dictionary, RSStringRef keyPath, RSTypeRef value) {
+    if (nil == dictionary || nil == keyPath) return;
+    RSArrayRef keys = RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, keyPath, __RSDictionayKeyPathSeparatingStrings);
+    RSDictionarySetValueForKeys(dictionary, keys, value);
+    RSRelease(keys);
+    return;
+}
+
+RSExport void RSDictionarySetValueForKeys(RSMutableDictionaryRef dictionary, RSArrayRef keys, RSTypeRef value) {
+    if (nil == dictionary || nil == keys || !RSArrayGetCount(keys)) return;
+    RSClassRef dictClass = RSClassGetWithUTF8String("RSDictionary");
+    RSUInteger cnt = RSArrayGetCount(keys);
+    if (cnt < 2) {
+        return RSDictionarySetValue(dictionary, RSArrayObjectAtIndex(keys, 0), value);
+    }
+    cnt --;
+    RSMutableDictionaryRef tmp = dictionary, tmp1 = tmp;
+    for (RSUInteger idx = 0; idx < cnt; idx++) {
+        if (RSInstanceIsMemberOfClass(tmp, dictClass)) {
+            tmp1 = (RSMutableDictionaryRef)RSDictionaryGetValue(tmp, RSArrayObjectAtIndex(keys, idx));
+            if (!tmp1) {
+                tmp1 = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
+                RSDictionarySetValue(tmp, RSArrayObjectAtIndex(keys, idx), tmp1);
+                RSRelease(tmp1);
+                tmp = tmp1;
+            }
+        } else {
+            return ;
+        }
+    }
+    return RSDictionarySetValue(tmp, RSArrayLastObject(keys), value);
+}

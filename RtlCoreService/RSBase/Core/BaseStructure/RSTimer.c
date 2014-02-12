@@ -173,6 +173,7 @@ static RSStringRef __RSTimerClassDescription(RSTypeRef rs)
 
 static RSRuntimeClass __RSTimerClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSTimer",
     __RSTimerClassInit,
     __RSTimerClassCopy,

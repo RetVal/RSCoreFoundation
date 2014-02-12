@@ -65,7 +65,54 @@ int main(int argc, const char * argv[])
     return 0;
 }
 
+RSNumberRef RSNumberAdd(RSNumberRef n1, RSNumberRef n2) {
+    return RSNumberWithInteger(RSNumberIntegerValue(n1) + RSNumberIntegerValue(n2));
+}
+
 void test_fn() {
+    RSClassRef cls1 = RSClassGetWithUTF8String("RSDictionary");
+    RSClassRef cls2 = RSClassGetWithUTF8String("RSArray");
+    RSShow(cls1);
+    RSShow(cls2);
+    RSShow(RSNumberWithBool(RSEqual(cls1, cls2)));
+    RSShow(RSNumberWithInteger(RSGetRetainCount(cls1)));
+    RSShow(RSRetain(cls1));
+    RSShow(RSAutorelease(cls1));
+    RSRelease(cls2);
+    
+    return;
+    RSArrayRef lines = RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, RSStringWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/B.txt"))), RSSTR("\n"));
+    RSDictionaryRef rst_map = RSShow(RSMap(RSDrop(lines, 2), ^RSTypeRef(RSTypeRef obj) {
+        RSArrayRef id_name = RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, obj, RSSTR("\t"));
+        RSDictionaryRef dict = RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorDefault, RSArrayObjectAtIndex(id_name, 1), RSArrayObjectAtIndex(id_name, 0), NULL);
+        RSRelease(id_name);
+        return RSAutorelease(dict);
+    }));
+    RSRelease(lines);
+    
+    lines = RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, RSStringWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/A.txt"))), RSSTR("\n"));
+    RSArrayRef rst_order_a = RSShow(RSMap(RSDrop(lines, 2), ^RSTypeRef(RSTypeRef obj) {
+        RSArrayRef x = RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, obj, RSSTR("\t"));
+        RSArrayRef pair = RSArrayCreate(RSAllocatorDefault, RSArrayObjectAtIndex(x, 0), RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, RSArrayLastObject(x), RSSTR(";"))), NULL);
+        RSRelease(x);
+        return RSAutorelease(pair);
+    }));
+    
+    RSTypeRef result = RSShow(RSMap(rst_order_a, ^RSTypeRef(RSTypeRef obj) {
+        RSArrayRef pair = (RSArrayRef)obj;
+        return RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorDefault, RSMap(RSArrayLastObject(pair), ^RSTypeRef(RSTypeRef obj) {
+            return RSDictionaryGetValue(rst_map, obj);
+        }), RSArrayObjectAtIndex(pair, 0),NULL));
+    }));
+    
+    RSRelease(lines);
+    return;
+    
+    
+    RSMutableDictionaryRef dict = RSDictionaryCreateMutable(RSAllocatorDefault, 0, RSDictionaryRSTypeContext);
+    RSDictionarySetValueForKeyPath(dict, RSSTR("a.b.c.d"), RSBooleanTrue);
+    RSRelease(RSShow(dict));
+    return;
 //    RSMutableDictionaryRef dict = RSDictionaryCreateMutable(RSAllocatorDefault, 0, RSDictionaryRSTypeContext);
 //    RSMutableDictionaryRef dict2 = RSDictionaryCreateMutable(RSAllocatorDefault, 0, RSDictionaryRSTypeContext);
 //    RSDictionarySetValue(dict, RSNumberWithInteger(0), dict2);
@@ -79,7 +126,17 @@ void test_fn() {
 //    RSRelease(dict2);
 //    RSRelease(dict);
 
-    RSListRef list = RSListCreate(RSAllocatorDefault, RSNumberWithInt(0), RSNumberWithLong(1), RSNumberWithInteger(2), nil);
+    RSListRef list = RSListCreate(RSAllocatorDefault, RSNumberWithInt(0), RSNumberWithInteger(123), RSNumberWithLong(23), nil);
+    
+    RSShow(RSMap(RSFilter(list, ^BOOL(RSTypeRef x) {
+        return RSNumberIntegerValue(x) > 20;
+    }), ^RSTypeRef(RSTypeRef obj) {
+        return RSShow(obj);
+    }));
+    
+    RSRelease(list);
+    
+    return;
     
     RSMap(list, ^RSTypeRef(RSTypeRef obj) {
         RSShow(obj);
@@ -116,9 +173,9 @@ void test_fn() {
         return RSNumberWithInteger(RSNumberIntegerValue(obj) + 1);
     }));
     
-    RSShow(RSReduce(^RSTypeRef(RSTypeRef a, RSTypeRef b) {
+    RSShow(RSReduce(coll, ^RSTypeRef(RSTypeRef a, RSTypeRef b) {
         return RSNumberWithInteger(RSNumberIntegerValue(a) + RSNumberIntegerValue(b));
-    }, coll));
+    }));
     
     RSRelease(coll);
     return;

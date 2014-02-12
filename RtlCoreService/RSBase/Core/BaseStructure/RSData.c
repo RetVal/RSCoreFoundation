@@ -59,6 +59,7 @@ static RSStringRef __RSISAPayloadClassDecription(RSTypeRef rs)
 
 static RSRuntimeClass __RSISAPayloadClass = {
     _RSRuntimeScannedObject,
+    0,
     "__RSISAPayload",
     nil,
     nil,
@@ -315,6 +316,7 @@ static  RSStringRef __RSDataClassDecription(RSTypeRef obj)
 
 static RSRuntimeClass __RSDataClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSData",
     __RSDataClassInit,
     __RSDataClassCopy,

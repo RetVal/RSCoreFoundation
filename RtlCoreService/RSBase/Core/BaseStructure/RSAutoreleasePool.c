@@ -437,6 +437,7 @@ static RSStringRef __RSAutoreleasePoolClassDescription(RSTypeRef obj)
 static const RSRuntimeClass __RSAutoreleasePoolClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSAutoreleasePool",
     __RSAutoreleasePoolClassInit,
     nil,

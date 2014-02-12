@@ -35,6 +35,7 @@ static BOOL __RSRuntimeInitiazing = YES;
 static RSRuntimeClass __RSRuntimeErrorClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "Runtime Error Class",
     (void*) __HALT,
     (void*) __HALT,
@@ -353,14 +354,23 @@ RSExport BOOL  __RSRuntimeScanClass(const RSRuntimeClass* cls)
     RSRuntimeClass* __cls = (RSRuntimeClass*)cls;
     if (__cls) {
         RSRuntimeClassVersion version = __RSRuntimeGetClassVersionInformation(cls);
+        unsigned char reftype = version._rsinfo;
+        __builtin_memset(&version, 0, sizeof(RSRuntimeClassVersion));
+        version.reftype = reftype;
         if (version.reftype == _RSRuntimeScannedObject) {
             if (cls->refcount) {
                 version.reftype = _RSRuntimeCustomRefCount;
                 __RSRuntimeSetClassVersionInformation(__cls, version);
+                __RSRuntimeSetInstanceAsClass(__cls);
+                __RSRuntimeSetInstanceSpecial(__cls, YES);
+                __RSSetValid(__cls);
                 return YES;
             }
             version.reftype = _RSRuntimeBasedObject;
             __RSRuntimeSetClassVersionInformation(__cls, version);
+            __RSRuntimeSetInstanceAsClass(__cls);
+            __RSRuntimeSetInstanceSpecial(__cls, YES);
+            __RSSetValid(__cls);
             return YES;
         }
     }
@@ -590,7 +600,7 @@ RSExport RSTypeRef __RSRuntimeRetain(RSTypeRef obj, BOOL try) {
         RSIndex ref = 0;
         RSIndex before = 0;
 #if __LP64__
-        if (__RSRuntimeIsInstanceSpecial(obj))
+        if (__RSRuntimeInstanceIsSpecial(obj))
             return obj;
         do
         {
@@ -667,7 +677,7 @@ RSExport void __RSRuntimeSetInstanceSpecial(RSTypeRef obj, BOOL special)
     base->_rsinfo._special = special;
 }
 
-RSExport BOOL __RSRuntimeIsInstanceSpecial(RSTypeRef rs)
+RSExport BOOL __RSRuntimeInstanceIsSpecial(RSTypeRef rs)
 {
     return ((RSRuntimeBase*)rs)->_rsinfo._special;
 }

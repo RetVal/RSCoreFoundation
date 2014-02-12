@@ -56,6 +56,7 @@ static RSStringRef __RSKVBucketClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSKVBucketClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSKVBucket",
     nil,
     __RSKVBucketClassCopy,

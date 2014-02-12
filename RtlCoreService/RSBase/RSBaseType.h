@@ -212,7 +212,7 @@ typedef signed long RSIndex;
 typedef const void* RSTypeRef;
 typedef void* RSMutableTypeRef;
 
-typedef RSTypeRef RSClass;
+typedef RSTypeRef RSClassRef;
 
 typedef unsigned char                   UInt8;
 typedef signed char                     SInt8;

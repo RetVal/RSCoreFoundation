@@ -566,6 +566,7 @@ static RSStringRef __RSBundleClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSBundleClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSBundle",
     __RSBundleClassInit,
     __RSBundleClassCopy,

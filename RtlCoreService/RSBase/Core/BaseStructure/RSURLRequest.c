@@ -110,6 +110,7 @@ static RSStringRef __RSURLRequestClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSURLRequestClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSURLRequest",
     __RSURLRequestClassInit,
     __RSURLRequestClassCopy,

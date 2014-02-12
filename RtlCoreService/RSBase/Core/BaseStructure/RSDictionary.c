@@ -381,6 +381,7 @@ static RSStringRef __RSDictionaryClassDescription(RSTypeRef obj)
 }
 static RSRuntimeClass __RSDictionaryClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSDictionary",
     __RSDictionaryClassInit,
     __RSDictionaryClassCopy,
@@ -870,6 +871,7 @@ static RSTypeID _RSDictionaryTypeID = _RSRuntimeNotATypeID;
 
 static const RSRuntimeClass __RSDictionaryClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSDictionary",
     nil,        // init
     __RSDictionaryCopy,        // copy

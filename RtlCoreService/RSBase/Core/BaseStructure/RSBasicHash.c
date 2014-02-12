@@ -3255,6 +3255,7 @@ static RSTypeID __RSBasicHashTypeID = _RSRuntimeNotATypeID;
 
 static const RSRuntimeClass __RSBasicHashClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSBasicHash",
     nil,        // init
     nil,        // copy

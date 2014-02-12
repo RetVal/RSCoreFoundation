@@ -80,6 +80,7 @@ RSUInteger __RSNilClassRefcount(intptr_t op, RSTypeRef obj)
 
 static RSRuntimeClass __RSNilClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSNil",
     __RSNilClassInit,
     __RSNilClassCopy,

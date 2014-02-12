@@ -121,6 +121,7 @@ static RSStringRef __RSTimeZoneClassDescription(RSTypeRef obj)
 static struct __RSRuntimeClass __RSTimeZoneClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSTimeZone",
     __RSTimeZoneClassInit,
     __RSTimeZoneClassCopy,

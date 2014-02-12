@@ -379,6 +379,7 @@ static RSStringRef __RSArchiverClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSArchiverClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSArchiver",
     __RSArchiverClassInit,
     __RSArchiverClassCopy,
@@ -505,6 +506,7 @@ static RSStringRef __RSUnarchiverClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSUnarchiverClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSUnarchiver",
     __RSUnarchiverClassInit,
     __RSUnarchiverClassCopy,

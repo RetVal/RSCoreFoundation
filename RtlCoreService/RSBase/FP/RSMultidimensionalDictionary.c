@@ -56,6 +56,7 @@ static RSStringRef __RSMultidimensionalDictionaryClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSMultidimensionalDictionaryClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSMultidimensionalDictionary",
     __RSMultidimensionalDictionaryClassInit,
     __RSMultidimensionalDictionaryClassCopy,

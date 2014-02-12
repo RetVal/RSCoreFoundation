@@ -1332,6 +1332,7 @@ static RSTypeID __RSURLTypeID = _RSRuntimeNotATypeID;
 
 static const RSRuntimeClass __RSURLClass = {
     _RSRuntimeScannedObject,                                  // version
+    0,
     "RSURL",                            // className
     nil,                               // init
     nil,                               // copy

@@ -148,6 +148,7 @@ static RSStringRef __RSHTTPCookieStorageClassDescription(RSTypeRef rs) {
 static RSRuntimeClass __RSHTTPCookieStorageClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSHTTPCookieStorage",
     __RSHTTPCookieStorageClassInit,
     nil,

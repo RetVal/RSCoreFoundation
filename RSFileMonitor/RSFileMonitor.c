@@ -100,6 +100,7 @@ static RSStringRef __RSFileMonitorClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSFileMonitorClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSFileMonitor",
     __RSFileMonitorClassInit,
     __RSFileMonitorClassCopy,

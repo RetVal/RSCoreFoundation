@@ -653,6 +653,7 @@ static RSStringRef __RSAllocatorClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSAllocatorClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSAllocator",
     nil,
     nil,

@@ -375,6 +375,7 @@ static RSTypeID _RSRunLoopSourceTypeID = _RSRuntimeNotATypeID;
 static RSRuntimeClass __RSRunLoopSourceClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSRunLoopSource",
     nil,
     __RSRunLoopSourceClassCopy,
@@ -571,6 +572,7 @@ static RSStringRef __RSRunLoopClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSRunLoopClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSRunLoop",
     __RSRunLoopClassInit,
     __RSRunLoopClassCopy,
@@ -6332,6 +6334,7 @@ static void __RSRunLoopClassDeallocate(RSTypeRef rs) {
 
 static const RSRuntimeClass __RSRunLoopModeClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSRunLoopMode",
     nil,      // init
     nil,      // copy
@@ -6345,6 +6348,7 @@ static const RSRuntimeClass __RSRunLoopModeClass = {
 
 static const RSRuntimeClass __RSRunLoopClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSRunLoop",
     nil,      // init
     nil,      // copy
@@ -8297,6 +8301,7 @@ static void __RSRunLoopSourceClassDeallocate(RSTypeRef rs) {	/* DOES CALLOUT */
 
 static const RSRuntimeClass __RSRunLoopSourceClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSRunLoopSource",
     nil,      // init
     nil,      // copy
@@ -8493,6 +8498,7 @@ static void __RSRunLoopObserverClassDeallocate(RSTypeRef rs) {	/* DOES CALLOUT *
 
 static const RSRuntimeClass __RSRunLoopObserverClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSRunLoopObserver",
     nil,      // init
     nil,      // copy
@@ -8690,6 +8696,7 @@ static void __RSRunLoopTimerClassDeallocate(RSTypeRef rs) {	/* DOES CALLOUT */
 
 static const RSRuntimeClass __RSRunLoopTimerClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSRunLoopTimer",
     nil,      // init
     nil,      // copy

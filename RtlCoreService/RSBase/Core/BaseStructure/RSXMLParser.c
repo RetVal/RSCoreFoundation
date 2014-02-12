@@ -1008,6 +1008,7 @@ static RSStringRef __RSXMLNodeClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSXMLNodeClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSXMLNode",
     __RSXMLNodeClassInit,
     __RSXMLNodeClassCopy,
@@ -1244,6 +1245,7 @@ static RSStringRef __RSXMLElementClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSXMLElementClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSXMLElement",
     __RSXMLElementClassInit,
     __RSXMLElementClassCopy,
@@ -1532,6 +1534,7 @@ static RSStringRef __RSXMLDocumentClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSXMLDocumentClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSXMLDocument",
     __RSXMLDocumentClassInit,
     __RSXMLDocumentClassCopy,

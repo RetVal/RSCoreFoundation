@@ -63,6 +63,7 @@ static RSStringRef __RSProtocolClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSProtocolClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSProtocol",
     __RSProtocolClassInit,
     __RSProtocolClassCopy,

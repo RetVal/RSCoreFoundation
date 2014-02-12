@@ -164,6 +164,7 @@ static RSStringRef __RSHTTPCookieClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSHTTPCookieClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSHTTPCookie",
     __RSHTTPCookieClassInit,
     __RSHTTPCookieClassCopy,

@@ -18,6 +18,8 @@ typedef const struct __RSList *RSListRef;
 RSExport RSTypeID RSListGetTypeID();
 RSExport RSListRef RSListCreate(RSAllocatorRef allocator, RSTypeRef a, ...);
 RSExport RSListRef RSListCreateWithArray(RSAllocatorRef allocator, RSArrayRef array);
-RSExport void RSListApplyBlock(RSListRef list, void (^fn)(RSTypeRef node));
+RSExport RSIndex RSListGetCount(RSListRef list);
+RSExport void RSListApplyBlock(RSListRef list, void (^fn)(RSTypeRef value));
+RSExport RSListRef RSListCreateDrop(RSAllocatorRef allocator, RSListRef list, RSIndex n);
 RS_EXTERN_C_END
 #endif 

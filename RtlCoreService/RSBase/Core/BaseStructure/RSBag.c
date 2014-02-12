@@ -96,6 +96,7 @@ static RSTypeID __RSBagTypeID = _RSRuntimeNotATypeID;
 
 static const RSRuntimeClass __RSBagClass = {
     _RSRuntimeScannedObject,
+    0,
     "RSBag",
     nil,        // init
     nil,        // copy

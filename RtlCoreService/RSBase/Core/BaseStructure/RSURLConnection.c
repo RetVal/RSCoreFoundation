@@ -474,6 +474,7 @@ static RSStringRef __RSURLConnectionClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSURLConnectionClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSURLConnection",
     __RSURLConnectionClassInit,
     __RSURLConnectionClassCopy,

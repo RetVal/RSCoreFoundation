@@ -1313,6 +1313,7 @@ static void __RSCharacterSetDeallocate(RSTypeRef cf) {
 static RSTypeID __RSCharacterSetTypeID = _RSRuntimeNotATypeID;
 
 static const RSRuntimeClass __RSCharacterSetClass = {
+    _RSRuntimeScannedObject,
     0,
     "RSCharacterSet",
     nil,      // init

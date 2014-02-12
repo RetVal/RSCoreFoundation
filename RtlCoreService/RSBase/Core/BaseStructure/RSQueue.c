@@ -73,6 +73,7 @@ static RSStringRef __RSQueueClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSQueueClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSQueue",
     nil,
     __RSQueueClassCopy,

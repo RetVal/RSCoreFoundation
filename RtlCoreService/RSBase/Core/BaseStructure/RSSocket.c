@@ -3845,6 +3845,7 @@ static void __RSSocketClassDeallocate(RSTypeRef rs) {
 static RSTypeID _RSSocketTypeID = _RSRuntimeNotATypeID;
 
 static const RSRuntimeClass __RSSocketClass = {
+    _RSRuntimeScannedObject,
     0,
     "RSSocket",
     nil,      // init
