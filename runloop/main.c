@@ -70,6 +70,10 @@ RSNumberRef RSNumberAdd(RSNumberRef n1, RSNumberRef n2) {
 }
 
 void test_fn() {
+    if (1) {
+        RSShow(RSAutorelease(RSMutableCopy(RSAllocatorDefault, RSDictionaryWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/log.2.plist"))))));
+        return;
+    }
     if (0) {
         RSArrayRef content = RSArrayWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/log.1.plist")));
         RSCollectionRef rst = RSFilter(content, ^BOOL(RSTypeRef x) {

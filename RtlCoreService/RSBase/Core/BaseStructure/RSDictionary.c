@@ -1379,14 +1379,14 @@ RSExport RSHashRef RSDictionaryCreateCopy(RSAllocatorRef allocator, RSHashRef ot
         RSIndex numValues = RSDictionaryGetCount(other);
         const_any_pointer_t vbuffer[256], kbuffer[256];
         const_any_pointer_t *vlist = (numValues <= 256) ? vbuffer : (const_any_pointer_t *)RSAllocatorAllocate(RSAllocatorSystemDefault, numValues * sizeof(const_any_pointer_t));
-        const_any_pointer_t *klist = (numValues <= 256) ? kbuffer : (const_any_pointer_t *)RSAllocatorAllocate(RSAllocatorSystemDefault, numValues * sizeof(const_any_pointer_t));
+        const_any_pointer_t *klist = (numValues <= 256) ? kbuffer : &vlist[numValues];
+        
         RSDictionaryGetKeysAndValues(other, klist, vlist);
         ht = __RSDictionaryCreateGeneric(allocator, & RSTypeDictionaryKeyCallBacks, RSDictionary ? & RSTypeDictionaryValueCallBacks : nil, RSDictionary);
         if (ht && 0 < numValues) RSBasicHashSetCapacity(ht, numValues);
         for (RSIndex idx = 0; ht && idx < numValues; idx++) {
             RSBasicHashAddValue(ht, (uintptr_t)klist[idx], (uintptr_t)vlist[idx]);
         }
-        if (klist != kbuffer && klist != vlist) RSAllocatorDeallocate(RSAllocatorSystemDefault, klist);
         if (vlist != vbuffer) RSAllocatorDeallocate(RSAllocatorSystemDefault, vlist);
     } else {
         ht = RSBasicHashCreateCopy(allocator, (RSBasicHashRef)other);
@@ -1408,16 +1408,17 @@ RSExport RSMutableHashRef RSDictionaryCreateMutableCopy(RSAllocatorRef allocator
     if (RS_IS_OBJC(typeID, other)) {
         RSIndex numValues = RSDictionaryGetCount(other);
         const_any_pointer_t vbuffer[256], kbuffer[256];
-        const_any_pointer_t *vlist = (numValues <= 256) ? vbuffer : (const_any_pointer_t *)RSAllocatorAllocate(RSAllocatorSystemDefault, numValues * sizeof(const_any_pointer_t));
-        const_any_pointer_t *klist = (numValues <= 256) ? kbuffer : (const_any_pointer_t *)RSAllocatorAllocate(RSAllocatorSystemDefault, numValues * sizeof(const_any_pointer_t));
+        const_any_pointer_t *vlist = (numValues <= 256) ? vbuffer : (const_any_pointer_t *)RSAllocatorAllocate(RSAllocatorSystemDefault, 2 * numValues * sizeof(const_any_pointer_t));
+        const_any_pointer_t *klist = (numValues <= 256) ? kbuffer : &vlist[numValues];
+
         RSDictionaryGetKeysAndValues(other, klist, vlist);
         ht = __RSDictionaryCreateGeneric(allocator, & RSTypeDictionaryKeyCallBacks, RSDictionary ? & RSTypeDictionaryValueCallBacks : nil, RSDictionary);
         if (ht && 0 < numValues) RSBasicHashSetCapacity(ht, numValues);
         for (RSIndex idx = 0; ht && idx < numValues; idx++) {
             RSBasicHashAddValue(ht, (uintptr_t)klist[idx], (uintptr_t)vlist[idx]);
         }
-        if (klist != kbuffer && klist != vlist) RSAllocatorDeallocate(RSAllocatorSystemDefault, klist);
-        if (vlist != vbuffer) RSAllocatorDeallocate(RSAllocatorSystemDefault, vlist);
+        if (vlist != vbuffer)
+            RSAllocatorDeallocate(RSAllocatorSystemDefault, vlist);
     } else {
         ht = RSBasicHashCreateCopy(allocator, (RSBasicHashRef)other);
     }

@@ -74,5 +74,6 @@ RSExport void RSBagRemoveValue(RSMutableBagRef theBag, const void *value);
 
 RSExport void RSBagRemoveAllValues(RSMutableBagRef theBag);
 
+RSExport RSArrayRef RSBagCopyAllValues(RSBagRef theBag) RS_AVAILABLE(0_4);
 RS_EXTERN_C_END
 #endif 
