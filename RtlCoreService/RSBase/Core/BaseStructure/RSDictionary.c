@@ -1700,10 +1700,7 @@ RSExport RSArrayRef RSDictionaryCopyAllKeys(RSHashRef hc)
     if (cnt == 0) return RSArrayCreate(RSAllocatorSystemDefault, nil);
     STACK_BUFFER_DECL(RSTypeRef, keys, cnt);
     RSDictionaryGetKeysAndValues(hc, keys, nil);
-    RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
-    for (RSUInteger idx = 0; idx < cnt; ++idx) {
-        RSArrayAddObject(array, keys[idx]);
-    }
+    RSArrayRef array = RSArrayCreateWithObjects(RSAllocatorSystemDefault, keys, cnt);
     return array;
 }
 
@@ -1714,10 +1711,7 @@ RSExport RSArrayRef RSDictionaryCopyAllValues(RSHashRef hc)
     if (cnt == 0) return RSArrayCreate(RSAllocatorSystemDefault, nil);
     STACK_BUFFER_DECL(RSTypeRef, values, cnt);
     RSDictionaryGetKeysAndValues(hc, nil, values);
-    RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
-    for (RSUInteger idx = 0; idx < cnt; ++idx) {
-        RSArrayAddObject(array, values[idx]);
-    }
+    RSArrayRef array = RSArrayCreateWithObjects(RSAllocatorSystemDefault, values, cnt);
     return array;
 }
 

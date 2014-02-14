@@ -407,6 +407,7 @@ void RSSetRemoveValue(RSMutableSetRef theSet, const void *value) RS_AVAILABLE(0_
 RSExport
 void RSSetRemoveAllValues(RSMutableSetRef theSet) RS_AVAILABLE(0_1);
 
+RSExport RSArrayRef RSSetCopyAllValues(RSSetRef hc) RS_AVAILABLE(0_4);
 RS_EXTERN_C_END
 
 

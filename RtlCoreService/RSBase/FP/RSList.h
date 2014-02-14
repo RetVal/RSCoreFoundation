@@ -21,5 +21,6 @@ RSExport RSListRef RSListCreateWithArray(RSAllocatorRef allocator, RSArrayRef ar
 RSExport RSIndex RSListGetCount(RSListRef list);
 RSExport void RSListApplyBlock(RSListRef list, void (^fn)(RSTypeRef value));
 RSExport RSListRef RSListCreateDrop(RSAllocatorRef allocator, RSListRef list, RSIndex n);
+RSExport RSArrayRef RSListCreateArray(RSListRef list);
 RS_EXTERN_C_END
 #endif 

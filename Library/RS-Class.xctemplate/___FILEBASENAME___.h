@@ -13,7 +13,7 @@
 
 RS_EXTERN_C_BEGIN
 
-typedef struct _____FILEBASENAME___ *___FILEBASENAME___Ref;
+typedef const struct _____FILEBASENAME___ *___FILEBASENAME___Ref;
 
 RSExport RSTypeID ___FILEBASENAME___GetTypeID();
 

@@ -24,7 +24,7 @@ RSExport RSStringRef RSStringWithBytesNoCopy(RSCUBuffer bytes, RSIndex numBytes,
 RSExport RSStringRef RSStringWithCharacters(const UniChar *characters, RSIndex numChars) RS_AVAILABLE(0_4);
 RSExport RSStringRef RSStringWithCharactersNoCopy(const UniChar *characters, RSIndex numChars) RS_AVAILABLE(0_4);
 RSExport RSStringRef RSStringWithSubstring(RSStringRef string, RSRange range) RS_AVAILABLE(0_4);
-RSExport RSStringRef RSStringWithArrayBySeparatingString(RSStringRef string, RSStringRef seperatorString) RS_AVAILABLE(0_4);
+RSExport RSArrayRef  RSStringWithArrayBySeparatingString(RSStringRef string, RSStringRef seperatorString) RS_AVAILABLE(0_4);
 RSExport RSStringRef RSStringWithCombingStrings(RSArrayRef strings, RSStringRef separatorString) RS_AVAILABLE(0_4);
 RSExport RSStringRef RSStringWithExternalRepresentation(RSStringRef aString, RSStringEncoding encoding, RSIndex n) RS_AVAILABLE(0_4);
 RSExport RSStringRef RSStringConvert(RSStringRef aString, RSStringEncoding encoding) RS_AVAILABLE(0_4);

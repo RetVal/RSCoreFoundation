@@ -163,7 +163,7 @@ RSExport void RSArrayExchangeObjectsAtIndices(RSMutableArrayRef array, RSIndex i
  @result void.
  */
 RSExport void RSArraySort(RSArrayRef array, RSComparisonOrder order, RSComparatorFunction comparator, void *context) RS_AVAILABLE(0_0);
-
+RSExport void RSArraySortUsingComparaotr(RSArrayRef array, RSComparisonResult (^comparator)(const void *val1, const void *val2)) RS_AVAILABLE(0_4);
 /*! @function RSArrayGetObjects
  @abstract Return nothing.
  @discussion This function get the objects in range of array, all objects are returned with weak link.

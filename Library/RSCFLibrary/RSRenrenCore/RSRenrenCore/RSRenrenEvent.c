@@ -118,6 +118,7 @@ static RSStringRef __RSRenrenEventClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSRenrenEventClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSRenrenEvent",
     nil,
     __RSRenrenEventClassCopy,

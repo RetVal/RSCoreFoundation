@@ -886,9 +886,9 @@ RSExport void __RSLogArgs(RSIndex logLevel, RSStringRef format, va_list args)
     else converted = length;
     if (converted && logString && buf)
     {
-        size_t len = length;//(logString);
+        RSBitU64 len = length;//(logString);
         // silently ignore 0-length or really large messages, and levels outside the valid range
-        if (!((1 << 24) < len))
+        if (!((1 << 31) < len))
         {
             RSBlock* cStrFormat = "%s\n";
             if ((length) && ((('\r' == (UTF8Char)*(buf + length - 1)) && '\n' == (UTF8Char)*(buf + length)) ||

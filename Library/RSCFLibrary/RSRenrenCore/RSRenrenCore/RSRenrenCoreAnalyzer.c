@@ -69,6 +69,7 @@ static RSStringRef __RSRenrenCoreAnalyzerClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSRenrenCoreAnalyzerClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSRenrenCoreAnalyzer",
     __RSRenrenCoreAnalyzerClassInit,
     nil,

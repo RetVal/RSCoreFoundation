@@ -63,6 +63,7 @@ static RSStringRef __RSRenrenFriendClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSRenrenFriendClass =
 {
     _RSRuntimeScannedObject,
+    0,
     "RSRenrenFriend",
     nil,
     __RSRenrenFriendClassCopy,

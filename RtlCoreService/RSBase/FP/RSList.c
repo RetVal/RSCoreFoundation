@@ -388,7 +388,7 @@ RSExport RSListRef RSListCreateDrop(RSAllocatorRef allocator, RSListRef list, RS
     return rst;
 }
 
-RSPrivate RSArrayRef RSListDumpValueToArray(RSListRef list) {
+RSExport RSArrayRef RSListCreateArray(RSListRef list) {
     if (!list || list == (RSListRef)RSNil) return nil;
     RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorSystemDefault, list->_count);
     RSNodeRef node = list->_head;

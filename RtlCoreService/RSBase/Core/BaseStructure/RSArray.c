@@ -2390,6 +2390,7 @@ RSExport RSMutableArrayRef RSArrayCreateMutableCopy(RSAllocatorRef allocator, RS
 RSExport RSIndex RSArrayGetCount(RSArrayRef array)
 {
     RS_OBJC_FUNCDISPATCHV(__RSArrayTypeID, RSIndex, (NSArray *)array, count);
+    if (!array) return 0;
     __RSGenericValidInstance(array, __RSArrayTypeID);
     return __RSArrayGetCount(array);
 }
@@ -2499,6 +2500,7 @@ void RSArrayApplyFunction(RSArrayRef array, RSRange range, RSArrayApplierFunctio
 #if RS_BLOCKS_AVAILABLE
 RSExport void RSArrayApplyBlock(RSArrayRef array, RSRange range, void (^block)(const void*value, RSUInteger idx, BOOL *isStop))
 {
+    if (!array || range.length == 0) return;
     RSIndex idx;
     FAULT_CALLBACK((void **)&(applier));
     __RSGenericValidInstance(array, __RSArrayTypeID);
@@ -2946,6 +2948,10 @@ RSExport void RSArraySort(RSArrayRef array, RSComparisonOrder order, RSComparato
     RSSortArray(values, range.length, sizeof(void *), order, (RSComparatorFunction)__RSArrayCompareObjects, &ctx);
     if (!immutable) RSArrayReplaceObject((RSMutableArrayRef)array, range, values, range.length);
     if (values != buffer) RSAllocatorDeallocate(RSAllocatorSystemDefault, values);
+}
+
+RSExport void RSArraySortUsingComparaotr(RSArrayRef array, RSComparisonResult (^comparator)(const void *val1, const void *val2)) {
+    
 }
 
 RSIndex RSArrayBSearchObjects(RSArrayRef array, RSRange range, const void *value, RSComparatorFunction comparator, void *context)

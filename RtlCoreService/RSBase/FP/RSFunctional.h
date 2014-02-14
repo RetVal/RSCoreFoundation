@@ -31,7 +31,10 @@ RSExport RSCollectionRef RSReverse(RSCollectionRef coll);
 RSExport RSCollectionRef RSFilter(RSCollectionRef coll, BOOL (^pred)(RSTypeRef x));
 RSExport RSCollectionRef RSDrop(RSCollectionRef coll, RSIndex n);
 
-RSCollectionRef RSMerge(RSCollectionRef a, RSCollectionRef b, ...);
+RSExport RSCollectionRef RSMerge(RSCollectionRef a, RSCollectionRef b, ...);
+
+RSExport RSIndex RSCollPred(RSTypeRef coll);
+RSExport RSIndex RSCount(RSTypeRef coll);
 RS_EXTERN_C_END
 
 #endif

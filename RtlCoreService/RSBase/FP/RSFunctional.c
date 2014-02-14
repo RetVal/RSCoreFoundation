@@ -33,6 +33,14 @@ static RSListRef __RSMapList(RSListRef coll, RSTypeRef (^fn)(RSTypeRef obj)) {
     return rst;
 }
 
+static RSSetRef __RSMapSet(RSSetRef coll, RSTypeRef (^fn)(RSTypeRef obj)) {
+    RSMutableSetRef result = RSSetCreateMutable(RSAllocatorSystemDefault, RSSetGetCount(coll), &RSTypeSetCallBacks);
+    RSSetApplyBlock(coll, ^(const void *value, BOOL *stop) {
+        RSSetAddValue(result, fn(value));
+    });
+    return RSAutorelease(result);
+}
+
 RSExport RSCollectionRef RSMap(RSCollectionRef coll, RSTypeRef (^fn)(RSTypeRef obj)) {
     if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSArray"))) return __RSMapArray(coll, fn);
     else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSList"))) return __RSReverseList(__RSMapList(coll, fn));
@@ -137,7 +145,7 @@ RSExport RSCollectionRef RSFilter(RSCollectionRef coll, BOOL (^pred)(RSTypeRef x
 }
 
 #pragma mark -
-#pragma mark Drop
+#pragma mark Drop API Group
 
 static RSArrayRef __RSDropArray(RSArrayRef coll, RSIndex n) {
     if (!coll || RSArrayGetCount(coll) < n) return nil;
@@ -161,22 +169,96 @@ RSExport RSCollectionRef RSDrop(RSCollectionRef coll, RSIndex n) {
     return nil;
 }
 
+#pragma mark -
+#pragma mark Merge API Group
+
+static RSDictionaryRef __RSMergeDictionary(RSArrayRef colls) {
+    if (!colls || !RSArrayGetCount(colls)) return nil;
+    RSMutableDictionaryRef merge = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
+    RSArrayApplyBlock(colls, RSMakeRange(0, RSArrayGetCount(colls)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+        RSDictionaryApplyBlock(value, ^(const void *key, const void *value, BOOL *stop) {
+            RSDictionarySetValue(merge, key, value);
+        });
+    });
+    return RSAutorelease(merge);
+}
+
+static RSArrayRef __RSMergeArray(RSArrayRef colls) {
+    if (!colls || !RSArrayGetCount(colls)) return nil;
+    RSMutableArrayRef merge = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
+    RSArrayApplyBlock(colls, RSMakeRange(0, RSArrayGetCount(colls)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+        RSArrayAddObjects(merge, value);
+    });
+    return RSAutorelease(merge);
+}
+
+static RSListRef __RSMergeList(RSArrayRef colls) {
+    if (!colls || !RSArrayGetCount(colls)) return nil;
+    RSListRef merge = nil;
+    RSMutableArrayRef buf = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
+    RSArrayApplyBlock(colls, RSMakeRange(0, RSArrayGetCount(colls)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+        RSListApplyBlock(value, ^(RSTypeRef value) {
+            RSArrayAddObject(buf, value);
+        });
+    });
+    merge = RSListCreateWithArray(RSAllocatorSystemDefault, buf);
+    RSRelease(merge);
+    return RSAutorelease(merge);
+}
+
 RSExport RSCollectionRef RSMerge(RSCollectionRef a, RSCollectionRef b, ...) {
     if (!a || !b) return nil;
     va_list ap;
     va_start(ap, b);
     RSArrayRef collections = __RSArrayCreateWithArguments(ap, -1);
     va_end(ap);
+    if (!collections) {
+        collections = (RSArrayRef)RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
+        RSArrayAddObjects((RSMutableArrayRef)collections, a);
+        RSArrayAddObjects((RSMutableArrayRef)collections, b);
+    } else {
+        RSArrayInsertObjectAtIndex((RSMutableArrayRef)collections, 0, b);
+        RSArrayInsertObjectAtIndex((RSMutableArrayRef)collections, 0, a);
+    }
     __block RSCollectionRef merge = nil;
     RSAutoreleaseBlock(^{
-        RSClassRef cls = RSClassFromInstance(a);
+        RSClassRef cls = RSClassFromInstance(RSArrayObjectAtIndex(collections, 0));
         RSArrayRef validCollections = RSFilter(collections, ^BOOL(RSTypeRef x) {
             return RSInstanceIsMemberOfClass(x, cls);
         });
         if (RSArrayGetCount(validCollections) == RSArrayGetCount(collections)) {
-            
+            if (RSInstanceIsMemberOfClass(RSArrayObjectAtIndex(validCollections, 0), RSClassGetWithUTF8String("RSDictionary")))
+                merge = RSRetain(__RSMergeDictionary(validCollections));
+            else if (RSInstanceIsMemberOfClass(RSArrayObjectAtIndex(validCollections, 0), RSClassGetWithUTF8String("RSArray")))
+                merge = RSRetain(__RSMergeArray(validCollections));
+            else if (RSInstanceIsMemberOfClass(RSArrayObjectAtIndex(validCollections, 0), RSClassGetWithUTF8String("RSList")))
+                merge = RSRetain(__RSMergeList(validCollections));
         }
+        RSRelease(collections);
     });
-    RSRelease(collections);
-    return merge;
+    return RSAutorelease(merge);
 }
+
+static RSClassRef listClass = nil, arrayClass = nil, dictionaryClass = nil, setClass = nil, bagClass = nil, stringClass = nil;
+RSExport RSIndex RSCollPred(RSTypeRef coll) {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        listClass = RSClassGetWithUTF8String("RSList"), arrayClass = RSClassGetWithUTF8String("RSArray"), dictionaryClass = RSClassGetWithUTF8String("RSDictionary"), setClass = RSClassGetWithUTF8String("RSSet"), bagClass = RSClassGetWithUTF8String("RSBag"), stringClass = RSClassGetWithUTF8String("RSString");
+    });
+    return RSInstanceIsMemberOfClass(coll, arrayClass) || RSInstanceIsMemberOfClass(coll, dictionaryClass) || RSInstanceIsMemberOfClass(coll, setClass) || RSInstanceIsMemberOfClass(coll, listClass) || RSInstanceIsMemberOfClass(coll, bagClass);
+}
+
+RSExport RSIndex RSCount(RSTypeRef coll) {
+    if (!coll) return 0;
+    if (RSCollPred(coll)) {
+        if (RSInstanceIsMemberOfClass(coll, arrayClass)) return RSArrayGetCount(coll);
+        else if (RSInstanceIsMemberOfClass(coll, dictionaryClass)) return RSDictionaryGetCount(coll);
+        else if (RSInstanceIsMemberOfClass(coll, setClass)) return RSSetGetCount(coll);
+        else if (RSInstanceIsMemberOfClass(coll, listClass)) return RSListGetCount(coll);
+        else if (RSInstanceIsMemberOfClass(coll, bagClass)) return RSBagGetCount(coll);
+    } else if (RSInstanceIsMemberOfClass(coll, stringClass)) {
+        return RSStringGetLength(coll);
+    }
+    return 0;
+}
+

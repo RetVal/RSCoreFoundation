@@ -125,8 +125,8 @@ RSExport void RSDictionarySetValueForKeys(RSMutableDictionaryRef dictionary, RSA
                 tmp1 = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
                 RSDictionarySetValue(tmp, RSArrayObjectAtIndex(keys, idx), tmp1);
                 RSRelease(tmp1);
-                tmp = tmp1;
             }
+            tmp = tmp1;
         } else {
             return ;
         }

@@ -9,16 +9,16 @@
 /* Begin PBXBuildFile section */
 		30217B651875D0F300BC813A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30217B631875D0F300BC813A /* InfoPlist.strings */; };
 		30217B691875D0F300BC813A /* RSRenrenCore.c in Sources */ = {isa = PBXBuildFile; fileRef = 30217B681875D0F300BC813A /* RSRenrenCore.c */; };
-		30217B861875D12200BC813A /* RSCoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30217B851875D12200BC813A /* RSCoreFoundation.framework */; };
 		30217B871875D15200BC813A /* RSRenrenCore.h in Headers */ = {isa = PBXBuildFile; fileRef = 30217B671875D0F300BC813A /* RSRenrenCore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30217B8E1875D30B00BC813A /* RSRenrenCoreAnalyzer.c in Sources */ = {isa = PBXBuildFile; fileRef = 30217B8C1875D30B00BC813A /* RSRenrenCoreAnalyzer.c */; };
 		30217B8F1875D30B00BC813A /* RSRenrenCoreAnalyzer.h in Headers */ = {isa = PBXBuildFile; fileRef = 30217B8D1875D30B00BC813A /* RSRenrenCoreAnalyzer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30217B921875D4F500BC813A /* RSRenrenEvent.c in Sources */ = {isa = PBXBuildFile; fileRef = 30217B901875D4F500BC813A /* RSRenrenEvent.c */; };
 		30217B931875D4F500BC813A /* RSRenrenEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 30217B911875D4F500BC813A /* RSRenrenEvent.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		30746CD018ABAA53006111B8 /* RSCoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30AD1AC018ABA9E5003C7424 /* RSCoreFoundation.framework */; };
 		30A09AF5187651E700920C81 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 30A09AF4187651E700920C81 /* main.c */; };
 		30A09AF7187651E700920C81 /* RSRenrenCoreDemo.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 30A09AF6187651E700920C81 /* RSRenrenCoreDemo.1 */; };
-		30A09AFB1876520000920C81 /* RSCoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30A09AEC187650C100920C81 /* RSCoreFoundation.framework */; };
 		30A09AFC1876520400920C81 /* RSRenrenCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30217B571875D0F300BC813A /* RSRenrenCore.framework */; };
+		30AD1AC118ABA9E5003C7424 /* RSCoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30AD1AC018ABA9E5003C7424 /* RSCoreFoundation.framework */; };
 		30B6AADC18767B5B0082690A /* RSRenrenFriend.c in Sources */ = {isa = PBXBuildFile; fileRef = 30B6AADA18767B5B0082690A /* RSRenrenFriend.c */; };
 		30B6AADD18767B5B0082690A /* RSRenrenFriend.h in Headers */ = {isa = PBXBuildFile; fileRef = 30B6AADB18767B5B0082690A /* RSRenrenFriend.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
@@ -43,15 +43,14 @@
 		30217B661875D0F300BC813A /* RSRenrenCore-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RSRenrenCore-Prefix.pch"; sourceTree = "<group>"; };
 		30217B671875D0F300BC813A /* RSRenrenCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RSRenrenCore.h; sourceTree = "<group>"; };
 		30217B681875D0F300BC813A /* RSRenrenCore.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = RSRenrenCore.c; sourceTree = "<group>"; };
-		30217B851875D12200BC813A /* RSCoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RSCoreFoundation.framework; path = ../../../Build/Products/Debug/RSCoreFoundation.framework; sourceTree = "<group>"; };
 		30217B8C1875D30B00BC813A /* RSRenrenCoreAnalyzer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRenrenCoreAnalyzer.c; sourceTree = "<group>"; };
 		30217B8D1875D30B00BC813A /* RSRenrenCoreAnalyzer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRenrenCoreAnalyzer.h; sourceTree = "<group>"; };
 		30217B901875D4F500BC813A /* RSRenrenEvent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRenrenEvent.c; sourceTree = "<group>"; };
 		30217B911875D4F500BC813A /* RSRenrenEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRenrenEvent.h; sourceTree = "<group>"; };
-		30A09AEC187650C100920C81 /* RSCoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RSCoreFoundation.framework; path = ../../../../../../Users/closure/Library/Frameworks/RSCoreFoundation.framework; sourceTree = "<group>"; };
 		30A09AF2187651E700920C81 /* RSRenrenCoreDemo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RSRenrenCoreDemo; sourceTree = BUILT_PRODUCTS_DIR; };
 		30A09AF4187651E700920C81 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		30A09AF6187651E700920C81 /* RSRenrenCoreDemo.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = RSRenrenCoreDemo.1; sourceTree = "<group>"; };
+		30AD1AC018ABA9E5003C7424 /* RSCoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RSCoreFoundation.framework; path = ../../../../../../Users/closure/Library/Frameworks/RSCoreFoundation.framework; sourceTree = "<group>"; };
 		30B6AADA18767B5B0082690A /* RSRenrenFriend.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRenrenFriend.c; sourceTree = "<group>"; };
 		30B6AADB18767B5B0082690A /* RSRenrenFriend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRenrenFriend.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -61,7 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30217B861875D12200BC813A /* RSCoreFoundation.framework in Frameworks */,
+				30AD1AC118ABA9E5003C7424 /* RSCoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -69,8 +68,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30A09AFB1876520000920C81 /* RSCoreFoundation.framework in Frameworks */,
 				30A09AFC1876520400920C81 /* RSRenrenCore.framework in Frameworks */,
+				30746CD018ABAA53006111B8 /* RSCoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,8 +98,7 @@
 		30217B591875D0F300BC813A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				30A09AEC187650C100920C81 /* RSCoreFoundation.framework */,
-				30217B851875D12200BC813A /* RSCoreFoundation.framework */,
+				30AD1AC018ABA9E5003C7424 /* RSCoreFoundation.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -359,6 +357,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"/SourceCache/Library/RSCoreFoundation-1400/Build/Products/Debug",
+					"$(USER_LIBRARY_DIR)/Frameworks",
 				);
 				FRAMEWORK_VERSION = A;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -380,6 +379,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"/SourceCache/Library/RSCoreFoundation-1400/Build/Products/Debug",
+					"$(USER_LIBRARY_DIR)/Frameworks",
 				);
 				FRAMEWORK_VERSION = A;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;

@@ -926,6 +926,24 @@ void RSSetRemoveAllValues(RSMutableHashRef hc) {
     RS_OBJC_KVO_DIDCHANGEALL(hc);
 }
 
+RSExport RSArrayRef RSSetCopyAllValues(RSHashRef hc) {
+    RSIndex numValues = RSSetGetCount(hc);
+    const_any_pointer_t vbuffer[256];
+    const_any_pointer_t *vlist = nil;
+    if (numValues <= 256) {
+        vlist = vbuffer;
+    }
+    else
+    {
+        vlist = RSAllocatorAllocate(RSAllocatorSystemDefault, numValues * sizeof(const_any_pointer_t));
+    }
+    RSSetGetValues(hc, vlist);
+    RSArrayRef result = RSArrayCreateWithObjects(RSAllocatorSystemDefault, vlist, numValues);
+    if (vlist != vbuffer)
+        RSAllocatorDeallocate(RSAllocatorSystemDefault, vlist);
+    return result;
+}
+
 #undef RS_OBJC_KVO_WILLCHANGE
 #undef RS_OBJC_KVO_DIDCHANGE
 #undef RS_OBJC_KVO_WILLCHANGEALL

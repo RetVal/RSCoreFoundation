@@ -8,16 +8,6 @@
 
 #include <RSRenrenCore/RSRenrenCore.h>
 
-static int GetG_TK(char * str){
-    int hash = 5381;
-    
-    for(int i = 0, len = strlen(str); i < len; ++i){
-        printf("hash << 5 -> %d str[%d] -> %d\n", hash << 5, i, str[i]);
-        hash += ((hash << 5) + (int)str[i]);
-    }
-    return (hash & 0x7fffffff);
-}
-
 int main(int argc, const char * argv[])
 {
     RSShow(RSStringWithUTF8String(argv[3]));
