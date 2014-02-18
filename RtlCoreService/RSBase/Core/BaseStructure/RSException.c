@@ -75,6 +75,8 @@ static void __RSExceptionClassDeallocate(RSTypeRef rs)
     _e->_infoFrames = nil;
     if (_e->_userInfo) RSRelease(_e->_userInfo);
     _e->_userInfo = nil;
+    RSRelease(_e->_exceptionReason);
+    RSRelease(_e->_name);
     return;
 }
 
@@ -165,8 +167,8 @@ static RSExceptionRef __RSExceptionCreateWithFrames(RSAllocatorRef allocator,RSS
     struct __RSException *e = (struct __RSException *)__RSRuntimeCreateInstance(allocator, _RSExceptionTypeID, sizeof(struct __RSException) - sizeof(RSRuntimeBase));
     e->_frameDepth = numFrames;
     e->_stackFrames = frames;
-    e->_exceptionReason = reason;
-    e->_name = name ?: RSGenericException;
+    e->_exceptionReason = RSRetain(reason);
+    e->_name = name ? RSRetain(name) : RSGenericException;
     if (userInfo) e->_userInfo = RSRetain(userInfo);
     return e;
 }

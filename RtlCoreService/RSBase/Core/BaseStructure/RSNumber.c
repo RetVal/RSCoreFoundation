@@ -514,105 +514,105 @@ RSExport char RSNumberCharValue(RSNumberRef aValue) {
 RSExport unsigned char RSNumberUnsignedCharValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     unsigned char value = 0;
-    if (RSNumberGetType(aValue) == RSNumberUnsignedChar && RSNumberGetValue(aValue, &value)) return value;
+    if (RSNumberIsIntegerType(aValue) && RSNumberGetType(aValue) == RSNumberUnsignedChar && RSNumberGetValue(aValue, &value)) return value;
     return 0;
 }
 
 RSExport short RSNumberShortValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     short value = 0;
-    if (RSNumberGetType(aValue) == RSNumberShort && RSNumberGetValue(aValue, &value)) return value;
+    if (RSNumberIsIntegerType(aValue) && RSNumberGetType(aValue) == RSNumberShort && RSNumberGetValue(aValue, &value)) return value;
     return 0;
 }
 
 RSExport unsigned short RSNumberUnsignedShortValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     unsigned short value = 0;
-    if (RSNumberGetType(aValue) == RSNumberUnsignedShort && RSNumberGetValue(aValue, &value)) return value;
+    if (RSNumberIsIntegerType(aValue) && RSNumberGetType(aValue) == RSNumberUnsignedShort && RSNumberGetValue(aValue, &value)) return value;
     return 0;
 }
 
 RSExport int RSNumberIntValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     int value = 0;
-    if (RSNumberGetType(aValue) == RSNumberInt && RSNumberGetValue(aValue, &value)) return value;
+    if (RSNumberIsIntegerType(aValue) && RSNumberGetType(aValue) == RSNumberInt && RSNumberGetValue(aValue, &value)) return value;
     return 0;
 }
 
 RSExport unsigned int RSNumberUnsignedIntValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     unsigned int value = 0;
-    if (RSNumberGetType(aValue) == RSNumberUnsignedInt && RSNumberGetValue(aValue, &value)) return value;
+    if (RSNumberIsIntegerType(aValue) && RSNumberGetType(aValue) == RSNumberUnsignedInt && RSNumberGetValue(aValue, &value)) return value;
     return 0;
 }
 
 RSExport long RSNumberLongValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     long value = 0;
-    if (RSNumberGetType(aValue) == RSNumberLong && RSNumberGetValue(aValue, &value)) return value;
+    if (RSNumberIsIntegerType(aValue) && RSNumberGetType(aValue) == RSNumberLong && RSNumberGetValue(aValue, &value)) return value;
     return 0;
 }
 
 RSExport unsigned long RSNumberUnsignedLongValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     unsigned long value = 0;
-    if (RSNumberGetType(aValue) == RSNumberUnsignedLong && RSNumberGetValue(aValue, &value)) return value;
+    if (RSNumberIsIntegerType(aValue) && RSNumberGetValue(aValue, &value)) return value;
     return 0;
 }
 
 RSExport long long RSNumberLongLongValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     long long value = 0;
-    if (RSNumberGetType(aValue) == RSNumberLonglong && RSNumberGetValue(aValue, &value)) return value;
+    if (RSNumberIsIntegerType(aValue) && RSNumberGetValue(aValue, &value)) return value;
     return 0;
 }
 
 RSExport unsigned long long RSNumberUnsignedLongLongValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     unsigned long long value = 0;
-    if (RSNumberGetType(aValue) == RSNumberUnsignedLonglong && RSNumberGetValue(aValue, &value)) return value;
+    if (RSNumberIsIntegerType(aValue) && RSNumberGetValue(aValue, &value)) return value;
     return 0;
 }
 
 RSExport float RSNumberFloatValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     float value = 0;
-    if (RSNumberGetType(aValue) == RSNumberFloat && RSNumberGetValue(aValue, &value)) return value;
+    if (RSNumberIsFloatType(aValue) && RSNumberGetValue(aValue, &value)) return value;
     return 0;
 }
 
 RSExport double RSNumberDoubleValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     double value = 0;
-    if (RSNumberGetType(aValue) == RSNumberDouble && RSNumberGetValue(aValue, &value)) return value;
+    if (RSNumberIsFloatType(aValue) && RSNumberGetValue(aValue, &value)) return value;
     return 0;
 }
 
 RSExport BOOL RSNumberBooleanValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     BOOL value = 0;
-    if (RSNumberGetType(aValue) == RSNumberBoolean && RSNumberGetValue(aValue, &value)) return value;
+    if (RSNumberIsBooleanType(aValue) && RSNumberGetType(aValue) == RSNumberBoolean && RSNumberGetValue(aValue, &value)) return value;
     return 0;
 }
 
 RSExport RSFloat RSNumberRSFloatValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     RSFloat value = 0;
-    if (RSNumberGetType(aValue) == RSNumberRSFloat && RSNumberGetValue(aValue, &value)) return value;
+    if (RSNumberIsFloatType(aValue) && RSNumberGetValue(aValue, &value)) return value;
     return 0;
 }
 
 RSExport RSInteger RSNumberIntegerValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     RSInteger value = 0;
-    if (RSNumberGetType(aValue) == RSNumberInteger && RSNumberGetValue(aValue, &value)) return value;
+    if (RSNumberIsIntegerType(aValue) && RSNumberGetValue(aValue, &value)) return value;
     return 0;
 }
 
 RSExport RSUInteger RSNumberUnsignedIntegerValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     RSUInteger value = 0;
-    if (RSNumberGetType(aValue) == RSNumberUnsignedInteger && RSNumberGetValue(aValue, &value)) return value;
+    if (RSNumberIsIntegerType(aValue) && RSNumberGetValue(aValue, &value)) return value;
     return 0;
 }
 
@@ -1485,6 +1485,11 @@ RSExport BOOL RSNumberIsFloatType(RSNumberRef aNumber)
 {
     __RSGenericValidInstance(aNumber, __RSNumberTypeID);
     return __RSNumberTypeIsFloatGroup(RSNumberGetType(aNumber));
+}
+
+RSExport BOOL RSNumberIsIntegerType(RSNumberRef aNumber) {
+    __RSGenericValidInstance(aNumber, __RSNumberTypeID);
+    return __RSNumberTypeIsIntGroup(RSNumberGetType(aNumber));
 }
 
 RSExport BOOL RSNumberIsBooleanType(RSNumberRef aNumber)

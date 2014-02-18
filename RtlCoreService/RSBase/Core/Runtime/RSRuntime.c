@@ -1003,6 +1003,7 @@ extern void __RSDictionaryInitialize();
 extern void __RSTimeZoneInitialize();
 extern void __RSDateInitialize();
 extern void __RSCalendarInitialize();
+extern void __RSCharacterSetInitialize();
 //extern void __RSBaseHeapInitialize();
 extern void __RSUUIDInitialize();
 extern void __RSRunLoopInitialize();
@@ -1096,6 +1097,7 @@ RSExport __RS_INIT_ROUTINE(RSRuntimePriority) void RSCoreFoundationInitialize()
     __RSDataInitialize();       //  17   data
     __RSUUIDInitialize();       //  18
     __RSErrorInitialize();      //  19
+    __RSCharacterSetInitialize();
     
     __RSRuntimeClassTableCount = 22;
     
@@ -1158,6 +1160,7 @@ extern void __RSFileManagerDeallocate();
 extern void __RSSocketDeallocate();
 extern void __RSBundleDeallocate();
 extern void __RSArchiverDeallocate();
+extern void __RSCharacterSetDeallocate();
 
 void RSCoreFoundationDeallocate() __RS_FINAL_ROUTINE(RSRuntimePriority);
 
@@ -1174,6 +1177,7 @@ void RSCoreFoundationDeallocate()
     __RSErrorDeallocate();
     __RSTimeZoneDeallocate();   // deallocate RSTimeZone (known time zones information)
     __RSAutoreleasePoolDeallocate();
+    __RSCharacterSetDeallocate();
     RSStringCacheRelease();     // deallocate RSString automatically memory.
     
     for (RSIndex idx = 0; idx < NUM_EXTERN_TABLES; idx++)

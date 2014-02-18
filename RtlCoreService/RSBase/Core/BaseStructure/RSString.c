@@ -4066,15 +4066,28 @@ RSInline RSStringRef __RSStringDescriptionEx(RSTypeRef rs) {
         RSStringAppendCString(tmp, "\"", RSStringEncodingASCII);
         description = RSCopy(RSAllocatorSystemDefault, tmp);
         RSRelease(tmp);
+        
         return description;
     }
-    return RSRetain(_RSEmptyStringWithQuotationMask);
+    return RSCopy(RSAllocatorSystemDefault, rs);
+}
+
+RSExport RSStringRef RSStringCopyDetailDescription(RSStringRef str) {
+    if (nil == str || (RSStringRef)RSNil == str) {
+        return RSRetain(_RSEmptyString);
+    }
+    __RSGenericValidInstance(str, __RSStringTypeID);
+    if (__RSStrLength(str)) {
+        return __RSStringDescriptionEx(str);
+    }
+    return RSRetain(_RSEmptyString);
 }
 
 static RSStringRef __RSStringDescription(RSTypeRef rs) {
     if (__RSStrLength(rs))
     {
         return RSCopy(RSAllocatorSystemDefault, rs);
+//        return __RSStringDescriptionEx(rs);
     }
     return RSRetain(_RSEmptyString);
 }

@@ -619,29 +619,29 @@ static void __RSCSetGetBitmap(RSCharacterSetRef cset, uint8_t *bits) {
     }
 }
 
-static BOOL __RSCharacterSetEqual(RSTypeRef cf1, RSTypeRef cf2);
+static BOOL __RSCharacterSetClassEqual(RSTypeRef rs1, RSTypeRef rs2);
 
-static BOOL __RSCSetIsEqualAnnex(RSCharacterSetRef cf1, RSCharacterSetRef cf2) {
+static BOOL __RSCSetIsEqualAnnex(RSCharacterSetRef rs1, RSCharacterSetRef rs2) {
     RSCharacterSetRef subSet1;
     RSCharacterSetRef subSet2;
-    BOOL isAnnexInvertStateIdentical = (__RSCSetAnnexIsInverted(cf1) == __RSCSetAnnexIsInverted(cf2) ? YES: NO);
+    BOOL isAnnexInvertStateIdentical = (__RSCSetAnnexIsInverted(rs1) == __RSCSetAnnexIsInverted(rs2) ? YES: NO);
     int idx;
     
     if (isAnnexInvertStateIdentical) {
-        if (__RSCSetAnnexValidEntriesBitmap(cf1) != __RSCSetAnnexValidEntriesBitmap(cf2)) return NO;
+        if (__RSCSetAnnexValidEntriesBitmap(rs1) != __RSCSetAnnexValidEntriesBitmap(rs2)) return NO;
         for (idx = 1;idx <= MAX_ANNEX_PLANE;idx++) {
-            subSet1 = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(cf1, idx);
-            subSet2 = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(cf2, idx);
+            subSet1 = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(rs1, idx);
+            subSet2 = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(rs2, idx);
             
-            if (subSet1 && !__RSCharacterSetEqual(subSet1, subSet2)) return NO;
+            if (subSet1 && !__RSCharacterSetClassEqual(subSet1, subSet2)) return NO;
         }
     } else {
         uint8_t bitsBuf[__RSBitmapSize];
         uint8_t bitsBuf2[__RSBitmapSize];
         
         for (idx = 1;idx <= MAX_ANNEX_PLANE;idx++) {
-            subSet1 = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(cf1, idx);
-            subSet2 = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(cf2, idx);
+            subSet1 = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(rs1, idx);
+            subSet2 = __RSCSetGetAnnexPlaneCharacterSetNoAlloc(rs2, idx);
             
             if (subSet1 == nil && subSet2 == nil) {
                 return NO;
@@ -936,9 +936,9 @@ static RSSpinLock __RSCharacterSetLock = RSSpinLockInit;
 
 /* RSBase API functions
  */
-static BOOL __RSCharacterSetEqual(RSTypeRef cf1, RSTypeRef cf2) {
-    BOOL isInvertStateIdentical = (__RSCSetIsInverted((RSCharacterSetRef)cf1) == __RSCSetIsInverted((RSCharacterSetRef)cf2) ? YES: NO);
-    BOOL isAnnexInvertStateIdentical = (__RSCSetAnnexIsInverted((RSCharacterSetRef)cf1) == __RSCSetAnnexIsInverted((RSCharacterSetRef)cf2) ? YES: NO);
+static BOOL __RSCharacterSetClassEqual(RSTypeRef rs1, RSTypeRef rs2) {
+    BOOL isInvertStateIdentical = (__RSCSetIsInverted((RSCharacterSetRef)rs1) == __RSCSetIsInverted((RSCharacterSetRef)rs2) ? YES: NO);
+    BOOL isAnnexInvertStateIdentical = (__RSCSetAnnexIsInverted((RSCharacterSetRef)rs1) == __RSCSetAnnexIsInverted((RSCharacterSetRef)rs2) ? YES: NO);
     RSIndex idx;
     RSCharacterSetRef subSet1;
     uint8_t bitsBuf[__RSBitmapSize];
@@ -946,22 +946,22 @@ static BOOL __RSCharacterSetEqual(RSTypeRef cf1, RSTypeRef cf2) {
     BOOL isBitmap1;
     BOOL isBitmap2;
     
-    if (__RSCSetHasHashValue((RSCharacterSetRef)cf1) && __RSCSetHasHashValue((RSCharacterSetRef)cf2) && ((RSCharacterSetRef)cf1)->_hashValue != ((RSCharacterSetRef)cf2)->_hashValue) return NO;
-    if (__RSCSetIsEmpty((RSCharacterSetRef)cf1) && __RSCSetIsEmpty((RSCharacterSetRef)cf2) && !isInvertStateIdentical) return NO;
+    if (__RSCSetHasHashValue((RSCharacterSetRef)rs1) && __RSCSetHasHashValue((RSCharacterSetRef)rs2) && ((RSCharacterSetRef)rs1)->_hashValue != ((RSCharacterSetRef)rs2)->_hashValue) return NO;
+    if (__RSCSetIsEmpty((RSCharacterSetRef)rs1) && __RSCSetIsEmpty((RSCharacterSetRef)rs2) && !isInvertStateIdentical) return NO;
     
-    if (__RSCSetClassType((RSCharacterSetRef)cf1) == __RSCSetClassType((RSCharacterSetRef)cf2)) { // Types are identical, we can do it fast
-        switch (__RSCSetClassType((RSCharacterSetRef)cf1)) {
+    if (__RSCSetClassType((RSCharacterSetRef)rs1) == __RSCSetClassType((RSCharacterSetRef)rs2)) { // Types are identical, we can do it fast
+        switch (__RSCSetClassType((RSCharacterSetRef)rs1)) {
             case __RSCharSetClassBuiltin:
-                return (__RSCSetBuiltinType((RSCharacterSetRef)cf1) == __RSCSetBuiltinType((RSCharacterSetRef)cf2) && isInvertStateIdentical ? YES : NO);
+                return (__RSCSetBuiltinType((RSCharacterSetRef)rs1) == __RSCSetBuiltinType((RSCharacterSetRef)rs2) && isInvertStateIdentical ? YES : NO);
                 
             case __RSCharSetClassRange:
-                return (__RSCSetRangeFirstChar((RSCharacterSetRef)cf1) == __RSCSetRangeFirstChar((RSCharacterSetRef)cf2) && __RSCSetRangeLength((RSCharacterSetRef)cf1) && __RSCSetRangeLength((RSCharacterSetRef)cf2) && isInvertStateIdentical ? YES : NO);
+                return (__RSCSetRangeFirstChar((RSCharacterSetRef)rs1) == __RSCSetRangeFirstChar((RSCharacterSetRef)rs2) && __RSCSetRangeLength((RSCharacterSetRef)rs1) && __RSCSetRangeLength((RSCharacterSetRef)rs2) && isInvertStateIdentical ? YES : NO);
                 
             case __RSCharSetClassString:
-                if (__RSCSetStringLength((RSCharacterSetRef)cf1) == __RSCSetStringLength((RSCharacterSetRef)cf2) && isInvertStateIdentical) {
-                    const UniChar *buf1 = __RSCSetStringBuffer((RSCharacterSetRef)cf1);
-                    const UniChar *buf2 = __RSCSetStringBuffer((RSCharacterSetRef)cf2);
-                    RSIndex length = __RSCSetStringLength((RSCharacterSetRef)cf1);
+                if (__RSCSetStringLength((RSCharacterSetRef)rs1) == __RSCSetStringLength((RSCharacterSetRef)rs2) && isInvertStateIdentical) {
+                    const UniChar *buf1 = __RSCSetStringBuffer((RSCharacterSetRef)rs1);
+                    const UniChar *buf2 = __RSCSetStringBuffer((RSCharacterSetRef)rs2);
+                    RSIndex length = __RSCSetStringLength((RSCharacterSetRef)rs1);
                     
                     while (length--) if (*buf1++ != *buf2++) return NO;
                 } else {
@@ -970,16 +970,16 @@ static BOOL __RSCharacterSetEqual(RSTypeRef cf1, RSTypeRef cf2) {
                 break;
                 
             case __RSCharSetClassBitmap:
-                if (!__RSCSetIsEqualBitmap((const UInt32 *)__RSCSetBitmapBits((RSCharacterSetRef)cf1), (const UInt32 *)__RSCSetBitmapBits((RSCharacterSetRef)cf2))) return NO;
+                if (!__RSCSetIsEqualBitmap((const UInt32 *)__RSCSetBitmapBits((RSCharacterSetRef)rs1), (const UInt32 *)__RSCSetBitmapBits((RSCharacterSetRef)rs2))) return NO;
                 break;
         }
-        return __RSCSetIsEqualAnnex((RSCharacterSetRef)cf1, (RSCharacterSetRef)cf2);
+        return __RSCSetIsEqualAnnex((RSCharacterSetRef)rs1, (RSCharacterSetRef)rs2);
     }
     
     // Check for easy empty cases
-    if (__RSCSetIsEmpty((RSCharacterSetRef)cf1) || __RSCSetIsEmpty((RSCharacterSetRef)cf2)) {
-        RSCharacterSetRef emptySet = (__RSCSetIsEmpty((RSCharacterSetRef)cf1) ? (RSCharacterSetRef)cf1 : (RSCharacterSetRef)cf2);
-        RSCharacterSetRef nonEmptySet = (emptySet == cf1 ? (RSCharacterSetRef)cf2 : (RSCharacterSetRef)cf1);
+    if (__RSCSetIsEmpty((RSCharacterSetRef)rs1) || __RSCSetIsEmpty((RSCharacterSetRef)rs2)) {
+        RSCharacterSetRef emptySet = (__RSCSetIsEmpty((RSCharacterSetRef)rs1) ? (RSCharacterSetRef)rs1 : (RSCharacterSetRef)rs2);
+        RSCharacterSetRef nonEmptySet = (emptySet == rs1 ? (RSCharacterSetRef)rs2 : (RSCharacterSetRef)rs1);
         
         if (__RSCSetIsBuiltin(nonEmptySet)) {
             return NO;
@@ -1022,9 +1022,9 @@ static BOOL __RSCharacterSetEqual(RSTypeRef cf1, RSTypeRef cf2) {
         }
     }
     
-    if (__RSCSetIsBuiltin((RSCharacterSetRef)cf1) || __RSCSetIsBuiltin((RSCharacterSetRef)cf2)) {
-        RSCharacterSetRef builtinSet = (__RSCSetIsBuiltin((RSCharacterSetRef)cf1) ? (RSCharacterSetRef)cf1 : (RSCharacterSetRef)cf2);
-        RSCharacterSetRef nonBuiltinSet = (builtinSet == cf1 ? (RSCharacterSetRef)cf2 : (RSCharacterSetRef)cf1);
+    if (__RSCSetIsBuiltin((RSCharacterSetRef)rs1) || __RSCSetIsBuiltin((RSCharacterSetRef)rs2)) {
+        RSCharacterSetRef builtinSet = (__RSCSetIsBuiltin((RSCharacterSetRef)rs1) ? (RSCharacterSetRef)rs1 : (RSCharacterSetRef)rs2);
+        RSCharacterSetRef nonBuiltinSet = (builtinSet == rs1 ? (RSCharacterSetRef)rs2 : (RSCharacterSetRef)rs1);
         
         
         if (__RSCSetIsRange(nonBuiltinSet)) {
@@ -1133,9 +1133,9 @@ static BOOL __RSCharacterSetEqual(RSTypeRef cf1, RSTypeRef cf2) {
         }
     }
     
-    if (__RSCSetIsRange((RSCharacterSetRef)cf1) || __RSCSetIsRange((RSCharacterSetRef)cf2)) {
-        RSCharacterSetRef rangeSet = (__RSCSetIsRange((RSCharacterSetRef)cf1) ? (RSCharacterSetRef)cf1 : (RSCharacterSetRef)cf2);
-        RSCharacterSetRef nonRangeSet = (rangeSet == cf1 ? (RSCharacterSetRef)cf2 : (RSCharacterSetRef)cf1);
+    if (__RSCSetIsRange((RSCharacterSetRef)rs1) || __RSCSetIsRange((RSCharacterSetRef)rs2)) {
+        RSCharacterSetRef rangeSet = (__RSCSetIsRange((RSCharacterSetRef)rs1) ? (RSCharacterSetRef)rs1 : (RSCharacterSetRef)rs2);
+        RSCharacterSetRef nonRangeSet = (rangeSet == rs1 ? (RSCharacterSetRef)rs2 : (RSCharacterSetRef)rs1);
         UTF32Char firstChar = __RSCSetRangeFirstChar(rangeSet);
         UTF32Char lastChar = (RSBitU32)(firstChar + __RSCSetRangeLength(rangeSet) - 1);
         uint8_t firstPlane = (firstChar >> 16) & 0xFF;
@@ -1195,62 +1195,62 @@ static BOOL __RSCharacterSetEqual(RSTypeRef cf1, RSTypeRef cf2) {
         return YES;
     }
     
-    isBitmap1 = __RSCSetIsBitmap((RSCharacterSetRef)cf1);
-    isBitmap2 = __RSCSetIsBitmap((RSCharacterSetRef)cf2);
+    isBitmap1 = __RSCSetIsBitmap((RSCharacterSetRef)rs1);
+    isBitmap2 = __RSCSetIsBitmap((RSCharacterSetRef)rs2);
     
     if (isBitmap1 && isBitmap2) {
-        if (!__RSCSetIsEqualBitmap((const UInt32 *)__RSCSetBitmapBits((RSCharacterSetRef)cf1), (const UInt32 *)__RSCSetBitmapBits((RSCharacterSetRef)cf2))) return NO;
+        if (!__RSCSetIsEqualBitmap((const UInt32 *)__RSCSetBitmapBits((RSCharacterSetRef)rs1), (const UInt32 *)__RSCSetBitmapBits((RSCharacterSetRef)rs2))) return NO;
     } else if (!isBitmap1 && !isBitmap2) {
         uint8_t bitsBuf2[__RSBitmapSize];
         
-        __RSCSetGetBitmap((RSCharacterSetRef)cf1, bitsBuf);
-        __RSCSetGetBitmap((RSCharacterSetRef)cf2, bitsBuf2);
+        __RSCSetGetBitmap((RSCharacterSetRef)rs1, bitsBuf);
+        __RSCSetGetBitmap((RSCharacterSetRef)rs2, bitsBuf2);
         
         if (!__RSCSetIsEqualBitmap((const UInt32*)bitsBuf, (const UInt32*)bitsBuf2)) {
             return NO;
         }
     } else {
         if (isBitmap2) {
-            RSCharacterSetRef tmp = (RSCharacterSetRef)cf2;
-            cf2 = cf1;
-            cf1 = tmp;
+            RSCharacterSetRef tmp = (RSCharacterSetRef)rs2;
+            rs2 = rs1;
+            rs1 = tmp;
         }
         
-        __RSCSetGetBitmap((RSCharacterSetRef)cf2, bitsBuf);
+        __RSCSetGetBitmap((RSCharacterSetRef)rs2, bitsBuf);
         
-        if (!__RSCSetIsEqualBitmap((const UInt32 *)__RSCSetBitmapBits((RSCharacterSetRef)cf1), (const UInt32 *)bitsBuf)) return NO;
+        if (!__RSCSetIsEqualBitmap((const UInt32 *)__RSCSetBitmapBits((RSCharacterSetRef)rs1), (const UInt32 *)bitsBuf)) return NO;
     }
-    return __RSCSetIsEqualAnnex((RSCharacterSetRef)cf1, (RSCharacterSetRef)cf2);
+    return __RSCSetIsEqualAnnex((RSCharacterSetRef)rs1, (RSCharacterSetRef)rs2);
 }
 
-static RSHashCode __RSCharacterSetHash(RSTypeRef cf) {
-    if (!__RSCSetHasHashValue((RSCharacterSetRef)cf)) {
-        if (__RSCSetIsEmpty((RSCharacterSetRef)cf)) {
-            ((RSMutableCharacterSetRef)cf)->_hashValue = (__RSCSetIsInverted((RSCharacterSetRef)cf) ? ((UInt32)0xFFFFFFFF) : 0);
-        } else if (__RSCSetIsBitmap( (RSCharacterSetRef) cf  )) {
-            ((RSMutableCharacterSetRef)cf)->_hashValue = RSHashBytes(__RSCSetBitmapBits((RSCharacterSetRef)cf), __RSBitmapSize);
+static RSHashCode __RSCharacterSetClassHash(RSTypeRef rs) {
+    if (!__RSCSetHasHashValue((RSCharacterSetRef)rs)) {
+        if (__RSCSetIsEmpty((RSCharacterSetRef)rs)) {
+            ((RSMutableCharacterSetRef)rs)->_hashValue = (__RSCSetIsInverted((RSCharacterSetRef)rs) ? ((UInt32)0xFFFFFFFF) : 0);
+        } else if (__RSCSetIsBitmap( (RSCharacterSetRef) rs  )) {
+            ((RSMutableCharacterSetRef)rs)->_hashValue = RSHashBytes(__RSCSetBitmapBits((RSCharacterSetRef)rs), __RSBitmapSize);
         } else {
             uint8_t bitsBuf[__RSBitmapSize];
-            __RSCSetGetBitmap((RSCharacterSetRef)cf, bitsBuf);
-            ((RSMutableCharacterSetRef)cf)->_hashValue = RSHashBytes(bitsBuf, __RSBitmapSize);
+            __RSCSetGetBitmap((RSCharacterSetRef)rs, bitsBuf);
+            ((RSMutableCharacterSetRef)rs)->_hashValue = RSHashBytes(bitsBuf, __RSBitmapSize);
         }
-        __RSCSetPutHasHashValue((RSMutableCharacterSetRef)cf, YES);
+        __RSCSetPutHasHashValue((RSMutableCharacterSetRef)rs, YES);
     }
-    return ((RSCharacterSetRef)cf)->_hashValue;
+    return ((RSCharacterSetRef)rs)->_hashValue;
 }
 
-static RSStringRef  __RSCharacterSetCopyDescription(RSTypeRef cf) {
+static RSStringRef  __RSCharacterSetClassDescription(RSTypeRef rs) {
     RSMutableStringRef string;
     RSIndex idx;
     RSIndex length;
     
-    if (__RSCSetIsEmpty((RSCharacterSetRef)cf)) {
-        return (RSStringRef)(__RSCSetIsInverted((RSCharacterSetRef)cf) ? RSRetain(RSSTR("<RSCharacterSet All>")) : RSRetain(RSSTR("<RSCharacterSet Empty>")));
+    if (__RSCSetIsEmpty((RSCharacterSetRef)rs)) {
+        return (RSStringRef)(__RSCSetIsInverted((RSCharacterSetRef)rs) ? RSRetain(RSSTR("<RSCharacterSet All>")) : RSRetain(RSSTR("<RSCharacterSet Empty>")));
     }
     
-    switch (__RSCSetClassType((RSCharacterSetRef)cf)) {
+    switch (__RSCSetClassType((RSCharacterSetRef)rs)) {
         case __RSCharSetClassBuiltin:
-            switch (__RSCSetBuiltinType((RSCharacterSetRef)cf)) {
+            switch (__RSCSetBuiltinType((RSCharacterSetRef)rs)) {
                 case RSCharacterSetControl: return (RSStringRef)RSRetain(RSSTR("<RSCharacterSet Predefined Control Set>"));
                 case RSCharacterSetWhitespace : return (RSStringRef)RSRetain(RSSTR("<RSCharacterSet Predefined Whitespace Set>"));
                 case RSCharacterSetWhitespaceAndNewline: return (RSStringRef)RSRetain(RSSTR("<RSCharacterSet Predefined WhitespaceAndNewline Set>"));
@@ -1270,16 +1270,16 @@ static RSStringRef  __RSCharacterSetCopyDescription(RSTypeRef cf) {
             break;
             
         case __RSCharSetClassRange:
-            return RSStringCreateWithFormat(RSGetAllocator((RSCharacterSetRef)cf), RSSTR("<RSCharacterSet Range(%d, %d)>"), __RSCSetRangeFirstChar((RSCharacterSetRef)cf), __RSCSetRangeLength((RSCharacterSetRef)cf));
+            return RSStringCreateWithFormat(RSGetAllocator((RSCharacterSetRef)rs), RSSTR("<RSCharacterSet Range(%d, %d)>"), __RSCSetRangeFirstChar((RSCharacterSetRef)rs), __RSCSetRangeLength((RSCharacterSetRef)rs));
             
         case __RSCharSetClassString: {
             RSStringRef format = RSSTR("<RSCharacterSet Items(");
             
-            length = __RSCSetStringLength((RSCharacterSetRef)cf);
-            string = RSStringCreateMutable(RSGetAllocator(cf), RSStringGetLength(format) + 7 * length + 2); // length of format + "U+XXXX "(7) * length + ")>"(2)
+            length = __RSCSetStringLength((RSCharacterSetRef)rs);
+            string = RSStringCreateMutable(RSGetAllocator(rs), RSStringGetLength(format) + 7 * length + 2); // length of format + "U+XXXX "(7) * length + ")>"(2)
             RSStringAppendString(string, format);
             for (idx = 0;idx < length;idx++) {
-                RSStringAppendStringWithFormat(string, RSSTR("%sU+%04X"), (idx > 0 ? " " : ""), (UInt32)((__RSCSetStringBuffer((RSCharacterSetRef)cf))[idx]));
+                RSStringAppendStringWithFormat(string, RSSTR("%sU+%04X"), (idx > 0 ? " " : ""), (UInt32)((__RSCSetStringBuffer((RSCharacterSetRef)rs))[idx]));
             }
             RSStringAppendString(string, RSSTR(")>"));
             return string;
@@ -1293,21 +1293,21 @@ static RSStringRef  __RSCharacterSetCopyDescription(RSTypeRef cf) {
     return nil;
 }
 
-static void __RSCharacterSetDeallocate(RSTypeRef cf) {
-    RSAllocatorRef allocator = RSGetAllocator(cf);
+static void __RSCharacterSetClassDeallocate(RSTypeRef rs) {
+    RSAllocatorRef allocator = RSGetAllocator(rs);
     
-    if (__RSCSetIsBuiltin((RSCharacterSetRef)cf) && !__RSCSetIsMutable((RSCharacterSetRef)cf) && !__RSCSetIsInverted((RSCharacterSetRef)cf)) {
-        RSCharacterSetRef sharedSet = RSCharacterSetGetPredefined(__RSCSetBuiltinType((RSCharacterSetRef)cf));
-        if (sharedSet == cf) { // We're trying to dealloc the builtin set
-            RSAssert1(0, __RSLogAssertion, "%s: Trying to deallocate predefined set. The process is likely to crash.", __PRETTY_FUNCTION__);
-            return; // We never deallocate builtin set
-        }
-    }
+//    if (__RSCSetIsBuiltin((RSCharacterSetRef)rs) && !__RSCSetIsMutable((RSCharacterSetRef)rs) && !__RSCSetIsInverted((RSCharacterSetRef)rs)) {
+//        RSCharacterSetRef sharedSet = RSCharacterSetGetPredefined(__RSCSetBuiltinType((RSCharacterSetRef)rs));
+//        if (sharedSet == rs) { // We're trying to dealloc the builtin set
+//            RSAssert1(0, __RSLogAssertion, "%s: Trying to deallocate predefined set. The process is likely to crash.", __PRETTY_FUNCTION__);
+//            return; // We never deallocate builtin set
+//        }
+//    }
     
-    if (__RSCSetIsString((RSCharacterSetRef)cf) && __RSCSetStringBuffer((RSCharacterSetRef)cf)) RSAllocatorDeallocate(allocator, __RSCSetStringBuffer((RSCharacterSetRef)cf));
-    else if (__RSCSetIsBitmap((RSCharacterSetRef)cf) && __RSCSetBitmapBits((RSCharacterSetRef)cf)) RSAllocatorDeallocate(allocator, __RSCSetBitmapBits((RSCharacterSetRef)cf));
-    else if (__RSCSetIsCompactBitmap((RSCharacterSetRef)cf) && __RSCSetCompactBitmapBits((RSCharacterSetRef)cf)) RSAllocatorDeallocate(allocator, __RSCSetCompactBitmapBits((RSCharacterSetRef)cf));
-    __RSCSetDeallocateAnnexPlane((RSCharacterSetRef)cf);
+    if (__RSCSetIsString((RSCharacterSetRef)rs) && __RSCSetStringBuffer((RSCharacterSetRef)rs)) RSAllocatorDeallocate(allocator, __RSCSetStringBuffer((RSCharacterSetRef)rs));
+    else if (__RSCSetIsBitmap((RSCharacterSetRef)rs) && __RSCSetBitmapBits((RSCharacterSetRef)rs)) RSAllocatorDeallocate(allocator, __RSCSetBitmapBits((RSCharacterSetRef)rs));
+    else if (__RSCSetIsCompactBitmap((RSCharacterSetRef)rs) && __RSCSetCompactBitmapBits((RSCharacterSetRef)rs)) RSAllocatorDeallocate(allocator, __RSCSetCompactBitmapBits((RSCharacterSetRef)rs));
+    __RSCSetDeallocateAnnexPlane((RSCharacterSetRef)rs);
 }
 
 static RSTypeID __RSCharacterSetTypeID = _RSRuntimeNotATypeID;
@@ -1318,15 +1318,36 @@ static const RSRuntimeClass __RSCharacterSetClass = {
     "RSCharacterSet",
     nil,      // init
     nil,      // copy
-    __RSCharacterSetDeallocate,
-    __RSCharacterSetEqual,
-    __RSCharacterSetHash,
-    __RSCharacterSetCopyDescription
+    __RSCharacterSetClassDeallocate,
+    __RSCharacterSetClassEqual,
+    __RSCharacterSetClassHash,
+    __RSCharacterSetClassDescription
 };
 
 static BOOL __RSCheckForExapendedSet = NO;
+RSPrivate void __RSCharacterSetDeallocate() {
+    RSSpinLockLock(&__RSCharacterSetLock);
+    if (!__RSBuiltinSets) {
+        RSSpinLockUnlock(&__RSCharacterSetLock);
+        return;
+    }
+    for (RSUInteger idx = 0; idx < __RSLastBuiltinSetID; idx++) {
+        __RSRuntimeSetInstanceSpecial(__RSBuiltinSets[idx], NO);
+    }
+    RSSpinLockUnlock(&__RSCharacterSetLock);
+    
+    for (RSUInteger idx = 0; idx < __RSLastBuiltinSetID; idx++) {
+        RSRelease(__RSBuiltinSets[idx]);
+        __RSBuiltinSets[idx] = nil;
+    }
+    
+    RSSpinLockLock(&__RSCharacterSetLock);
+    RSAllocatorDeallocate(RSAllocatorSystemDefault, __RSBuiltinSets);
+    __RSBuiltinSets = nil;
+    RSSpinLockUnlock(&__RSCharacterSetLock);
+}
 
-__private_extern__ void __RSCharacterSetInitialize(void) {
+RSPrivate void __RSCharacterSetInitialize(void) {
     const char *checkForExpandedSet = __RSRuntimeGetEnvironment("__RS_DEBUG_EXPANDED_SET");
     
     __RSCharacterSetTypeID = __RSRuntimeRegisterClass(&__RSCharacterSetClass);
@@ -1360,10 +1381,10 @@ RSCharacterSetRef RSCharacterSetGetPredefined(RSCharacterSetPredefinedSet theSet
     
     RSSpinLockLock(&__RSCharacterSetLock);
     if (!__RSBuiltinSets) {
-        __RSBuiltinSets = (RSCharacterSetRef *)RSAllocatorAllocate((RSAllocatorRef)RSRetain(RSAllocatorGetDefault()), sizeof(RSCharacterSetRef) * __RSLastBuiltinSetID);
+        __RSBuiltinSets = (RSCharacterSetRef *)RSAllocatorAllocate(RSAllocatorSystemDefault, sizeof(RSCharacterSetRef) * __RSLastBuiltinSetID);
         memset(__RSBuiltinSets, 0, sizeof(RSCharacterSetRef) * __RSLastBuiltinSetID);
     }
-    
+    __RSRuntimeSetInstanceSpecial(cset, YES);
     __RSBuiltinSets[theSetIdentifier - 1] = cset;
     RSSpinLockUnlock(&__RSCharacterSetLock);
     
@@ -1847,7 +1868,7 @@ BOOL RSCharacterSetIsSupersetOfSet(RSCharacterSetRef theSet, RSCharacterSetRef t
     
     copy = RSCharacterSetCreateMutableCopy(RSAllocatorSystemDefault, theSet);
     RSCharacterSetIntersect(copy, theOtherSet);
-    result = __RSCharacterSetEqual(copy, theOtherSet);
+    result = __RSCharacterSetClassEqual(copy, theOtherSet);
     RSRelease(copy);
     
     return result;

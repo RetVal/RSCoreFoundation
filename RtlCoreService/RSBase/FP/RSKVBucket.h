@@ -13,7 +13,7 @@
 
 RS_EXTERN_C_BEGIN
 
-typedef struct __RSKVBucket *RSKVBucketRef;
+typedef const struct __RSKVBucket *RSKVBucketRef;
 
 RSExport RSTypeID RSKVBucketGetTypeID();
 RSExport RSKVBucketRef RSKVBucketCreate(RSAllocatorRef allocator, RSTypeRef key, RSTypeRef value);

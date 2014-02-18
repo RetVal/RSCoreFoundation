@@ -378,7 +378,7 @@ extern RSUInteger RSRunLoopRunSpecific(RSRunLoopRef rl, RSStringRef modeName, RS
 #define __RSMax(A,B) ((A) > (B) ? (A) : (B))
 #endif /* __GNUC__ */
 
-#include "RSCharacterSet.h"
+#include <RSCoreFoundation/RSCharacterSet.h>
 
 typedef struct {
     RSCharacterSetRef cset;

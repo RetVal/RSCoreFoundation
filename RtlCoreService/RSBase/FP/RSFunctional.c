@@ -7,12 +7,18 @@
 //
 
 #include <RSCoreFoundation/RSFunctional.h>
+#include <RSCoreFoundation/RSKVBucket.h>
 #include <RSCoreFoundation/RSRuntime.h>
 
 #pragma mark -
 #pragma mark Map API Group
 
 static RSArrayRef __RSMapArray(RSArrayRef coll, RSTypeRef (^fn)(RSTypeRef obj)) {
+    if (RSArrayGetCount(coll) > 4096) {
+        return RSAutorelease(RSPerformBlockConcurrentCopyResults(RSArrayGetCount(coll), ^RSTypeRef(RSIndex idx) {
+            return fn(RSArrayObjectAtIndex(coll, idx));
+        }));
+    }
     RSMutableArrayRef result = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
     RSArrayApplyBlock(coll, RSMakeRange(0, RSArrayGetCount(coll)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
         RSTypeRef obj = fn(value);
@@ -41,9 +47,30 @@ static RSSetRef __RSMapSet(RSSetRef coll, RSTypeRef (^fn)(RSTypeRef obj)) {
     return RSAutorelease(result);
 }
 
+static RSBagRef __RSMapBag(RSBagRef coll, RSTypeRef (^fn)(RSTypeRef obj)) {
+    RSMutableBagRef result = RSBagCreateMutable(RSAllocatorSystemDefault, RSBagGetCount(coll), &RSTypeBagCallBacks);
+    RSBagApplyBlock(coll, ^(const void *value, BOOL *stop) {
+        RSBagAddValue(result, fn(value));
+    });
+    return RSAutorelease(result);
+}
+
+static RSSetRef __RSMapDictionary(RSDictionaryRef coll, RSTypeRef (^fn)(RSTypeRef obj)) {
+    RSMutableArrayRef result = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
+    RSDictionaryApplyBlock(coll, ^(const void *key, const void *value, BOOL *stop) {
+        RSKVBucketRef bucket = RSKVBucketCreate(RSAllocatorSystemDefault, key, value);
+        RSArrayAddObject(result, fn(bucket));
+        RSRelease(bucket);
+    });
+    return RSAutorelease(result);
+}
+
 RSExport RSCollectionRef RSMap(RSCollectionRef coll, RSTypeRef (^fn)(RSTypeRef obj)) {
     if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSArray"))) return __RSMapArray(coll, fn);
     else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSList"))) return __RSReverseList(__RSMapList(coll, fn));
+    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSDictionary"))) return __RSMapDictionary(coll, fn);
+    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSSet"))) return __RSMapSet(coll, fn);
+    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSBag"))) return __RSMapBag(coll, fn);
     return nil;
 }
 
@@ -60,7 +87,7 @@ static RSTypeRef __RSReduceArray(RSArrayRef coll, RSTypeRef (^fn)(RSTypeRef a, R
     
     RSAutoreleaseBlock(^{
         RSArrayApplyBlock(coll, RSMakeRange(1, RSArrayGetCount(coll) - 1), ^(const void *value, RSUInteger idx, BOOL *isStop) {
-            result = RSAutorelease(fn(result, value));
+            result = fn(result, value);
         });
         RSRetain(result);
     });
@@ -138,9 +165,41 @@ static RSListRef __RSFilterList(RSListRef coll, BOOL (^pred)(RSTypeRef x)) {
     return rst;
 }
 
+static RSSetRef __RSFilterSet(RSSetRef coll, BOOL (^pred)(RSTypeRef obj)) {
+    RSMutableSetRef result = RSSetCreateMutable(RSAllocatorSystemDefault, RSSetGetCount(coll), &RSTypeSetCallBacks);
+    RSSetApplyBlock(coll, ^(const void *value, BOOL *stop) {
+        if(pred(value))
+        	RSSetAddValue(result, value);
+    });
+    return RSAutorelease(result);
+}
+
+static RSBagRef __RSFilterBag(RSBagRef coll, BOOL (^pred)(RSTypeRef obj)) {
+    RSMutableBagRef result = RSBagCreateMutable(RSAllocatorSystemDefault, RSBagGetCount(coll), &RSTypeBagCallBacks);
+    RSBagApplyBlock(coll, ^(const void *value, BOOL *stop) {
+        if (pred(value))
+            RSBagAddValue(result, value);
+    });
+    return RSAutorelease(result);
+}
+
+static RSSetRef __RSFilterDictionary(RSDictionaryRef coll, BOOL (^pred)(RSTypeRef obj)) {
+    RSMutableArrayRef result = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
+    RSDictionaryApplyBlock(coll, ^(const void *key, const void *value, BOOL *stop) {
+        RSKVBucketRef bucket = RSKVBucketCreate(RSAllocatorSystemDefault, key, value);
+        if (pred(bucket))
+            RSArrayAddObject(result, bucket);
+        RSRelease(bucket);
+    });
+    return RSAutorelease(result);
+}
+
 RSExport RSCollectionRef RSFilter(RSCollectionRef coll, BOOL (^pred)(RSTypeRef x)) {
     if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSArray"))) return __RSFilterArray(coll, pred);
     else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSList"))) return __RSFilterList(coll, pred);
+    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSDictionary"))) return __RSFilterDictionary(coll, pred);
+    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSSet"))) return __RSFilterSet(coll, pred);
+    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSBag"))) return __RSFilterBag(coll, pred);
     return nil;
 }
 
@@ -163,9 +222,16 @@ static RSListRef __RSDropList(RSListRef coll, RSIndex n) {
     return RSAutorelease(rst);
 }
 
+static RSStringRef __RSDropString(RSStringRef coll, RSIndex n) {
+    RSMutableStringRef s = RSMutableCopy(RSAllocatorSystemDefault, coll);
+    RSStringDelete(s, RSMakeRange(0, n));
+    return RSAutorelease(s);
+}
+
 RSExport RSCollectionRef RSDrop(RSCollectionRef coll, RSIndex n) {
     if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSArray"))) return __RSDropArray(coll, n);
     else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSList"))) return __RSDropList(coll, n);
+    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSString"))) return __RSDropString(coll, n);
     return nil;
 }
 
@@ -239,13 +305,16 @@ RSExport RSCollectionRef RSMerge(RSCollectionRef a, RSCollectionRef b, ...) {
     return RSAutorelease(merge);
 }
 
-static RSClassRef listClass = nil, arrayClass = nil, dictionaryClass = nil, setClass = nil, bagClass = nil, stringClass = nil;
+static RSClassRef listClass = nil, arrayClass = nil, dictionaryClass = nil, setClass = nil, bagClass = nil, kvbCLass = nil, stringClass = nil;
 RSExport RSIndex RSCollPred(RSTypeRef coll) {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        listClass = RSClassGetWithUTF8String("RSList"), arrayClass = RSClassGetWithUTF8String("RSArray"), dictionaryClass = RSClassGetWithUTF8String("RSDictionary"), setClass = RSClassGetWithUTF8String("RSSet"), bagClass = RSClassGetWithUTF8String("RSBag"), stringClass = RSClassGetWithUTF8String("RSString");
+        RSListGetTypeID();
+        RSKVBucketGetTypeID();
+        RSBagGetTypeID();
+        listClass = RSClassGetWithUTF8String("RSList"), arrayClass = RSClassGetWithUTF8String("RSArray"), dictionaryClass = RSClassGetWithUTF8String("RSDictionary"), setClass = RSClassGetWithUTF8String("RSSet"), bagClass = RSClassGetWithUTF8String("RSBag"), kvbCLass = RSClassGetWithUTF8String("RSKVBucket"), stringClass = RSClassGetWithUTF8String("RSString");
     });
-    return RSInstanceIsMemberOfClass(coll, arrayClass) || RSInstanceIsMemberOfClass(coll, dictionaryClass) || RSInstanceIsMemberOfClass(coll, setClass) || RSInstanceIsMemberOfClass(coll, listClass) || RSInstanceIsMemberOfClass(coll, bagClass);
+    return RSInstanceIsMemberOfClass(coll, arrayClass) || RSInstanceIsMemberOfClass(coll, dictionaryClass) || RSInstanceIsMemberOfClass(coll, setClass) || RSInstanceIsMemberOfClass(coll, listClass) || RSInstanceIsMemberOfClass(coll, kvbCLass) || RSInstanceIsMemberOfClass(coll, bagClass);
 }
 
 RSExport RSIndex RSCount(RSTypeRef coll) {
@@ -256,6 +325,7 @@ RSExport RSIndex RSCount(RSTypeRef coll) {
         else if (RSInstanceIsMemberOfClass(coll, setClass)) return RSSetGetCount(coll);
         else if (RSInstanceIsMemberOfClass(coll, listClass)) return RSListGetCount(coll);
         else if (RSInstanceIsMemberOfClass(coll, bagClass)) return RSBagGetCount(coll);
+        else if (RSInstanceIsMemberOfClass(coll, kvbCLass)) return RSKVBucketGetKey(coll) && RSKVBucketGetValue(coll) ? 1 : 0;
     } else if (RSInstanceIsMemberOfClass(coll, stringClass)) {
         return RSStringGetLength(coll);
     }

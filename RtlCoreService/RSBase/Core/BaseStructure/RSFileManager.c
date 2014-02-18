@@ -910,6 +910,8 @@ RSExport RSStringRef __RSFileManagerStandardizingPath(RSStringRef path)
                 RSStringAppendString(returnPath, ___RSFileManagerGetFilePathDelimiterOperation(fmg));
             }
         }
+    } else if (!returnPath) {
+        return RSRetain(path);
     }
     return returnPath;
 }

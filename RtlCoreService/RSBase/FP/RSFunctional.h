@@ -13,6 +13,7 @@ RS_EXTERN_C_BEGIN
 #include <RSCoreFoundation/RSCoreFoundation.h>
 #include <RSCoreFoundation/RSList.h>
 #include <RSCoreFoundation/RSMultidimensionalDictionary.h>
+#include <RSCoreFoundation/RSKVBucket.h>
 
 typedef RSTypeRef RSCollectionRef;
 

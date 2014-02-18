@@ -122,6 +122,7 @@ RSExport BOOL RSNumberGetValue(RSNumberRef aNumber, void* value) RS_AVAILABLE(0_
 RSExport RSComparisonResult RSNumberCompare(RSNumberRef aNumber, RSNumberRef other, void *context) RS_AVAILABLE(0_0);
 
 RSExport BOOL RSNumberIsFloatType(RSNumberRef aNumber) RS_AVAILABLE(0_0);
+RSExport BOOL RSNumberIsIntegerType(RSNumberRef aNumber) RS_AVAILABLE(0_0);
 RSExport BOOL RSNumberIsBooleanType(RSNumberRef aNumber) RS_AVAILABLE(0_0);
 
 RS_EXTERN_C_END

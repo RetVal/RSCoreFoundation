@@ -17,7 +17,7 @@
 		304B3850186C36F300806E4B /* RSRegularExpression.c in Sources */ = {isa = PBXBuildFile; fileRef = 304B384E186C36F300806E4B /* RSRegularExpression.c */; };
 		304B3851186C36F300806E4B /* RSRegularExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 304B384F186C36F300806E4B /* RSRegularExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		305EC3B7189E14F00025E664 /* RSKVBucket.c in Sources */ = {isa = PBXBuildFile; fileRef = 305EC3B5189E14F00025E664 /* RSKVBucket.c */; };
-		305EC3B8189E14F00025E664 /* RSKVBucket.h in Headers */ = {isa = PBXBuildFile; fileRef = 305EC3B6189E14F00025E664 /* RSKVBucket.h */; };
+		305EC3B8189E14F00025E664 /* RSKVBucket.h in Headers */ = {isa = PBXBuildFile; fileRef = 305EC3B6189E14F00025E664 /* RSKVBucket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3098391E1868818400398AC3 /* RSRawHashTable.c in Sources */ = {isa = PBXBuildFile; fileRef = 3098391C1868818400398AC3 /* RSRawHashTable.c */; };
 		3098391F1868818400398AC3 /* RSRawHashTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 3098391D1868818400398AC3 /* RSRawHashTable.h */; };
 		30A15D3918A9C5170055B9A1 /* RSCoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4158D55A1625C4C60070E69F /* RSCoreFoundation.framework */; };
@@ -2563,6 +2563,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				305EC3B8189E14F00025E664 /* RSKVBucket.h in Headers */,
 				300CB714189932A6004298E2 /* RSFunctional.h in Headers */,
 				30A4B616189E029800DF6FA4 /* RSMultidimensionalDictionary.h in Headers */,
 				412C1B3917AF5CDC00F36F25 /* RSCharacterSet.h in Headers */,
@@ -2678,7 +2679,6 @@
 				41FE75971822B9A600E5E581 /* curlbuild.h in Headers */,
 				4170505C1647C713005E7FB5 /* RSHashSHA-2.h in Headers */,
 				41FE76191822B9A600E5E581 /* inet_ntop.h in Headers */,
-				305EC3B8189E14F00025E664 /* RSKVBucket.h in Headers */,
 				417050671647C713005E7FB5 /* RSMathNumber.h in Headers */,
 				417050691647C713005E7FB5 /* RSMath.h in Headers */,
 				4174EC131649400B004F3435 /* RSPrivateTimeZoneNames.h in Headers */,

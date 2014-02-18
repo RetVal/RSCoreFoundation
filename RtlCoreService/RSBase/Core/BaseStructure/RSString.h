@@ -119,6 +119,8 @@ RSExport RSIndex RSStringGetMaximumSizeForEncoding(RSIndex length, RSStringEncod
 //RSExport void RSStringShowContent(RSStringRef aString) RS_AVAILABLE(0_0);
 RSExport void RSStringTest(RSStringRef s);
 #endif
+
+RSExport RSStringRef RSStringCopyDetailDescription(RSStringRef str) RS_AVAILABLE(0_4);
 //
 RSExport void RSStringCacheRelease() RS_AVAILABLE(0_0);
 

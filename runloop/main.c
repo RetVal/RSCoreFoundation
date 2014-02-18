@@ -71,7 +71,45 @@ RSNumberRef RSNumberAdd(RSNumberRef n1, RSNumberRef n2) {
 
 void test_fn() {
     if (1) {
-        RSShow(RSAutorelease(RSMutableCopy(RSAllocatorDefault, RSDictionaryWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/log.2.plist"))))));
+        RSMutableStringRef copy = RSMutableCopy(RSAllocatorDefault, RSStringWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/1.risp"))));
+        RSShow(copy);
+        RSShow(RSSTR("end"));
+        RSCharacterSetRef cset = RSCharacterSetGetPredefined(RSCharacterSetNewline);
+        RSStringTrimInCharacterSet(copy, cset);
+        RSShow(copy);
+        RSShow(RSSTR("end"));
+        RSRelease(copy);
+        return;
+    }
+    if (0) {
+        
+        // 2014/02/13 23:00:02 [error] 20572#0: *598658985 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 60.49.107.153, server: api.zank.mobi, request: "POST /snowball/api/client/devicePush/bindDevicetoken.json HTTP/1.1", upstream: "fastcgi://unix:/tmp/php-fpm.sock:", host: "api.zank.mobi"
+        RSArrayRef content = RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, RSStringWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/error.2014-02-17.txt"))), RSSTR("\n")));
+        RSMutableArrayRef rst = RSArrayCreateMutable(RSAllocatorDefault, 0);
+        RSCollectionRef coll = RSMap(content, ^RSTypeRef(RSTypeRef obj) {
+            RSArrayRef line = RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, obj, RSSTR(" "));
+            RSArrayRef r = RSArrayCreate(RSAllocatorDefault, RSArrayObjectAtIndex(line, 0), RSArrayObjectAtIndex(line, 1), RSArrayObjectAtIndex(line, RSArrayGetCount(line) - 6), NULL);
+            RSRelease(line);
+            return RSAutorelease(r);
+        });
+        RSRelease(rst);
+        RSMutableDictionaryRef dict = RSDictionaryCreateMutable(RSAllocatorDefault, 0, RSDictionaryRSTypeContext);
+        RSCollectionRef api = RSFilter(RSMap(coll, ^RSTypeRef(RSTypeRef obj) {
+            return RSArrayLastObject(RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, RSArrayObjectAtIndex(RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, RSArrayLastObject(obj), RSSTR("?"))), 0), RSSTR("/"))));
+        }), ^BOOL(RSTypeRef x) {
+            return RSStringHasSuffix(x, RSSTR(".json"));
+        });
+        RSArrayApplyBlock(api, RSMakeRange(0, RSArrayGetCount(api)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+            RSNumberRef n = RSDictionaryGetValue(dict, value);
+            if (!n) {
+                n = RSNumberWithInteger(1);
+            } else {
+                n = RSNumberWithInteger(RSNumberIntegerValue(n) + 1);
+            }
+            RSDictionarySetValue(dict, value, n);
+        });
+        RSDictionaryWriteToFile(dict, RSFileManagerStandardizingPath(RSSTR("~/Desktop/error.2014-02-17.plist")), RSWriteFileAutomatically);
+        RSRelease(dict);
         return;
     }
     if (0) {

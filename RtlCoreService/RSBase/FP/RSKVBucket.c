@@ -93,7 +93,7 @@ RSPrivate void __RSKVBucketDeallocate()
 
 static RSKVBucketRef __RSKVBucketCreateInstance(RSAllocatorRef allocator, RSTypeRef key, RSTypeRef value)
 {
-    RSKVBucketRef instance = (RSKVBucketRef)__RSRuntimeCreateInstance(allocator, RSKVBucketGetTypeID(), sizeof(struct __RSKVBucket) - sizeof(RSRuntimeBase));
+    struct __RSKVBucket *instance = (struct __RSKVBucket *)__RSRuntimeCreateInstance(allocator, RSKVBucketGetTypeID(), sizeof(struct __RSKVBucket) - sizeof(RSRuntimeBase));
     
     instance->_k = RSRetain(key);
     instance->_v = RSRetain(value);

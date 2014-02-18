@@ -61,16 +61,6 @@ static RSRuntimeClass _____FILEBASENAME___Class = {
 };
 
 static RSTypeID ____FILEBASENAME___TypeID = _RSRuntimeNotATypeID;
-static void __RSMultidimensionalDictionaryInitialize();
-
-RSExport RSTypeID RSMultidimensionalDictionaryGetTypeID()
-{
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        __RSMultidimensionalDictionaryInitialize();
-    });
-    return _RSMultidimensionalDictionaryTypeID;
-}
 
 static void _____FILEBASENAME___Initialize() {
     ____FILEBASENAME___TypeID = __RSRuntimeRegisterClass(&_____FILEBASENAME___Class);
