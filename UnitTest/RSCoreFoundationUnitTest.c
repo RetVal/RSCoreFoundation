@@ -125,7 +125,7 @@ static BOOL unit_test_string(RSErrorRef *error)
     }
     
     RSStringRef string = RSStringCreateWithCString(RSAllocatorDefault, "SourceCache/Library/RSCoreFoundation-1208/", RSStringEncodingUTF8);
-    RSArrayRef array = RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, string, RSSTR("/"));
+    RSArrayRef array = RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, string, RSSTR("/"));
     RSShow(array);
     
     RSStringRef x = RSStringCreateByCombiningStrings(RSAllocatorDefault, array, RSSTR("/"));

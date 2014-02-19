@@ -1603,7 +1603,7 @@ RSExport void RSConnectionGetInterfaceInformation(RSMutableDataRef *interfaceAdd
 {
     RSMutableDataRef addr4 = nil, addr6 = nil;
     RSStringRef interface = nil;
-    RSArrayRef components = RSStringCreateArrayBySeparatingStrings(RSAllocatorSystemDefault, interfaceDescription, RSSTR(":"));
+    RSArrayRef components = RSStringCreateComponentsSeparatedByStrings(RSAllocatorSystemDefault, interfaceDescription, RSSTR(":"));
     
     if (RSArrayGetCount(components) > 0)
     {

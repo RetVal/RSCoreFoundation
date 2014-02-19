@@ -67,7 +67,7 @@ static RSSetRef __RSMapDictionary(RSDictionaryRef coll, RSTypeRef (^fn)(RSTypeRe
 
 RSExport RSCollectionRef RSMap(RSCollectionRef coll, RSTypeRef (^fn)(RSTypeRef obj)) {
     if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSArray"))) return __RSMapArray(coll, fn);
-    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSList"))) return __RSReverseList(__RSMapList(coll, fn));
+    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSList"))) return (__RSMapList(coll, fn));
     else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSDictionary"))) return __RSMapDictionary(coll, fn);
     else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSSet"))) return __RSMapSet(coll, fn);
     else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSBag"))) return __RSMapBag(coll, fn);

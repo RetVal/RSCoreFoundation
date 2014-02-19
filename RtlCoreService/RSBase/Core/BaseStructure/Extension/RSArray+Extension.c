@@ -27,7 +27,7 @@ RSExport RSArrayRef RSArrayWithObjectsNoCopy(RSTypeRef* objects, RSIndex count, 
 
 RSExport RSArrayRef RSArrayBySeparatingStrings(RSStringRef string, RSStringRef separatorString)
 {
-    return RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorSystemDefault, string, separatorString));
+    return RSAutorelease(RSStringCreateComponentsSeparatedByStrings(RSAllocatorSystemDefault, string, separatorString));
 }
 
 RSExport RSArrayRef RSArrayWithContentOfPath(RSStringRef path) RS_AVAILABLE(0_3)

@@ -62,6 +62,11 @@ static RSNodeRef __RSNodePoolGetNode(RSTypeRef value, RSNodeRef next, BOOL creat
     __block RSNodeRef n = nil;
     RSSyncUpdateBlock(&__RSNodePoolLock, ^{
         n = RSMultidimensionalDictionaryGetValue(__RSNodePool, value, next ? : (RSNodeRef)RSNil);
+        if (n && n->_next && RSEqual(n->_next, next)) {
+            return;
+        } else if (n) {
+            n = nil;
+        }
         if (!n) {
             n = __RSNodeCreateWithNext(value, next, createAsHead);
             RSMultidimensionalDictionarySetValue(__RSNodePool, n, value, next ? : (RSNodeRef)RSNil);
@@ -87,7 +92,28 @@ static BOOL __RSNodeClassEqual(RSTypeRef rs1, RSTypeRef rs2)
     BOOL result = NO;
     
     result = RSEqual(RSNode1->_value, RSNode2->_value);
+    if (result) {
+        if ((RSNode1->_next && !RSNode2->_next) || (!RSNode1->_next && RSNode2->_next)) {
+            result = NO;
+        } else if (RSNode1->_next) {
+            result = RSEqual(RSNode1->_next->_value, RSNode2->_next->_value) && RSEqual(RSNode1->_next->_next, RSNode2->_next->_next);
+//            if (result) {
+//                if ((RSNode1->_next->_next && !RSNode2->_next->_next) || (!RSNode1->_next->_next && RSNode2->_next->_next)) {
+//                    result = NO;
+//                } else if (RSNode1->_next) {
+//                    result = RSEqual(RSNode1->_next->_next->_value, RSNode2->_next->_next->_value);
+//                }
+//            }
+        }
+    }
     return result;
+}
+
+static RSHashCode __RSNodeClassHash(RSTypeRef rs) {
+    RSNodeRef node = (RSNodeRef)rs;
+    if (node->_next)
+        return RSHash(node->_value) + RSHash(node->_next->_value);
+    return RSHash(node->_value);
 }
 
 static RSStringRef __RSNodeClassDescription(RSTypeRef rs)
@@ -109,7 +135,7 @@ static RSRuntimeClass __RSNodeClass =
     nil,
     __RSNodeClassDeallocate,
     __RSNodeClassEqual,
-    nil,
+    __RSNodeClassHash,
     __RSNodeClassDescription,
     nil,
     nil
@@ -240,18 +266,17 @@ static RSStringRef __RSListClassDescription(RSTypeRef rs)
 //    RSStringRef description = RSStringCreateWithFormat(RSAllocatorDefault, RSSTR("RSList %p"), rs);
     RSMutableStringRef description = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
     RSStringAppendCString(description, "(", RSStringEncodingASCII);
-    if (list->_count) {
-        RSUInteger cnt = list->_count;
-        RSNodeRef node = list->_head;
-        while (node) {
-            RSStringRef desc = RSDescription(node);
-            RSStringAppendString(description, desc);
-            RSRelease(desc);
+    RSNodeRef node = list->_head;
+    for (RSUInteger idx = 0; idx < list->_count; idx++) {
+        RSStringRef desc = RSDescription(node);
+        RSStringAppendString(description, desc);
+        RSRelease(desc);
+        if (node)
             node = node->_next;
-            if (cnt > 1) {
-                RSStringAppendCString(description, " ", RSStringEncodingASCII);
-                cnt--;
-            }
+        else
+            break;
+        if (idx < list->_count - 1) {
+            RSStringAppendCString(description, " ", RSStringEncodingASCII);
         }
     }
     RSStringAppendCString(description, ")", RSStringEncodingASCII);
@@ -364,7 +389,8 @@ RSExport RSListRef RSListCreateWithArray(RSAllocatorRef allocator, RSArrayRef ar
     if (!array || !RSArrayGetCount(array)) return __RSListCreateEmpty(allocator);
     RSListRef instance = __RSListCreateEmpty(allocator);
     for (RSIndex idx = RSArrayGetCount(array) - 1; idx >= 0; idx--) {
-        instance = __RSNodeConjoin(instance, RSArrayObjectAtIndex(array, idx));
+        RSTypeRef value = RSArrayObjectAtIndex(array, idx);
+        instance = __RSNodeConjoin(instance, value);
     }
     return instance;
 }

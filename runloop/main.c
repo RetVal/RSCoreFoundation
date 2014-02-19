@@ -65,29 +65,25 @@ int main(int argc, const char * argv[])
     return 0;
 }
 
-RSNumberRef RSNumberAdd(RSNumberRef n1, RSNumberRef n2) {
-    return RSNumberWithInteger(RSNumberIntegerValue(n1) + RSNumberIntegerValue(n2));
-}
+#include "../../Risp/Risp/RSNumberOperation.h"
+#include "../../Risp/Risp/RSNumberOperation.c"
 
 void test_fn() {
     if (1) {
-        RSMutableStringRef copy = RSMutableCopy(RSAllocatorDefault, RSStringWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/1.risp"))));
-        RSShow(copy);
-        RSShow(RSSTR("end"));
-        RSCharacterSetRef cset = RSCharacterSetGetPredefined(RSCharacterSetNewline);
-        RSStringTrimInCharacterSet(copy, cset);
-        RSShow(copy);
-        RSShow(RSSTR("end"));
-        RSRelease(copy);
+        RSListRef list = RSShow(RSAutorelease(RSListCreateWithArray(RSAllocatorDefault, RSAutorelease(RSArrayCreate(RSAllocatorDefault, RSNumberWithInt(0),RSNumberWithInt(1),RSNumberWithInt(2),RSNumberWithInt(3),RSNumberWithInt(4),RSNumberWithInt(5),RSNumberWithInt(6),RSNumberWithInt(7),RSNumberWithInt(8),RSNumberWithInt(9) ,NULL)))));
+        RSListRef new = RSMap(list, ^RSTypeRef(RSTypeRef obj) {
+            return numberAdd(obj, RSNumberWithInt(1));
+        });
+        RSShow(new);
         return;
     }
     if (0) {
         
         // 2014/02/13 23:00:02 [error] 20572#0: *598658985 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 60.49.107.153, server: api.zank.mobi, request: "POST /snowball/api/client/devicePush/bindDevicetoken.json HTTP/1.1", upstream: "fastcgi://unix:/tmp/php-fpm.sock:", host: "api.zank.mobi"
-        RSArrayRef content = RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, RSStringWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/error.2014-02-17.txt"))), RSSTR("\n")));
+        RSArrayRef content = RSAutorelease(RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, RSStringWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/error.2014-02-17.txt"))), RSSTR("\n")));
         RSMutableArrayRef rst = RSArrayCreateMutable(RSAllocatorDefault, 0);
         RSCollectionRef coll = RSMap(content, ^RSTypeRef(RSTypeRef obj) {
-            RSArrayRef line = RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, obj, RSSTR(" "));
+            RSArrayRef line = RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, obj, RSSTR(" "));
             RSArrayRef r = RSArrayCreate(RSAllocatorDefault, RSArrayObjectAtIndex(line, 0), RSArrayObjectAtIndex(line, 1), RSArrayObjectAtIndex(line, RSArrayGetCount(line) - 6), NULL);
             RSRelease(line);
             return RSAutorelease(r);
@@ -95,7 +91,7 @@ void test_fn() {
         RSRelease(rst);
         RSMutableDictionaryRef dict = RSDictionaryCreateMutable(RSAllocatorDefault, 0, RSDictionaryRSTypeContext);
         RSCollectionRef api = RSFilter(RSMap(coll, ^RSTypeRef(RSTypeRef obj) {
-            return RSArrayLastObject(RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, RSArrayObjectAtIndex(RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, RSArrayLastObject(obj), RSSTR("?"))), 0), RSSTR("/"))));
+            return RSArrayLastObject(RSAutorelease(RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, RSArrayObjectAtIndex(RSAutorelease(RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, RSArrayLastObject(obj), RSSTR("?"))), 0), RSSTR("/"))));
         }), ^BOOL(RSTypeRef x) {
             return RSStringHasSuffix(x, RSSTR(".json"));
         });
@@ -118,7 +114,7 @@ void test_fn() {
             return RSStringIntegerValue(RSArrayObjectAtIndex(x, 5)) >= 500;
         });
         RSStringRef (^transform)(RSStringRef url) = ^RSStringRef (RSStringRef url) {
-            return RSArrayObjectAtIndex(RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, url, RSSTR("?"))), 0);
+            return RSArrayObjectAtIndex(RSAutorelease(RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, url, RSSTR("?"))), 0);
         };
         RSMutableDictionaryRef dict = RSDictionaryCreateMutable(RSAllocatorDefault, 0, RSDictionaryRSTypeContext);
         rst = RSMap(rst, ^RSTypeRef(RSTypeRef obj) {
@@ -142,9 +138,9 @@ void test_fn() {
     
     if (1) {
         RSStringRef content = RSStringWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/log.txt")));
-        RSArrayRef lines = RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, content, RSSTR("\n")));
+        RSArrayRef lines = RSAutorelease(RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, content, RSSTR("\n")));
         RSArrayRef rst_1 = RSMap(lines, ^RSTypeRef(RSTypeRef obj) {
-            RSMutableArrayRef parts = RSMutableCopy(RSAllocatorDefault, RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, obj, RSSTR(" "))));
+            RSMutableArrayRef parts = RSMutableCopy(RSAllocatorDefault, RSAutorelease(RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, obj, RSSTR(" "))));
             RSArrayRemoveObjectAtIndex(parts, 1);
             RSArrayRemoveObjectAtIndex(parts, 1);
             RSArrayRemoveObjectAtIndex(parts, 2);
@@ -207,9 +203,9 @@ void test_fn() {
     }
     if (0) {
         //    [13-Feb-2014 01:07:46 Asia/Shanghai] PHP Fatal error:  Call to a member function query() on a non-object in /feizan/vhost/zank.mobi/api/snowball/source/function_user.php on line 1130
-        RSArrayRef lines = RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, RSStringWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/1.log"))), RSSTR("\n")));
+        RSArrayRef lines = RSAutorelease(RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, RSStringWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/1.log"))), RSSTR("\n")));
         RSArrayRef rst = RSMap(lines, ^RSTypeRef(RSTypeRef obj) {
-            RSArrayRef parts = RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, obj, RSSTR(" "));
+            RSArrayRef parts = RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, obj, RSSTR(" "));
             return RSAutorelease(parts);
         });
         rst = (RSMap(rst, ^RSTypeRef(RSTypeRef obj) {
@@ -239,14 +235,14 @@ void test_fn() {
         return;
     }
     if (0) {
-        RSArrayRef rst_array = RSMap(RSDrop(RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, RSStringWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/B.txt"))), RSSTR("\n"))), 2), ^RSTypeRef(RSTypeRef obj) {
-            RSArrayRef id_name = RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, obj, RSSTR("\t")));
+        RSArrayRef rst_array = RSMap(RSDrop(RSAutorelease(RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, RSStringWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/B.txt"))), RSSTR("\n"))), 2), ^RSTypeRef(RSTypeRef obj) {
+            RSArrayRef id_name = RSAutorelease(RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, obj, RSSTR("\t")));
             return RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorDefault, RSArrayObjectAtIndex(id_name, 1), RSArrayObjectAtIndex(id_name, 0), NULL));
         });
         RSDictionaryRef map = RSMerge(RSArrayWithObject(RSArrayObjectAtIndex(rst_array, 0)), RSDrop(rst_array, 1), nil);
-        RSShow(RSMap(RSMap(RSDrop(RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, RSStringWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/A.txt"))), RSSTR("\n"))), 2), ^RSTypeRef(RSTypeRef obj) {
-            RSArrayRef x = RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, obj, RSSTR("\t")));
-            return RSAutorelease(RSArrayCreate(RSAllocatorDefault, RSArrayObjectAtIndex(x, 0), RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, RSArrayLastObject(x), RSSTR(";"))), NULL));
+        RSShow(RSMap(RSMap(RSDrop(RSAutorelease(RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, RSStringWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/A.txt"))), RSSTR("\n"))), 2), ^RSTypeRef(RSTypeRef obj) {
+            RSArrayRef x = RSAutorelease(RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, obj, RSSTR("\t")));
+            return RSAutorelease(RSArrayCreate(RSAllocatorDefault, RSArrayObjectAtIndex(x, 0), RSAutorelease(RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, RSArrayLastObject(x), RSSTR(";"))), NULL));
         }), ^RSTypeRef(RSTypeRef obj) {
             RSArrayRef pair = (RSArrayRef)obj;
             return RSAutorelease(RSDictionaryCreateWithObjectsAndOKeys(RSAllocatorDefault, RSMap(RSArrayLastObject(pair), ^RSTypeRef(RSTypeRef obj) {

@@ -1279,7 +1279,7 @@ RS_CONST_STRING_DECL(_RSEmptyString, "");
 //    }
 //}
 //
-//RSExport RSArrayRef RSStringCreateArrayBySeparatingStrings(RSAllocatorRef allocator, RSStringRef string, RSStringRef separatorString)
+//RSExport RSArrayRef RSStringCreateComponentsSeparatedByStrings(RSAllocatorRef allocator, RSStringRef string, RSStringRef separatorString)
 //{
 //    RSMutableArrayRef array = nil;
 //    RSIndex number = 0;
@@ -5134,6 +5134,79 @@ static RSIndex __RSStringFoldCharacterClusterAtIndex(UTF32Char character, RSStri
     return filledLength;
 }
 
+#define SURROGATE_START 0xD800
+#define SURROGATE_END 0xDFFF
+
+RSExport BOOL RSStringFindCharacterFromSet(RSStringRef theString, RSCharacterSetRef theSet, RSRange rangeToSearch, RSStringCompareFlags searchOptions, RSRange *result) {
+    RSStringInlineBuffer stringBuffer;
+    RSCharacterSetInlineBuffer csetBuffer;
+    UniChar ch;
+    RSIndex step;
+    RSIndex fromLoc, toLoc, cnt;	// fromLoc and toLoc are inclusive
+    BOOL found = NO;
+    BOOL done = NO;
+    
+    //#warning FIX ME !! Should support RSCompareNonliteral
+    
+    if ((rangeToSearch.location + rangeToSearch.length > RSStringGetLength(theString)) || (rangeToSearch.length == 0)) return NO;
+    
+    if (searchOptions & RSCompareBackwards) {
+        fromLoc = rangeToSearch.location + rangeToSearch.length - 1;
+        toLoc = rangeToSearch.location;
+    } else {
+        fromLoc = rangeToSearch.location;
+        toLoc = rangeToSearch.location + rangeToSearch.length - 1;
+    }
+    if (searchOptions & RSCompareAnchored) {
+        toLoc = fromLoc;
+    }
+    
+    step = (fromLoc <= toLoc) ? 1 : -1;
+    cnt = fromLoc;
+    
+    RSStringInitInlineBuffer(theString, &stringBuffer, rangeToSearch);
+    RSCharacterSetInitInlineBuffer(theSet, &csetBuffer);
+    
+    do {
+        ch = RSStringGetCharacterFromInlineBuffer(&stringBuffer, cnt - rangeToSearch.location);
+        if ((ch >= SURROGATE_START) && (ch <= SURROGATE_END)) {
+            RSIndex otherCharIndex = cnt + step;
+            
+            if (((step < 0) && (otherCharIndex < toLoc)) || ((step > 0) && (otherCharIndex > toLoc))) {
+                done = YES;
+            } else {
+                UniChar highChar;
+                UniChar lowChar = RSStringGetCharacterFromInlineBuffer(&stringBuffer, otherCharIndex - rangeToSearch.location);
+                
+                if (cnt < otherCharIndex) {
+                    highChar = ch;
+                } else {
+                    highChar = lowChar;
+                    lowChar = ch;
+                }
+                
+                if (RSUniCharIsSurrogateHighCharacter(highChar) && RSUniCharIsSurrogateLowCharacter(lowChar) && RSCharacterSetInlineBufferIsLongCharacterMember(&csetBuffer, RSUniCharGetLongCharacterForSurrogatePair(highChar, lowChar))) {
+                    if (result) *result = RSMakeRange((cnt < otherCharIndex ? cnt : otherCharIndex), 2);
+                    return YES;
+                } else if (otherCharIndex == toLoc) {
+                    done = YES;
+                } else {
+                    cnt = otherCharIndex + step;
+                }
+            }
+        } else if (RSCharacterSetInlineBufferIsLongCharacterMember(&csetBuffer, ch)) {
+            done = found = YES;
+        } else if (cnt == toLoc) {
+            done = YES;
+        } else {
+            cnt += step;
+        }
+    } while (!done);
+    
+    if (found && result) *result = RSMakeRange(cnt, 1);
+    return found;
+}
+
 #include "unicode/ucol.h"
 #include "unicode/ucoleitr.h"
 
@@ -7093,7 +7166,7 @@ static BOOL	__rangeEqual(const void *ptr1, const void *ptr2) {
 RSArrayRef RSStringCreateArrayWithFindResults(RSAllocatorRef alloc, RSStringRef string, RSStringRef stringToFind, RSRange rangeToSearch, RSStringCompareFlags compareOptions)
 {
     RSRange foundRange;
-    Boolean backwards = ((compareOptions & RSCompareBackwards) != 0);
+    BOOL backwards = ((compareOptions & RSCompareBackwards) != 0);
     UInt32 endIndex = (RSBitU32)(rangeToSearch.location + rangeToSearch.length);
     RSMutableDataRef rangeStorage = nil;	// Basically an array of RSRange, RSDataRef (packed)
     uint8_t *rangeStorageBytes = nil;
@@ -7152,8 +7225,8 @@ RSExport RSStringRef RSStringCreateByCombiningStrings(RSAllocatorRef alloc, RSAr
     RSIndex numChars;
     RSIndex separatorNumByte;
     RSIndex stringCount = RSArrayGetCount(array);
-    Boolean isSepRSString = !RS_IS_OBJC(__RSStringTypeID, separatorString);
-    Boolean canBeEightbit = isSepRSString && __RSStrIsEightBit(separatorString);
+    BOOL isSepRSString = !RS_IS_OBJC(__RSStringTypeID, separatorString);
+    BOOL canBeEightbit = isSepRSString && __RSStrIsEightBit(separatorString);
     RSIndex idx;
     RSStringRef otherString;
     void *buffer;
@@ -7224,7 +7297,7 @@ RSExport RSStringRef RSStringCreateByCombiningStrings(RSAllocatorRef alloc, RSAr
 }
 
 
-RSExport RSArrayRef RSStringCreateArrayBySeparatingStrings(RSAllocatorRef alloc, RSStringRef string, RSStringRef separatorString) {
+RSExport RSArrayRef RSStringCreateComponentsSeparatedByStrings(RSAllocatorRef alloc, RSStringRef string, RSStringRef separatorString) {
     RSArrayRef separatorRanges;
     RSIndex length = RSStringGetLength(string);
     /* No objc dispatch needed here since RSStringCreateArrayWithFindResults() works with both RSString and NSString */
@@ -7255,6 +7328,38 @@ RSExport RSArrayRef RSStringCreateArrayBySeparatingStrings(RSAllocatorRef alloc,
         
         return array;
     }
+}
+
+RSExport RSArrayRef RSStringCreateComponentsSeparatedByCharactersInSet(RSAllocatorRef allocator, RSStringRef string, RSCharacterSetRef charactersSet) {
+    if (!string || !charactersSet) return nil;
+    RSRange searchRange = RSStringGetRange(string);
+    RSRange range;
+    if (!RSStringFindCharacterFromSet(string, charactersSet, searchRange, 0, &range)) {
+        return RSArrayCreateWithObject(allocator, string);
+    } else {
+        RSMutableArrayRef array = RSArrayCreateMutable(allocator, 0);
+        RSIndex location = 0;
+        RSStringRef part = RSStringCreateSubStringWithRange(allocator, string, RSMakeRange(location, range.location));
+        RSArrayAddObject(array, part);
+        RSRelease(part);
+        
+        searchRange.location = range.location + range.length;
+        searchRange.length = RSStringGetLength(string) - searchRange.location;
+        location = searchRange.location;
+        while (RSStringFindCharacterFromSet(string, charactersSet, searchRange, 0, &range)) {
+            if (range.location > location) {
+                part = RSStringCreateSubStringWithRange(allocator, string, RSMakeRange(location, range.location - location));
+                RSArrayAddObject(array, part);
+                RSRelease(part);
+            }
+            searchRange.location = range.location + range.length;
+            searchRange.length = RSStringGetLength(string) - searchRange.location;
+            location = searchRange.location;
+        }
+        
+        return array;
+    }
+    return nil;
 }
 
 RSExport RSDataRef RSStringCreateExternalRepresentation(RSAllocatorRef alloc, RSStringRef string, RSStringEncoding encoding, RSIndex lossByte)
@@ -7354,9 +7459,9 @@ RSExport void RSStringTrim(RSMutableStringRef string, RSStringRef trimString) {
             }
         }
         memmove(contents, contents + newStartIndex * charSize, length * charSize);
-        __RSStringChangeSize(string, RSMakeRange(length, __RSStrLength(string) - length), 0, false);
+        __RSStringChangeSize(string, RSMakeRange(length, __RSStrLength(string) - length), 0, NO);
     } else { // Only trimString in string, trim all
-        __RSStringChangeSize(string, RSMakeRange(0, length), 0, false);
+        __RSStringChangeSize(string, RSMakeRange(0, length), 0, NO);
     }
 }
 
@@ -7389,9 +7494,9 @@ RSExport void RSStringTrimWhitespace(RSMutableStringRef string) {
         length = buffer_idx - newStartIndex + 1;
         
         memmove(contents, contents + newStartIndex * charSize, length * charSize);
-        __RSStringChangeSize(string, RSMakeRange(length, __RSStrLength(string) - length), 0, false);
+        __RSStringChangeSize(string, RSMakeRange(length, __RSStrLength(string) - length), 0, NO);
     } else { // Whitespace only string
-        __RSStringChangeSize(string, RSMakeRange(0, length), 0, false);
+        __RSStringChangeSize(string, RSMakeRange(0, length), 0, NO);
     }
 }
 
@@ -7416,9 +7521,9 @@ RSExport void RSStringTrimInCharacterSet(RSMutableStringRef string, RSCharacterS
         length = buffer_idx - newStartIndex + 1;
         
         memmove(contents, contents + newStartIndex * charSize, length * charSize);
-        __RSStringChangeSize(string, RSMakeRange(length, __RSStrLength(string) - length), 0, false);
+        __RSStringChangeSize(string, RSMakeRange(length, __RSStrLength(string) - length), 0, NO);
     } else { // Whitespace only string
-        __RSStringChangeSize(string, RSMakeRange(0, length), 0, false);
+        __RSStringChangeSize(string, RSMakeRange(0, length), 0, NO);
     }
 }
 
@@ -7442,16 +7547,16 @@ RSExport void RSStringTrimInCharacterSet(RSMutableStringRef string, RSCharacterS
 
 RSInline BOOL _RSCanUseLocale(RSLocaleRef locale) {
     if (locale) {
-        return true;
+        return YES;
     }
-    return false;
+    return NO;
 }
 
 RSExport void RSStringLowercase(RSMutableStringRef string, RSLocaleRef locale) {
     RSIndex currentIndex = 0;
     RSIndex length;
     const uint8_t *langCode;
-    Boolean isEightBit = __RSStrIsEightBit(string);
+    BOOL isEightBit = __RSStrIsEightBit(string);
     
     RS_OBJC_FUNCDISPATCHV(__RSStringTypeID, void, (NSMutableString *)string, _cfLowercase:(const void *)locale);
     
@@ -7459,7 +7564,7 @@ RSExport void RSStringLowercase(RSMutableStringRef string, RSLocaleRef locale) {
     
     length = __RSStrLength(string);
     
-    langCode = (const uint8_t *)(_RSCanUseLocale(locale) ? _RSStrGetLanguageIdentifierForLocale(locale, false) : NULL);
+    langCode = (const uint8_t *)(_RSCanUseLocale(locale) ? _RSStrGetLanguageIdentifierForLocale(locale, NO) : NULL);
     
     if (!langCode && isEightBit) {
         uint8_t *contents = (uint8_t *)__RSStrContents(string) + __RSStrSkipAnyLengthByte(string);
@@ -7479,7 +7584,7 @@ RSExport void RSStringLowercase(RSMutableStringRef string, RSLocaleRef locale) {
         UTF32Char currentChar;
         UInt32 flags = 0;
         
-        if (isEightBit) __RSStringChangeSize(string, RSMakeRange(0, 0), 0, true);
+        if (isEightBit) __RSStringChangeSize(string, RSMakeRange(0, 0), 0, YES);
         
         contents = (UniChar *)__RSStrContents(string);
         
@@ -7498,13 +7603,13 @@ RSExport void RSStringLowercase(RSMutableStringRef string, RSLocaleRef locale) {
             if (currentChar > 0xFFFF) { // Non-BMP char
                 switch (mappedLength) {
                     case 0:
-                        __RSStringChangeSize(string, RSMakeRange(currentIndex, 2), 0, true);
+                        __RSStringChangeSize(string, RSMakeRange(currentIndex, 2), 0, YES);
                         contents = (UniChar *)__RSStrContents(string);
                         length -= 2;
                         break;
                         
                     case 1:
-                        __RSStringChangeSize(string, RSMakeRange(currentIndex + 1, 1), 0, true);
+                        __RSStringChangeSize(string, RSMakeRange(currentIndex + 1, 1), 0, YES);
                         contents = (UniChar *)__RSStrContents(string);
                         --length;
                         break;
@@ -7515,7 +7620,7 @@ RSExport void RSStringLowercase(RSMutableStringRef string, RSLocaleRef locale) {
                         
                     default:
                         --mappedLength; // Skip the current char
-                        __RSStringChangeSize(string, RSMakeRange(currentIndex + 1, 0), mappedLength - 1, true);
+                        __RSStringChangeSize(string, RSMakeRange(currentIndex + 1, 0), mappedLength - 1, YES);
                         contents = (UniChar *)__RSStrContents(string);
                         memmove(contents + currentIndex + 1, mappedCharacters + 1, mappedLength * sizeof(UniChar));
                         length += (mappedLength - 1);
@@ -7523,12 +7628,12 @@ RSExport void RSStringLowercase(RSMutableStringRef string, RSLocaleRef locale) {
                         break;
                 }
             } else if (mappedLength == 0) {
-                __RSStringChangeSize(string, RSMakeRange(currentIndex, 1), 0, true);
+                __RSStringChangeSize(string, RSMakeRange(currentIndex, 1), 0, YES);
                 contents = (UniChar *)__RSStrContents(string);
                 --length;
             } else if (mappedLength > 1) {
                 --mappedLength; // Skip the current char
-                __RSStringChangeSize(string, RSMakeRange(currentIndex + 1, 0), mappedLength, true);
+                __RSStringChangeSize(string, RSMakeRange(currentIndex + 1, 0), mappedLength, YES);
                 contents = (UniChar *)__RSStrContents(string);
                 memmove(contents + currentIndex + 1, mappedCharacters + 1, mappedLength * sizeof(UniChar));
                 length += mappedLength;
@@ -7542,7 +7647,7 @@ RSExport void RSStringUppercase(RSMutableStringRef string, RSLocaleRef locale) {
     RSIndex currentIndex = 0;
     RSIndex length;
     const uint8_t *langCode;
-    Boolean isEightBit = __RSStrIsEightBit(string);
+    BOOL isEightBit = __RSStrIsEightBit(string);
     
     RS_OBJC_FUNCDISPATCHV(__RSStringTypeID, void, (NSMutableString *)string, _cfUppercase:(const void *)locale);
     
@@ -7550,7 +7655,7 @@ RSExport void RSStringUppercase(RSMutableStringRef string, RSLocaleRef locale) {
     
     length = __RSStrLength(string);
     
-    langCode = (const uint8_t *)(_RSCanUseLocale(locale) ? _RSStrGetLanguageIdentifierForLocale(locale, false) : NULL);
+    langCode = (const uint8_t *)(_RSCanUseLocale(locale) ? _RSStrGetLanguageIdentifierForLocale(locale, NO) : NULL);
     
     if (!langCode && isEightBit) {
         uint8_t *contents = (uint8_t *)__RSStrContents(string) + __RSStrSkipAnyLengthByte(string);
@@ -7570,7 +7675,7 @@ RSExport void RSStringUppercase(RSMutableStringRef string, RSLocaleRef locale) {
         UTF32Char currentChar;
         UInt32 flags = 0;
         
-        if (isEightBit) __RSStringChangeSize(string, RSMakeRange(0, 0), 0, true);
+        if (isEightBit) __RSStringChangeSize(string, RSMakeRange(0, 0), 0, YES);
         
         contents = (UniChar *)__RSStrContents(string);
         
@@ -7589,13 +7694,13 @@ RSExport void RSStringUppercase(RSMutableStringRef string, RSLocaleRef locale) {
             if (currentChar > 0xFFFF) { // Non-BMP char
                 switch (mappedLength) {
                     case 0:
-                        __RSStringChangeSize(string, RSMakeRange(currentIndex, 2), 0, true);
+                        __RSStringChangeSize(string, RSMakeRange(currentIndex, 2), 0, YES);
                         contents = (UniChar *)__RSStrContents(string);
                         length -= 2;
                         break;
                         
                     case 1:
-                        __RSStringChangeSize(string, RSMakeRange(currentIndex + 1, 1), 0, true);
+                        __RSStringChangeSize(string, RSMakeRange(currentIndex + 1, 1), 0, YES);
                         contents = (UniChar *)__RSStrContents(string);
                         --length;
                         break;
@@ -7606,7 +7711,7 @@ RSExport void RSStringUppercase(RSMutableStringRef string, RSLocaleRef locale) {
                         
                     default:
                         --mappedLength; // Skip the current char
-                        __RSStringChangeSize(string, RSMakeRange(currentIndex + 1, 0), mappedLength - 1, true);
+                        __RSStringChangeSize(string, RSMakeRange(currentIndex + 1, 0), mappedLength - 1, YES);
                         contents = (UniChar *)__RSStrContents(string);
                         memmove(contents + currentIndex + 1, mappedCharacters + 1, mappedLength * sizeof(UniChar));
                         length += (mappedLength - 1);
@@ -7614,12 +7719,12 @@ RSExport void RSStringUppercase(RSMutableStringRef string, RSLocaleRef locale) {
                         break;
                 }
             } else if (mappedLength == 0) {
-                __RSStringChangeSize(string, RSMakeRange(currentIndex, 1), 0, true);
+                __RSStringChangeSize(string, RSMakeRange(currentIndex, 1), 0, YES);
                 contents = (UniChar *)__RSStrContents(string);
                 --length;
             } else if (mappedLength > 1) {
                 --mappedLength; // Skip the current char
-                __RSStringChangeSize(string, RSMakeRange(currentIndex + 1, 0), mappedLength, true);
+                __RSStringChangeSize(string, RSMakeRange(currentIndex + 1, 0), mappedLength, YES);
                 contents = (UniChar *)__RSStrContents(string);
                 memmove(contents + currentIndex + 1, mappedCharacters + 1, mappedLength * sizeof(UniChar));
                 length += mappedLength;

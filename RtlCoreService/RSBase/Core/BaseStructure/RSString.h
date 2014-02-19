@@ -75,6 +75,8 @@ RSExport BOOL RSStringFindWithOptions(RSStringRef aString, RSStringRef stringToF
 RSExport BOOL RSStringFind(RSStringRef aString, RSStringRef stringToFind, RSRange rangeToSearch, RSRange* result) RS_AVAILABLE(0_0);
 RSExport RSRange *RSStringFindAll(RSStringRef aString, RSStringRef stringToFind, RSIndex *numberOfResult) RS_AVAILABLE(0_3);
 
+RSExport BOOL RSStringFindCharacterFromSet(RSStringRef theString, RSCharacterSetRef theSet, RSRange rangeToSearch, RSStringCompareFlags searchOptions, RSRange *result) RS_AVAILABLE(0_4);
+
 RSExport void RSStringDelete(RSMutableStringRef aString, RSRange range) RS_AVAILABLE(0_0);
 
 RSExport void RSStringTrim(RSMutableStringRef string, RSStringRef trimString) RS_AVAILABLE(0_4);
@@ -108,7 +110,9 @@ RSExport BOOL RSStringHasSuffix(RSStringRef aString, RSStringRef suffix) RS_AVAI
 //
 //RSExport BOOL RSStringIsIpAddress(RSStringRef aString) RS_AVAILABLE(0_0);
 //RSExport RSStringEncoding RSStringFileSystemEncoding() RS_AVAILABLE(0_3);
-RSExport RSArrayRef RSStringCreateArrayBySeparatingStrings(RSAllocatorRef allocator, RSStringRef string, RSStringRef separatorString) RS_AVAILABLE(0_3);
+RSExport RSArrayRef RSStringCreateComponentsSeparatedByStrings(RSAllocatorRef allocator, RSStringRef string, RSStringRef separatorString) RS_AVAILABLE(0_3);
+RSExport RSArrayRef RSStringCreateComponentsSeparatedByCharactersInSet(RSAllocatorRef allocator, RSStringRef string, RSCharacterSetRef charactersSet) RS_AVAILABLE(0_4);
+
 RSExport RSStringRef RSStringCreateByCombiningStrings(RSAllocatorRef allocator, RSArrayRef array, RSStringRef separatorString) RS_AVAILABLE(0_3);
 RSExport RSDataRef RSStringCreateExternalRepresentation(RSAllocatorRef allocator, RSStringRef aString, RSStringEncoding encoding, RSIndex n) RS_AVAILABLE(0_3);
 RSExport RSIndex RSStringGetMaximumSizeForEncoding(RSIndex length, RSStringEncoding encoding) RS_AVAILABLE(0_0);

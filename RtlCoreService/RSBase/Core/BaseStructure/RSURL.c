@@ -3329,7 +3329,7 @@ static BOOL decomposeToRFC1808(RSURLRef url, RSURLComponentsRFC1808 *components)
     
     RSStringRef path = RSURLCopyPath(url);
     if (path) {
-        components->pathComponents = RSStringCreateArrayBySeparatingStrings(alloc, path, RSSTR("/"));
+        components->pathComponents = RSStringCreateComponentsSeparatedByStrings(alloc, path, RSSTR("/"));
         RSRelease(path);
     } else {
         components->pathComponents = nil;
@@ -3547,7 +3547,7 @@ static RSArrayRef WindowsPathToURLComponents(RSStringRef path, RSAllocatorRef al
     RSMutableArrayRef urlComponents = nil;
     RSIndex i=0;
     
-    tmp = RSStringCreateArrayBySeparatingStrings(alloc, path, RSSTR("\\"));
+    tmp = RSStringCreateComponentsSeparatedByStrings(alloc, path, RSSTR("\\"));
     urlComponents = RSMutableCopy(alloc, tmp);
     RSRelease(tmp);
     
@@ -3760,7 +3760,7 @@ extern RSStringRef RSCreateWindowsDrivePathFromVolumeName(RSStringRef volNameStr
 static RSStringRef URLPathToWindowsPath(RSStringRef path, RSAllocatorRef allocator, RSStringEncoding encoding) {
     // Check for a drive letter, then flip all the slashes
     RSStringRef result;
-    RSArrayRef tmp = RSStringCreateArrayBySeparatingStrings(allocator, path, RSSTR("/"));
+    RSArrayRef tmp = RSStringCreateComponentsSeparatedByStrings(allocator, path, RSSTR("/"));
     SInt32 count = (SInt32)RSArrayGetCount(tmp);
     RSMutableArrayRef components = RSMutableCopy(allocator, tmp);
     RSStringRef newPath;
@@ -4810,7 +4810,7 @@ RSExport RSURLRef RSURLCreateCopyDeletingPathExtension(RSAllocatorRef allocator,
 
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED
 static RSArrayRef HFSPathToURLComponents(RSStringRef path, RSAllocatorRef alloc, BOOL isDir) {
-    RSArrayRef components = RSStringCreateArrayBySeparatingStrings(alloc, path, RSSTR(":"));
+    RSArrayRef components = RSStringCreateComponentsSeparatedByStrings(alloc, path, RSSTR(":"));
     RSMutableArrayRef newComponents = RSMutableCopy(alloc, components);
     BOOL doSpecialLeadingColon = NO;
     UniChar firstChar = RSStringGetCharacterAtIndex(path, 0);

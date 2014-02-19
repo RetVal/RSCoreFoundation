@@ -67,7 +67,7 @@ RSExport RSStringRef RSStringWithSubstring(RSStringRef string, RSRange range)
 
 RSExport RSArrayRef RSStringWithArrayBySeparatingString(RSStringRef string, RSStringRef seperatorString)
 {
-    return RSAutorelease(RSStringCreateArrayBySeparatingStrings(RSAllocatorSystemDefault, string, seperatorString));
+    return RSAutorelease(RSStringCreateComponentsSeparatedByStrings(RSAllocatorSystemDefault, string, seperatorString));
 }
 
 RSExport RSStringRef RSStringWithCombingStrings(RSArrayRef strings, RSStringRef separatorString)

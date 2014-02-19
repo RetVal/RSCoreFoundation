@@ -337,7 +337,7 @@ static RSArrayRef __RSHTTPCookieStorageCopyCookiesForURLDomainAndPath(RSDictiona
     RSUInteger cnt = RSArrayGetCount(domains);
     
     RSMutableArrayRef paths = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
-    RSArrayRef pathDomain = RSStringCreateArrayBySeparatingStrings(RSAllocatorSystemDefault, path, RSSTR("/"));
+    RSArrayRef pathDomain = RSStringCreateComponentsSeparatedByStrings(RSAllocatorSystemDefault, path, RSSTR("/"));
     RSMutableStringRef currentPath = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
     RSArrayApplyBlock(pathDomain, RSMakeRange(0, RSArrayGetCount(pathDomain) - 1), ^(const void *value, RSUInteger idx, BOOL *isStop) {
         RSStringRef path = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("%r%r/"), currentPath, value);

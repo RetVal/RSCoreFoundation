@@ -576,16 +576,18 @@ RSExport unsigned long long RSNumberUnsignedLongLongValue(RSNumberRef aValue) {
 
 RSExport float RSNumberFloatValue(RSNumberRef aValue) {
     if (!aValue) return 0;
-    float value = 0;
-    if (RSNumberIsFloatType(aValue) && RSNumberGetValue(aValue, &value)) return value;
-    return 0;
+    if (RSNumberIsFloatType(aValue)) {
+        return (float)RSNumberGetFloatingValue(aValue);
+    }
+    return (float)RSNumberIntegerValue(aValue);
 }
 
 RSExport double RSNumberDoubleValue(RSNumberRef aValue) {
     if (!aValue) return 0;
-    double value = 0;
-    if (RSNumberIsFloatType(aValue) && RSNumberGetValue(aValue, &value)) return value;
-    return 0;
+    if (RSNumberIsFloatType(aValue)) {
+        return RSNumberGetFloatingValue(aValue);
+    }
+    return (double)RSNumberIntegerValue(aValue);
 }
 
 RSExport BOOL RSNumberBooleanValue(RSNumberRef aValue) {
@@ -1519,6 +1521,44 @@ static RSStringRef __RSNumberCreateFormattingDescriptionAsFloat64(RSAllocatorRef
 RSPrivate RSStringRef __RSNumberCopyFormattingDescriptionAsFloat64(RSTypeRef obj)
 {
     return __RSNumberCreateFormattingDescriptionAsFloat64(RSAllocatorSystemDefault, obj);
+}
+
+RSExport RSBitU64 RSNumberGetUnFloatingValue(RSNumberRef aNum) {
+    if (!aNum) return 0;
+    RSNumberType t = RSNumberGetType(aNum);
+    struct __RSBaseNumber base;
+    RSNumberGetValue(aNum, &base._pay);
+    switch (t) {
+        case RSNumberChar:
+            return base._pay._char;
+        case RSNumberBoolean:
+            return base._pay._bool ? YES : NO;
+        case RSNumberShort:
+            return base._pay._short;
+        case RSNumberInt:
+            return base._pay._int;
+        case RSNumberLong:
+            return base._pay._long;
+        case RSNumberLonglong:
+            return base._pay._longlong;
+        default:
+            break;
+    }
+    return 0;
+}
+
+RSExport double RSNumberGetFloatingValue(RSNumberRef aNum) {
+    if (!aNum) return 0.0;
+    RSNumberType t = RSNumberGetType(aNum);
+    struct __RSBaseNumber base;
+    RSNumberGetValue(aNum, &base._pay);
+    switch (t) {
+        case RSNumberFloat32:
+            return base._pay._float;
+        case RSNumberDouble:
+            return base._pay._double;
+    }
+    return 0.0;
 }
 
 //for(n=0; b; n++) b &= b-1;

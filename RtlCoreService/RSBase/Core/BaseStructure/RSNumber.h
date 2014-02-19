@@ -125,5 +125,7 @@ RSExport BOOL RSNumberIsFloatType(RSNumberRef aNumber) RS_AVAILABLE(0_0);
 RSExport BOOL RSNumberIsIntegerType(RSNumberRef aNumber) RS_AVAILABLE(0_0);
 RSExport BOOL RSNumberIsBooleanType(RSNumberRef aNumber) RS_AVAILABLE(0_0);
 
+RSExport RSBitU64 RSNumberGetUnFloatingValue(RSNumberRef aNum);
+RSExport double RSNumberGetFloatingValue(RSNumberRef aNum);
 RS_EXTERN_C_END
 #endif

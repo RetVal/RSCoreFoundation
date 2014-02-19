@@ -151,7 +151,7 @@ RSExport RSTypeRef RSMultidimensionalDictionaryGetValue(RSMultidimensionalDictio
 RSExport RSTypeRef RSMultidimensionalDictionaryGetValueWithKeyPaths(RSMultidimensionalDictionaryRef dict, RSStringRef keyPath) {
     if (!dict) return nil;
     __RSGenericValidInstance(dict, _RSMultidimensionalDictionaryTypeID);
-    RSArrayRef keys = RSStringCreateArrayBySeparatingStrings(RSAllocatorSystemDefault, keyPath, __RSMultidimensionalDictionayKeyPathSeparatingStrings);
+    RSArrayRef keys = RSStringCreateComponentsSeparatedByStrings(RSAllocatorSystemDefault, keyPath, __RSMultidimensionalDictionayKeyPathSeparatingStrings);
     RSTypeRef value = __RSMultidimensionalDictionaryGetValueWithKeys(dict, keys);
     RSRelease(keys);
     return value;
@@ -201,7 +201,7 @@ RSExport void RSMultidimensionalDictionarySetValue(RSMultidimensionalDictionaryR
 RSExport void RSMultidimensionalDictionarySetValueWithKeyPaths(RSMultidimensionalDictionaryRef dict, RSTypeRef value, RSStringRef keyPath) {
     if (!dict) return;
     __RSGenericValidInstance(dict, _RSMultidimensionalDictionaryTypeID);
-    RSArrayRef keys = RSStringCreateArrayBySeparatingStrings(RSAllocatorSystemDefault, keyPath, __RSMultidimensionalDictionayKeyPathSeparatingStrings);
+    RSArrayRef keys = RSStringCreateComponentsSeparatedByStrings(RSAllocatorSystemDefault, keyPath, __RSMultidimensionalDictionayKeyPathSeparatingStrings);
     __RSMultidimensionalDictionarySetValueWithKeys(dict, value, keys);
     RSRelease(keys);
 }

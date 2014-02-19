@@ -79,7 +79,7 @@ RS_CONST_STRING_DECL(__RSDictionayKeyPathSeparatingStrings, ".");
 RSExport RSTypeRef RSDictionaryGetValueForKeyPath(RSDictionaryRef dictionary, RSStringRef keyPath) {
     if (!dictionary) return nil;
     RSTypeRef rst = nil;
-    RSArrayRef keys = RSStringCreateArrayBySeparatingStrings(RSAllocatorSystemDefault, keyPath, __RSDictionayKeyPathSeparatingStrings);
+    RSArrayRef keys = RSStringCreateComponentsSeparatedByStrings(RSAllocatorSystemDefault, keyPath, __RSDictionayKeyPathSeparatingStrings);
     rst = RSDictionaryGetValueForKeys(dictionary, keys);
     RSRelease(keys);
     return rst;
@@ -103,7 +103,7 @@ RSExport RSTypeRef RSDictionaryGetValueForKeys(RSDictionaryRef dictionary, RSArr
 
 RSExport void RSDictionarySetValueForKeyPath(RSMutableDictionaryRef dictionary, RSStringRef keyPath, RSTypeRef value) {
     if (nil == dictionary || nil == keyPath) return;
-    RSArrayRef keys = RSStringCreateArrayBySeparatingStrings(RSAllocatorDefault, keyPath, __RSDictionayKeyPathSeparatingStrings);
+    RSArrayRef keys = RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, keyPath, __RSDictionayKeyPathSeparatingStrings);
     RSDictionarySetValueForKeys(dictionary, keys, value);
     RSRelease(keys);
     return;
