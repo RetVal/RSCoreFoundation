@@ -2682,7 +2682,7 @@ RSPrivate void RSBasicHashApplyBlock(RSConstBasicHashRef ht, BOOL (^block)(RSBas
     for (RSIndex idx = 0; !stop && 0 < used && idx < cnt; idx++) {
         RSBasicHashBucket bkt = RSBasicHashGetBucket(ht, idx);
         if (0 < bkt.count) {
-            if (!block(bkt, stop)) {
+            if (!block(bkt, &stop)) {
                 return;
             }
             used--;
