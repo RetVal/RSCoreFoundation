@@ -41,6 +41,7 @@ RSExport RSClassRef RSClassGetWithUTF8String(const char *name) RS_AVAILABLE(0_4)
 RSExport RSStringRef RSClassGetName(RSClassRef cls) RS_AVAILABLE(0_4);
 RSExport RSTypeID RSClassGetTypeID(RSClassRef cls) RS_AVAILABLE(0_4);
 RSExport BOOL RSInstanceIsMemberOfClass(RSTypeRef id, RSClassRef cls) RS_AVAILABLE(0_4);
+RSExport BOOL RSInstanceIsMemberOfClassByUTF8String(RSTypeRef id, const char *name) RS_AVAILABLE(0_4);
 
 RSExport RSStringRef RSClassGetNameWithInstance(RSTypeRef id) RS_AVAILABLE(0_4);
 /****************************************************************************/

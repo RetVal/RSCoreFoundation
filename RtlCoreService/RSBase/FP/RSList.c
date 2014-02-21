@@ -42,10 +42,15 @@ static void __RSNodePoolInitialize() {
 static void __RSNodePoolDeallocate() {
     RSSyncUpdateBlock(&__RSNodePoolLock, ^{
         if (__RSNodePool) {
+//            RSShow(__RSNodePool);
             extern void __RSDictionaryCleanAllObjects(RSMutableDictionaryRef dictionary);
+//            __RSCLog(RSLogLevelWarning, "RSNil -> %p\n", RSNil);
             RSDictionaryRef dimension = RSMultidimensionalDictionaryGetDimensionEntry(__RSNodePool);
             RSDictionaryApplyBlock(dimension, ^(const void *key1, const void *nd_dimension, BOOL *stop) {
+//                RSLog(RSSTR("1 : %r<%p> - %r<%p>"), key1, key1, nd_dimension, nd_dimension);
                 RSDictionaryApplyBlock(nd_dimension, ^(const void *key2, const void *value, BOOL *stop) {
+//                    RSNodeRef n = value;
+//                    RSLog(RSSTR("value <%p> - (%r -> %r)"), n, n, n->_next);
 //                    RSLog(RSSTR("dimension1 -> %r, dimension2 -> %r (%r - rc -> %lld)"), key1, key2, value, RSGetRetainCount(value));
                     __RSRuntimeSetInstanceSpecial(value, NO);
                 });
@@ -62,7 +67,7 @@ static RSNodeRef __RSNodePoolGetNode(RSTypeRef value, RSNodeRef next, BOOL creat
     __block RSNodeRef n = nil;
     RSSyncUpdateBlock(&__RSNodePoolLock, ^{
         n = RSMultidimensionalDictionaryGetValue(__RSNodePool, value, next ? : (RSNodeRef)RSNil);
-        if (n && n->_next && RSEqual(n->_next, next)) {
+        if (n && (!(n->_next) || (n->_next && RSEqual(n->_next, next)))) {
             return;
         } else if (n) {
             n = nil;
@@ -71,7 +76,7 @@ static RSNodeRef __RSNodePoolGetNode(RSTypeRef value, RSNodeRef next, BOOL creat
             n = __RSNodeCreateWithNext(value, next, createAsHead);
             RSMultidimensionalDictionarySetValue(__RSNodePool, n, value, next ? : (RSNodeRef)RSNil);
             RSRelease(n);
-//            RSLog(RSSTR("%r(%ld) set special"), n, RSGetRetainCount(n));
+//            RSLog(RSSTR("%r -> %r, <%p>(%ld) set special"), n, n->_next, n, RSGetRetainCount(n));
             __RSRuntimeSetInstanceSpecial(n, YES);
         }
     });
@@ -405,11 +410,11 @@ RSExport RSListRef RSListCreateDrop(RSAllocatorRef allocator, RSListRef list, RS
     if (!list || RSListGetCount(list) < n) return nil;
     else if (RSListGetCount(list) == n) return __RSListCreateEmpty(allocator);
     struct __RSList *rst = __RSListCreateEmpty(allocator);
-    RSUInteger cnt = list->_count - n;
+    rst->_count = list->_count - n;
     rst->_head = list->_head;
-    while (cnt) {
+    while (n) {
         rst->_head = rst->_head->_next;
-        cnt--;
+        n--;
     }
     return rst;
 }

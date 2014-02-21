@@ -248,7 +248,7 @@ void RSDeallocateInstance(RSTypeRef obj)
 {
     if (nil == obj) HALTWithError(RSInvalidArgumentException, "the object is nil");
     if (__RSRuntimeInstanceIsClass(obj)) return;
-    
+    if (unlikely(YES == __RSRuntimeInstanceIsStackValue(obj))) return;
     RSTypeID id = _RSRuntimeNotATypeID;
     if ((id = RSGetTypeID(obj)) == _RSRuntimeNotATypeID) HALTWithError(RSInvalidArgumentException, "the object is not available");
     RSRuntimeClass* cls = (RSRuntimeClass*)__RSRuntimeGetClassWithTypeID(id);
@@ -256,7 +256,6 @@ void RSDeallocateInstance(RSTypeRef obj)
         __RSCLog(RSLogLevelDebug, "%s dealloc - <%p>\n",cls->className, obj);
 
     if (cls->deallocate) __RSRuntimeInstanceDeallocate(obj);
-    if (unlikely(YES == __RSRuntimeInstanceIsStackValue(obj))) return;
     return __RSRuntimeDeallocate(obj);
     HALTWithError(RSInvalidArgumentException, "overflow here");
 }
@@ -379,6 +378,10 @@ RSExport RSClassRef RSClassGetWithUTF8String(const char *name) {
     RSTypeID ID = __RSRuntimeGetClassTypeIDWithName(name);
     if (ID) return __RSRuntimeGetClassWithTypeID(ID);
     return nil;
+}
+
+RSExport BOOL RSInstanceIsMemberOfClassByUTF8String(RSTypeRef id, const char *name) {
+    return RSInstanceIsMemberOfClass(id, RSClassGetWithUTF8String(name));
 }
 
 RSExport RSStringRef RSClassGetNameWithInstance(RSTypeRef id) {

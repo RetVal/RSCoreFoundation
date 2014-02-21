@@ -6397,6 +6397,9 @@ RSPrivate const RSDictionaryContext* __RSStringConstantTableContext = &___RSStri
 
 RSExport RSStringRef __RSStringMakeConstantString(RSCBuffer cStr)
 {
+    if (nil == cStr) {
+        return nil;
+    }
     if (nil == constantStringTable) {
         constantStringTable = RSDictionaryCreateMutable(RSAllocatorSystemDefault,2500,__RSStringConstantTableContext);
         __RSRuntimeSetInstanceSpecial(constantStringTable, YES);
@@ -6406,10 +6409,7 @@ RSExport RSStringRef __RSStringMakeConstantString(RSCBuffer cStr)
         //        RSDictionarySetValue(__RSStringConstantTable, key, str);
         //        RSRelease(str);
     }
-    if (nil == cStr) {
-        return nil;
-    }
-    
+
     RSSpinLockLock(&_RSSTRLock);
     
     RSStringRef string = (RSStringRef)RSDictionaryGetValue(constantStringTable, cStr);
@@ -6498,12 +6498,16 @@ static BOOL __RSStrIsConstantString(RSStringRef str)
 
 RSExport void RSStringCacheRelease()
 {
+//    RSDictionaryApplyBlock(constantStringTable, ^(const void *key, const void *value, BOOL *stop) {
+//        __RSCLog(RSLogLevelWarning, "%s <%p>\n", RSStringGetCStringPtr(value, RSStringEncodingMacRoman), value);
+//    });
     if(constantStringTable == nil) return;
     RSSpinLockLock(&_RSSTRLock);
 #if defined(DEBUG)
     __RSConstantStringTableBeingFreed = YES;
 #endif
     extern void __RSDictionaryCleanAllObjects(RSMutableDictionaryRef dictionary);
+    
     __RSDictionaryCleanAllObjects(constantStringTable);
     __RSRuntimeSetInstanceSpecial(constantStringTable, NO);
     RSRelease(constantStringTable);
