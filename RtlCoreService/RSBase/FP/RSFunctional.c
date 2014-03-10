@@ -11,6 +11,55 @@
 #include <RSCoreFoundation/RSRuntime.h>
 
 #pragma mark -
+#pragma mark Apply API Group
+
+static RSTypeRef __RSApplyArray(RSArrayRef coll, void (^fn)(RSTypeRef obj)) {
+    RSArrayApplyBlock(coll, RSMakeRange(0, RSArrayGetCount(coll)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+        fn(value);
+    });
+    return nil;
+}
+
+static RSTypeRef __RSApplyList(RSListRef coll, void (^fn)(RSTypeRef obj)) {
+    RSListApplyBlock(coll, ^(RSTypeRef value) {
+        fn(value);
+    });
+    return nil;
+}
+
+static RSTypeRef __RSApplyDictionary(RSDictionaryRef coll, void (^fn)(RSTypeRef obj)) {
+    RSDictionaryApplyBlock(coll, ^(const void *key, const void *value, BOOL *stop) {
+        RSKVBucketRef bucket = RSKVBucketCreate(RSAllocatorSystemDefault, key, value);
+        fn(bucket);
+        RSRelease(bucket);
+    });
+    return nil;
+}
+
+static RSTypeRef __RSApplySet(RSSetRef coll, void (^fn)(RSTypeRef obj)) {
+    RSSetApplyBlock(coll, ^(const void *value, BOOL *stop) {
+        fn(value);
+    });
+    return nil;
+}
+
+static RSTypeRef __RSApplyBag(RSBagRef coll, void (^fn)(RSTypeRef obj)) {
+    RSBagApplyBlock(coll, ^(const void *value, BOOL *stop) {
+        fn(value);
+    });
+    return nil;
+}
+
+RSExport RSTypeRef RSApply(RSCollectionRef coll, void (^fn)(RSTypeRef obj)) {
+    if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSArray"))) return __RSApplyArray(coll, fn);
+    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSList"))) return (__RSApplyList(coll, fn));
+    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSDictionary"))) return __RSApplyDictionary(coll, fn);
+    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSSet"))) return __RSApplySet(coll, fn);
+    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSBag"))) return __RSApplyBag(coll, fn);
+    return nil;
+}
+
+#pragma mark -
 #pragma mark Map API Group
 
 static RSArrayRef __RSMapArray(RSArrayRef coll, RSTypeRef (^fn)(RSTypeRef obj)) {

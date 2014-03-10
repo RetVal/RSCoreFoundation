@@ -449,6 +449,10 @@ RSExport RSCollectionRef RSConjoin(RSCollectionRef coll, RSTypeRef value) {
     if (RSInstanceIsMemberOfClass(coll, &__RSListClass)) {
         RSListRef list = (RSListRef)coll;
         return __RSNodeConjoin(list, value);
+    } else if (RSArrayGetTypeID() == RSGetTypeID(coll)) {
+        RSMutableArrayRef copy = RSMutableCopy(RSAllocatorSystemDefault, coll);
+        RSArrayAddObject(copy, value);
+        return RSAutorelease(copy);
     }
     return nil;
 }

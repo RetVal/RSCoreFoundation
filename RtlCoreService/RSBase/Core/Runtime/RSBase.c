@@ -37,8 +37,10 @@ RSInline RSTypeID __RSGetTypeID(RSTypeRef obj)
 
 RSInline BOOL   __RSCheckInstanceISCustomReferenceType(RSTypeRef obj) {
     RSTypeID typeID = __RSGetTypeID(obj);
-    if (typeID == _RSRuntimeNotATypeID)
+    if (typeID == _RSRuntimeNotATypeID) {
+        __RSCLog(RSLogLevelDebug, "object is <%p>\n", obj);
         HALTWithError(RSInvalidArgumentException, "the type of the object is not a registered class in runtime");
+    }
     const RSRuntimeClass *cls = __RSRuntimeGetClassWithTypeID(typeID);
     if (cls && cls->refcount) return YES;
     return NO;
@@ -264,8 +266,7 @@ RSExport RSTypeRef RSCopy(RSAllocatorRef allocator, RSTypeRef obj)
 {
     if (nil == obj) return nil; //HALTWithError(RSInvalidArgumentException, "the object is nil");
     
-    if (__RSRuntimeInstanceIsClass(obj)) return obj;
-    
+    if (__RSRuntimeInstanceIsSpecial(obj) || __RSRuntimeInstanceIsSpecial(obj) || __RSRuntimeInstanceIsClass(obj)) return obj;
     RSIndex id = _RSRuntimeNotATypeID;
     if ((id = RSGetTypeID(obj)) == _RSRuntimeNotATypeID) HALTWithError(RSInvalidArgumentException, "the object is not available");
     RSRuntimeClass* cls = (RSRuntimeClass*)__RSRuntimeGetClassWithTypeID(id);
@@ -353,6 +354,7 @@ RSExport RSStringRef RSClassGetName(RSClassRef cls) {
 
 RSExport RSTypeID RSClassGetTypeID(RSClassRef cls) {
     if (!cls) return _RSRuntimeNotATypeID;
+    if (!__RSRuntimeInstanceIsClass(cls)) return _RSRuntimeNotATypeID;
     return __RSRuntimeGetClassTypeID(cls);
 }
 

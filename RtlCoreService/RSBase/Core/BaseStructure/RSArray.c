@@ -1997,7 +1997,7 @@ static void __RSArrayReleaseObjects(RSArrayRef array, RSRange range, bool releas
 RSInline void __RSArrayValidateRange(RSArrayRef array, RSRange range, const char *func)
 {
     if (range.location + range.length > RSArrayGetCount(array))
-        __RSCLog(RSLogLevelDebug, "%s", func);
+        __RSCLog(RSLogLevelDebug, "%s\n", func);
 }
 #else
 #define __RSArrayValidateRange(a,r,f)
@@ -2062,8 +2062,8 @@ static RSStringRef __RSArrayClassDescription(RSTypeRef rs)
 //            break;
 //    }
     cb = __RSArrayGetCallBacks(array);
-    RSStringAppendString(result, RSSTR("{\n"));
-    for (idx = 0; idx < cnt; idx++)
+    RSStringAppendString(result, RSSTR("("));
+    for (idx = 0; idx < (cnt - 1); idx++)
     {
         RSStringRef desc = nil;
         const void *val = __RSArrayGetBucketAtIndex(array, idx)->_item;
@@ -2074,14 +2074,32 @@ static RSStringRef __RSArrayClassDescription(RSTypeRef rs)
         if (nil != desc)
         {
 //            RSStringAppendStringWithFormat(result, RSSTR("\t%u : %R\n"), idx, desc);
-            RSStringAppendStringWithFormat(result, RSSTR("\t%R\n"), desc);
+            RSStringAppendStringWithFormat(result, RSSTR("%r "), desc);
             RSRelease(desc);
         } else {
-            RSStringAppendStringWithFormat(result, RSSTR("\t<%p>\n"), val);
+            RSStringAppendStringWithFormat(result, RSSTR("<%p> "), val);
 //            RSStringAppendStringWithFormat(result, RSSTR("\t%u : <%p>\n"), idx, val);
         }
     }
-    RSStringAppendString(result, RSSTR("}"));
+    
+    if (cnt > 0) {
+        RSStringRef desc = nil;
+        const void *val = __RSArrayGetBucketAtIndex(array, idx)->_item;
+        if (nil != cb->copyDescription)
+        {
+            desc = (RSStringRef)INVOKE_CALLBACK1(cb->copyDescription, val);
+        }
+        if (nil != desc)
+        {
+            //            RSStringAppendStringWithFormat(result, RSSTR("\t%u : %R\n"), idx, desc);
+            RSStringAppendStringWithFormat(result, RSSTR("%r"), desc);
+            RSRelease(desc);
+        } else {
+            RSStringAppendStringWithFormat(result, RSSTR("<%p>"), val);
+            //            RSStringAppendStringWithFormat(result, RSSTR("\t%u : <%p>\n"), idx, val);
+        }
+    }
+    RSStringAppendString(result, RSSTR(")"));
     return result;
 }
 

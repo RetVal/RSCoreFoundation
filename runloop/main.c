@@ -19,92 +19,92 @@ void test_fn();
 
 int main(int argc, const char * argv[])
 {
-    RSStringRef content = RSStringWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/leak.txt")));
-    RSArrayRef lines = RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, content, RSSTR("\n"));
-    RSStringRef prefix = RSSTR("RSRuntime debug notice : ");
-    RSArrayRef filterResult = RSFilter(lines, ^BOOL(RSTypeRef x) {
-        return RSStringHasPrefix(x, prefix);
-    });
-    RSRelease(lines);
-    
-    RSShow(RSNumberWithInteger(RSCount(filterResult)));
-    
-    RSArrayRef map = RSMap(filterResult, ^RSTypeRef(RSTypeRef obj) {
-        return RSDrop(RSAutorelease(RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, obj, RSSTR(" "))), 4);
-    });
-    
-    RSArrayRef alloc = RSFilter(map, ^BOOL(RSTypeRef x) {
-        return RSEqual(RSSTR("alloc"), RSArrayObjectAtIndex(x, 1));
-    });
-    
-    RSShow(RSNumberWithInteger(RSCount(alloc)));
-    
-    RSArrayRef dealloc = RSFilter(map, ^BOOL(RSTypeRef x) {
-        return RSEqual(RSSTR("dealloc"), RSArrayObjectAtIndex(x, 1));
-    });
-    
-    RSShow(RSNumberWithInteger(RSCount(dealloc)));
-    
-    RSMultidimensionalDictionaryRef allocDict = RSMultidimensionalDictionaryCreate(RSAllocatorDefault, 2);
-    RSArrayApplyBlock(alloc, RSMakeRange(0, RSArrayGetCount(alloc)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
-        RSStringRef key = RSArrayObjectAtIndex(value, 0);
-        RSStringRef address = RSArrayLastObject(value);
-        RSMutableArrayRef store = (RSMutableArrayRef)RSMultidimensionalDictionaryGetValue(allocDict, key, RSSTR("alloc"));
-        if (!store) {
-            store = RSArrayCreateMutable(RSAllocatorDefault, 0);
-            RSMultidimensionalDictionarySetValue(allocDict, store, key, RSSTR("alloc"));
-            RSRelease(store);
-        }
-        RSArrayAddObject(store, address);
-    });
-    
-    RSArrayApplyBlock(dealloc, RSMakeRange(0, RSArrayGetCount(dealloc)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
-        if (RSEqual(RSArrayObjectAtIndex(value, 0), RSSTR("RSSet"))) {
-            RSShow(RSSTR("hit"));
-        }
-        RSStringRef key = RSArrayObjectAtIndex(value, 0);
-        RSStringRef address = RSArrayLastObject(value);
-        RSMutableArrayRef store = (RSMutableArrayRef)RSMultidimensionalDictionaryGetValue(allocDict, key, RSSTR("alloc"));
-        if (!store) {
-            store = (RSMutableArrayRef)RSMultidimensionalDictionaryGetValue(allocDict, key, RSSTR("dealloc"));
-            if (!store) {
-                store = RSArrayCreateMutable(RSAllocatorDefault, 0);
-                RSMultidimensionalDictionarySetValue(allocDict, store, key, RSSTR("dealloc"));
-                RSRelease(store);
-            }
-            RSArrayAddObject(store, address);
-        } else {
-            if (RSArrayIndexOfObject(store, address) != RSNotFound) {
-                RSArrayRemoveObject(store, address);
-                if (!RSArrayGetCount(store)) {
-                    RSMultidimensionalDictionarySetValue(allocDict, nil, key, RSSTR("alloc"));
-                }
-            } else {
-                store = (RSMutableArrayRef)RSMultidimensionalDictionaryGetValue(allocDict, key, RSSTR("dealloc"));
-                if (!store) {
-                    store = RSArrayCreateMutable(RSAllocatorDefault, 0);
-                    RSMultidimensionalDictionarySetValue(allocDict, store, key, RSSTR("dealloc"));
-                    RSRelease(store);
-                } else {
-                    RSArrayAddObject(store, address);
-                }
-            }
-        }
-    });
-    
-    RSMutableArrayRef dictDeallocStore = (RSMutableArrayRef)RSMultidimensionalDictionaryGetValueWithKeyPaths(allocDict, RSSTR("RSDictionary.dealloc"));
-    RSMutableArrayRef basicHashAllocStore = (RSMutableArrayRef)RSMultidimensionalDictionaryGetValueWithKeyPaths(allocDict, RSSTR("RSBasicHash.alloc"));
-    RSMutableArrayRef rst = RSArrayCreateMutable(RSAllocatorDefault, 0);
-    RSArrayApplyBlock(basicHashAllocStore, RSMakeRange(0, RSArrayGetCount(basicHashAllocStore)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
-        if (RSNotFound == RSArrayIndexOfObject(dictDeallocStore, value)) {
-            RSArrayAddObject(rst, value);
-        }
-    });
-    RSArrayWriteToFile(rst, RSFileManagerStandardizingPath(RSSTR("~/Desktop/leak2.plist")), RSWriteFileAutomatically);
-    RSRelease(rst);
-    RSDictionaryWriteToFile(RSMultidimensionalDictionaryGetDimensionEntry(allocDict), RSFileManagerStandardizingPath(RSSTR("~/Desktop/leak.plist")), RSWriteFileAutomatically);
-    RSRelease(allocDict);
-    return 0;
+//    RSStringRef content = RSStringWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/leak.txt")));
+//    RSArrayRef lines = RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, content, RSSTR("\n"));
+//    RSStringRef prefix = RSSTR("RSRuntime debug notice : ");
+//    RSArrayRef filterResult = RSFilter(lines, ^BOOL(RSTypeRef x) {
+//        return RSStringHasPrefix(x, prefix);
+//    });
+//    RSRelease(lines);
+//    
+//    RSShow(RSNumberWithInteger(RSCount(filterResult)));
+//    
+//    RSArrayRef map = RSMap(filterResult, ^RSTypeRef(RSTypeRef obj) {
+//        return RSDrop(RSAutorelease(RSStringCreateComponentsSeparatedByStrings(RSAllocatorDefault, obj, RSSTR(" "))), 4);
+//    });
+//    
+//    RSArrayRef alloc = RSFilter(map, ^BOOL(RSTypeRef x) {
+//        return RSEqual(RSSTR("alloc"), RSArrayObjectAtIndex(x, 1));
+//    });
+//    
+//    RSShow(RSNumberWithInteger(RSCount(alloc)));
+//    
+//    RSArrayRef dealloc = RSFilter(map, ^BOOL(RSTypeRef x) {
+//        return RSEqual(RSSTR("dealloc"), RSArrayObjectAtIndex(x, 1));
+//    });
+//    
+//    RSShow(RSNumberWithInteger(RSCount(dealloc)));
+//    
+//    RSMultidimensionalDictionaryRef allocDict = RSMultidimensionalDictionaryCreate(RSAllocatorDefault, 2);
+//    RSArrayApplyBlock(alloc, RSMakeRange(0, RSArrayGetCount(alloc)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+//        RSStringRef key = RSArrayObjectAtIndex(value, 0);
+//        RSStringRef address = RSArrayLastObject(value);
+//        RSMutableArrayRef store = (RSMutableArrayRef)RSMultidimensionalDictionaryGetValue(allocDict, key, RSSTR("alloc"));
+//        if (!store) {
+//            store = RSArrayCreateMutable(RSAllocatorDefault, 0);
+//            RSMultidimensionalDictionarySetValue(allocDict, store, key, RSSTR("alloc"));
+//            RSRelease(store);
+//        }
+//        RSArrayAddObject(store, address);
+//    });
+//    
+//    RSArrayApplyBlock(dealloc, RSMakeRange(0, RSArrayGetCount(dealloc)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+//        if (RSEqual(RSArrayObjectAtIndex(value, 0), RSSTR("RSSet"))) {
+//            RSShow(RSSTR("hit"));
+//        }
+//        RSStringRef key = RSArrayObjectAtIndex(value, 0);
+//        RSStringRef address = RSArrayLastObject(value);
+//        RSMutableArrayRef store = (RSMutableArrayRef)RSMultidimensionalDictionaryGetValue(allocDict, key, RSSTR("alloc"));
+//        if (!store) {
+//            store = (RSMutableArrayRef)RSMultidimensionalDictionaryGetValue(allocDict, key, RSSTR("dealloc"));
+//            if (!store) {
+//                store = RSArrayCreateMutable(RSAllocatorDefault, 0);
+//                RSMultidimensionalDictionarySetValue(allocDict, store, key, RSSTR("dealloc"));
+//                RSRelease(store);
+//            }
+//            RSArrayAddObject(store, address);
+//        } else {
+//            if (RSArrayIndexOfObject(store, address) != RSNotFound) {
+//                RSArrayRemoveObject(store, address);
+//                if (!RSArrayGetCount(store)) {
+//                    RSMultidimensionalDictionarySetValue(allocDict, nil, key, RSSTR("alloc"));
+//                }
+//            } else {
+//                store = (RSMutableArrayRef)RSMultidimensionalDictionaryGetValue(allocDict, key, RSSTR("dealloc"));
+//                if (!store) {
+//                    store = RSArrayCreateMutable(RSAllocatorDefault, 0);
+//                    RSMultidimensionalDictionarySetValue(allocDict, store, key, RSSTR("dealloc"));
+//                    RSRelease(store);
+//                } else {
+//                    RSArrayAddObject(store, address);
+//                }
+//            }
+//        }
+//    });
+//    
+//    RSMutableArrayRef dictDeallocStore = (RSMutableArrayRef)RSMultidimensionalDictionaryGetValueWithKeyPaths(allocDict, RSSTR("RSDictionary.dealloc"));
+//    RSMutableArrayRef basicHashAllocStore = (RSMutableArrayRef)RSMultidimensionalDictionaryGetValueWithKeyPaths(allocDict, RSSTR("RSBasicHash.alloc"));
+//    RSMutableArrayRef rst = RSArrayCreateMutable(RSAllocatorDefault, 0);
+//    RSArrayApplyBlock(basicHashAllocStore, RSMakeRange(0, RSArrayGetCount(basicHashAllocStore)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+//        if (RSNotFound == RSArrayIndexOfObject(dictDeallocStore, value)) {
+//            RSArrayAddObject(rst, value);
+//        }
+//    });
+//    RSArrayWriteToFile(rst, RSFileManagerStandardizingPath(RSSTR("~/Desktop/leak2.plist")), RSWriteFileAutomatically);
+//    RSRelease(rst);
+//    RSDictionaryWriteToFile(RSMultidimensionalDictionaryGetDimensionEntry(allocDict), RSFileManagerStandardizingPath(RSSTR("~/Desktop/leak.plist")), RSWriteFileAutomatically);
+//    RSRelease(allocDict);
+//    return 0;
     test_fn();
     return 0;
     if (4 != argc) {
@@ -153,9 +153,32 @@ int main(int argc, const char * argv[])
 
 #include "../../Risp/Risp/RSNumberOperation.h"
 #include "../../Risp/Risp/RSNumberOperation.c"
-
+#include <dispatch/dispatch.h>
 void test_fn() {
     if (1) {
+        RSArrayRef range = RSPerformBlockConcurrentCopyResults(400000, ^RSTypeRef(RSIndex idx) {
+            return RSNumberWithInteger(idx);
+        });
+        RSURLRequestRef request = RSURLRequestWithURL(RSURLWithString(RSSTR("http://www.taobao.com")));
+        dispatch_group_t g = dispatch_group_create();
+//        __block RSSpinLock lock = RSSpinLockInit;
+        RSArrayApplyBlock(range, RSMakeRange(0, RSArrayGetCount(range)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+            dispatch_group_async(g, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 2), ^{
+                RSURLResponseRef response = nil;
+                RSErrorRef error = nil;
+                RSDataRef data = RSURLConnectionSendSynchronousRequest(request, &response, &error);
+                if (data) {
+                    RSShow(response);
+                } else {
+                    RSShow(error);
+                }
+            });
+        });
+        dispatch_group_wait(g, DISPATCH_TIME_FOREVER);
+//        RSArrayWriteToFile(result, RSFileManagerStandardizingPath(RSSTR("~/Desktop/result.plist")), RSWriteFileAutomatically);
+        return;
+    }
+    if (0) {
         RSListRef list = RSShow(RSAutorelease(RSListCreateWithArray(RSAllocatorDefault, RSAutorelease(RSArrayCreate(RSAllocatorDefault, RSNumberWithInt(0),RSNumberWithInt(1),RSNumberWithInt(2),RSNumberWithInt(3),RSNumberWithInt(4),RSNumberWithInt(5),RSNumberWithInt(6),RSNumberWithInt(7),RSNumberWithInt(8),RSNumberWithInt(9) ,NULL)))));
         RSListRef new = RSMap(list, ^RSTypeRef(RSTypeRef obj) {
             return numberAdd(obj, RSNumberWithInt(1));
