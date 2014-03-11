@@ -3627,7 +3627,7 @@ static RSStringRef __RSBundleCreateResourcePath(RSBundleRef bundle, RSStringRef 
             if (type)
                 path = RSStringCreateWithFormat(RSGetAllocator(bundle), RSSTR("%r/%r%r.%r"), RSBundleGetPath(bundle), resourcesPath, name, type);
             else
-                path = path = RSStringCreateWithFormat(RSGetAllocator(bundle), RSSTR("%r/%r%r"), RSBundleGetPath(bundle), resourcesPath, name);
+                path = RSStringCreateWithFormat(RSGetAllocator(bundle), RSSTR("%r/%r%r"), RSBundleGetPath(bundle), resourcesPath, name);
     }
     return path;
 }
