@@ -82,6 +82,9 @@ RSExport RSIndex    RSArrayGetCount(RSArrayRef array) RS_AVAILABLE(0_0);
 RSExport RSTypeRef  RSArrayObjectAtIndex(RSArrayRef array, RSIndex idx) RS_AVAILABLE(0_0);
 RSExport void RSArraySetObjectAtIndex(RSMutableArrayRef array, RSIndex idx, const void *value) RS_AVAILABLE(0_0);
 RSExport void RSArrayInsertObjectAtIndex(RSMutableArrayRef array, RSIndex idx, const void *value) RS_AVAILABLE(0_3);
+
+RSExport RSTypeRef  RSArrayFirstObject(RSArrayRef array) RS_AVAILABLE(0_4);
+
 /*! @function RSArrayLastObject
  @abstract Return the RSTypeRef that the object in the array at the last index.
  @discussion This function return the object in the array at the last index.

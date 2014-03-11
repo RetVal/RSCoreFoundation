@@ -4055,7 +4055,6 @@ RSInline BOOL __RSStringDescriptionShouldHasQuotationMask(RSStringRef str) {
     return NO;
 }
 
-RS_CONST_STRING_DECL(_RSEmptyStringWithQuotationMask, "\"\"");
 RSInline RSStringRef __RSStringDescriptionEx(RSTypeRef rs) {
     if (__RSStringDescriptionShouldHasQuotationMask(rs))
     {

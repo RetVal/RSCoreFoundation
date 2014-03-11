@@ -19,7 +19,7 @@ RSExport RSTypeID RSListGetTypeID();
 RSExport RSListRef RSListCreate(RSAllocatorRef allocator, RSTypeRef a, ...);
 RSExport RSListRef RSListCreateWithArray(RSAllocatorRef allocator, RSArrayRef array);
 RSExport RSIndex RSListGetCount(RSListRef list);
-RSExport void RSListApplyBlock(RSListRef list, void (^fn)(RSTypeRef value));
+RSExport void RSListApplyBlock(RSListRef list, void (^fn)(RSTypeRef value, BOOL *isStop));
 RSExport RSListRef RSListCreateDrop(RSAllocatorRef allocator, RSListRef list, RSIndex n);
 RSExport RSArrayRef RSListCreateArray(RSListRef list);
 RS_EXTERN_C_END

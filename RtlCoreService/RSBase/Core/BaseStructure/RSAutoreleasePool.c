@@ -70,10 +70,8 @@ static BOOL magic_t_fastcheck(struct magic_t* m)
 #define __poolMask 0xFFFFF000
 #endif
 
-static pthread_key_t const __RSAutoreleasePoolThreadKey = RSAutoreleasePageKey;
 static uint8_t const __RSAutoreleasePoolPageScribble = 0xA3;
 static size_t const __RSAutoreleasePoolPageSize = 4096; //getpagesize() = 4096;
-static size_t const __RSAutoreleasePoolPageCount = __RSAutoreleasePoolPageSize / sizeof(RSTypeRef);
 RSExport void __RS_AUTORELEASEPOOL_RELEASE__(RSTypeRef obj) __attribute__((noinline));
 
 struct __RSAutoreleasePool

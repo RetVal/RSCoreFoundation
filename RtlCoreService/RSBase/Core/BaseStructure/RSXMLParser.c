@@ -136,7 +136,7 @@ static const int parse_normalize_whitespace = 0x800;
 //! and using the flag will disable it.
 //! <br><br>
 //! See xml_document::parse() function.
-static const int parse_default = 0;
+static const int parse_default __unused = 0;
 
 //! A combination of parse flags that forbids any modifications of the source text.
 //! This also results in faster parsing. However, note that the following will occur:
@@ -151,13 +151,13 @@ static const int parse_non_destructive = parse_no_string_terminators | parse_no_
 //! A combination of parse flags resulting in fastest possible parsing, without sacrificing important data.
 //! <br><br>
 //! See xml_document::parse() function.
-static const int parse_fastest = parse_non_destructive | parse_no_data_nodes;
+static const int parse_fastest __unused = parse_non_destructive | parse_no_data_nodes;
 
 //! A combination of parse flags resulting in largest amount of data being extracted.
 //! This usually results in slowest parsing.
 //! <br><br>
 //! See xml_document::parse() function.
-static const int parse_full = parse_declaration_node | parse_comment_nodes | parse_doctype_node | parse_pi_nodes | parse_validate_closing_tags;
+static const int parse_full __unused = parse_declaration_node | parse_comment_nodes | parse_doctype_node | parse_pi_nodes | parse_validate_closing_tags;
 
 // Whitespace (space \n \r \t)
 static const unsigned char lookup_tables_lookup_whitespace[256] =

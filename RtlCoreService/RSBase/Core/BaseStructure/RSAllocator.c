@@ -499,7 +499,7 @@ static void __RSAllocatorCustomDestroy(malloc_zone_t *zone) {
 static void __RSAllocatorNullDestroy(malloc_zone_t *zone) {
 }
 
-static const struct __RSRuntimeBase __RSRuntimeClassBase = (const struct __RSRuntimeBase){
+static const struct __RSRuntimeBase __RSRuntimeClassBase = (const struct __RSRuntimeBase) {
     ._rsisa = 0,
     ._rc = 1,
     ._rsinfo._reserved = 0,

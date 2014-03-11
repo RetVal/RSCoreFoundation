@@ -2450,42 +2450,47 @@ RSExport BOOL RSArrayContainsObject(RSArrayRef array, RSRange range, const void 
     return NO;
 }
 
-const void *RSArrayObjectAtIndex(RSArrayRef array, RSIndex idx)
+RSExport const void *RSArrayObjectAtIndex(RSArrayRef array, RSIndex idx)
 {
     if (!array) return nil;
     __RSGenericValidInstance(array, __RSArrayTypeID);
     return __RSArrayGetBucketAtIndex(array, idx)->_item;
 }
 
-RSTypeRef RSArrayLastObject(RSArrayRef array)
+RSExport RSTypeRef  RSArrayFirstObject(RSArrayRef array) {
+    if (!array) return nil;
+    return RSArrayObjectAtIndex(array, 0);
+}
+
+RSExport RSTypeRef RSArrayLastObject(RSArrayRef array)
 {
     if (RSArrayGetCount(array))
         return RSArrayObjectAtIndex(array, RSArrayGetCount(array) - 1);
     return nil;
 }
 
-void RSArrayRemoveObject(RSMutableArrayRef array, RSTypeRef object)
+RSExport void RSArrayRemoveObject(RSMutableArrayRef array, RSTypeRef object)
 {
     RSIndex idx = RSArrayIndexOfObject(array, object);
     if (idx == RSNotFound) return;
     RSArrayRemoveObjectAtIndex(array, idx);
 }
 
-void RSArrayRemoveLastObject(RSMutableArrayRef array)
+RSExport void RSArrayRemoveLastObject(RSMutableArrayRef array)
 {
     if (RSArrayGetCount(array))
         RSArrayRemoveObjectAtIndex(array, RSArrayGetCount(array) - 1);
 }
 
 // This is for use by NSRSArray; it avoids ObjC dispatch, and checks for out of bounds
-const void *_RSArrayCheckAndGetObjectAtIndex(RSArrayRef array, RSIndex idx)
+RSExport const void *_RSArrayCheckAndGetObjectAtIndex(RSArrayRef array, RSIndex idx)
 {
     if (0 <= idx && idx < __RSArrayGetCount(array)) return __RSArrayGetBucketAtIndex(array, idx)->_item;
     return (void *)(-1);
 }
 
 
-void RSArrayGetObjects(RSArrayRef array, RSRange range, const void **values)
+RSExport void RSArrayGetObjects(RSArrayRef array, RSRange range, const void **values)
 {
     __RSGenericValidInstance(array, __RSArrayTypeID);
     __RSArrayValidateRange(array, range, __PRETTY_FUNCTION__);
@@ -2501,7 +2506,7 @@ void RSArrayGetObjects(RSArrayRef array, RSRange range, const void **values)
     }
 }
 
-void RSArrayApplyFunction(RSArrayRef array, RSRange range, RSArrayApplierFunction applier, void *context) 
+RSExport void RSArrayApplyFunction(RSArrayRef array, RSRange range, RSArrayApplierFunction applier, void *context)
 {
     RSIndex idx;
     FAULT_CALLBACK((void **)&(applier));
@@ -2533,7 +2538,7 @@ RSExport void RSArrayApplyBlock(RSArrayRef array, RSRange range, void (^block)(c
 }
 #endif
 
-RSIndex RSArrayGetFirstIndexOfObject(RSArrayRef array, RSRange range, const void *value)
+RSExport RSIndex RSArrayGetFirstIndexOfObject(RSArrayRef array, RSRange range, const void *value)
 {
     RSIndex idx;
     __RSGenericValidInstance(array, __RSArrayTypeID);

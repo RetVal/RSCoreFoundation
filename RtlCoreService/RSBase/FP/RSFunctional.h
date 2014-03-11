@@ -25,6 +25,7 @@ RSExport RSTypeRef RSReduce(RSCollectionRef coll, RSTypeRef (^fn)(RSTypeRef a, R
 RSExport RSCollectionRef RSNext(RSCollectionRef coll);
 RSExport RSTypeRef RSFirst(RSCollectionRef coll);
 RSExport RSTypeRef RSSecond(RSCollectionRef coll);
+RSExport RSTypeRef RSNth(RSCollectionRef coll, RSIndex idx);
 
 RSExport RSCollectionRef RSConjoin(RSCollectionRef coll, RSTypeRef value);
 RSExport RSCollectionRef RSReverse(RSCollectionRef coll);

@@ -380,12 +380,13 @@ RSExport RSListRef RSListCreate(RSAllocatorRef allocator, RSTypeRef a, ...) {
     return list;
 }
 
-RSExport void RSListApplyBlock(RSListRef list, void (^fn)(RSTypeRef value)) {
+RSExport void RSListApplyBlock(RSListRef list, void (^fn)(RSTypeRef value, BOOL *isStop)) {
     if (!list || !fn) return;
     __RSGenericValidInstance(list, _RSListTypeID);
     RSNodeRef node = list->_head;
-    for (RSUInteger idx = 0; node && idx < list->_count; idx++) {
-        fn(__RSNodeGetValue(node));
+    BOOL stop = NO;
+    for (RSUInteger idx = 0; node && idx < list->_count && !stop; idx++) {
+        fn(__RSNodeGetValue(node), &stop);
         node = node->_next;
     }
 }
@@ -436,12 +437,34 @@ RSExport RSTypeRef RSFirst(RSCollectionRef coll) {
     if (RSInstanceIsMemberOfClass(coll, &__RSListClass)) {
         RSListRef list = (RSListRef)coll;
         return __RSNodeGetValue(list->_head);
+    } else if (RSArrayGetTypeID() == RSGetTypeID(coll)) {
+        return RSArrayObjectAtIndex(coll, 0);
     }
     return nil;
 }
 
 RSExport RSTypeRef RSSecond(RSCollectionRef coll) {
     return RSFirst(RSNext(coll));
+}
+
+RSExport RSTypeRef RSNth(RSCollectionRef coll, RSIndex idx) {
+    if (!coll || coll == RSNil) return nil;
+    if (RSArrayGetTypeID() == RSGetTypeID(coll)) {
+        return RSArrayObjectAtIndex(coll, idx);
+    } else if (RSListGetTypeID() == RSGetTypeID(coll)) {
+        if (RSListGetCount(coll) >= idx) return nil;
+        __block RSIndex offset = 0;
+        __block RSTypeRef v = nil;
+        RSListApplyBlock(coll, ^(RSTypeRef value, BOOL *stop) {
+            if (offset == idx) {
+                v = value;
+                *stop = YES;
+            }
+            offset ++;
+        });
+        return v;
+    }
+    return nil;
 }
 
 RSExport RSCollectionRef RSConjoin(RSCollectionRef coll, RSTypeRef value) {

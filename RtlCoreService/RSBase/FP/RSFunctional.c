@@ -21,7 +21,7 @@ static RSTypeRef __RSApplyArray(RSArrayRef coll, void (^fn)(RSTypeRef obj)) {
 }
 
 static RSTypeRef __RSApplyList(RSListRef coll, void (^fn)(RSTypeRef obj)) {
-    RSListApplyBlock(coll, ^(RSTypeRef value) {
+    RSListApplyBlock(coll, ^(RSTypeRef value, BOOL *stop) {
         fn(value);
     });
     return nil;
@@ -80,7 +80,7 @@ static RSArrayRef __RSMapArray(RSArrayRef coll, RSTypeRef (^fn)(RSTypeRef obj)) 
 static RSListRef __RSReverseList(RSListRef list);
 static RSListRef __RSMapList(RSListRef coll, RSTypeRef (^fn)(RSTypeRef obj)) {
     __block RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
-    RSListApplyBlock(coll, ^(RSTypeRef node) {
+    RSListApplyBlock(coll, ^(RSTypeRef node, BOOL *stop) {
         RSArrayAddObject(array, fn(node));
     });
     RSListRef rst = RSAutorelease(RSListCreateWithArray(RSAllocatorSystemDefault, array));
@@ -205,7 +205,7 @@ static RSArrayRef __RSFilterArray(RSArrayRef coll, BOOL (^pred)(RSTypeRef x)) {
 
 static RSListRef __RSFilterList(RSListRef coll, BOOL (^pred)(RSTypeRef x)) {
     RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
-    RSListApplyBlock(coll, ^(RSTypeRef value) {
+    RSListApplyBlock(coll, ^(RSTypeRef value, BOOL *stop) {
         if (pred(value))
             RSArrayAddObject(array, value);
     });
@@ -312,7 +312,7 @@ static RSListRef __RSMergeList(RSArrayRef colls) {
     RSListRef merge = nil;
     RSMutableArrayRef buf = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
     RSArrayApplyBlock(colls, RSMakeRange(0, RSArrayGetCount(colls)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
-        RSListApplyBlock(value, ^(RSTypeRef value) {
+        RSListApplyBlock(value, ^(RSTypeRef value, BOOL *stop) {
             RSArrayAddObject(buf, value);
         });
     });
