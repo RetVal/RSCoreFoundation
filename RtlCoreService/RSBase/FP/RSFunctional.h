@@ -19,7 +19,11 @@ typedef RSTypeRef RSCollectionRef;
 
 // RSList, RSArray
 RSExport RSTypeRef RSApply(RSCollectionRef coll, void (^fn)(RSTypeRef obj));
+RSExport RSTypeRef RSApplyWithRange(RSCollectionRef coll, RSRange range, void (^fn)(RSTypeRef obj));
+
 RSExport RSCollectionRef RSMap(RSCollectionRef coll, RSTypeRef (^fn)(RSTypeRef obj));
+RSExport RSCollectionRef RSMapWithRange(RSCollectionRef coll, RSRange range, RSTypeRef (^fn)(RSTypeRef obj));
+
 RSExport RSTypeRef RSReduce(RSCollectionRef coll, RSTypeRef (^fn)(RSTypeRef a, RSTypeRef b));
 RSExport RSTypeRef RSReduceWithRange(RSCollectionRef coll, RSRange range, RSTypeRef (^fn)(RSTypeRef a, RSTypeRef b));
 

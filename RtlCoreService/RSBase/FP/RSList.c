@@ -380,14 +380,24 @@ RSExport RSListRef RSListCreate(RSAllocatorRef allocator, RSTypeRef a, ...) {
     return list;
 }
 
-RSExport void RSListApplyBlock(RSListRef list, void (^fn)(RSTypeRef value, BOOL *isStop)) {
+RSInline void __RSListValidateRange(RSListRef list, RSRange range, const char *func)
+{
+    if (range.location + range.length > RSListGetCount(list))
+        __RSCLog(RSLogLevelDebug, "%s\n", func);
+}
+
+RSExport void RSListApplyBlock(RSListRef list, RSRange range, void (^fn)(RSTypeRef value, BOOL *isStop)) {
     if (!list || !fn) return;
     __RSGenericValidInstance(list, _RSListTypeID);
+    __RSListValidateRange(list, range, __PRETTY_FUNCTION__);
     RSNodeRef node = list->_head;
     BOOL stop = NO;
-    for (RSUInteger idx = 0; node && idx < list->_count && !stop; idx++) {
+    for (RSUInteger idx = range.location; node && idx < range.length && !stop; idx++) {
         fn(__RSNodeGetValue(node), &stop);
-        node = node->_next;
+        if (node->_next)
+            node = node->_next;
+        else
+            break;
     }
 }
 
@@ -426,6 +436,7 @@ RSExport RSArrayRef RSListCreateArray(RSListRef list) {
     RSNodeRef node = list->_head;
     for (RSUInteger idx = 0; idx < list->_count; idx++) {
         RSArrayAddObject(array, __RSNodeGetValue(node));
+        node = node->_next;
     }
     return array;
 }
@@ -455,7 +466,7 @@ RSExport RSTypeRef RSNth(RSCollectionRef coll, RSIndex idx) {
         if (RSListGetCount(coll) >= idx) return nil;
         __block RSIndex offset = 0;
         __block RSTypeRef v = nil;
-        RSListApplyBlock(coll, ^(RSTypeRef value, BOOL *stop) {
+        RSListApplyBlock(coll, RSMakeRange(0, RSListGetCount(coll)), ^(RSTypeRef value, BOOL *stop) {
             if (offset == idx) {
                 v = value;
                 *stop = YES;
