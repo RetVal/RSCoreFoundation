@@ -25,7 +25,7 @@ RSExport RSStringRef const RSKeyedArchiveRootObjectKey;
 RSExport RSTypeID RSArchiverGetTypeID() RS_AVAILABLE(0_0);
 
 typedef RSDataRef (*RSArchiverSerializeCallBack)(RSArchiverRef archiver, RSTypeRef object);
-typedef RSTypeRef (*RSArchiverDeserializeCallBack)(RSUnarchiverRef archiver, RSDataRef data);
+typedef RSTypeRef (*RSArchiverDeserializeCallBack)(RSUnarchiverRef unarchiver, RSDataRef data);
 typedef struct __RSArchiverCallBacks {
     RSIndex version;
     RSTypeID classID;

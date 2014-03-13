@@ -315,6 +315,7 @@ struct  __RSRuntimeClass __RSDateClass =
     nil,
     nil,
 };
+
 static  void __RSDateAvailable(RSDateRef date)
 {
     if (date == nil) HALTWithError(RSInvalidArgumentException, "date is nil");

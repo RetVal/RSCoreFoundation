@@ -126,8 +126,12 @@ RSExport RSCollectionRef RSMap(RSCollectionRef coll, RSTypeRef (^fn)(RSTypeRef o
 #pragma mark -
 #pragma mark Reduce API Group
 
-static RSTypeRef __RSReduceArray(RSArrayRef coll, RSTypeRef (^fn)(RSTypeRef a, RSTypeRef b)) {
-    __block RSTypeRef result = RSArrayObjectAtIndex(coll, 0);
+static RSTypeRef __RSReduceArray(RSArrayRef coll, RSRange range, RSTypeRef (^fn)(RSTypeRef a, RSTypeRef b)) {
+    if (range.location == -1) {
+        range.location = 0;
+        range.length = RSArrayGetCount(coll);
+    }
+    __block RSTypeRef result = RSArrayObjectAtIndex(coll, range.location);
     if (RSArrayGetCount(coll) == 1)
         return RSAutorelease(fn(result, nil));
     else if (RSArrayGetCount(coll) == 2) {
@@ -135,7 +139,7 @@ static RSTypeRef __RSReduceArray(RSArrayRef coll, RSTypeRef (^fn)(RSTypeRef a, R
     }
     
     RSAutoreleaseBlock(^{
-        RSArrayApplyBlock(coll, RSMakeRange(1, RSArrayGetCount(coll) - 1), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+        RSArrayApplyBlock(coll, RSMakeRange(range.location + 1, range.length - 1), ^(const void *value, RSUInteger idx, BOOL *isStop) {
             result = fn(result, value);
         });
         RSRetain(result);
@@ -143,12 +147,25 @@ static RSTypeRef __RSReduceArray(RSArrayRef coll, RSTypeRef (^fn)(RSTypeRef a, R
     return RSAutorelease(result);
 }
 
-static RSTypeRef __RSReduceList(RSListRef coll, RSTypeRef (^fn)(RSTypeRef a, RSTypeRef b)) {
-    __block RSTypeRef result = RSFirst(coll);
+static RSTypeRef __RSReduceList(RSListRef coll, RSRange range, RSTypeRef (^fn)(RSTypeRef a, RSTypeRef b)) {
+    
     __block RSCollectionRef cache = coll;
+    if (range.location == -1) {
+        range.location = 0;
+        range.length = RSListGetCount(coll);
+    }
+    __block RSTypeRef result = nil;
     RSAutoreleaseBlock(^{
-        while ((cache = RSNext(cache))) {
+        RSIndex idx = 0;
+        while (idx < range.location) {
+            cache = RSNext(cache);
+            idx ++;
+        }
+        result = RSFirst(cache);
+        idx = 0;
+        while ((cache = RSNext(cache)) && idx < range.length) {
             result = fn(result, RSFirst(cache));
+            idx++;
         }
         RSRetain(result);
     });
@@ -156,8 +173,12 @@ static RSTypeRef __RSReduceList(RSListRef coll, RSTypeRef (^fn)(RSTypeRef a, RST
 }
 
 RSExport RSTypeRef RSReduce(RSCollectionRef coll, RSTypeRef (^fn)(RSTypeRef a, RSTypeRef b)) {
-    if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSArray"))) return __RSReduceArray(coll, fn);
-    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSList"))) return __RSReduceList(coll, fn);
+    return RSReduceWithRange(coll, RSMakeRange(-1, -1), fn);
+}
+
+RSExport RSTypeRef RSReduceWithRange(RSCollectionRef coll, RSRange range, RSTypeRef (^fn)(RSTypeRef a, RSTypeRef b)) {
+    if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSArray"))) return __RSReduceArray(coll, range, fn);
+    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSList"))) return __RSReduceList(coll, range, fn);
     return nil;
 }
 

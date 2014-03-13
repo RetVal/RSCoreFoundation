@@ -156,6 +156,14 @@ int main(int argc, const char * argv[])
 #include <dispatch/dispatch.h>
 void test_fn() {
     if (1) {
+        RSShow(RSReduceWithRange(RSAutorelease(RSListCreate(RSAllocatorDefault, RSNumberWithInt(1), RSNumberWithInt(2), RSNumberWithInt(3), nil)), RSMakeRange(1, 2), ^RSTypeRef(RSTypeRef a, RSTypeRef b) {
+            RSShow(a);
+            RSShow(b);
+            return a;
+        }));
+        return;
+    }
+    if (1) {
         RSArrayRef range = RSPerformBlockConcurrentCopyResults(400000, ^RSTypeRef(RSIndex idx) {
             return RSNumberWithInteger(idx);
         });

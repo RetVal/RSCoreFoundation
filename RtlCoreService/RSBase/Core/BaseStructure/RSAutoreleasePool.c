@@ -221,6 +221,7 @@ static void __RSAutoreleasePoolClassDeallocate(RSTypeRef obj);
 
 RSPrivate void __RSAutoreleasePoolReleaseUntil(RSAutoreleasePoolRef pool, RSTypeRef *stop)
 {
+    RSIndex cnt __unused = 0;
     // Not recursive: we don't want to blow out the stack
     // if a thread accumulates a stupendous amount of garbage
     while (pool && pool->_next != stop)
@@ -256,6 +257,7 @@ RSPrivate void __RSAutoreleasePoolReleaseUntil(RSAutoreleasePoolRef pool, RSType
 #endif
 //            __RSCLog(RSLogLevelNotice, "RSAutoreleasePool release %p [%lld][rc = %lld]\n", obj, RSGetTypeID(obj), RSGetRetainCount(obj));
             __RS_AUTORELEASEPOOL_RELEASE__(obj);
+            cnt++;
         }
         else HALTWithError(RSInvalidArgumentException, "RSAutoreleasePool should not have nil!");
     }
@@ -562,7 +564,6 @@ RSExport void RSAutoreleasePoolDrain(RSAutoreleasePoolRef pool)
         setHotPool(nil);
         return;
     }
-    
     while (pool != nil && pool != orginal)
     {
         releaseAll(pool);
