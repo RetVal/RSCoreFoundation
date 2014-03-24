@@ -918,6 +918,8 @@ RSExport RSStringRef __RSFileManagerStandardizingPath(RSStringRef path)
 
 RSExport __autorelease RSStringRef RSFileManagerStandardizingPath(RSStringRef path)
 {
+    if (!path)
+        return nil;
     return RSAutorelease(__RSFileManagerStandardizingPath(path));
 }
 

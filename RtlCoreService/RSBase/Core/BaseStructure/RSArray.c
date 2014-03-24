@@ -2309,16 +2309,26 @@ RSExport RSArrayRef __RSArrayCreateCopy0(RSAllocatorRef allocator, RSArrayRef ar
     buckets = __RSArrayGetBucketsPtr(result);
     bucketsAllocator = allocator;
 	bucketsBase = nil;
-    for (idx = 0; idx < numObjects; idx++)
-    {
-        const void *value = RSArrayObjectAtIndex(array, idx);
-        if (nil != cb->retain)
+    if (&RSTypeArrayCallBacks == cb) {
+        for (idx = 0; idx < numObjects; idx++)
         {
-            value = (void *)INVOKE_CALLBACK2(cb->retain, allocator, value);
+            const void *value = RSCopy(allocator, RSArrayObjectAtIndex(array, idx));
+            __RSAssignWithWriteBarrier((void **)&buckets->_item, (void *)value);
+            buckets++;
         }
-        __RSAssignWithWriteBarrier((void **)&buckets->_item, (void *)value);
-        buckets++;
+    } else {
+        for (idx = 0; idx < numObjects; idx++)
+        {
+            const void *value = RSArrayObjectAtIndex(array, idx);
+            if (nil != cb->retain)
+            {
+                value = (void *)INVOKE_CALLBACK2(cb->retain, allocator, value);
+            }
+            __RSAssignWithWriteBarrier((void **)&buckets->_item, (void *)value);
+            buckets++;
+        }
     }
+    
     __RSArraySetCount(result, numObjects);
     return result;
 }
@@ -2341,10 +2351,20 @@ RSExport RSMutableArrayRef __RSArrayCreateMutableCopy0(RSAllocatorRef allocator,
     flags = __RSArrayDeque;
     result = (RSMutableArrayRef)__RSArrayInit(allocator, flags, capacity, cb);
     if (0 == capacity) _RSArraySetCapacity(result, numObjects);
-    for (idx = 0; idx < numObjects; idx++)
-    {
-        const void *value = RSArrayObjectAtIndex(array, idx);
-        RSArrayAddObject(result, value);
+    
+    if (cb == &RSTypeArrayCallBacks) {
+        for (idx = 0; idx < numObjects; idx++)
+        {
+            const void *value = RSMutableCopy(RSAllocatorDefault, RSArrayObjectAtIndex(array, idx));
+            RSArrayAddObject(result, value);
+            RSRelease(value);
+        }
+    } else {
+        for (idx = 0; idx < numObjects; idx++)
+        {
+            const void *value = RSArrayObjectAtIndex(array, idx);
+            RSArrayAddObject(result, value);
+        }
     }
     return result;
 }
@@ -2459,6 +2479,8 @@ RSExport const void *RSArrayObjectAtIndex(RSArrayRef array, RSIndex idx)
 
 RSExport RSTypeRef  RSArrayFirstObject(RSArrayRef array) {
     if (!array) return nil;
+    __RSGenericValidInstance(array, __RSArrayTypeID);
+    if (RSArrayGetCount(array) == 0) return nil;
     return RSArrayObjectAtIndex(array, 0);
 }
 

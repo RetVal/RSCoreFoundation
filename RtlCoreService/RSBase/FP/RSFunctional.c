@@ -13,21 +13,31 @@
 #pragma mark -
 #pragma mark Apply API Group
 
-static RSTypeRef __RSApplyArray(RSArrayRef coll, void (^fn)(RSTypeRef obj)) {
-    RSArrayApplyBlock(coll, RSMakeRange(0, RSArrayGetCount(coll)), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+static RSTypeRef __RSApplyArray(RSArrayRef coll, RSRange range, void (^fn)(RSTypeRef obj)) {
+    if (range.location == -1) {
+        range = RSMakeRange(0, RSArrayGetCount(coll));
+    }
+    RSArrayApplyBlock(coll, range, ^(const void *value, RSUInteger idx, BOOL *isStop) {
         fn(value);
     });
     return nil;
 }
 
-static RSTypeRef __RSApplyList(RSListRef coll, void (^fn)(RSTypeRef obj)) {
-    RSListApplyBlock(coll, RSMakeRange(0, RSListGetCount(coll)), ^(RSTypeRef value, BOOL *stop) {
+static RSTypeRef __RSApplyList(RSListRef coll, RSRange range, void (^fn)(RSTypeRef obj)) {
+    if (range.location == -1) {
+        range = RSMakeRange(0, RSListGetCount(coll));
+    }
+    RSListApplyBlock(coll, range, ^(RSTypeRef value, BOOL *stop) {
         fn(value);
     });
     return nil;
 }
 
-static RSTypeRef __RSApplyDictionary(RSDictionaryRef coll, void (^fn)(RSTypeRef obj)) {
+static RSTypeRef __RSApplyDictionary(RSDictionaryRef coll, RSRange range, void (^fn)(RSTypeRef obj)) {
+    if (range.location == -1) {
+        range = RSMakeRange(0, RSDictionaryGetCount(coll));
+    }
+    
     RSDictionaryApplyBlock(coll, ^(const void *key, const void *value, BOOL *stop) {
         RSKVBucketRef bucket = RSKVBucketCreate(RSAllocatorSystemDefault, key, value);
         fn(bucket);
@@ -36,14 +46,20 @@ static RSTypeRef __RSApplyDictionary(RSDictionaryRef coll, void (^fn)(RSTypeRef 
     return nil;
 }
 
-static RSTypeRef __RSApplySet(RSSetRef coll, void (^fn)(RSTypeRef obj)) {
+static RSTypeRef __RSApplySet(RSSetRef coll, RSRange range, void (^fn)(RSTypeRef obj)) {
+    if (range.location == -1) {
+        range = RSMakeRange(0, RSSetGetCount(coll));
+    }
     RSSetApplyBlock(coll, ^(const void *value, BOOL *stop) {
         fn(value);
     });
     return nil;
 }
 
-static RSTypeRef __RSApplyBag(RSBagRef coll, void (^fn)(RSTypeRef obj)) {
+static RSTypeRef __RSApplyBag(RSBagRef coll, RSRange range, void (^fn)(RSTypeRef obj)) {
+    if (range.location == -1) {
+        range = RSMakeRange(0, RSBagGetCount(coll));
+    }
     RSBagApplyBlock(coll, ^(const void *value, BOOL *stop) {
         fn(value);
     });
@@ -51,11 +67,15 @@ static RSTypeRef __RSApplyBag(RSBagRef coll, void (^fn)(RSTypeRef obj)) {
 }
 
 RSExport RSTypeRef RSApply(RSCollectionRef coll, void (^fn)(RSTypeRef obj)) {
-    if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSArray"))) return __RSApplyArray(coll, fn);
-    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSList"))) return (__RSApplyList(coll, fn));
-    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSDictionary"))) return __RSApplyDictionary(coll, fn);
-    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSSet"))) return __RSApplySet(coll, fn);
-    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSBag"))) return __RSApplyBag(coll, fn);
+    return RSApplyWithRange(coll, RSMakeRange(-1, 0), fn);
+}
+
+RSExport RSTypeRef RSApplyWithRange(RSCollectionRef coll, RSRange range, void (^fn)(RSTypeRef obj)) {
+    if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSArray"))) return __RSApplyArray(coll, range, fn);
+    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSList"))) return (__RSApplyList(coll, range, fn));
+    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSDictionary"))) return __RSApplyDictionary(coll, range, fn);
+    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSSet"))) return __RSApplySet(coll, range, fn);
+    else if (RSInstanceIsMemberOfClass(coll, RSClassGetWithUTF8String("RSBag"))) return __RSApplyBag(coll, range, fn);
     return nil;
 }
 
@@ -143,9 +163,9 @@ static RSTypeRef __RSReduceArray(RSArrayRef coll, RSRange range, RSTypeRef (^fn)
     }
     __block RSTypeRef result = RSArrayObjectAtIndex(coll, range.location);
     if (RSArrayGetCount(coll) == 1)
-        return RSAutorelease(fn(result, nil));
+        return RSAutorelease(RSRetain(fn(result, nil)));
     else if (RSArrayGetCount(coll) == 2) {
-        return RSAutorelease(fn(result, RSArrayObjectAtIndex(coll, 1)));
+        return RSAutorelease(RSRetain(fn(result, RSArrayObjectAtIndex(coll, 1))));
     }
     
     RSAutoreleaseBlock(^{

@@ -1433,7 +1433,7 @@ RSExport RSComparisonResult RSNumberCompare(RSNumberRef aNumber, RSNumberRef oth
                 return RSStringCompare(pay1._pay._string, pay2._pay._string, nil);
             }
         }
-    } else {
+    } else if (!RS_IS_TAGGED_INT(aNumber) && !RS_IS_TAGGED_INT(other)) {
         if (!(__RSNumberTypeIsSpecialPayload(numberType) || __RSNumberTypeIsSpecialPayload(otherNumberType))) {
             if (__RSNumberTypeIsFloatGroup(numberType)) {
                 double n1 = 0.0f, n2 = 0.0f;
@@ -1479,6 +1479,136 @@ RSExport RSComparisonResult RSNumberCompare(RSNumberRef aNumber, RSNumberRef oth
         if (result > 0) return RSCompareGreaterThan;
         else if (result < 0) return RSCompareLessThan;
         return RSCompareEqualTo;
+    } else {
+        // normal & tagged
+        BOOL anti = NO;
+        RSNumberRef tagged = nil, normal = nil;
+        if (RS_IS_TAGGED_OBJ(aNumber)) {
+            tagged = aNumber;
+            normal = other;
+            anti = YES;
+        } else {
+            tagged = other;
+            normal = aNumber;
+        }
+        // normal vs tagged
+        RSNumberType taggedType = RSNumberGetType(tagged);
+        RSNumberType normalType = RSNumberGetType(normal);
+        if (normalType == RSNumberBoolean) {
+            if (__RSNumberTypeIsIntGroup(taggedType)) {
+                int64_t n2 = 0;
+                RSNumberGetValue(tagged, &n2);
+                if (n2 > 1) {
+                    return anti * RSCompareLessThan;
+                } else if (n2 < 0) {
+                    return anti * RSCompareGreaterThan;
+                } else if (n2 == 1 && normal == RSBooleanTrue) {
+                    return RSCompareEqualTo;
+                } else if (n2 == 0 && normal == RSBooleanFalse) {
+                    return RSCompareEqualTo;
+                } else if (n2 > 0 && n2 < 1 && normal == RSBooleanTrue) {
+                    return anti * RSCompareGreaterThan;
+                } else {
+                    return anti * RSCompareLessThan;
+                }
+            } else if (__RSNumberTypeIsFloatGroup(taggedType)) {
+                double n1 = 0.0f, n2 = 0.0f;
+                RSNumberGetValue(tagged, &n1);
+                int64_t l1 = normal == RSBooleanTrue ? 1 : 0;
+                n2 = (double)l1;
+                
+                if (isnan(n1) && isnan(n2)) return RSCompareEqualTo;
+                double s1 = copysign(1.0, n2);
+                double s2 = copysign(1.0, n1);
+                if (isnan(n1)) return anti * ((s2 < 0.0) ? RSCompareGreaterThan : RSCompareLessThan);
+                if (isnan(n2)) return anti * ((s1 < 0.0) ? RSCompareLessThan : RSCompareGreaterThan);
+                // at this point, we know we don't have any NaNs
+                if (s1 < s2) return anti * RSCompareLessThan;
+                if (s2 < s1) return anti * RSCompareGreaterThan;
+                // at this point, we know the signs are the same; do not combine these tests
+                if (n1 < n2) return anti * RSCompareLessThan;
+                if (n2 < n1) return anti * RSCompareGreaterThan;
+                return RSCompareEqualTo;
+            } else {
+                return anti * RSCompareLessThan;
+            }
+        } else if (__RSNumberTypeIsIntGroup(normalType)) {
+            if (__RSNumberTypeIsIntGroup(taggedType)) {
+                int64_t n1 = 0, n2 = 0;
+                if (RSNumberGetValue(normal, &n1) && RSNumberGetValue(tagged, &n2)) {
+                    if (n1 > n2) return anti * RSCompareGreaterThan;
+                    if (n1 < n2) return anti * RSCompareLessThan;
+                    return RSCompareEqualTo;
+                } else {
+                    return anti * RSCompareLessThan;
+                }
+            } else if (__RSNumberTypeIsFloatGroup(taggedType)) {
+                double n1 = 0.0f, n2 = 0.0f;
+                RSNumberGetValue(tagged, &n1);
+                int64_t l1 = 0;
+                RSNumberGetValue(normal, &l1);
+                n2 = (double)l1;
+                
+                if (isnan(n1) && isnan(n2)) return RSCompareEqualTo;
+                double s1 = copysign(1.0, n2);
+                double s2 = copysign(1.0, n1);
+                if (isnan(n1)) return anti * ((s2 < 0.0) ? RSCompareGreaterThan : RSCompareLessThan);
+                if (isnan(n2)) return anti * ((s1 < 0.0) ? RSCompareLessThan : RSCompareGreaterThan);
+                // at this point, we know we don't have any NaNs
+                if (s1 < s2) return anti * RSCompareLessThan;
+                if (s2 < s1) return anti * RSCompareGreaterThan;
+                // at this point, we know the signs are the same; do not combine these tests
+                if (n1 < n2) return anti * RSCompareLessThan;
+                if (n2 < n1) return anti * RSCompareGreaterThan;
+                return RSCompareEqualTo;
+            } else {
+                return anti * RSCompareLessThan;
+            }
+        } else if (__RSNumberTypeIsFloatGroup(normalType)) {
+            if (__RSNumberTypeIsFloatGroup(taggedType)) {
+                double n1 = 0.0f, n2 = 0.0f;
+                if (RSNumberGetValue(normal, &n1) && RSNumberGetValue(tagged, &n2)) {
+                    if (isnan(n1) && isnan(n2)) return RSCompareEqualTo;
+                    double s1 = copysign(1.0, n1);
+                    double s2 = copysign(1.0, n2);
+                    if (isnan(n1)) return anti * ((s2 < 0.0) ? RSCompareGreaterThan : RSCompareLessThan);
+                    if (isnan(n2)) return anti * ((s1 < 0.0) ? RSCompareLessThan : RSCompareGreaterThan);
+                    // at this point, we know we don't have any NaNs
+                    if (s1 < s2) return anti * RSCompareLessThan;
+                    if (s2 < s1) return anti * RSCompareGreaterThan;
+                    // at this point, we know the signs are the same; do not combine these tests
+                    if (n1 < n2) return anti * RSCompareLessThan;
+                    if (n2 < n1) return anti * RSCompareGreaterThan;
+                    return RSCompareEqualTo;
+                } else {
+                    return anti * RSCompareLessThan;
+                }
+            } else if (__RSNumberTypeIsIntGroup(taggedType)) {
+                double n1 = 0.0f, n2 = 0.0f;
+                RSNumberGetValue(normal, &n1);
+                int64_t l1 = 0;
+                RSNumberGetValue(tagged, &l1);
+                n2 = (double)l1;
+                
+                if (isnan(n1) && isnan(n2)) return RSCompareEqualTo;
+                double s1 = copysign(1.0, n1);
+                double s2 = copysign(1.0, n2);
+                if (isnan(n1)) return anti * ((s2 < 0.0) ? RSCompareGreaterThan : RSCompareLessThan);
+                if (isnan(n2)) return anti * ((s1 < 0.0) ? RSCompareLessThan : RSCompareGreaterThan);
+                // at this point, we know we don't have any NaNs
+                if (s1 < s2) return anti * RSCompareLessThan;
+                if (s2 < s1) return anti * RSCompareGreaterThan;
+                // at this point, we know the signs are the same; do not combine these tests
+                if (n1 < n2) return anti * RSCompareLessThan;
+                if (n2 < n1) return anti * RSCompareGreaterThan;
+                return RSCompareEqualTo;
+            } else {
+                return anti * RSCompareLessThan;
+            }
+        } else if (__RSNumberTypeIsSpecialPayload(normalType)) {
+            return anti * RSCompareLessThan;
+        }
+        return anti * RSCompareLessThan;
     }
     HALTWithError(RSInvalidArgumentException, "overflow");
 }

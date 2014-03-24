@@ -33,8 +33,11 @@ RSExport RSFileHandleRef RSFileHandleCreateWithStderr() RS_AVAILABLE(0_2);
 
 RSExport RSFileLength RSFileHandleGetFileSize(RSFileHandleRef handle) RS_AVAILABLE(0_0);
 RSExport RSFileLength RSFileHanldeOffsetInFile(RSFileHandleRef handle) RS_AVAILABLE(0_0);
+    
+// read data from handle with retain!!!
 RSExport RSDataRef RSFileHandleReadDataOfLength(RSFileHandleRef handle, RSFileLength length) RS_AVAILABLE(0_0);
 RSExport RSDataRef RSFileHandleReadDataToEndOfFile(RSFileHandleRef handle) RS_AVAILABLE(0_0);
+    
 RSExport void RSFileHandleSeekToFileOffset(RSFileHandleRef handle, RSFileLength offset) RS_AVAILABLE(0_0);
 RSExport BOOL RSFileHandleWriteData(RSFileHandleRef handle ,RSDataRef data) RS_AVAILABLE(0_0);
 RSExport void RSFileHandleCloseFile(RSFileHandleRef handle) RS_AVAILABLE(0_0);

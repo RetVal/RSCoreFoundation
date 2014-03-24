@@ -151,11 +151,20 @@ int main(int argc, const char * argv[])
     return 0;
 }
 
-#include "../../Risp/Risp/RSNumberOperation.h"
-#include "../../Risp/Risp/RSNumberOperation.c"
+#include "../../Risp/Risp/BIF/RSNumberOperation.h"
+#include "../../Risp/Risp/BIF/RSNumberOperation.c"
 #include <dispatch/dispatch.h>
 void test_fn() {
     if (1) {
+        RSURLConnectionSendAsynchronousRequest(RSURLRequestWithURL(RSURLWithString(RSSTR("http://localhost"))), nil, ^(RSURLResponseRef response, RSDataRef data, RSErrorRef error) {
+            RSShow(response);
+            RSRunLoopStop(RSRunLoopGetMain());
+        });
+        RSRunLoopRun();
+        RSShow(RSSTR("么么哒"));
+        return;
+    }
+    if (0) {
         RSShow(RSReduceWithRange(RSAutorelease(RSListCreate(RSAllocatorDefault, RSNumberWithInt(1), RSNumberWithInt(2), RSNumberWithInt(3), nil)), RSMakeRange(1, 2), ^RSTypeRef(RSTypeRef a, RSTypeRef b) {
             RSShow(a);
             RSShow(b);

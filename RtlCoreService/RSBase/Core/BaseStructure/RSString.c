@@ -2732,8 +2732,10 @@ RSStringRef  _RSStringCreateWithFormatAndArgumentsAux(RSAllocatorRef alloc, RSSt
 
 RSExport RSStringRef RSStringCreateCopy(RSAllocatorRef alloc, RSStringRef str)
 {
+    if (!str) {
+        return _RSEmptyString;
+    }
     //  RS_OBJC_FUNCDISPATCHV(__RSStringTypeID, RSStringRef, (NSString *)str, copy);
-    
     __RSAssertIsString(str);
     if (!__RSStrIsMutable((RSStringRef)str) && 								// If the string is not mutable
         ((alloc ? alloc : RSAllocatorGetDefault()) == __RSGetAllocator(str)) &&		//  and it has the same allocator as the one we're using
@@ -2742,7 +2744,9 @@ RSExport RSStringRef RSStringCreateCopy(RSAllocatorRef alloc, RSStringRef str)
         RSRetain(str);			// Then just retain instead of making a YES copy
         return str;
     }
-    
+    if (__RSRuntimeInstanceIsSpecial(str)) {
+        return RSRetain(str);
+    }
     if (__RSStrIsEightBit((RSStringRef)str))
     {
         const uint8_t *contents = (const uint8_t *)__RSStrContents((RSStringRef)str);
@@ -2756,8 +2760,7 @@ RSExport RSStringRef RSStringCreateCopy(RSAllocatorRef alloc, RSStringRef str)
     }
 }
 
-static RSTypeRef __RSStringCopy(RSAllocatorRef allocator, RSTypeRef rs, BOOL mutableCopy)
-{
+static RSTypeRef __RSStringCopy(RSAllocatorRef allocator, RSTypeRef rs, BOOL mutableCopy) {
     if (mutableCopy) return RSStringCreateMutableCopy(allocator, 0, rs);
     return RSStringCreateCopy(allocator, rs);
 }

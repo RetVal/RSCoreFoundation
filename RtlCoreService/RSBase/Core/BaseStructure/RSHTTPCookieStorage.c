@@ -469,7 +469,8 @@ RSExport RSArrayRef RSHTTPCookieStorageCopyCookiesForURL(RSHTTPCookieStorageRef 
         }
         RSStringRef domain = __RSHTTPCookieStorageCreateDomainWithHostName(host);
         RSRelease(host);
-        cookies = __RSHTTPCookieStorageCopyCookiesForURLDomainAndPath(storage->_cache, URL, domain, path);
+        if (domain)
+            cookies = __RSHTTPCookieStorageCopyCookiesForURLDomainAndPath(storage->_cache, URL, domain, path);
         RSRelease(domain);
         RSRelease(path);
     });
