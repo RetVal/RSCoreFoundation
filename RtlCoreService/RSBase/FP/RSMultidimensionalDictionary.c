@@ -24,9 +24,16 @@ static void __RSMultidimensionalDictionaryClassInit(RSTypeRef rs)
     md->_dict = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
 }
 
+static RSTypeID _RSMultidimensionalDictionaryTypeID = _RSRuntimeNotATypeID;
+
 static RSTypeRef __RSMultidimensionalDictionaryClassCopy(RSAllocatorRef allocator, RSTypeRef rs, BOOL mutableCopy)
 {
-    return RSRetain(rs);
+//    if (!mutableCopy) return RSRetain(rs);
+    RSMultidimensionalDictionaryRef md = (RSMultidimensionalDictionaryRef)rs;
+    RSMultidimensionalDictionaryRef copy = (RSMultidimensionalDictionaryRef)__RSRuntimeCreateInstance(allocator, _RSMultidimensionalDictionaryTypeID, sizeof(struct __RSMultidimensionalDictionary) -  sizeof(struct __RSRuntimeBase));
+    copy->_dimensions = md->_dimensions;
+    copy->_dict = RSMutableCopy(allocator, md->_dict);
+    return copy;
 }
 
 static void __RSMultidimensionalDictionaryClassDeallocate(RSTypeRef rs)
@@ -68,7 +75,6 @@ static RSRuntimeClass __RSMultidimensionalDictionaryClass =
     nil
 };
 
-static RSTypeID _RSMultidimensionalDictionaryTypeID = _RSRuntimeNotATypeID;
 static void __RSMultidimensionalDictionaryInitialize();
 
 RSExport RSTypeID RSMultidimensionalDictionaryGetTypeID()

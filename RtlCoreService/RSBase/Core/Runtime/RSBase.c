@@ -266,7 +266,7 @@ RSExport RSTypeRef RSCopy(RSAllocatorRef allocator, RSTypeRef obj)
 {
     if (nil == obj) return nil; //HALTWithError(RSInvalidArgumentException, "the object is nil");
     
-    if (__RSRuntimeInstanceIsSpecial(obj) || __RSRuntimeInstanceIsSpecial(obj) || __RSRuntimeInstanceIsClass(obj)) return obj;
+    if (RS_IS_TAGGED_OBJ(obj) || __RSRuntimeInstanceIsSpecial(obj) || __RSRuntimeInstanceIsClass(obj)) return obj;
     RSIndex id = _RSRuntimeNotATypeID;
     if ((id = RSGetTypeID(obj)) == _RSRuntimeNotATypeID) HALTWithError(RSInvalidArgumentException, "the object is not available");
     RSRuntimeClass* cls = (RSRuntimeClass*)__RSRuntimeGetClassWithTypeID(id);
