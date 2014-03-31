@@ -1762,7 +1762,7 @@ RSExport RSMutableDictionaryRef RSDictionaryCreateWithObjectsAndOKeys(RSAllocato
     return dict;
 }
 
-RSPrivate void __RSDictionaryCleanAllObjects(RSMutableDictionaryRef dictionary)
+RSExport void __RSDictionaryCleanAllObjects(RSMutableDictionaryRef dictionary)
 {
     //    rbtree_container* rbt = __RSDictionaryRoot(dictionary);
     //    rbtree_container_node* pc = rbtree_container_first(rbt), *tpc = nil;
