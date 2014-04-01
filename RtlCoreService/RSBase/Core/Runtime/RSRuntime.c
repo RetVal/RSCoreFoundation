@@ -22,7 +22,7 @@
 
 // define the runtime class table   (10 bits)
 #define  __RSClassTableSize 1024
-RSPrivate volatile RSSpinLock  __RSRuntimeClassTableSpinLock = RSSpinLockInit;
+volatile RSSpinLock  __RSRuntimeClassTableSpinLock = RSSpinLockInit;
 static RSRuntimeClass* __RSRuntimeClassTable[__RSClassTableSize];
 static RSBit32 __RSRuntimeClassTableCount = 0;
 static BOOL __RSRuntimeInitiazing = YES;
