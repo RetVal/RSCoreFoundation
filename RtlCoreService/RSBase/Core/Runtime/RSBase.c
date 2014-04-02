@@ -100,7 +100,7 @@ RSPrivate void __RSRelease(RSTypeRef obj)
     }
 }
 
-RSExport void RSRelease(RSTypeRef obj)
+RSExport void RSRelease(RSTypeRef RS_RELEASES_ARGUMENT obj)
 {
     if (obj == nil || RS_IS_TAGGED_OBJ(obj)) return;
     
@@ -142,7 +142,7 @@ RSExport void RSRelease(RSTypeRef obj)
     __RSRelease(obj);
 }
 
-RSExport RSMutableTypeRef RSAutorelease(RSTypeRef obj)
+RSExport RSMutableTypeRef RSAutorelease(RSTypeRef RS_RELEASES_ARGUMENT obj)
 {
     if (obj == nil || RS_IS_TAGGED_OBJ(obj) || __RSRuntimeInstanceIsClass(obj) || __RSRuntimeInstanceIsStackValue(obj) || __RSRuntimeInstanceIsSpecial(obj))
         return (RSMutableTypeRef)obj;

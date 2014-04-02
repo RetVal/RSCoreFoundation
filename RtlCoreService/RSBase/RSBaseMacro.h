@@ -20,6 +20,32 @@
 #endif
 #endif
 
+#ifndef RS_RETURNS_RETAINED
+#if __has_feature(attribute_cf_returns_retained)
+#define RS_RETURNS_RETAINED __attribute__((cf_returns_retained))
+#else
+#define RS_RETURNS_RETAINED
+#endif
+#endif
+
+// Marks functions which return a RS type that may need to be retained by the caller but whose names are not consistent with CoreFoundation naming rules. The recommended fix to this is to rename the functions, but this macro can be used to let the clang static analyzer know of any exceptions that cannot be fixed.
+// This macro is ONLY to be used in exceptional circumstances, not to annotate functions which conform to the CoreFoundation naming rules.
+#ifndef RS_RETURNS_NOT_RETAINED
+#if __has_feature(attribute_cf_returns_not_retained)
+#define RS_RETURNS_NOT_RETAINED __attribute__((cf_returns_not_retained))
+#else
+#define RS_RETURNS_NOT_RETAINED
+#endif
+#endif
+
+#ifndef RS_RELEASES_ARGUMENT
+#if __has_feature(attribute_cf_consumed)
+#define RS_RELEASES_ARGUMENT __attribute__((cf_consumed))
+#else
+#define RS_RELEASES_ARGUMENT
+#endif
+#endif
+
 #if __has_feature(objc_arc)
 #ifndef RCM
 #define RCM(code,ret,r1,r2)         BWI((ret) = (((int*)(code) != nil)?(r1):(r2)))

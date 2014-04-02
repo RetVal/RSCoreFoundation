@@ -3599,7 +3599,7 @@ static void __RSSocketManager(void * arg)
     
     struct timeval tv;
     struct timeval* pTimeout = nil;
-    struct timeval timeBeforeSelect;
+    struct timeval timeBeforeSelect = {0};
     
     for (;;) {
         RSSpinLockLock(&__RSActiveSocketsLock);

@@ -464,7 +464,7 @@ extern void __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNC
 
 
 typedef const void *	(*RSArrayRetainCallBack)(RSAllocatorRef allocator, const void *value);
-typedef void		(*RSArrayReleaseCallBack)(RSAllocatorRef allocator, const void *value);
+typedef void		(*RSArrayReleaseCallBack)(RSAllocatorRef allocator, const void * RS_RELEASES_ARGUMENT value);
 typedef RSStringRef	(*RSArrayCopyDescriptionCallBack)(const void *value);
 typedef BOOL		(*RSArrayEqualCallBack)(const void *value1, const void *value2);
 typedef struct {

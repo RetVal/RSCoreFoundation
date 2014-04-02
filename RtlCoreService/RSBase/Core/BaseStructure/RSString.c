@@ -3808,8 +3808,12 @@ static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
 //                        str = __RSCopyFormattingDescription(values[specs[curSpec].mainArgNum].value.pointerValue, formatOptions);
 //                        if (nil == str)
 //                        {
-                            str = (RSStringRef)RSDescription(values[specs[curSpec].mainArgNum].value.pointerValue);
+//                            str = (RSStringRef)RSDescription(values[specs[curSpec].mainArgNum].value.pointerValue);
 //                        }
+                        if (RSGetTypeID(values[specs[curSpec].mainArgNum].value.pointerValue) == 7)
+                            str = RSRetain(values[specs[curSpec].mainArgNum].value.pointerValue);
+                        else
+                            str = (RSStringRef)RSDescription(values[specs[curSpec].mainArgNum].value.pointerValue);
                     }
                     if (str)
                     {

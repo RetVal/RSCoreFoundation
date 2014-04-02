@@ -1722,7 +1722,7 @@ RSExport RSHashRef RSDictionaryCreateWithArray(RSAllocatorRef allocator, RSArray
     RSIndex cnt = RSArrayGetCount(keys);
     if (cnt != RSArrayGetCount(values)) HALTWithError(RSInvalidArgumentException, "the number of keys and values is not equal.");
     RSMutableDictionaryRef dictionary = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, context);
-    RSRetain(keys); RSRetain(values);
+    keys = RSRetain(keys); values = RSRetain(values);
     for (RSIndex idx = 0; idx < cnt; idx++)
     {
         RSTypeRef key = RSArrayObjectAtIndex(keys, idx);

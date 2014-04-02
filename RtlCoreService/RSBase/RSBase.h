@@ -12,11 +12,12 @@
 #include <RSCoreFoundation/RSAllocator.h>
 #include <RSCoreFoundation/RSArray.h>
 #include <RSCoreFoundation/RSString.h>
+
 RS_EXTERN_C_BEGIN
 /****************************************************************************/
 RSExport RSTypeRef RSRetain(RSTypeRef obj) RS_AVAILABLE(0_0);
-RSExport void RSRelease(RSTypeRef obj) RS_AVAILABLE(0_0);
-RSExport RSMutableTypeRef RSAutorelease(RSTypeRef obj) RS_AVAILABLE(0_1);
+RSExport void RSRelease(RSTypeRef RS_RELEASES_ARGUMENT obj) RS_AVAILABLE(0_0);
+RSExport RSMutableTypeRef RSAutorelease(RSTypeRef RS_RELEASES_ARGUMENT obj) RS_AVAILABLE(0_1);
 RSExport RSIndex RSGetRetainCount(RSTypeRef obj) RS_AVAILABLE(0_0);
 RSExport RSTypeID RSGetTypeID(RSTypeRef obj) RS_AVAILABLE(0_0);
 RSExport BOOL RSEqual(RSTypeRef obj1, RSTypeRef obj2) RS_AVAILABLE(0_0);

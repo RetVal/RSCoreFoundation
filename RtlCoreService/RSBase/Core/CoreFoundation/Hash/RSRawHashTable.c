@@ -702,6 +702,7 @@ unsigned int raw_ht_index(raw_hash_table *table, void *key, size_t key_size)
     uint32_t index;
     // 32 bits of murmur seems to fare pretty well
     table->hashfunc_x86_32(key, (int)key_size, global_seed, &index);
+    if (!table->array_size) return 1;
     index %= table->array_size;
     return index;
 }

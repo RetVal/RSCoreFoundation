@@ -1941,7 +1941,7 @@ void _RSArrayReplaceObjects(RSMutableArrayRef array, RSRange range, const void *
 
 static void __RSArrayReleaseObjects(RSArrayRef array, RSRange range, bool releaseStorageIfPossible)
 {
-    const RSArrayCallBacks *cb = __RSArrayGetCallBacks(array);
+    const RSArrayCallBacks * cb  = __RSArrayGetCallBacks(array);
     RSAllocatorRef allocator;
     RSIndex idx;
     switch (__RSArrayGetType(array))

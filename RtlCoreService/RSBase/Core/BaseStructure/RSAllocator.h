@@ -40,7 +40,6 @@ RSAllocatorRef RSAllocatorGetDefault() RS_AVAILABLE(0_0);
  @result void.
  */
 void RSAllocatorSetDefault(RSAllocatorRef allocator) RS_AVAILABLE(0_0);
-
 void *RSAllocatorAllocate(RSAllocatorRef allocator, RSIndex size) __attribute__ ((__malloc__));
 void *RSAllocatorCallocate(RSAllocatorRef allocator, RSIndex part, RSIndex size);
 void  RSAllocatorDeallocate(RSAllocatorRef allocator, const void *ptr);

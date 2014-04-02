@@ -1277,17 +1277,17 @@ static RSHashCode __RSURLClassHash(RSTypeRef rs)
     return ( result );
 }
 
-static RSStringRef  __RSURLFormattingDescription(RSTypeRef  rs, RSDictionaryRef formatOptions) {
-    RSURLRef  url = (RSURLRef)rs;
-    __RSGenericValidInstance(rs, RSURLGetTypeID());
-    if (! url->_base) {
-        RSRetain(url->_string);
-        return url->_string;
-    } else {
-        // Do not dereference url->_base; it may be an ObjC object
-        return RSStringCreateWithFormat(RSGetAllocator(url), nil, RSSTR("%R -- %R"), url->_string, url->_base);
-    }
-}
+//static RSStringRef  __RSURLFormattingDescription(RSTypeRef  rs, RSDictionaryRef formatOptions) {
+//    RSURLRef  url = (RSURLRef)rs;
+//    __RSGenericValidInstance(rs, RSURLGetTypeID());
+//    if (! url->_base) {
+//        RSRetain(url->_string);
+//        return url->_string;
+//    } else {
+//        // Do not dereference url->_base; it may be an ObjC object
+//        return RSStringCreateWithFormat(RSGetAllocator(url), nil, RSSTR("%R -- %R"), url->_string, url->_base);
+//    }
+//}
 
 
 static RSStringRef __RSURLClassDescription(RSTypeRef rs) {
@@ -1492,7 +1492,7 @@ static void constructBuffers(RSAllocatorRef alloc, RSStringRef string, BOOL useE
 
 #define STRING_CHAR(x) (useCString ? cstring[(x)] : ustring[(x)])
 static void _parseComponents(RSAllocatorRef alloc, RSStringRef string, RSURLRef baseURL, RSBitU32 *theFlags, RSRange **range) {
-    RSRange ranges[9];
+    RSRange ranges[9] = {0};
     /* index gives the URL part involved; to calculate the correct range index, use the number of the bit of the equivalent flag (i.e. the host flag is HAS_HOST, which is 0x8.  so the range index for the host is 3.)  Note that this is YES in this function ONLY, since the ranges stored in (*range) are actually packed, skipping those URL components that don't exist.  This is why the indices are hard-coded in this function. */
     
     RSIndex idx, base_idx = 0;
@@ -2341,6 +2341,7 @@ static RSStringRef _resolvedPath(UniChar *pathStr, UniChar *end, UniChar pathDel
     }
     return RSStringCreateWithCharactersNoCopy(alloc, pathStr, end - pathStr, alloc);
 }
+static RSMutableStringRef resolveAbsoluteURLString(RSAllocatorRef alloc, RSStringRef relString, RSBitU32 relFlags, RSRange *relRanges, RSStringRef baseString, RSBitU32 baseFlags, RSRange *baseRanges) RS_RETURNS_RETAINED;
 
 static RSMutableStringRef resolveAbsoluteURLString(RSAllocatorRef alloc, RSStringRef relString, RSBitU32 relFlags, RSRange *relRanges, RSStringRef baseString, RSBitU32 baseFlags, RSRange *baseRanges) {
     RSMutableStringRef newString = RSStringCreateMutable(alloc, 0);
