@@ -32,6 +32,7 @@ RSExport RSTypeRef RSFirst(RSCollectionRef coll);
 RSExport RSTypeRef RSSecond(RSCollectionRef coll);
 RSExport RSTypeRef RSNth(RSCollectionRef coll, RSIndex idx);
 
+RSExport RSCollectionRef RSConjoinM(RSCollectionRef coll, RSTypeRef value);
 RSExport RSCollectionRef RSConjoin(RSCollectionRef coll, RSTypeRef value);
 RSExport RSCollectionRef RSReverse(RSCollectionRef coll);
 

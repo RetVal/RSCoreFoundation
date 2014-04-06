@@ -478,6 +478,18 @@ RSExport RSTypeRef RSNth(RSCollectionRef coll, RSIndex idx) {
     return nil;
 }
 
+RSExport RSCollectionRef RSConjoinM(RSCollectionRef coll, RSTypeRef value) {
+    if (coll == nil || coll == RSNil) return nil;
+    if (RSInstanceIsMemberOfClass(coll, &__RSListClass)) {
+        RSListRef list = (RSListRef)coll;
+        return __RSNodeConjoin(list, value);
+    } else if (RSArrayGetTypeID() == RSGetTypeID(coll)) {
+        RSArrayAddObject((RSMutableArrayRef)coll, value);
+        return coll;
+    }
+    return nil;
+}
+
 RSExport RSCollectionRef RSConjoin(RSCollectionRef coll, RSTypeRef value) {
     if (coll == nil || coll == RSNil) return nil;
     if (RSInstanceIsMemberOfClass(coll, &__RSListClass)) {
