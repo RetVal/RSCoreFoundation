@@ -15,18 +15,20 @@ typedef void * RSRegularExpression;
 struct __RSRegularExpression
 {
     RSRuntimeBase _base;
+    RSStringRef _pattern;
     RSRegularExpression _regex;
 };
 
 static void __RSRegularExpressionClassDeallocate(RSTypeRef rs)
 {
     struct __RSRegularExpression *expression = (struct __RSRegularExpression *)rs;
+    if (expression->_pattern) RSRelease(expression->_pattern);
     if (expression->_regex) uregex_close(expression->_regex);
 }
 
 static RSStringRef __RSRegularExpressionClassDescription(RSTypeRef rs)
 {
-    RSStringRef description = RSStringCreateWithFormat(RSAllocatorDefault, RSSTR("RSRegularExpression.h %p"), rs);
+    RSStringRef description = RSStringCreateWithFormat(RSAllocatorDefault, RSSTR("%r"), ((RSRegularExpressionRef)rs)->_pattern);
     return description;
 }
 
@@ -79,6 +81,7 @@ static RSRegularExpressionRef __RSRegularExpressionCreateInstance(RSAllocatorRef
     if (errorCode == U_ZERO_ERROR && _regex != nil) {
         struct __RSRegularExpression* instance = (struct __RSRegularExpression *)__RSRuntimeCreateInstance(allocator, _RSRegularExpressionTypeID, sizeof(struct __RSRegularExpression) - sizeof(RSRuntimeBase));
         instance->_regex = _regex;
+        instance->_pattern = RSRetain(expression);
         if (needFree) RSAllocatorDeallocate(RSAllocatorSystemDefault, ptr);
         return instance;
     }
