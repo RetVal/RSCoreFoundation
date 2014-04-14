@@ -391,8 +391,13 @@ RSExport void RSListApplyBlock(RSListRef list, RSRange range, void (^fn)(RSTypeR
     __RSGenericValidInstance(list, _RSListTypeID);
     __RSListValidateRange(list, range, __PRETTY_FUNCTION__);
     RSNodeRef node = list->_head;
+    for (RSUInteger idx = 0; node && idx < range.location; idx++) {
+        node = node->_next;
+    }
+    if (!node)
+        return;
     BOOL stop = NO;
-    for (RSUInteger idx = range.location; node && idx < range.length && !stop; idx++) {
+    for (RSUInteger idx = 0; node && idx < range.length && !stop; idx++) {
         fn(__RSNodeGetValue(node), &stop);
         if (node->_next)
             node = node->_next;

@@ -592,9 +592,12 @@ RSExport double RSNumberDoubleValue(RSNumberRef aValue) {
 
 RSExport BOOL RSNumberBooleanValue(RSNumberRef aValue) {
     if (!aValue) return 0;
+    if (aValue == RSBooleanTrue) return YES;
+    else if (aValue == RSBooleanFalse) return NO;
     BOOL value = 0;
-    if (RSNumberIsBooleanType(aValue) && RSNumberGetType(aValue) == RSNumberBoolean && RSNumberGetValue(aValue, &value)) return value;
-    return 0;
+    if (RSNumberCompare(aValue, RSAutorelease(RSNumberCreateInteger(RSAllocatorDefault, 0)), nil) == RSCompareEqualTo)
+        return NO;
+    return YES;
 }
 
 RSExport RSFloat RSNumberRSFloatValue(RSNumberRef aValue) {
