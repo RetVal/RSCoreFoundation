@@ -21,6 +21,7 @@ RSExport RSMutableTypeRef RSAutorelease(RSTypeRef RS_RELEASES_ARGUMENT obj) RS_A
 RSExport RSIndex RSGetRetainCount(RSTypeRef obj) RS_AVAILABLE(0_0);
 RSExport RSTypeID RSGetTypeID(RSTypeRef obj) RS_AVAILABLE(0_0);
 RSExport BOOL RSEqual(RSTypeRef obj1, RSTypeRef obj2) RS_AVAILABLE(0_0);
+RSExport BOOL RSNotEqual(RSTypeRef obj1, RSTypeRef obj2) RS_AVAILABLE(0_4);
 RSExport RSHashCode RSHash(RSTypeRef obj) RS_AVAILABLE(0_0);
 RSExport RSTypeRef RSCopy(RSAllocatorRef allocator, RSTypeRef obj) RS_AVAILABLE(0_1);
 RSExport RSMutableTypeRef RSMutableCopy(RSAllocatorRef allocator, RSTypeRef obj) RS_AVAILABLE(0_1);

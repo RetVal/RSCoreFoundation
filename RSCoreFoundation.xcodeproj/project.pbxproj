@@ -13,7 +13,6 @@
 		300CB718189A3349004298E2 /* RSList.h in Headers */ = {isa = PBXBuildFile; fileRef = 300CB716189A3349004298E2 /* RSList.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30217B891875D18D00BC813A /* RSURL+Extension.c in Sources */ = {isa = PBXBuildFile; fileRef = 30217B881875D18D00BC813A /* RSURL+Extension.c */; };
 		30217B8B1875D19700BC813A /* RSURL+Extension.h in Headers */ = {isa = PBXBuildFile; fileRef = 30217B8A1875D19700BC813A /* RSURL+Extension.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3049CF4A187D2A6D00B7D95F /* RSRenrenCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3049CF49187D2A6D00B7D95F /* RSRenrenCore.framework */; };
 		304B3850186C36F300806E4B /* RSRegularExpression.c in Sources */ = {isa = PBXBuildFile; fileRef = 304B384E186C36F300806E4B /* RSRegularExpression.c */; };
 		304B3851186C36F300806E4B /* RSRegularExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 304B384F186C36F300806E4B /* RSRegularExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		305EC3B7189E14F00025E664 /* RSKVBucket.c in Sources */ = {isa = PBXBuildFile; fileRef = 305EC3B5189E14F00025E664 /* RSKVBucket.c */; };
@@ -26,6 +25,7 @@
 		30D845901875164C004DEBE0 /* regex.h in Headers */ = {isa = PBXBuildFile; fileRef = 30D8458F1875164C004DEBE0 /* regex.h */; };
 		30F32B3A1860318300A45125 /* RSHTTPCookieStorage.c in Sources */ = {isa = PBXBuildFile; fileRef = 30F32B381860318300A45125 /* RSHTTPCookieStorage.c */; };
 		30F32B3B1860318300A45125 /* RSHTTPCookieStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F32B391860318300A45125 /* RSHTTPCookieStorage.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		30F669C119CB2DA50074B8A8 /* RSClosure.c in Sources */ = {isa = PBXBuildFile; fileRef = 30F669BF19CB2DA50074B8A8 /* RSClosure.c */; };
 		30F9A85818752F27006EC81B /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 30F9A85718752F27006EC81B /* libicucore.dylib */; };
 		4101F34418447BBA0090C212 /* attribute.c in Sources */ = {isa = PBXBuildFile; fileRef = 4101F32B18447BBA0090C212 /* attribute.c */; };
 		4101F34518447BBA0090C212 /* attribute.h in Headers */ = {isa = PBXBuildFile; fileRef = 4101F32C18447BBA0090C212 /* attribute.h */; };
@@ -73,8 +73,6 @@
 		411671D516F5637C00E70FDE /* RSDistributedNotificationCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 411671D416F5637C00E70FDE /* RSDistributedNotificationCenter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4118341816E8F68E00C4322A /* RSQueue.c in Sources */ = {isa = PBXBuildFile; fileRef = 4118341716E8F68E00C4322A /* RSQueue.c */; };
 		4118341A16E8F69B00C4322A /* RSQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 4118341916E8F69B00C4322A /* RSQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4120F30A16E0E07E00413D37 /* rbtree.c in Sources */ = {isa = PBXBuildFile; fileRef = 4120F30416E0E02E00413D37 /* rbtree.c */; };
-		4120F30B16E0E08000413D37 /* rbtree_container.c in Sources */ = {isa = PBXBuildFile; fileRef = 4120F30616E0E02E00413D37 /* rbtree_container.c */; };
 		41259DD417E18DEC00FECA33 /* RSArchiver.c in Sources */ = {isa = PBXBuildFile; fileRef = 41259DD117E18DEC00FECA33 /* RSArchiver.c */; };
 		41259DD517E18DEC00FECA33 /* RSArchiver.h in Headers */ = {isa = PBXBuildFile; fileRef = 41259DD217E18DEC00FECA33 /* RSArchiver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		41259DD617E18DEC00FECA33 /* RSArchiverRoutine.h in Headers */ = {isa = PBXBuildFile; fileRef = 41259DD317E18DEC00FECA33 /* RSArchiverRoutine.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -376,8 +374,6 @@
 		41B0E3B9182F338300A5E00D /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 41B0E3B8182F338300A5E00D /* main.c */; };
 		41B0E3BB182F338300A5E00D /* runloop.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 41B0E3BA182F338300A5E00D /* runloop.1 */; };
 		41B0E3C1182F33A200A5E00D /* RSCoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4158D55A1625C4C60070E69F /* RSCoreFoundation.framework */; };
-		41B0E3C7182F434000A5E00D /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41B0E3C6182F434000A5E00D /* CoreFoundation.framework */; };
-		41B0E3C9182FE1FA00A5E00D /* MobileDevice.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41B0E3C8182FE1FA00A5E00D /* MobileDevice.framework */; };
 		41B2088A16D484FA0063AB3A /* RSBundlePrivateC0Context.c in Sources */ = {isa = PBXBuildFile; fileRef = 41B2088916D484FA0063AB3A /* RSBundlePrivateC0Context.c */; };
 		41B2088C16D4850B0063AB3A /* RSBundlePrivateC0Context.h in Headers */ = {isa = PBXBuildFile; fileRef = 41B2088B16D4850B0063AB3A /* RSBundlePrivateC0Context.h */; };
 		41B22977175F2AAE00726FE3 /* RSString+Extension.c in Sources */ = {isa = PBXBuildFile; fileRef = 41B22976175F2AAE00726FE3 /* RSString+Extension.c */; };
@@ -394,7 +390,7 @@
 		41BEF0AF17B7E93500B09C05 /* RSUnicodePrecomposition.h in Headers */ = {isa = PBXBuildFile; fileRef = 41BEF0AD17B7E93500B09C05 /* RSUnicodePrecomposition.h */; };
 		41C0DC4B182F14CC0022D5DC /* RSBag.c in Sources */ = {isa = PBXBuildFile; fileRef = 41C0DC49182F14CC0022D5DC /* RSBag.c */; };
 		41C0DC4C182F14CC0022D5DC /* RSBag.h in Headers */ = {isa = PBXBuildFile; fileRef = 41C0DC4A182F14CC0022D5DC /* RSBag.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		41C583E61776D42D00E037E4 /* RSCoreFoundation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4158D55A1625C4C60070E69F /* RSCoreFoundation.framework */; };
+		41C583E61776D42D00E037E4 /* RSCoreFoundation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4158D55A1625C4C60070E69F /* RSCoreFoundation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		41D49BE816797659002AB893 /* RSStringEncoding.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D49BE716797659002AB893 /* RSStringEncoding.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		41D919231652758E007568E9 /* RSInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D919221652758E007568E9 /* RSInternal.h */; };
 		41D9375D17A538AB004E5E0F /* RSUniChar.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D9375C17A538AB004E5E0F /* RSUniChar.h */; };
@@ -750,6 +746,8 @@
 		30D8458F1875164C004DEBE0 /* regex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = regex.h; sourceTree = "<group>"; };
 		30F32B381860318300A45125 /* RSHTTPCookieStorage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSHTTPCookieStorage.c; sourceTree = "<group>"; };
 		30F32B391860318300A45125 /* RSHTTPCookieStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSHTTPCookieStorage.h; sourceTree = "<group>"; };
+		30F669BF19CB2DA50074B8A8 /* RSClosure.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSClosure.c; sourceTree = "<group>"; };
+		30F669C019CB2DA50074B8A8 /* RSClosure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSClosure.h; sourceTree = "<group>"; };
 		30F9A85318752AB7006EC81B /* libicui18n.51.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicui18n.51.1.dylib; path = usr/lib/libicui18n.51.1.dylib; sourceTree = SDKROOT; };
 		30F9A85518752AEE006EC81B /* libicui18n.51.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicui18n.51.1.dylib; path = "../ICU-511.25/build/lib/libicui18n.51.1.dylib"; sourceTree = "<group>"; };
 		30F9A85718752F27006EC81B /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/usr/lib/libicucore.dylib; sourceTree = DEVELOPER_DIR; };
@@ -798,10 +796,6 @@
 		411671D416F5637C00E70FDE /* RSDistributedNotificationCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSDistributedNotificationCenter.h; sourceTree = "<group>"; };
 		4118341716E8F68E00C4322A /* RSQueue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSQueue.c; sourceTree = "<group>"; };
 		4118341916E8F69B00C4322A /* RSQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSQueue.h; sourceTree = "<group>"; };
-		4120F30416E0E02E00413D37 /* rbtree.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rbtree.c; sourceTree = "<group>"; };
-		4120F30516E0E02E00413D37 /* rbtree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rbtree.h; sourceTree = "<group>"; };
-		4120F30616E0E02E00413D37 /* rbtree_container.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rbtree_container.c; sourceTree = "<group>"; };
-		4120F30716E0E02E00413D37 /* rbtree_container.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rbtree_container.h; sourceTree = "<group>"; };
 		41259DD117E18DEC00FECA33 /* RSArchiver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSArchiver.c; sourceTree = "<group>"; };
 		41259DD217E18DEC00FECA33 /* RSArchiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSArchiver.h; sourceTree = "<group>"; };
 		41259DD317E18DEC00FECA33 /* RSArchiverRoutine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSArchiverRoutine.h; sourceTree = "<group>"; };
@@ -1455,10 +1449,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3049CF4A187D2A6D00B7D95F /* RSRenrenCore.framework in Frameworks */,
-				41B0E3C7182F434000A5E00D /* CoreFoundation.framework in Frameworks */,
 				41B0E3C1182F33A200A5E00D /* RSCoreFoundation.framework in Frameworks */,
-				41B0E3C9182FE1FA00A5E00D /* MobileDevice.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1566,17 +1557,6 @@
 			);
 			name = Extension;
 			path = RSBase/Core/BaseStructure/Extension;
-			sourceTree = "<group>";
-		};
-		4120F30316E0E02E00413D37 /* RSDictionary */ = {
-			isa = PBXGroup;
-			children = (
-				4120F30416E0E02E00413D37 /* rbtree.c */,
-				4120F30516E0E02E00413D37 /* rbtree.h */,
-				4120F30616E0E02E00413D37 /* rbtree_container.c */,
-				4120F30716E0E02E00413D37 /* rbtree_container.h */,
-			);
-			path = RSDictionary;
 			sourceTree = "<group>";
 		};
 		413C15941670BD40003EDEB6 /* RSErrorPrivate */ = {
@@ -2013,7 +1993,6 @@
 				41A3453D1747600600E49821 /* RSException */,
 				4102DD27174218C800A09614 /* CString */,
 				41FE75F916EDA1F0009B84D4 /* RSArchiver */,
-				4120F30316E0E02E00413D37 /* RSDictionary */,
 				4104AC9716CF35500056A2C4 /* RSBundle */,
 				413C15941670BD40003EDEB6 /* RSErrorPrivate */,
 				41EEAABD16B98A44005D855D /* RSFileManager */,
@@ -2199,6 +2178,8 @@
 			isa = PBXGroup;
 			children = (
 				41B0E3B8182F338300A5E00D /* main.c */,
+				30F669BF19CB2DA50074B8A8 /* RSClosure.c */,
+				30F669C019CB2DA50074B8A8 /* RSClosure.h */,
 				41B0E3BA182F338300A5E00D /* runloop.1 */,
 			);
 			path = runloop;
@@ -3133,7 +3114,7 @@
 		4158D5501625C4C60070E69F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0600;
 				ORGANIZATIONNAME = RetVal;
 			};
 			buildConfigurationList = 4158D5531625C4C60070E69F /* Build configuration list for PBXProject "RSCoreFoundation" */;
@@ -3319,12 +3300,10 @@
 				41A695961769B2FF00694064 /* RSDistributedProtocol.c in Sources */,
 				41FE76681822B9A600E5E581 /* sendf.c in Sources */,
 				4101F35018447BBA0090C212 /* string_piece.c in Sources */,
-				4120F30B16E0E08000413D37 /* rbtree_container.c in Sources */,
 				417050591647C713005E7FB5 /* RSHashBlizzard.c in Sources */,
 				4170505B1647C713005E7FB5 /* RSHashSHA-2.c in Sources */,
 				41FE75EF1822B9A600E5E581 /* fileinfo.c in Sources */,
 				41FE75FB1822B9A600E5E581 /* gopher.c in Sources */,
-				4120F30A16E0E07E00413D37 /* rbtree.c in Sources */,
 				41FE75AE1822B9A600E5E581 /* base64.c in Sources */,
 				41FE75E01822B9A600E5E581 /* curl_sspi.c in Sources */,
 				4101F35218447BBA0090C212 /* tag.c in Sources */,
@@ -3536,6 +3515,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30F669C119CB2DA50074B8A8 /* RSClosure.c in Sources */,
 				41B0E3B9182F338300A5E00D /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3624,6 +3604,7 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CODE_SIGN_IDENTITY = "";
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = "";
 				GCC_VERSION = "";
 				INSTALL_PATH = "@rpath";
@@ -3641,6 +3622,7 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CODE_SIGN_IDENTITY = "";
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = "";
 				GCC_VERSION = "";
 				INSTALL_PATH = "@rpath";
@@ -3660,7 +3642,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -3691,7 +3673,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -3716,14 +3698,16 @@
 				CLANG_ANALYZER_OBJC_INCOMP_METHOD_TYPES = YES;
 				CLANG_ANALYZER_OBJC_NSCFERROR = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_LINK_OBJC_RUNTIME = NO;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = NO;
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
 				CLANG_WARN_OBJC_ROOT_CLASS = NO;
 				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = NO;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
@@ -3771,6 +3755,7 @@
 				);
 				PRODUCT_NAME = RSCoreFoundation;
 				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				USER_HEADER_SEARCH_PATHS = "icu/** \"$(SRCROOT)/icu/common/\"/**";
 				WRAPPER_EXTENSION = framework;
 			};
@@ -3786,15 +3771,17 @@
 				CLANG_ANALYZER_OBJC_INCOMP_METHOD_TYPES = YES;
 				CLANG_ANALYZER_OBJC_NSCFERROR = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_LINK_OBJC_RUNTIME = NO;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = NO;
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
 				CLANG_WARN_OBJC_ROOT_CLASS = NO;
 				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = NO;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
+				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
@@ -3853,6 +3840,7 @@
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3865,6 +3853,7 @@
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3979,6 +3968,7 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CODE_SIGN_IDENTITY = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
@@ -4006,6 +3996,7 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CODE_SIGN_IDENTITY = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4031,6 +4022,7 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -4057,6 +4049,7 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				EXECUTABLE_PREFIX = "";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;

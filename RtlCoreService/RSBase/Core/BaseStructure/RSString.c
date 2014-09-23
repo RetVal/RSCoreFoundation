@@ -1561,6 +1561,7 @@ RS_CONST_STRING_DECL(_RSEmptyString, "");
 
 #include "RSPrivate/CString/RSString/RSFoundationEncoding.h"
 
+#include <malloc/malloc.h>
 #define ALLOCATORSFREEFUNC ((RSAllocatorRef)-1)
 static RSTypeID __RSStringTypeID = _RSRuntimeNotATypeID;
 //RSInline BOOL __RSCanUseLengthByte(RSIndex len) {
@@ -1911,7 +1912,6 @@ RSInline RSIndex __RSStrNewCapacity(RSMutableStringRef str, unsigned long reqCap
             }
             else
             {
-                #include <malloc/malloc.h>
                 newCapacity = malloc_good_size(newCapacity);
 #endif
             }
@@ -4293,7 +4293,7 @@ RSExport RSMutableStringRef  RSStringCreateMutableCopy(RSAllocatorRef alloc, RSI
     return newString;
 }
 
-static RSStringRef __RSStringCreateInstanceImmutable(RSAllocatorRef allocator,
+static RSStringRef __RSStringCreateInstanceImmutable( RSAllocatorRef allocator,
                                                       const void *bytes,
                                                       RSIndex numBytes,
                                                       RSStringEncoding encoding,

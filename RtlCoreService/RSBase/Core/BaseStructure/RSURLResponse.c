@@ -366,8 +366,8 @@ XX(UNKNOWN, "an unknown error occurred")
 # define ULLONG_MAX ((uint64_t) -1) /* 2^64-1 */
 #endif
 
-#ifndef MIN
-# define MIN(a,b) ((a) < (b) ? (a) : (b))
+#ifndef min
+# define min(a,b) ((a) < (b) ? (a) : (b))
 #endif
 
 #ifndef ARRAY_SIZE
@@ -2003,7 +2003,7 @@ size_t http_parser_execute (http_parser *parser,
                 
             case s_body_identity:
             {
-                uint64_t to_read = MIN(parser->content_length,
+                uint64_t to_read = min(parser->content_length,
                                        (uint64_t) ((data + len) - p));
                 
                 assert(parser->content_length != 0
@@ -2131,7 +2131,7 @@ size_t http_parser_execute (http_parser *parser,
                 
             case s_chunk_data:
             {
-                uint64_t to_read = MIN(parser->content_length,
+                uint64_t to_read = min(parser->content_length,
                                        (uint64_t) ((data + len) - p));
                 
                 assert(parser->flags & F_CHUNKED);

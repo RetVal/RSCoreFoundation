@@ -2558,6 +2558,15 @@
 #include <RSCoreFoundation/RSPropertyList.h>
 #include "RSInternal.h"
 
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <resolv.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 #if DEPLOYMENT_TARGET_WINDOWS
 
 #define EINPROGRESS WSAEINPROGRESS

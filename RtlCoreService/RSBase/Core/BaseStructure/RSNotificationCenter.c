@@ -18,7 +18,14 @@
 #include <RSCoreFoundation/RSSet.h>
 #include <RSCoreFoundation/RSSocket.h>
 #include <RSCoreFoundation/RSRuntime.h>
-
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <resolv.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 //RSInside RSSpinLock __RSNotificationCenterLock = RSSpinLockInit;
 #pragma mark Notification
 struct __RSNotification

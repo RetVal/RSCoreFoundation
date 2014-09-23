@@ -309,7 +309,7 @@ static RSUInteger __RSConnectionReadPacketOptimalReadLength(__RSConnectionReadPa
 	{
 		// Read a specific length of data
 		
-		result = MIN(defaultValue, (instance->readLength - instance->bytesDone));
+		result = min(defaultValue, (instance->readLength - instance->bytesDone));
 		
 		// There is no need to prebuffer since we know exactly how much data we need to read.
 		// Even if the buffer isn't currently big enough to fit this amount of data,
@@ -329,7 +329,7 @@ static RSUInteger __RSConnectionReadPacketOptimalReadLength(__RSConnectionReadPa
 		// - readDataWithTimeout packet
 		
 		if (instance->maxLength > 0)
-			result =  MIN(defaultValue, (instance->maxLength - instance->bytesDone));
+			result =  min(defaultValue, (instance->maxLength - instance->bytesDone));
 		else
 			result = defaultValue;
 		
@@ -362,12 +362,12 @@ static RSUInteger __RSConnectionReadPacketReadLengthForNonTerm(__RSConnectionRea
     assert(instance->term == nil);
     assert(bytesAvailable > 0);
     if (instance->readLength)
-        return MIN(bytesAvailable, (instance->readLength - instance->bytesDone));
+        return min(bytesAvailable, (instance->readLength - instance->bytesDone));
     else
     {
         RSUInteger result = bytesAvailable;
         if (instance->maxLength > 0){
-            result = MIN(result, (instance->maxLength - instance->bytesDone));
+            result = min(result, (instance->maxLength - instance->bytesDone));
         }
         return result;
     }
@@ -381,7 +381,7 @@ static RSUInteger __RSConnectionReadPacketReadLengthForTerm(__RSConnectionReadPa
     RSUInteger result = bytesAvailable;
     
     if (instance->maxLength > 0)
-        result = MIN(result, (instance->maxLength - instance->bytesDone));
+        result = min(result, (instance->maxLength - instance->bytesDone));
     
     if (shouldPreBufferPtr)
     {
@@ -407,13 +407,13 @@ static RSUInteger __RSConnectionReadPacketReadForTerm(__RSConnectionReadPacketRe
     if ((instance->bytesDone + preBufferLength) < termLength) return preBufferLength;
     
     RSUInteger maxPreBufferLength = 0;
-    if (instance->maxLength > 0) maxPreBufferLength = MIN(preBufferLength, (instance->maxLength - instance->bytesDone));
+    if (instance->maxLength > 0) maxPreBufferLength = min(preBufferLength, (instance->maxLength - instance->bytesDone));
     else maxPreBufferLength = preBufferLength;
     RSBitU8 seq[termLength];
     
     const void *termBuf = RSDataGetBytesPtr(instance->term);
     
-    RSUInteger bufLen = MIN(instance->bytesDone, (termLength - 1));
+    RSUInteger bufLen = min(instance->bytesDone, (termLength - 1));
     RSBitU8 *buf = (RSBitU8 *)RSDataMutableBytes(instance->buffer) + instance->startOffset + instance->bytesDone - bufLen;
     
     RSUInteger preLen = termLength - bufLen;

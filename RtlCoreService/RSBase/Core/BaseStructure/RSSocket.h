@@ -12,14 +12,6 @@
 #include <RSCoreFoundation/RSString.h>
 #include <RSCoreFoundation/RSRunLoop.h>
 
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <resolv.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
 RS_EXTERN_C_BEGIN
 typedef struct __RSSocket* RSSocketRef RS_AVAILABLE(0_0);
 

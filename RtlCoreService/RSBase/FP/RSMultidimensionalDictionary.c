@@ -121,7 +121,7 @@ RSExport RSDictionaryRef RSMultidimensionalDictionaryGetDimensionEntry(RSMultidi
 static RSTypeRef __RSMultidimensionalDictionaryGetValueWithKeys(RSMultidimensionalDictionaryRef dict, RSArrayRef keys) {
     RSTypeRef key = nil;
     if (dict->_dimensions < RSArrayGetCount(keys)) return nil; // keys is not invalid
-    RSUInteger dimensions = MIN(dict->_dimensions, RSArrayGetCount(keys));
+    RSUInteger dimensions = min(dict->_dimensions, RSArrayGetCount(keys));
     RSMutableDictionaryRef currentDimension = dict->_dict;
     for (RSUInteger idx = 0; idx < dimensions - 1; idx++) {
         key = RSArrayObjectAtIndex(keys, idx);

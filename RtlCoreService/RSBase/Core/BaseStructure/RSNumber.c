@@ -508,6 +508,9 @@ RSExport char RSNumberCharValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     char value = 0;
     if (RSNumberGetType(aValue) == RSNumberChar && RSNumberGetValue(aValue, &value)) return value;
+    else if (RS_IS_TAGGED_INT(aValue) && RSNumberGetValue(aValue, &value)) {
+        return value;
+    }
     return 0;
 }
 
@@ -515,6 +518,9 @@ RSExport unsigned char RSNumberUnsignedCharValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     unsigned char value = 0;
     if (RSNumberIsIntegerType(aValue) && RSNumberGetType(aValue) == RSNumberUnsignedChar && RSNumberGetValue(aValue, &value)) return value;
+    else if (RS_IS_TAGGED_INT(aValue) && RSNumberGetValue(aValue, &value)) {
+        return value;
+    }
     return 0;
 }
 
@@ -522,6 +528,9 @@ RSExport short RSNumberShortValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     short value = 0;
     if (RSNumberIsIntegerType(aValue) && RSNumberGetType(aValue) == RSNumberShort && RSNumberGetValue(aValue, &value)) return value;
+    else if (RS_IS_TAGGED_INT(aValue) && RSNumberGetValue(aValue, &value)) {
+        return value;
+    }
     return 0;
 }
 
@@ -529,6 +538,9 @@ RSExport unsigned short RSNumberUnsignedShortValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     unsigned short value = 0;
     if (RSNumberIsIntegerType(aValue) && RSNumberGetType(aValue) == RSNumberUnsignedShort && RSNumberGetValue(aValue, &value)) return value;
+    else if (RS_IS_TAGGED_INT(aValue) && RSNumberGetValue(aValue, &value)) {
+        return value;
+    }
     return 0;
 }
 
@@ -536,6 +548,9 @@ RSExport int RSNumberIntValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     int value = 0;
     if (RSNumberIsIntegerType(aValue) && RSNumberGetType(aValue) == RSNumberInt && RSNumberGetValue(aValue, &value)) return value;
+    else if (RS_IS_TAGGED_INT(aValue) && RSNumberGetValue(aValue, &value)) {
+        return value;
+    }
     return 0;
 }
 
@@ -543,6 +558,9 @@ RSExport unsigned int RSNumberUnsignedIntValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     unsigned int value = 0;
     if (RSNumberIsIntegerType(aValue) && RSNumberGetType(aValue) == RSNumberUnsignedInt && RSNumberGetValue(aValue, &value)) return value;
+    else if (RS_IS_TAGGED_INT(aValue) && RSNumberGetValue(aValue, &value)) {
+        return value;
+    }
     return 0;
 }
 
@@ -550,6 +568,9 @@ RSExport long RSNumberLongValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     long value = 0;
     if (RSNumberIsIntegerType(aValue) && RSNumberGetType(aValue) == RSNumberLong && RSNumberGetValue(aValue, &value)) return value;
+    else if (RS_IS_TAGGED_INT(aValue) && RSNumberGetValue(aValue, &value)) {
+        return value;
+    }
     return 0;
 }
 
@@ -557,6 +578,9 @@ RSExport unsigned long RSNumberUnsignedLongValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     unsigned long value = 0;
     if (RSNumberIsIntegerType(aValue) && RSNumberGetValue(aValue, &value)) return value;
+    else if (RS_IS_TAGGED_INT(aValue) && RSNumberGetValue(aValue, &value)) {
+        return value;
+    }
     return 0;
 }
 
@@ -564,6 +588,9 @@ RSExport long long RSNumberLongLongValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     long long value = 0;
     if (RSNumberIsIntegerType(aValue) && RSNumberGetValue(aValue, &value)) return value;
+    else if (RS_IS_TAGGED_INT(aValue) && RSNumberGetValue(aValue, &value)) {
+        return value;
+    }
     return 0;
 }
 
@@ -571,6 +598,9 @@ RSExport unsigned long long RSNumberUnsignedLongLongValue(RSNumberRef aValue) {
     if (!aValue) return 0;
     unsigned long long value = 0;
     if (RSNumberIsIntegerType(aValue) && RSNumberGetValue(aValue, &value)) return value;
+    else if (RS_IS_TAGGED_INT(aValue) && RSNumberGetValue(aValue, &value)) {
+        return value;
+    }
     return 0;
 }
 

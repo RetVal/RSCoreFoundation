@@ -9,6 +9,7 @@
 #include "RSPrivateFileSystem.h"
 #include <RSCoreFoundation/RSFileManager.h>
 #include <RSCoreFoundation/RSString+Extension.h>
+#include <libproc.h>
 
 BOOL _RSGetCurrentDirectory(char *path, int maxlen)
 {
@@ -19,8 +20,6 @@ BOOL _RSGetExecutablePath(char *path, int maxlen)
 {
     if (path == nil || maxlen < 1) return NO;
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_IPHONE
-    
-#include <libproc.h>
     char *selfname[PROC_PIDPATHINFO_MAXSIZE] = {0};
     if (proc_pidpath(getpid(), selfname, PROC_PIDPATHINFO_MAXSIZE) > 0)
     {

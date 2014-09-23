@@ -205,6 +205,10 @@ RSExport BOOL RSEqual(RSTypeRef obj1, RSTypeRef obj2)
     return NO;
 }
 
+RSExport BOOL RSNotEqual(RSTypeRef obj1, RSTypeRef obj2) {
+    return !RSEqual(obj1, obj2);
+}
+
 #define ELF_STEP(B) T1 = (H << 4) + B; T2 = T1 & 0xF0000000; if (T2) T1 ^= (T2 >> 24); T1 &= (~T2); H = T1;
 
 RSHashCode RSHashBytes(RSBitU8* bytes, RSBit32 length)

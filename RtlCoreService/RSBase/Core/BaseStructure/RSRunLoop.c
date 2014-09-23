@@ -8968,10 +8968,10 @@ RSExport void RSRunLoopTimerSetTolerance(RSRunLoopTimerRef rlt, RSTimeInterval t
      *
      * For the initial timer fire at 'start', the upper limit to the allowable
      * delay is set to 'leeway' nanoseconds. For the subsequent timer fires at
-     * 'start' + N * 'interval', the upper limit is MIN('leeway','interval'/2).
+     * 'start' + N * 'interval', the upper limit is min('leeway','interval'/2).
      */
     if (rlt->_interval > 0) {
-        rlt->_tolerance = MIN(tolerance, rlt->_interval / 2);
+        rlt->_tolerance = min(tolerance, rlt->_interval / 2);
     } else {
         // Tolerance must be a positive value or zero
         if (tolerance < 0) tolerance = 0.0;
