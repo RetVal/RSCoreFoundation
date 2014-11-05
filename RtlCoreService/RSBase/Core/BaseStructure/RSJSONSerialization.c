@@ -799,7 +799,6 @@ static BOOL parserJSON(__RSJSONParserContext *context, BOOL *isKey, RSTypeRef *o
 {
     while (!context->_error && context->_curr < context->_end)
     {
-        
         skipWhitespace(context);
         if (context->_curr + 1 >= context->_end)
         {

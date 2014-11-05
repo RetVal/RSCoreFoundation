@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		302B1C1319DAB1EB00EDC2DA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 302B1C1219DAB1EB00EDC2DA /* main.m */; };
+		302B1C1B19DAEC6900EDC2DA /* RSNote.m in Sources */ = {isa = PBXBuildFile; fileRef = 302B1C1A19DAEC6900EDC2DA /* RSNote.m */; };
+		302B1C1E19DAECDD00EDC2DA /* RSNoteChapters.m in Sources */ = {isa = PBXBuildFile; fileRef = 302B1C1D19DAECDD00EDC2DA /* RSNoteChapters.m */; };
+		302B1C2119DAED1300EDC2DA /* RSNoteChapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 302B1C2019DAED1300EDC2DA /* RSNoteChapter.m */; };
+		302B1C2419DB065B00EDC2DA /* RSNoteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 302B1C2319DB065B00EDC2DA /* RSNoteManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +29,14 @@
 /* Begin PBXFileReference section */
 		302B1C0F19DAB1EB00EDC2DA /* RSNoteSR */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RSNoteSR; sourceTree = BUILT_PRODUCTS_DIR; };
 		302B1C1219DAB1EB00EDC2DA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		302B1C1919DAEC6900EDC2DA /* RSNote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSNote.h; sourceTree = "<group>"; };
+		302B1C1A19DAEC6900EDC2DA /* RSNote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSNote.m; sourceTree = "<group>"; };
+		302B1C1C19DAECDD00EDC2DA /* RSNoteChapters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSNoteChapters.h; sourceTree = "<group>"; };
+		302B1C1D19DAECDD00EDC2DA /* RSNoteChapters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSNoteChapters.m; sourceTree = "<group>"; };
+		302B1C1F19DAED1300EDC2DA /* RSNoteChapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSNoteChapter.h; sourceTree = "<group>"; };
+		302B1C2019DAED1300EDC2DA /* RSNoteChapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSNoteChapter.m; sourceTree = "<group>"; };
+		302B1C2219DB065B00EDC2DA /* RSNoteManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSNoteManager.h; sourceTree = "<group>"; };
+		302B1C2319DB065B00EDC2DA /* RSNoteManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSNoteManager.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +70,14 @@
 			isa = PBXGroup;
 			children = (
 				302B1C1219DAB1EB00EDC2DA /* main.m */,
+				302B1C1F19DAED1300EDC2DA /* RSNoteChapter.h */,
+				302B1C2019DAED1300EDC2DA /* RSNoteChapter.m */,
+				302B1C1C19DAECDD00EDC2DA /* RSNoteChapters.h */,
+				302B1C1D19DAECDD00EDC2DA /* RSNoteChapters.m */,
+				302B1C1919DAEC6900EDC2DA /* RSNote.h */,
+				302B1C1A19DAEC6900EDC2DA /* RSNote.m */,
+				302B1C2219DB065B00EDC2DA /* RSNoteManager.h */,
+				302B1C2319DB065B00EDC2DA /* RSNoteManager.m */,
 			);
 			path = RSNoteSR;
 			sourceTree = "<group>";
@@ -118,7 +138,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				302B1C2119DAED1300EDC2DA /* RSNoteChapter.m in Sources */,
+				302B1C1E19DAECDD00EDC2DA /* RSNoteChapters.m in Sources */,
+				302B1C1B19DAEC6900EDC2DA /* RSNote.m in Sources */,
 				302B1C1319DAB1EB00EDC2DA /* main.m in Sources */,
+				302B1C2419DB065B00EDC2DA /* RSNoteManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

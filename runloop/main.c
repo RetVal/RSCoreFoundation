@@ -7,16 +7,16 @@
 //
 
 #include <RSCoreFoundation/RSCoreFoundation.h>
-#include "RSClosure.h"
-
-void timer(void (^fn)()) {
-    RSAbsoluteTime at1 = RSAbsoluteTimeGetCurrent();
-    fn();
-    RSLog(RSSTR("Elapsed time %f msecs"), 1000.0 * (RSAbsoluteTimeGetCurrent() - at1));
-}
-
-void test_fn();
 
 int main(int argc, const char * argv[]) {
-    demo();
+    RSURLConnectionSendAsynchronousRequest(RSURLRequestWithURL(RSURLWithString(RSSTR("http://www.baidu.com/"))), RSRunLoopGetCurrent(), ^(RSURLResponseRef response, RSDataRef data, RSErrorRef error) {
+        RSShow(response);
+//        RSShow(RSStringWithData(data, RSStringEncodingUTF8));
+        if (error) RSShow(error);
+        RSRunLoopStop(RSRunLoopGetMain());
+    });
+    RSShow(RSSTR("start run loop"));
+    RSRunLoopRun();
+    RSShow(RSSTR("stop run loop"));
+    return 0;
 }
