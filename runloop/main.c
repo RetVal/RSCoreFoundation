@@ -11,12 +11,21 @@
 int main(int argc, const char * argv[]) {
     RSURLConnectionSendAsynchronousRequest(RSURLRequestWithURL(RSURLWithString(RSSTR("http://www.baidu.com/"))), RSRunLoopGetCurrent(), ^(RSURLResponseRef response, RSDataRef data, RSErrorRef error) {
         RSShow(response);
-//        RSShow(RSStringWithData(data, RSStringEncodingUTF8));
-        if (error) RSShow(error);
+        
+        if (error) {
+            RSShow(error);
+        } else if (data) {
+            RSShow(RSStringWithData(data, RSStringEncodingUTF8));
+        }
         RSRunLoopStop(RSRunLoopGetMain());
     });
     RSShow(RSSTR("start run loop"));
     RSRunLoopRun();
     RSShow(RSSTR("stop run loop"));
+    
+    for (unsigned i = 0; i < 1000; i++) {
+        RSShow(RSNumberWithInt(i));
+    }
+    
     return 0;
 }

@@ -847,8 +847,7 @@ RSExport void RSTraceLog(const char* f, const char* file, RSUInteger line, const
     return;
 }
 
-RSExport void __RSLog(RSIndex logLevel, RSStringRef format, ...)
-{
+RSExport void __RSLog(RSIndex logLevel, RSStringRef format, ...) {
     RSRetain(format);
     va_list args ;
     va_start(args, format);
@@ -859,8 +858,7 @@ RSExport void __RSLog(RSIndex logLevel, RSStringRef format, ...)
     RSRelease(format);
 }
 
-RSExport void __RSLogArgs(RSIndex logLevel, RSStringRef format, va_list args)
-{
+RSExport void __RSLogArgs(RSIndex logLevel, RSStringRef format, va_list args) {
     RSStringRef formatString = RSStringCreateWithFormatAndArguments(RSAllocatorSystemDefault, 0, format, args);
     
     static RSTimeZoneRef tz = nil;
@@ -878,22 +876,19 @@ RSExport void __RSLogArgs(RSIndex logLevel, RSStringRef format, va_list args)
     RSIndex length = logString ? (buf ? RSStringGetLength(logString) : RSStringGetMaximumSizeForEncoding(RSStringGetLength(logString), RSStringEncodingUTF8) + 1) : 0;
     BOOL shouldReleaseBuf = NO;
     char BUF[256] = {0};
-    if (!buf)
-    {
+    if (!buf) {
         buf = logString ? (length > 254 ? shouldReleaseBuf = YES, (char *)RSAllocatorAllocate(RSAllocatorSystemDefault, length) : BUF) : nil;
         if (buf) converted = RSStringGetCString(logString, (char *)buf, length, RSStringEncodingUTF8);
+    } else {
+        converted = length;
     }
-    else converted = length;
-    if (converted && logString && buf)
-    {
+    if (converted && logString && buf) {
         RSBitU64 len = length;//(logString);
         // silently ignore 0-length or really large messages, and levels outside the valid range
-        if (!((1 << 31) < len))
-        {
+        if (!((1 << 31) < len)) {
             RSBlock* cStrFormat = "%s\n";
             if ((length) && ((('\r' == (UTF8Char)*(buf + length - 1)) && '\n' == (UTF8Char)*(buf + length)) ||
-                             ('\n' == (UTF8Char)*(buf + length))))
-            {
+                             ('\n' == (UTF8Char)*(buf + length)))) {
                 cStrFormat = "%s";
             }
             __RSCLog(logLevel, cStrFormat, buf);
@@ -904,14 +899,12 @@ RSExport void __RSLogArgs(RSIndex logLevel, RSStringRef format, va_list args)
     RSRelease(logString);
 }
 
-RSExport void      __RSLogShowWarning(RSTypeRef rs)
-{
+RSExport void __RSLogShowWarning(RSTypeRef rs) {
     return __RSLog(RSLogLevelWarning, RSSTR("%R"), rs);
 }
 
 
-RSExport void __RSTraceLog(RSCBuffer format,...)
-{
+RSExport void __RSTraceLog(RSCBuffer format,...) {
     RSBlock traceBuf[RSBufferSize] = {0};
     if (strcmp(format,__RSTraceLogDefaultFormat) == 0)
     {
@@ -1147,6 +1140,7 @@ RSExport __RS_INIT_ROUTINE(RSRuntimePriority) void RSCoreFoundationInitialize()
     
     __RSProtocolInitialize();
     __RSDelegateInitialize();
+    
     RSNotificationCenterPostImmediately(RSNotificationCenterGetDefault(), RSCoreFoundationDidFinishLoadingNotification, nil, nil);
     return;
 }
