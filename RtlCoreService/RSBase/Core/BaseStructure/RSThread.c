@@ -13,7 +13,7 @@
 #include "RSPrivate/RSException/RSPrivateExceptionHandler.h"
 
 
-RSPrivate void *__RSStartSimpleThread(void *func, void *arg)
+RSExport void *__RSStartSimpleThread(void (*func)(void *), void *arg)
 {
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI || DEPLOYMENT_TARGET_LINUX || DEPLOYMENT_TARGET_FREEBSD
     pthread_attr_t attr;
@@ -23,7 +23,7 @@ RSPrivate void *__RSStartSimpleThread(void *func, void *arg)
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 //    pthread_attr_setstacksize(&attr, 60 * 1024);	// 60K stack for our internal threads is sufficient
     __RSRuntimeMemoryBarrier(); // ensure arg is fully initialized and set in memory
-    pthread_create(&tid, &attr, func, arg);
+    pthread_create(&tid, &attr, (void *)func, arg);
     pthread_attr_destroy(&attr);
 	//warning RS: we dont actually know that a pthread_t is the same size as void *
     return (void *)tid;

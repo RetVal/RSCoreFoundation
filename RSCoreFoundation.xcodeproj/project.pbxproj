@@ -15,6 +15,7 @@
 		30217B8B1875D19700BC813A /* RSURL+Extension.h in Headers */ = {isa = PBXBuildFile; fileRef = 30217B8A1875D19700BC813A /* RSURL+Extension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		304B3850186C36F300806E4B /* RSRegularExpression.c in Sources */ = {isa = PBXBuildFile; fileRef = 304B384E186C36F300806E4B /* RSRegularExpression.c */; };
 		304B3851186C36F300806E4B /* RSRegularExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 304B384F186C36F300806E4B /* RSRegularExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3056A93E1AD4E75E00AE909D /* RSCoder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3056A93D1AD4E75E00AE909D /* RSCoder.framework */; };
 		305EC3B7189E14F00025E664 /* RSKVBucket.c in Sources */ = {isa = PBXBuildFile; fileRef = 305EC3B5189E14F00025E664 /* RSKVBucket.c */; };
 		305EC3B8189E14F00025E664 /* RSKVBucket.h in Headers */ = {isa = PBXBuildFile; fileRef = 305EC3B6189E14F00025E664 /* RSKVBucket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3098391E1868818400398AC3 /* RSRawHashTable.c in Sources */ = {isa = PBXBuildFile; fileRef = 3098391C1868818400398AC3 /* RSRawHashTable.c */; };
@@ -25,7 +26,6 @@
 		30D845901875164C004DEBE0 /* regex.h in Headers */ = {isa = PBXBuildFile; fileRef = 30D8458F1875164C004DEBE0 /* regex.h */; };
 		30F32B3A1860318300A45125 /* RSHTTPCookieStorage.c in Sources */ = {isa = PBXBuildFile; fileRef = 30F32B381860318300A45125 /* RSHTTPCookieStorage.c */; };
 		30F32B3B1860318300A45125 /* RSHTTPCookieStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F32B391860318300A45125 /* RSHTTPCookieStorage.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		30F669C119CB2DA50074B8A8 /* RSClosure.c in Sources */ = {isa = PBXBuildFile; fileRef = 30F669BF19CB2DA50074B8A8 /* RSClosure.c */; };
 		30F9A85818752F27006EC81B /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 30F9A85718752F27006EC81B /* libicucore.dylib */; };
 		4101F34418447BBA0090C212 /* attribute.c in Sources */ = {isa = PBXBuildFile; fileRef = 4101F32B18447BBA0090C212 /* attribute.c */; };
 		4101F34518447BBA0090C212 /* attribute.h in Headers */ = {isa = PBXBuildFile; fileRef = 4101F32C18447BBA0090C212 /* attribute.h */; };
@@ -57,7 +57,7 @@
 		4102DD2F174218C800A09614 /* RSPrivateStringFormat.h in Headers */ = {isa = PBXBuildFile; fileRef = 4102DD2A174218C800A09614 /* RSPrivateStringFormat.h */; };
 		4102DD30174218C800A09614 /* RSPriveteBuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 4102DD2B174218C800A09614 /* RSPriveteBuffer.c */; };
 		4102DD31174218C800A09614 /* RSStringScanner.c in Sources */ = {isa = PBXBuildFile; fileRef = 4102DD2C174218C800A09614 /* RSStringScanner.c */; };
-		4102DD331742198400A09614 /* RSStringInlineBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 4102DD321742198400A09614 /* RSStringInlineBuffer.h */; };
+		4102DD331742198400A09614 /* RSStringInlineBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 4102DD321742198400A09614 /* RSStringInlineBuffer.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4102DD35174221F500A09614 /* RSPrivateFileSystem.c in Sources */ = {isa = PBXBuildFile; fileRef = 4102DD34174221F500A09614 /* RSPrivateFileSystem.c */; };
 		4102DD371742221700A09614 /* RSPrivateFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 4102DD361742221700A09614 /* RSPrivateFileSystem.h */; };
 		4104913716B6E1BD0076243F /* RSFileManager.c in Sources */ = {isa = PBXBuildFile; fileRef = 4104913616B6E1BD0076243F /* RSFileManager.c */; };
@@ -392,13 +392,13 @@
 		41C0DC4C182F14CC0022D5DC /* RSBag.h in Headers */ = {isa = PBXBuildFile; fileRef = 41C0DC4A182F14CC0022D5DC /* RSBag.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		41C583E61776D42D00E037E4 /* RSCoreFoundation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4158D55A1625C4C60070E69F /* RSCoreFoundation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		41D49BE816797659002AB893 /* RSStringEncoding.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D49BE716797659002AB893 /* RSStringEncoding.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		41D919231652758E007568E9 /* RSInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D919221652758E007568E9 /* RSInternal.h */; };
+		41D919231652758E007568E9 /* RSInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D919221652758E007568E9 /* RSInternal.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		41D9375D17A538AB004E5E0F /* RSUniChar.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D9375C17A538AB004E5E0F /* RSUniChar.h */; };
 		41D9375F17A53989004E5E0F /* RSUnicodeDecomposition.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D9375E17A53989004E5E0F /* RSUnicodeDecomposition.h */; };
 		41D9376117A53A7C004E5E0F /* RSUnicodeDecomposition.c in Sources */ = {isa = PBXBuildFile; fileRef = 41D9376017A53A7C004E5E0F /* RSUnicodeDecomposition.c */; };
 		41D9376317A53AF3004E5E0F /* RSUniChar.c in Sources */ = {isa = PBXBuildFile; fileRef = 41D9376217A53AF3004E5E0F /* RSUniChar.c */; };
 		41D9376517A53B16004E5E0F /* RSUniCharPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D9376417A53B16004E5E0F /* RSUniCharPrivate.h */; };
-		41D9376717A5409D004E5E0F /* RSFoundationEncoding.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D9376617A5409D004E5E0F /* RSFoundationEncoding.h */; };
+		41D9376717A5409D004E5E0F /* RSFoundationEncoding.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D9376617A5409D004E5E0F /* RSFoundationEncoding.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		41D9376917A541AD004E5E0F /* RSFoundationEncoding.c in Sources */ = {isa = PBXBuildFile; fileRef = 41D9376817A541AD004E5E0F /* RSFoundationEncoding.c */; };
 		41D9376B17A57539004E5E0F /* RSBuiltinConverters.c in Sources */ = {isa = PBXBuildFile; fileRef = 41D9376A17A57539004E5E0F /* RSBuiltinConverters.c */; };
 		41D9376D17A575AA004E5E0F /* RSStringEncodingConverterExt.h in Headers */ = {isa = PBXBuildFile; fileRef = 41D9376C17A575AA004E5E0F /* RSStringEncodingConverterExt.h */; };
@@ -737,6 +737,16 @@
 		3049CF49187D2A6D00B7D95F /* RSRenrenCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RSRenrenCore.framework; path = Library/RSCFLibrary/RSRenrenCore/Build/Products/Debug/RSRenrenCore.framework; sourceTree = "<group>"; };
 		304B384E186C36F300806E4B /* RSRegularExpression.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRegularExpression.c; sourceTree = "<group>"; };
 		304B384F186C36F300806E4B /* RSRegularExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRegularExpression.h; sourceTree = "<group>"; };
+		3056A93D1AD4E75E00AE909D /* RSCoder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RSCoder.framework; path = ../../../../Users/closure/Library/Frameworks/RSCoder.framework; sourceTree = "<group>"; };
+		3056A93F1AD4E8B700AE909D /* libAES.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libAES.dylib; path = runloop/libAES.dylib; sourceTree = "<group>"; };
+		3056A9401AD4E8B700AE909D /* libCRC32.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libCRC32.dylib; path = runloop/libCRC32.dylib; sourceTree = "<group>"; };
+		3056A9411AD4E8B700AE909D /* libLzma.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libLzma.dylib; path = runloop/libLzma.dylib; sourceTree = "<group>"; };
+		3056A9421AD4E8B700AE909D /* libMD5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libMD5.dylib; path = runloop/libMD5.dylib; sourceTree = "<group>"; };
+		3056A9431AD4E8B700AE909D /* libRC6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libRC6.dylib; path = runloop/libRC6.dylib; sourceTree = "<group>"; };
+		3056A9441AD4E8B700AE909D /* libSHA1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSHA1.dylib; path = runloop/libSHA1.dylib; sourceTree = "<group>"; };
+		3056A9451AD4E8B700AE909D /* libSHA256.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSHA256.dylib; path = runloop/libSHA256.dylib; sourceTree = "<group>"; };
+		3056A9461AD4E8B700AE909D /* libSHA512.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSHA512.dylib; path = runloop/libSHA512.dylib; sourceTree = "<group>"; };
+		3056A9471AD4E8B700AE909D /* libZip.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libZip.dylib; path = runloop/libZip.dylib; sourceTree = "<group>"; };
 		305EC3B5189E14F00025E664 /* RSKVBucket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSKVBucket.c; sourceTree = "<group>"; };
 		305EC3B6189E14F00025E664 /* RSKVBucket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSKVBucket.h; sourceTree = "<group>"; };
 		3098391C1868818400398AC3 /* RSRawHashTable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRawHashTable.c; sourceTree = "<group>"; };
@@ -746,8 +756,6 @@
 		30D8458F1875164C004DEBE0 /* regex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = regex.h; sourceTree = "<group>"; };
 		30F32B381860318300A45125 /* RSHTTPCookieStorage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSHTTPCookieStorage.c; sourceTree = "<group>"; };
 		30F32B391860318300A45125 /* RSHTTPCookieStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSHTTPCookieStorage.h; sourceTree = "<group>"; };
-		30F669BF19CB2DA50074B8A8 /* RSClosure.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSClosure.c; sourceTree = "<group>"; };
-		30F669C019CB2DA50074B8A8 /* RSClosure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSClosure.h; sourceTree = "<group>"; };
 		30F9A85318752AB7006EC81B /* libicui18n.51.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicui18n.51.1.dylib; path = usr/lib/libicui18n.51.1.dylib; sourceTree = SDKROOT; };
 		30F9A85518752AEE006EC81B /* libicui18n.51.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicui18n.51.1.dylib; path = "../ICU-511.25/build/lib/libicui18n.51.1.dylib"; sourceTree = "<group>"; };
 		30F9A85718752F27006EC81B /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/usr/lib/libicucore.dylib; sourceTree = DEVELOPER_DIR; };
@@ -1449,6 +1457,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3056A93E1AD4E75E00AE909D /* RSCoder.framework in Frameworks */,
 				41B0E3C1182F33A200A5E00D /* RSCoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1780,6 +1789,16 @@
 		4158D55C1625C4C60070E69F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3056A93F1AD4E8B700AE909D /* libAES.dylib */,
+				3056A9401AD4E8B700AE909D /* libCRC32.dylib */,
+				3056A9411AD4E8B700AE909D /* libLzma.dylib */,
+				3056A9421AD4E8B700AE909D /* libMD5.dylib */,
+				3056A9431AD4E8B700AE909D /* libRC6.dylib */,
+				3056A9441AD4E8B700AE909D /* libSHA1.dylib */,
+				3056A9451AD4E8B700AE909D /* libSHA256.dylib */,
+				3056A9461AD4E8B700AE909D /* libSHA512.dylib */,
+				3056A9471AD4E8B700AE909D /* libZip.dylib */,
+				3056A93D1AD4E75E00AE909D /* RSCoder.framework */,
 				3049CF49187D2A6D00B7D95F /* RSRenrenCore.framework */,
 				30F9A85718752F27006EC81B /* libicucore.dylib */,
 				30F9A85518752AEE006EC81B /* libicui18n.51.1.dylib */,
@@ -2178,8 +2197,6 @@
 			isa = PBXGroup;
 			children = (
 				41B0E3B8182F338300A5E00D /* main.c */,
-				30F669BF19CB2DA50074B8A8 /* RSClosure.c */,
-				30F669C019CB2DA50074B8A8 /* RSClosure.h */,
 				41B0E3BA182F338300A5E00D /* runloop.1 */,
 			);
 			path = runloop;
@@ -2614,8 +2631,11 @@
 				410A175C168C446F005B2EDF /* RSDeploymentAvailability.h in Headers */,
 				41AD129F16ECE91A0032577A /* RSNotification.h in Headers */,
 				41C0DC4C182F14CC0022D5DC /* RSBag.h in Headers */,
+				41D9376717A5409D004E5E0F /* RSFoundationEncoding.h in Headers */,
+				41D919231652758E007568E9 /* RSInternal.h in Headers */,
 				41FE766B1822B9A600E5E581 /* setup.h in Headers */,
 				41D9376F17A57A77004E5E0F /* RSStringEncodingConverter.h in Headers */,
+				4102DD331742198400A09614 /* RSStringInlineBuffer.h in Headers */,
 				41AD12A116ECE9570032577A /* RSObserver.h in Headers */,
 				41FE76041822B9A600E5E581 /* hostip.h in Headers */,
 				41A9FC50165F179C00EB7175 /* RSRunLoop.h in Headers */,
@@ -2635,7 +2655,6 @@
 				41FB48FE177AE3CC00571B16 /* RSError+Extension.h in Headers */,
 				415D57DE17BE265C00FE3E9D /* RSProcessInfo.h in Headers */,
 				41FE75DB1822B9A600E5E581 /* curl_ntlm_wb.h in Headers */,
-				41D9376717A5409D004E5E0F /* RSFoundationEncoding.h in Headers */,
 				41419A05175F054800DD4755 /* RSArray+Extension.h in Headers */,
 				41FE76691822B9A600E5E581 /* sendf.h in Headers */,
 				41FE75B31822B9A600E5E581 /* config-mac.h in Headers */,
@@ -2668,7 +2687,6 @@
 				41FE767F1822B9A600E5E581 /* sslgen.h in Headers */,
 				41D9375F17A53989004E5E0F /* RSUnicodeDecomposition.h in Headers */,
 				41FE75F51822B9A600E5E581 /* ftp.h in Headers */,
-				41D919231652758E007568E9 /* RSInternal.h in Headers */,
 				41A6174E165B68FD008FC250 /* RSPacket.h in Headers */,
 				30D845901875164C004DEBE0 /* regex.h in Headers */,
 				413C15991670C165003EDEB6 /* RSErrorPrivate.h in Headers */,
@@ -2684,7 +2702,6 @@
 				4102DD2D174218C800A09614 /* RSPrivateBuffer.h in Headers */,
 				41FE768B1822B9A600E5E581 /* strtoofft.h in Headers */,
 				4102DD2F174218C800A09614 /* RSPrivateStringFormat.h in Headers */,
-				4102DD331742198400A09614 /* RSStringInlineBuffer.h in Headers */,
 				41FE768D1822B9A600E5E581 /* telnet.h in Headers */,
 				41FE769A1822B9A600E5E581 /* warnless.h in Headers */,
 				4102DD371742221700A09614 /* RSPrivateFileSystem.h in Headers */,
@@ -3515,7 +3532,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30F669C119CB2DA50074B8A8 /* RSClosure.c in Sources */,
 				41B0E3B9182F338300A5E00D /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3973,6 +3989,7 @@
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 					"/SourceCache/Library/RSCoreFoundation-1400/Library/RSCFLibrary/RSRenrenCore/Build/Products/Debug",
+					"$(USER_LIBRARY_DIR)/Frameworks",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -3981,6 +3998,11 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(USER_LIBRARY_DIR)/Frameworks/RSCoder.framework/Versions/A/Frameworks/";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/runloop",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -4002,10 +4024,16 @@
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 					"/SourceCache/Library/RSCoreFoundation-1400/Library/RSCFLibrary/RSRenrenCore/Build/Products/Debug",
+					"$(USER_LIBRARY_DIR)/Frameworks",
 				);
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(USER_LIBRARY_DIR)/Frameworks/RSCoder.framework/Versions/A/Frameworks/";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/runloop",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;

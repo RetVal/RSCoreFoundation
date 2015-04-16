@@ -7,25 +7,20 @@
 //
 
 #include <RSCoreFoundation/RSCoreFoundation.h>
+#include <RSCoder/RSCoder.h>
+
+#include <RSCoreFoundation/RSInternal.h>
+RS_PUBLIC_CONST_STRING_DECL(User, "zachtest@feizan.com")
+RS_PUBLIC_CONST_STRING_DECL(Password, "zachtest")
 
 int main(int argc, const char * argv[]) {
-    RSURLConnectionSendAsynchronousRequest(RSURLRequestWithURL(RSURLWithString(RSSTR("http://www.baidu.com/"))), RSRunLoopGetCurrent(), ^(RSURLResponseRef response, RSDataRef data, RSErrorRef error) {
-        RSShow(response);
-        
-        if (error) {
-            RSShow(error);
-        } else if (data) {
-            RSShow(RSStringWithData(data, RSStringEncodingUTF8));
-        }
-        RSRunLoopStop(RSRunLoopGetMain());
-    });
-    RSShow(RSSTR("start run loop"));
-    RSRunLoopRun();
-    RSShow(RSSTR("stop run loop"));
+    RSDataRef data = RSDataCreateWithString(RSAllocatorDefault, User, RSStringEncodingUTF8);
+    RSDataRef encoded = RSCoderRoutineInvoke(RSMD5Coder, RSCoderInvokeEncode, data);
+    RSRelease(data);
     
-    for (unsigned i = 0; i < 1000; i++) {
-        RSShow(RSNumberWithInt(i));
-    }
-    
+    RSStringRef encodedString = RSStringCreateWithData(RSAllocatorDefault, encoded, RSStringEncodingUTF8);
+    RSShow(encodedString);
+    RSRelease(encodedString);
+    RSRelease(encoded);
     return 0;
 }

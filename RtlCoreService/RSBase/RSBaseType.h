@@ -8,6 +8,7 @@
 
 #ifndef RSCoreFoundation_RSBaseType_h
 #define RSCoreFoundation_RSBaseType_h
+
 #import <RSCoreFoundation/RSBaseMacro.h>
 #include <sys/types.h>
 #include <stdarg.h>
@@ -48,6 +49,9 @@
 #define RS_EXTERN_C_END
 #endif
 #endif
+
+RS_EXTERN_C_BEGIN
+
 typedef char  RSBlock;
 typedef RSBlock* RSBuffer;
 
@@ -271,4 +275,5 @@ RSInline RSRange RSMakeRange(RSIndex location, RSIndex length) {
 }
 
 typedef RS_ENUM(RSInteger, RSComparisonOrder) {RSOrderedAscending = -1L, RSOrderedSame, RSOrderedDescending};
+RS_EXTERN_C_END
 #endif

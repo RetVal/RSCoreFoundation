@@ -8,13 +8,16 @@
 
 #ifndef RSCoreFoundation_RSInternal_h
 #define RSCoreFoundation_RSInternal_h
+
+RS_EXTERN_C_BEGIN
+
 #include <RSCoreFoundation/RSRuntime.h>
 #include <RSCoreFoundation/RSStringEncoding.h>
 #include <RSCoreFoundation/RSAvailability.h>
 #include <RSCoreFoundation/RSBaseType.h>
 
-#include "BaseStructure/RSPrivate/CString/RSStringInlineBuffer.h"
-#include "BaseStructure/RSPrivate/CString/RSString/RSFoundationEncoding.h"
+#include "RSStringInlineBuffer.h"
+#include "RSFoundationEncoding.h"
 
 #include <dispatch/dispatch.h>
 #define RSDictionaryBasicHash   1
@@ -318,7 +321,7 @@ extern const RSDictionaryKeyContext ___RSConstantCStringKeyContext;
 
 extern void __RSRuntimeMemoryBarrier();
 extern void RSAllocatorLogUnitCount();
-extern void *__RSStartSimpleThread(void *func, void *arg);
+extern void *__RSStartSimpleThread(void (*func)(void *), void *arg);
 extern void _RSRunLoopRunBackGround();
 
 struct _RSRuntimeLogPreference {
@@ -486,5 +489,7 @@ typedef RS_ENUM(RSIndex, RSStringCharacterClusterType) {
     RSStringCursorMovementCluster = 3, /* Cluster suitable for cursor movements */
     RSStringBackwardDeletionCluster = 4 /* Cluster suitable for backward deletion */
 };
+
     
+RS_EXTERN_C_END
 #endif
