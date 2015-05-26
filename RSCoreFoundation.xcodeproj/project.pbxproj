@@ -20,6 +20,15 @@
 		305EC3B8189E14F00025E664 /* RSKVBucket.h in Headers */ = {isa = PBXBuildFile; fileRef = 305EC3B6189E14F00025E664 /* RSKVBucket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3098391E1868818400398AC3 /* RSRawHashTable.c in Sources */ = {isa = PBXBuildFile; fileRef = 3098391C1868818400398AC3 /* RSRawHashTable.c */; };
 		3098391F1868818400398AC3 /* RSRawHashTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 3098391D1868818400398AC3 /* RSRawHashTable.h */; };
+		309903281B1452110081278B /* RSFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = 309903271B1452110081278B /* RSFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3099032E1B1452110081278B /* RSFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 309903231B1452110081278B /* RSFoundation.framework */; };
+		309903371B1452120081278B /* RSFoundationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 309903361B1452120081278B /* RSFoundationTests.mm */; };
+		3099033A1B1452120081278B /* RSFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 309903231B1452110081278B /* RSFoundation.framework */; };
+		3099033B1B1452120081278B /* RSFoundation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 309903231B1452110081278B /* RSFoundation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		309903471B1452650081278B /* RSBasicObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 309903451B1452650081278B /* RSBasicObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		309903491B1452770081278B /* RSBasicObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 309903481B1452770081278B /* RSBasicObject.cpp */; };
+		3099034E1B14540D0081278B /* RSTypeTraits.h in Headers */ = {isa = PBXBuildFile; fileRef = 3099034C1B14540D0081278B /* RSTypeTraits.h */; };
+		309903501B1454740081278B /* RSTypeTraits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3099034F1B1454740081278B /* RSTypeTraits.cpp */; };
 		30A15D3918A9C5170055B9A1 /* RSCoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4158D55A1625C4C60070E69F /* RSCoreFoundation.framework */; };
 		30A4B615189E029800DF6FA4 /* RSMultidimensionalDictionary.c in Sources */ = {isa = PBXBuildFile; fileRef = 30A4B613189E029800DF6FA4 /* RSMultidimensionalDictionary.c */; };
 		30A4B616189E029800DF6FA4 /* RSMultidimensionalDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 30A4B614189E029800DF6FA4 /* RSMultidimensionalDictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -654,6 +663,27 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		3099032F1B1452110081278B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4158D5501625C4C60070E69F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 309903221B1452110081278B;
+			remoteInfo = RSFoundation;
+		};
+		309903311B1452120081278B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4158D5501625C4C60070E69F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 41AA721F162A7B0A000473BD;
+			remoteInfo = RSCoreFoundationLoader;
+		};
+		309903381B1452120081278B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4158D5501625C4C60070E69F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 309903221B1452110081278B;
+			remoteInfo = RSFoundation;
+		};
 		4148EA9616EB8C0100357D9E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 4158D5501625C4C60070E69F /* Project object */;
@@ -701,6 +731,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				3099033B1B1452120081278B /* RSFoundation.framework in CopyFiles */,
 				41C583E61776D42D00E037E4 /* RSCoreFoundation.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -734,30 +765,28 @@
 		300CB716189A3349004298E2 /* RSList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSList.h; sourceTree = "<group>"; };
 		30217B881875D18D00BC813A /* RSURL+Extension.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "RSURL+Extension.c"; sourceTree = "<group>"; };
 		30217B8A1875D19700BC813A /* RSURL+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RSURL+Extension.h"; sourceTree = "<group>"; };
-		3049CF49187D2A6D00B7D95F /* RSRenrenCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RSRenrenCore.framework; path = Library/RSCFLibrary/RSRenrenCore/Build/Products/Debug/RSRenrenCore.framework; sourceTree = "<group>"; };
 		304B384E186C36F300806E4B /* RSRegularExpression.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRegularExpression.c; sourceTree = "<group>"; };
 		304B384F186C36F300806E4B /* RSRegularExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRegularExpression.h; sourceTree = "<group>"; };
 		3056A93D1AD4E75E00AE909D /* RSCoder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RSCoder.framework; path = ../../../../Users/closure/Library/Frameworks/RSCoder.framework; sourceTree = "<group>"; };
-		3056A93F1AD4E8B700AE909D /* libAES.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libAES.dylib; path = runloop/libAES.dylib; sourceTree = "<group>"; };
-		3056A9401AD4E8B700AE909D /* libCRC32.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libCRC32.dylib; path = runloop/libCRC32.dylib; sourceTree = "<group>"; };
-		3056A9411AD4E8B700AE909D /* libLzma.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libLzma.dylib; path = runloop/libLzma.dylib; sourceTree = "<group>"; };
-		3056A9421AD4E8B700AE909D /* libMD5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libMD5.dylib; path = runloop/libMD5.dylib; sourceTree = "<group>"; };
-		3056A9431AD4E8B700AE909D /* libRC6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libRC6.dylib; path = runloop/libRC6.dylib; sourceTree = "<group>"; };
-		3056A9441AD4E8B700AE909D /* libSHA1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSHA1.dylib; path = runloop/libSHA1.dylib; sourceTree = "<group>"; };
-		3056A9451AD4E8B700AE909D /* libSHA256.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSHA256.dylib; path = runloop/libSHA256.dylib; sourceTree = "<group>"; };
-		3056A9461AD4E8B700AE909D /* libSHA512.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSHA512.dylib; path = runloop/libSHA512.dylib; sourceTree = "<group>"; };
-		3056A9471AD4E8B700AE909D /* libZip.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libZip.dylib; path = runloop/libZip.dylib; sourceTree = "<group>"; };
 		305EC3B5189E14F00025E664 /* RSKVBucket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSKVBucket.c; sourceTree = "<group>"; };
 		305EC3B6189E14F00025E664 /* RSKVBucket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSKVBucket.h; sourceTree = "<group>"; };
 		3098391C1868818400398AC3 /* RSRawHashTable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRawHashTable.c; sourceTree = "<group>"; };
 		3098391D1868818400398AC3 /* RSRawHashTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRawHashTable.h; sourceTree = "<group>"; };
+		309903231B1452110081278B /* RSFoundation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RSFoundation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		309903261B1452110081278B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		309903271B1452110081278B /* RSFoundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RSFoundation.h; sourceTree = "<group>"; };
+		3099032D1B1452110081278B /* RSFoundationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RSFoundationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		309903351B1452120081278B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		309903361B1452120081278B /* RSFoundationTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RSFoundationTests.mm; sourceTree = "<group>"; };
+		309903451B1452650081278B /* RSBasicObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSBasicObject.h; sourceTree = "<group>"; };
+		309903481B1452770081278B /* RSBasicObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RSBasicObject.cpp; sourceTree = "<group>"; };
+		3099034C1B14540D0081278B /* RSTypeTraits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSTypeTraits.h; sourceTree = "<group>"; };
+		3099034F1B1454740081278B /* RSTypeTraits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RSTypeTraits.cpp; sourceTree = "<group>"; };
 		30A4B613189E029800DF6FA4 /* RSMultidimensionalDictionary.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSMultidimensionalDictionary.c; sourceTree = "<group>"; };
 		30A4B614189E029800DF6FA4 /* RSMultidimensionalDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSMultidimensionalDictionary.h; sourceTree = "<group>"; };
 		30D8458F1875164C004DEBE0 /* regex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = regex.h; sourceTree = "<group>"; };
 		30F32B381860318300A45125 /* RSHTTPCookieStorage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSHTTPCookieStorage.c; sourceTree = "<group>"; };
 		30F32B391860318300A45125 /* RSHTTPCookieStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSHTTPCookieStorage.h; sourceTree = "<group>"; };
-		30F9A85318752AB7006EC81B /* libicui18n.51.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicui18n.51.1.dylib; path = usr/lib/libicui18n.51.1.dylib; sourceTree = SDKROOT; };
-		30F9A85518752AEE006EC81B /* libicui18n.51.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicui18n.51.1.dylib; path = "../ICU-511.25/build/lib/libicui18n.51.1.dylib"; sourceTree = "<group>"; };
 		30F9A85718752F27006EC81B /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/usr/lib/libicucore.dylib; sourceTree = DEVELOPER_DIR; };
 		4101F32B18447BBA0090C212 /* attribute.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = attribute.c; sourceTree = "<group>"; };
 		4101F32C18447BBA0090C212 /* attribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = attribute.h; sourceTree = "<group>"; };
@@ -1006,7 +1035,6 @@
 		415A2FEF171C48BD0080373A /* RSCoreFoundationUnitTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSCoreFoundationUnitTest.h; path = UnitTest/RSCoreFoundationUnitTest.h; sourceTree = SOURCE_ROOT; };
 		415D57DB17BE265C00FE3E9D /* RSProcessInfo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = RSProcessInfo.c; path = RtlCoreService/RSKit/RSProcessInfo.c; sourceTree = SOURCE_ROOT; };
 		415D57DC17BE265C00FE3E9D /* RSProcessInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSProcessInfo.h; path = RtlCoreService/RSKit/RSProcessInfo.h; sourceTree = SOURCE_ROOT; };
-		4162E42A17CA5B9700CB9C6F /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		41667C2916C8BBCF008B9648 /* RSBundle.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSBundle.c; sourceTree = "<group>"; };
 		41667C2B16C8BBEC008B9648 /* RSBundle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSBundle.h; sourceTree = "<group>"; };
 		416B381F16514C81005848CC /* RSDate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSDate.c; sourceTree = "<group>"; };
@@ -1124,7 +1152,6 @@
 		41B0E3B8182F338300A5E00D /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		41B0E3BA182F338300A5E00D /* runloop.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = runloop.1; sourceTree = "<group>"; };
 		41B0E3C6182F434000A5E00D /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/CoreFoundation.framework; sourceTree = DEVELOPER_DIR; };
-		41B0E3C8182FE1FA00A5E00D /* MobileDevice.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileDevice.framework; path = ../../../System/Library/PrivateFrameworks/MobileDevice.framework; sourceTree = "<group>"; };
 		41B2088916D484FA0063AB3A /* RSBundlePrivateC0Context.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSBundlePrivateC0Context.c; sourceTree = "<group>"; };
 		41B2088B16D4850B0063AB3A /* RSBundlePrivateC0Context.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSBundlePrivateC0Context.h; sourceTree = "<group>"; };
 		41B22976175F2AAE00726FE3 /* RSString+Extension.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "RSString+Extension.c"; sourceTree = "<group>"; };
@@ -1408,6 +1435,21 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		3099031F1B1452110081278B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3099032A1B1452110081278B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3099032E1B1452110081278B /* RSFoundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4148EA8716EB8B6200357D9E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1448,6 +1490,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3099033A1B1452120081278B /* RSFoundation.framework in Frameworks */,
 				41A9DC571693FA2B00F8B7C2 /* RSCoreFoundation.framework in Frameworks */,
 				41AA7222162A7B0A000473BD /* Cocoa.framework in Frameworks */,
 			);
@@ -1488,6 +1531,60 @@
 			);
 			name = FP;
 			path = RSBase/FP;
+			sourceTree = "<group>";
+		};
+		309903241B1452110081278B /* RSFoundation */ = {
+			isa = PBXGroup;
+			children = (
+				309903271B1452110081278B /* RSFoundation.h */,
+				309903421B14523E0081278B /* include */,
+				309903431B1452470081278B /* lib */,
+				309903251B1452110081278B /* Supporting Files */,
+			);
+			path = RSFoundation;
+			sourceTree = "<group>";
+		};
+		309903251B1452110081278B /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				309903261B1452110081278B /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		309903331B1452120081278B /* RSFoundationTests */ = {
+			isa = PBXGroup;
+			children = (
+				309903361B1452120081278B /* RSFoundationTests.mm */,
+				309903341B1452120081278B /* Supporting Files */,
+			);
+			path = RSFoundationTests;
+			sourceTree = "<group>";
+		};
+		309903341B1452120081278B /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				309903351B1452120081278B /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		309903421B14523E0081278B /* include */ = {
+			isa = PBXGroup;
+			children = (
+				3099034C1B14540D0081278B /* RSTypeTraits.h */,
+				309903451B1452650081278B /* RSBasicObject.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		309903431B1452470081278B /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				3099034F1B1454740081278B /* RSTypeTraits.cpp */,
+				309903481B1452770081278B /* RSBasicObject.cpp */,
+			);
+			path = lib;
 			sourceTree = "<group>";
 		};
 		4101F32A18447BBA0090C212 /* gumbo */ = {
@@ -1767,6 +1864,8 @@
 				4158D5631625C4C60070E69F /* RSCoreFoundation */,
 				41AA7223162A7B0A000473BD /* RSCoreFoundationLoader */,
 				41B0E3B7182F338200A5E00D /* runloop */,
+				309903241B1452110081278B /* RSFoundation */,
+				309903331B1452120081278B /* RSFoundationTests */,
 				4158D55C1625C4C60070E69F /* Frameworks */,
 				4158D55B1625C4C60070E69F /* Products */,
 			);
@@ -1782,6 +1881,8 @@
 				41E928F617C32AD3003DB0ED /* RSProcessInfo.dylib */,
 				41B0E3B6182F338200A5E00D /* runloop */,
 				418C497B1833930300D88CB3 /* RSFileMonitor.framework */,
+				309903231B1452110081278B /* RSFoundation.framework */,
+				3099032D1B1452110081278B /* RSFoundationTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1789,21 +1890,8 @@
 		4158D55C1625C4C60070E69F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				3056A93F1AD4E8B700AE909D /* libAES.dylib */,
-				3056A9401AD4E8B700AE909D /* libCRC32.dylib */,
-				3056A9411AD4E8B700AE909D /* libLzma.dylib */,
-				3056A9421AD4E8B700AE909D /* libMD5.dylib */,
-				3056A9431AD4E8B700AE909D /* libRC6.dylib */,
-				3056A9441AD4E8B700AE909D /* libSHA1.dylib */,
-				3056A9451AD4E8B700AE909D /* libSHA256.dylib */,
-				3056A9461AD4E8B700AE909D /* libSHA512.dylib */,
-				3056A9471AD4E8B700AE909D /* libZip.dylib */,
 				3056A93D1AD4E75E00AE909D /* RSCoder.framework */,
-				3049CF49187D2A6D00B7D95F /* RSRenrenCore.framework */,
 				30F9A85718752F27006EC81B /* libicucore.dylib */,
-				30F9A85518752AEE006EC81B /* libicui18n.51.1.dylib */,
-				30F9A85318752AB7006EC81B /* libicui18n.51.1.dylib */,
-				41B0E3C8182FE1FA00A5E00D /* MobileDevice.framework */,
 				41B0E3C6182F434000A5E00D /* CoreFoundation.framework */,
 				4152FB48182DD659005ED016 /* libdispatch.dylib */,
 				4129250D1822BAE800F2D71B /* libcrypto.dylib */,
@@ -1814,7 +1902,6 @@
 				41813436168B394500B08722 /* libicucore.dylib */,
 				4158D55D1625C4C60070E69F /* Cocoa.framework */,
 				41AE32CD16DE37A400C3A15E /* CoreFoundation.framework */,
-				4162E42A17CA5B9700CB9C6F /* XCTest.framework */,
 				4158D55F1625C4C60070E69F /* Other Frameworks */,
 			);
 			name = Frameworks;
@@ -2550,6 +2637,16 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		309903201B1452110081278B /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				309903281B1452110081278B /* RSFoundation.h in Headers */,
+				309903471B1452650081278B /* RSBasicObject.h in Headers */,
+				3099034E1B14540D0081278B /* RSTypeTraits.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4148EA8816EB8B6200357D9E /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -2991,6 +3088,44 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		309903221B1452110081278B /* RSFoundation */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 309903401B1452120081278B /* Build configuration list for PBXNativeTarget "RSFoundation" */;
+			buildPhases = (
+				3099031E1B1452110081278B /* Sources */,
+				3099031F1B1452110081278B /* Frameworks */,
+				309903201B1452110081278B /* Headers */,
+				309903211B1452110081278B /* Resources */,
+				3099034A1B1452B40081278B /* Install */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RSFoundation;
+			productName = RSFoundation;
+			productReference = 309903231B1452110081278B /* RSFoundation.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		3099032C1B1452110081278B /* RSFoundationTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 309903411B1452120081278B /* Build configuration list for PBXNativeTarget "RSFoundationTests" */;
+			buildPhases = (
+				309903291B1452110081278B /* Sources */,
+				3099032A1B1452110081278B /* Frameworks */,
+				3099032B1B1452110081278B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				309903301B1452110081278B /* PBXTargetDependency */,
+				309903321B1452120081278B /* PBXTargetDependency */,
+			);
+			name = RSFoundationTests;
+			productName = RSFoundationTests;
+			productReference = 3099032D1B1452110081278B /* RSFoundationTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		4148EA8916EB8B6200357D9E /* RSVersion */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4148EA8B16EB8B6200357D9E /* Build configuration list for PBXNativeTarget "RSVersion" */;
@@ -3083,6 +3218,7 @@
 			dependencies = (
 				4159783416E0550E00726AAA /* PBXTargetDependency */,
 				4148EA9716EB8C0100357D9E /* PBXTargetDependency */,
+				309903391B1452120081278B /* PBXTargetDependency */,
 			);
 			name = RSCoreFoundationLoader;
 			productName = RSKitLoader;
@@ -3133,6 +3269,15 @@
 			attributes = {
 				LastUpgradeCheck = 0600;
 				ORGANIZATIONNAME = RetVal;
+				TargetAttributes = {
+					309903221B1452110081278B = {
+						CreatedOnToolsVersion = 6.3.1;
+					};
+					3099032C1B1452110081278B = {
+						CreatedOnToolsVersion = 6.3.1;
+						TestTargetID = 41AA721F162A7B0A000473BD;
+					};
+				};
 			};
 			buildConfigurationList = 4158D5531625C4C60070E69F /* Build configuration list for PBXProject "RSCoreFoundation" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -3147,17 +3292,33 @@
 			projectRoot = "";
 			targets = (
 				4158D5591625C4C60070E69F /* RSCoreFoundation */,
+				309903221B1452110081278B /* RSFoundation */,
 				41AA721F162A7B0A000473BD /* RSCoreFoundationLoader */,
 				4148EA8916EB8B6200357D9E /* RSVersion */,
 				415A2FE7171C485E0080373A /* RSCoreFoundationUnitTest */,
 				41E928F517C32AD3003DB0ED /* RSProcessInfo */,
 				41B0E3B5182F338200A5E00D /* runloop */,
 				418C497A1833930300D88CB3 /* RSFileMonitor */,
+				3099032C1B1452110081278B /* RSFoundationTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		309903211B1452110081278B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3099032B1B1452110081278B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4158D5581625C4C60070E69F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3188,6 +3349,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		3099034A1B1452B40081278B /* Install */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = Install;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ${TARGET_BUILD_DIR}/\nrm -rf ~/Library/Frameworks/RSFoundation.framework\ncp -a RSFoundation.framework ~/Library/Frameworks/RSFoundation.framework";
+		};
 		4105854E162658C300A221DD /* Build Version */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 8;
@@ -3276,6 +3451,23 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		3099031E1B1452110081278B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				309903491B1452770081278B /* RSBasicObject.cpp in Sources */,
+				309903501B1454740081278B /* RSTypeTraits.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		309903291B1452110081278B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				309903371B1452120081278B /* RSFoundationTests.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4148EA8616EB8B6200357D9E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3547,6 +3739,21 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		309903301B1452110081278B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 309903221B1452110081278B /* RSFoundation */;
+			targetProxy = 3099032F1B1452110081278B /* PBXContainerItemProxy */;
+		};
+		309903321B1452120081278B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 41AA721F162A7B0A000473BD /* RSCoreFoundationLoader */;
+			targetProxy = 309903311B1452120081278B /* PBXContainerItemProxy */;
+		};
+		309903391B1452120081278B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 309903221B1452110081278B /* RSFoundation */;
+			targetProxy = 309903381B1452120081278B /* PBXContainerItemProxy */;
+		};
 		4148EA9716EB8C0100357D9E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 4148EA8916EB8B6200357D9E /* RSVersion */;
@@ -3613,6 +3820,154 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		3099033C1B1452120081278B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_VERSION = A;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = RSFoundation/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		3099033D1B1452120081278B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_VERSION = A;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = RSFoundation/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		3099033E1B1452120081278B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = RSFoundationTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RSCoreFoundationLoader.app/Contents/MacOS/RSCoreFoundationLoader";
+			};
+			name = Debug;
+		};
+		3099033F1B1452120081278B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = RSFoundationTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RSCoreFoundationLoader.app/Contents/MacOS/RSCoreFoundationLoader";
+			};
+			name = Release;
+		};
 		4148EA8C16EB8B6200357D9E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3673,6 +4028,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks/ @loader_path/Frameworks/ $(HOME)/Library/Frameworks/ /Library/Frameworks/";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PROVISIONING_PROFILE = "";
@@ -3698,6 +4054,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks/ @loader_path/Frameworks/ $(HOME)/Library/Frameworks/ /Library/Frameworks/";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
@@ -3947,7 +4304,7 @@
 				GCC_PREFIX_HEADER = "RSKitLoader/RSCoreFoundationLoader-Prefix.pch";
 				HEADER_SEARCH_PATHS = "~/Library/Frameworks/usr/local/include/**";
 				INFOPLIST_FILE = "RSKitLoader/RSCoreFoundationLoader-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks/ @loader_path/Frameworks/ $(HOME)/Library/Frameworks/ /Library/Frameworks/";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks/ @loader_path/Frameworks/ $(HOME)/Library/Frameworks/ /Library/Frameworks/ @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = RSCoreFoundationLoader;
@@ -3966,7 +4323,7 @@
 				GCC_PREFIX_HEADER = "RSKitLoader/RSCoreFoundationLoader-Prefix.pch";
 				HEADER_SEARCH_PATHS = "~/Library/Frameworks/usr/local/include/**";
 				INFOPLIST_FILE = "RSKitLoader/RSCoreFoundationLoader-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks/ @loader_path/Frameworks/ $(HOME)/Library/Frameworks/ /Library/Frameworks/";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks/ @loader_path/Frameworks/ $(HOME)/Library/Frameworks/ /Library/Frameworks/ @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = RSCoreFoundationLoader;
@@ -4094,6 +4451,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		309903401B1452120081278B /* Build configuration list for PBXNativeTarget "RSFoundation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3099033C1B1452120081278B /* Debug */,
+				3099033D1B1452120081278B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		309903411B1452120081278B /* Build configuration list for PBXNativeTarget "RSFoundationTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3099033E1B1452120081278B /* Debug */,
+				3099033F1B1452120081278B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		4148EA8B16EB8B6200357D9E /* Build configuration list for PBXNativeTarget "RSVersion" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -20,5 +20,8 @@ RSExport RSAutoreleasePoolRef RSAutoreleasePoolCreate(RSAllocatorRef allocator) 
 RSExport void RSAutoreleasePoolDrain(RSAutoreleasePoolRef pool) RS_AVAILABLE(0_2);
 
 RSExport void RSAutoreleaseBlock(void (^do_block)()) RS_AVAILABLE(0_3);
+
+RSExport void RSAutoreleasePoolPush() RS_AVAILABLE(0_4);
+RSExport void RSAutoreleasePoolPop() RS_AVAILABLE(0_4);
 RS_EXTERN_C_END
 #endif

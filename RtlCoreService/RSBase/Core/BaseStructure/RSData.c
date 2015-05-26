@@ -24,7 +24,7 @@ RSInline void __RSDataValidateRange(RSDataRef data, RSRange range, const char *f
     RSAssert2(range.location + range.length <= __RSDataLength(data), __RSLogAssertion, "%s(): ending index (%d) out of bounds", func, range.location + range.length);
 }
 #else
-#define __CFDataValidateRange(a,r,f)
+#define __RSDataValidateRange(a,r,f)
 #endif
 
 typedef struct __RSISAPayload

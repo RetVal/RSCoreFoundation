@@ -1951,11 +1951,11 @@ static RSStringRef __RSRunLoopClassDescription(RSTypeRef rs) {
     RSMutableStringRef result;
     result = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
 #if DEPLOYMENT_TARGET_WINDOWS
-    RSStringAppendFormat(result, nil, RSSTR("<RSRunLoop %p [%p]>{wakeup port = 0x%x, stopped = %s, ignoreWakeUps = %s, \ncurrent mode = %r,\n"), rs, RSGetAllocator(rs), rl->_wakeUpPort, __RSRunLoopIsStopped(rl) ? "YES" : "NO", __RSRunLoopIsIgnoringWakeUps(rl) ? "YES" : "NO", rl->_currentMode ? rl->_currentMode->_name : RSSTR("(none)"));
+    RSStringAppendFormat(result, RSSTR("<RSRunLoop %p [%p]>{wakeup port = 0x%x, stopped = %s, ignoreWakeUps = %s, \ncurrent mode = %r,\n"), rs, RSGetAllocator(rs), rl->_wakeUpPort, __RSRunLoopIsStopped(rl) ? "YES" : "NO", __RSRunLoopIsIgnoringWakeUps(rl) ? "YES" : "NO", rl->_currentMode ? rl->_currentMode->_name : RSSTR("(none)"));
 #else
-    RSStringAppendStringWithFormat(result, nil, RSSTR("<RSRunLoop %p [%p]>{wakeup port = 0x%x, stopped = %s, ignoreWakeUps = %s, \ncurrent mode = %r,\n"), rs, RSGetAllocator(rs), rl->_wakeUpPort, __RSRunLoopIsStopped(rl) ? "YES" : "NO", __RSRunLoopIsIgnoringWakeUps(rl) ? "YES" : "NO", rl->_currentMode ? rl->_currentMode->_name : RSSTR("(none)"));
+    RSStringAppendStringWithFormat(result, RSSTR("<RSRunLoop %p [%p]>{wakeup port = 0x%x, stopped = %s, ignoreWakeUps = %s, \ncurrent mode = %r,\n"), rs, RSGetAllocator(rs), rl->_wakeUpPort, __RSRunLoopIsStopped(rl) ? "YES" : "NO", __RSRunLoopIsIgnoringWakeUps(rl) ? "YES" : "NO", rl->_currentMode ? rl->_currentMode->_name : RSSTR("(none)"));
 #endif
-    RSStringAppendStringWithFormat(result, nil, RSSTR("common modes = %r,\ncommon mode items = %r,\nmodes = %r}\n"), rl->_commonModes, rl->_commonModeItems, rl->_modes);
+    RSStringAppendStringWithFormat(result, RSSTR("common modes = %r,\ncommon mode items = %r,\nmodes = %r}\n"), rl->_commonModes, rl->_commonModeItems, rl->_modes);
     return result;
 }
 
@@ -4355,17 +4355,17 @@ static RSStringRef __RSRunLoopSourceClassDescription(RSTypeRef rs) {	/* DOES CAL
     if (nil == contextDesc) {
         void *addr = rls->_context.version0.version == 0 ? (void *)rls->_context.version0.perform : (rls->_context.version0.version == 1 ? (void *)rls->_context.version1.perform : nil);
 #if DEPLOYMENT_TARGET_WINDOWS
-        contextDesc = RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("<RSRunLoopSource context>{version = %ld, info = %p, callout = %p}"), rls->_context.version0.version, rls->_context.version0.info, addr);
+        contextDesc = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<RSRunLoopSource context>{version = %ld, info = %p, callout = %p}"), rls->_context.version0.version, rls->_context.version0.info, addr);
 #elif DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
         Dl_info info;
         const char *name = (dladdr(addr, &info) && info.dli_saddr == addr && info.dli_sname) ? info.dli_sname : "???";
-        contextDesc = RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("<RSRunLoopSource context>{version = %ld, info = %p, callout = %s (%p)}"), rls->_context.version0.version, rls->_context.version0.info, name, addr);
+        contextDesc = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<RSRunLoopSource context>{version = %ld, info = %p, callout = %s (%p)}"), rls->_context.version0.version, rls->_context.version0.info, name, addr);
 #endif
     }
 #if DEPLOYMENT_TARGET_WINDOWS
-    result = RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("<RSRunLoopSource %p [%p]>{signalled = %s, valid = %s, order = %d, context = %r}"), rs, RSGetAllocator(rls), __RSRunLoopSourceIsSignaled(rls) ? "Yes" : "No", __RSRunLoopIsValid(rls) ? "Yes" : "No", rls->_order, contextDesc);
+    result = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<RSRunLoopSource %p [%p]>{signalled = %s, valid = %s, order = %d, context = %r}"), rs, RSGetAllocator(rls), __RSRunLoopSourceIsSignaled(rls) ? "Yes" : "No", __RSRunLoopIsValid(rls) ? "Yes" : "No", rls->_order, contextDesc);
 #else
-    result = RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("<RSRunLoopSource %p [%p]>{signalled = %s, valid = %s, order = %d, context = %r}"), rs, RSGetAllocator(rls), __RSRunLoopSourceIsSignaled(rls) ? "Yes" : "No", __RSRunLoopIsValid(rls) ? "Yes" : "No", rls->_order, contextDesc);
+    result = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<RSRunLoopSource %p [%p]>{signalled = %s, valid = %s, order = %d, context = %r}"), rs, RSGetAllocator(rls), __RSRunLoopSourceIsSignaled(rls) ? "Yes" : "No", __RSRunLoopIsValid(rls) ? "Yes" : "No", rls->_order, contextDesc);
 #endif
     RSRelease(contextDesc);
     return result;
@@ -5786,11 +5786,11 @@ static RSStringRef __RSRunLoopClassDescription(RSTypeRef rs) {
     RSMutableStringRef result;
     result = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
 #if DEPLOYMENT_TARGET_WINDOWS
-    RSStringAppendFormat(result, nil, RSSTR("<RSRunLoop %p [%p]>{wakeup port = 0x%x, stopped = %s, ignoreWakeUps = %s, \ncurrent mode = %r,\n"), rs, RSGetAllocator(rs), rl->_wakeUpPort, __RSRunLoopIsStopped(rl) ? "YES" : "NO", __RSRunLoopIsIgnoringWakeUps(rl) ? "YES" : "NO", rl->_currentMode ? rl->_currentMode->_name : RSSTR("(none)"));
+    RSStringAppendFormat(result, RSSTR("<RSRunLoop %p [%p]>{wakeup port = 0x%x, stopped = %s, ignoreWakeUps = %s, \ncurrent mode = %r,\n"), rs, RSGetAllocator(rs), rl->_wakeUpPort, __RSRunLoopIsStopped(rl) ? "YES" : "NO", __RSRunLoopIsIgnoringWakeUps(rl) ? "YES" : "NO", rl->_currentMode ? rl->_currentMode->_name : RSSTR("(none)"));
 #else
-    RSStringAppendStringWithFormat(result, nil, RSSTR("<RSRunLoop %p [%p]>{wakeup port = 0x%x, stopped = %s, ignoreWakeUps = %s, \ncurrent mode = %r,\n"), rs, RSGetAllocator(rs), rl->_wakeUpPort, __RSRunLoopIsStopped(rl) ? "YES" : "NO", __RSRunLoopIsIgnoringWakeUps(rl) ? "YES" : "NO", rl->_currentMode ? rl->_currentMode->_name : RSSTR("(none)"));
+    RSStringAppendStringWithFormat(result, RSSTR("<RSRunLoop %p [%p]>{wakeup port = 0x%x, stopped = %s, ignoreWakeUps = %s, \ncurrent mode = %r,\n"), rs, RSGetAllocator(rs), rl->_wakeUpPort, __RSRunLoopIsStopped(rl) ? "YES" : "NO", __RSRunLoopIsIgnoringWakeUps(rl) ? "YES" : "NO", rl->_currentMode ? rl->_currentMode->_name : RSSTR("(none)"));
 #endif
-    RSStringAppendStringWithFormat(result, nil, RSSTR("common modes = %r,\ncommon mode items = %r,\nmodes = %r}\n"), rl->_commonModes, rl->_commonModeItems, rl->_modes);
+    RSStringAppendStringWithFormat(result, RSSTR("common modes = %r,\ncommon mode items = %r,\nmodes = %r}\n"), rl->_commonModes, rl->_commonModeItems, rl->_modes);
     return result;
 }
 
@@ -8277,7 +8277,7 @@ static RSStringRef __RSRunLoopSourceClassDescription(RSTypeRef rs) {	/* DOES CAL
 #elif DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
         Dl_info info;
         const char *name = (dladdr(addr, &info) && info.dli_saddr == addr && info.dli_sname) ? info.dli_sname : "???";
-        contextDesc = RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("<RSRunLoopSource context>{version = %ld, info = %p, callout = %s (%p)}"), rls->_context.version0.version, rls->_context.version0.info, name, addr);
+        contextDesc = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<RSRunLoopSource context>{version = %ld, info = %p, callout = %s (%p)}"), rls->_context.version0.version, rls->_context.version0.info, name, addr);
 #endif
     }
 #if DEPLOYMENT_TARGET_WINDOWS
@@ -8476,15 +8476,15 @@ static RSStringRef __RSRunLoopObserverClassDescription(RSTypeRef rs) {	/* DOES C
         contextDesc = rlo->_context.description(rlo->_context.info);
     }
     if (!contextDesc) {
-        contextDesc = RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("<RSRunLoopObserver context %p>"), rlo->_context.info);
+        contextDesc = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<RSRunLoopObserver context %p>"), rlo->_context.info);
     }
 #if DEPLOYMENT_TARGET_WINDOWS
-    result = RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("<RSRunLoopObserver %p [%p]>{valid = %s, activities = 0x%x, repeats = %s, order = %d, callout = %p, context = %r}"), rs, RSGetAllocator(rlo), __RSRunLoopIsValid(rlo) ? "Yes" : "No", rlo->_activities, __RSRunLoopObserverRepeats(rlo) ? "Yes" : "No", rlo->_order, rlo->_callout, contextDesc);
+    result = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<RSRunLoopObserver %p [%p]>{valid = %s, activities = 0x%x, repeats = %s, order = %d, callout = %p, context = %r}"), rs, RSGetAllocator(rlo), __RSRunLoopIsValid(rlo) ? "Yes" : "No", rlo->_activities, __RSRunLoopObserverRepeats(rlo) ? "Yes" : "No", rlo->_order, rlo->_callout, contextDesc);
 #elif DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
     void *addr = rlo->_callout;
     Dl_info info;
     const char *name = (dladdr(addr, &info) && info.dli_saddr == addr && info.dli_sname) ? info.dli_sname : "???";
-    result = RSStringCreateWithFormat(RSAllocatorSystemDefault, nil, RSSTR("<RSRunLoopObserver %p [%p]>{valid = %s, activities = 0x%lx, repeats = %s, order = %ld, callout = %s (%p), context = %r}"), rs, RSGetAllocator(rlo), __RSRunLoopIsValid(rlo) ? "Yes" : "No", (long)rlo->_activities, __RSRunLoopObserverRepeats(rlo) ? "Yes" : "No", (long)rlo->_order, name, addr, contextDesc);
+    result = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<RSRunLoopObserver %p [%p]>{valid = %s, activities = 0x%lx, repeats = %s, order = %ld, callout = %s (%p), context = %r}"), rs, RSGetAllocator(rlo), __RSRunLoopIsValid(rlo) ? "Yes" : "No", (long)rlo->_activities, __RSRunLoopObserverRepeats(rlo) ? "Yes" : "No", (long)rlo->_order, name, addr, contextDesc);
 #endif
     RSRelease(contextDesc);
     return result;

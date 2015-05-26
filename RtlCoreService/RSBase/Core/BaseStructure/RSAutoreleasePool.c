@@ -576,6 +576,16 @@ RSExport void RSAutoreleasePoolDrain(RSAutoreleasePoolRef pool)
 //    __runloop_vm_pressure_handler(nil);
 }
 
+RSExport void RSAutoreleasePoolPush() {
+    RSAutoreleasePoolRef pool __unused = RSAutoreleasePoolCreate(RSAllocatorSystemDefault);
+}
+
+RSExport void RSAutoreleasePoolPop() {
+    RSAutoreleasePoolRef pool = hotPool();
+    if (pool)
+        RSAutoreleasePoolDrain(pool);
+}
+
 RSExport void RSAutoreleaseBlock(void (^do_block)())
 {
     if (do_block)
