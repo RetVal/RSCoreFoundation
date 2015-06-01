@@ -6,13 +6,23 @@
 //  Copyright (c) 2015 RetVal. All rights reserved.
 //
 
-#include <RSCoreFoundation/RSCoreFoundation.h>
+#include <RSFoundation/BasicTypeDefine.h>
+#include <RSFoundation/BasicAlgorithm.h>
+#include <RSFoundation/TypeTraits.h>
+#include <RSFoundation/Object.h>
+#include <RSFoundation/Nullable.h>
+#include <RSFoundation/ObjectBox.h>
+#include <RSFoundation/Date.h>
+#include <RSFoundation/BinaryBitMap.h>
+#include <RSFoundation/Protocol.h>
+#include <RSFoundation/Allocator.h>
+#include <RSFoundation/String.h>
 
 //! Project version number for RSFoundation.
-FOUNDATION_EXPORT double RSFoundationVersionNumber;
+RSFOUNDATION_EXPORT double RSFoundationVersionNumber;
 
 //! Project version string for RSFoundation.
-FOUNDATION_EXPORT const unsigned char RSFoundationVersionString[];
+RSFOUNDATION_EXPORT const unsigned char RSFoundationVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <RSFoundation/PublicHeader.h>
 

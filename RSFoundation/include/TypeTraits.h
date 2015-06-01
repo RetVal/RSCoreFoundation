@@ -9,6 +9,8 @@
 #ifndef __RSCoreFoundation__RSTypeTraits__
 #define __RSCoreFoundation__RSTypeTraits__
 
+#include <RSFoundation/BasicTypeDefine.h>
+
 namespace RSFoundation {
     namespace Basic {
         template<typename T>
@@ -88,6 +90,57 @@ namespace RSFoundation {
         
         template<typename ...TArgs>
         struct TypeTuple {
+        };
+        
+        template<typename T> struct POD {
+            static const bool Result=false;
+        };
+        
+        template<>struct POD<bool>{static const bool Result=true;};
+        template<>struct POD<RSInt8>{static const bool Result=true;};
+        template<>struct POD<RSUInt8>{static const bool Result=true;};
+        template<>struct POD<RSInt16>{static const bool Result=true;};
+        template<>struct POD<RSUInt16>{static const bool Result=true;};
+        template<>struct POD<RSInt32>{static const bool Result=true;};
+        template<>struct POD<RSUInt32>{static const bool Result=true;};
+        template<>struct POD<RSInt64>{static const bool Result=true;};
+        template<>struct POD<RSUInt64>{static const bool Result=true;};
+        template<>struct POD<char>{static const bool Result=true;};
+        template<>struct POD<wchar_t>{static const bool Result=true;};
+        template<typename T>struct POD<T*>{static const bool Result=true;};
+        template<typename T>struct POD<T&>{static const bool Result=true;};
+        template<typename T, typename C>struct POD<T C::*>{static const bool Result=true;};
+        template<typename T, RSInt32 _Size>struct POD<T[_Size]>{static const bool Result=POD<T>::Result;};
+        template<typename T>struct POD<const T>{static const bool Result=POD<T>::Result;};
+        template<typename T>struct POD<volatile T>{static const bool Result=POD<T>::Result;};
+        template<typename T>struct POD<const volatile T>{static const bool Result=POD<T>::Result;};
+        
+        struct YesType {};
+        struct NoType {};
+        
+        template<typename T, typename YesOrNo>
+        struct AcceptType{};
+        
+        template<typename T>
+        struct AcceptType<T, YesType> {
+            typedef T Type;
+        };
+        
+        template<typename YesOrNo>
+        struct AcceptValue {
+            static const bool Result = false;
+        };
+        
+        template<>
+        struct AcceptValue<YesType> {
+            static const bool Result = true;
+        };
+        
+        template<typename TFrom, typename TTo>
+        struct RequiresConvertable {
+            static YesType Test(TTo *value);
+            static NoType Test(void *value);
+            typedef decltype(Test((TFrom *)0)) YesNoType;
         };
     }
 }

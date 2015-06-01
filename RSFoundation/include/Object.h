@@ -9,21 +9,22 @@
 #ifndef __RSCoreFoundation__RSBasicObject__
 #define __RSCoreFoundation__RSBasicObject__
 
-#include <RSCoreFoundation/RSCoreFoundation.h>
-#include <type_traits>
+#include <RSFoundation/BasicTypeDefine.h>
+#include <RSFoundation/TypeTraits.h>
+
 namespace RSFoundation {
     namespace Basic {
         class NotCopyable {
         private:
-            NotCopyable(const NotCopyable &) {};
-            NotCopyable& operator=(const NotCopyable &) { return *this; };
+            NotCopyable(const NotCopyable &);
+            NotCopyable& operator=(const NotCopyable &);
         public:
-            NotCopyable() {}
+            NotCopyable();
         };
         
         class Object {
         public:
-            virtual ~Object() {};
+            virtual ~Object();
         };
         
         
