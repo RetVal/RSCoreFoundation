@@ -19,4 +19,6 @@
 #define __RS_BIG_ENDIAN__ 0
 #endif
 
+#include <xlocale.h>
+
 #endif

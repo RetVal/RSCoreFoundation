@@ -12,6 +12,14 @@
 #include <RSFoundation/BasicTypeDefine.h>
 #include <RSFoundation/Object.h>
 
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_IPHONEOS
+#include <libkern/OSAtomic.h>
+#endif
+
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_IPHONEOS || DEPLOYMENT_TARGET_LINUX
+#include <pthread/pthread.h>
+#endif
+
 namespace RSFoundation {
     namespace Basic {
         class Lock : public Object, public NotCopyable {
@@ -26,7 +34,12 @@ namespace RSFoundation {
         class SpinLock : public Lock {
         private:
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_IPHONEOS
-#include <libkern/OSAtomic.h>
+            
+#undef LOCK_IMPLMENT
+#undef LOCK_INIT
+#undef LOCK_LOCK
+#undef LOCK_UNLOCK
+            
 #define LOCK_IMPLMENT OSSpinLock
 #define LOCK_INIT OS_SPINLOCK_INIT
 #define LOCK_LOCK(x) OSSpinLockLock(&(x))
@@ -54,7 +67,6 @@ namespace RSFoundation {
         
         class MutexLock : public Lock {
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_IPHONEOS || DEPLOYMENT_TARGET_LINUX
-#include <pthread/pthread.h>
             
 #undef LOCK_IMPLMENT
 #undef LOCK_INIT
@@ -70,7 +82,7 @@ namespace RSFoundation {
 #define LOCK_INIT PTHREAD_MUTEX_INITIALIZER
 #endif
         public:
-            MutexLock() : Lock() : _lock(LOCK_INIT) {
+            MutexLock() : Lock(), _lock(LOCK_INIT) {
             }
             
             virtual void Acquire() override {
@@ -82,7 +94,7 @@ namespace RSFoundation {
             }
             
         private:
-            volatile LOCK_IMPLMENT _lock;
+            LOCK_IMPLMENT _lock;
         };
         
         class LockRAII {

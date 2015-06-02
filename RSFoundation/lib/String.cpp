@@ -6,15 +6,16 @@
 //  Copyright (c) 2015 RetVal. All rights reserved.
 //
 
-#include <RSFoundation/String.h>
+#include <RSFoundation/String.hpp>
 #include <RSFoundation/Order.h>
+#include <RSFoundation/UniChar.h>
+#include <RSFoundation/StringConverterExt.h>
 #include "Internal.h"
 
 namespace RSFoundation {
     namespace Collection {
-        using Encoding = String::Encoding;
         namespace StringPrivate {
-            static inline bool _CanBeStoredInEightBit(Encoding encoding) {
+            static inline bool _CanBeStoredInEightBit(String::Encoding encoding) {
                 switch (encoding & 0xFFF) {
                         // just use encoding base
                     case String::InvalidId:
@@ -84,15 +85,15 @@ namespace RSFoundation {
                 return true;
             }
             
-            static Encoding __DefaultEightBitStringEncoding;
+            static String::Encoding __DefaultEightBitStringEncoding;
             
-            static Encoding _GetSystemEncoding() {
+            Private String::Encoding _GetSystemEncoding() {
                 return String::UTF8;
             }
             
-            static Encoding _ComputeEightBitStringEncoding(void) {
+            static String::Encoding _ComputeEightBitStringEncoding(void) {
                 if (__DefaultEightBitStringEncoding == String::InvalidId) {
-                    Encoding systemEncoding = _GetSystemEncoding();
+                    String::Encoding systemEncoding = _GetSystemEncoding();
                     if (systemEncoding == String::InvalidId) { // We're right in the middle of querying system encoding from default database. Delaying to set until system encoding is determined.
                         return String::ASCII;
                     } else if (_CanBeStoredInEightBit(systemEncoding)) {
@@ -105,12 +106,12 @@ namespace RSFoundation {
                 return __DefaultEightBitStringEncoding;
             }
             
-            static inline Encoding _GetEightBitStringEncoding(void) {
+            static inline String::Encoding _GetEightBitStringEncoding(void) {
                 if (__DefaultEightBitStringEncoding == String::InvalidId) _ComputeEightBitStringEncoding();
                 return __DefaultEightBitStringEncoding;
             }
             
-            static inline bool _IsSupersetOfASCII(Encoding encoding) {
+            static inline bool _IsSupersetOfASCII(String::Encoding encoding) {
                 switch (encoding & 0x0000FF00) {
                     case 0x0: // MacOS Script range
                         // Symbol & bidi encodings are not ASCII superset
@@ -148,9 +149,9 @@ namespace RSFoundation {
                 }
             }
             
-            static inline bool _CanUseEightBitRSStringForBytes(const uint8_t *bytes, RSIndex len, Encoding encoding) {
+            static inline bool _CanUseEightBitStringForBytes(const uint8_t *bytes, RSIndex len, String::Encoding encoding) {
                 
-                // If the encoding is the same as the 8-bit RSString encoding, we can just use the bytes as-is.
+                // If the encoding is the same as the 8-bit String encoding, we can just use the bytes as-is.
                 // One exception is ASCII, which unfortunately needs to mean ISOLatin1 for compatibility reasons <rdar://problem/5458321>.
                 if (encoding == _GetEightBitStringEncoding() && encoding != String::ASCII) return YES;
                 if (_IsSupersetOfASCII(encoding) && _BytesInASCII(bytes, len)) return YES;
@@ -175,35 +176,35 @@ namespace RSFoundation {
              if insertLength = 3, result = A ? ? ? C ? ? ? E ? ? ? Q ? ? ? S ? ? ? U
              
              */
-            typedef struct _RSStringDeferredRange {
+            typedef struct _StringDeferredRange {
                 RSIndex beginning;
                 RSIndex length;
                 RSIndex shift;
-            } RSStringDeferredRange;
+            } StringDeferredRange;
             
-            typedef struct _RSStringStackInfo {
+            typedef struct _StringStackInfo {
                 RSIndex capacity;		// Capacity (if capacity == count, need to realloc to add another)
                 RSIndex count;			// Number of elements actually stored
-                RSStringDeferredRange *stack;
+                StringDeferredRange *stack;
                 BOOL hasMalloced;	// Indicates "stack" is allocated and needs to be deallocated when done
                 char _padding[3];
-            } RSStringStackInfo;
+            } StringStackInfo;
 
-            inline void pop (RSStringStackInfo *si, RSStringDeferredRange *topRange) {
+            inline void pop (StringStackInfo *si, StringDeferredRange *topRange) {
                 si->count = si->count - 1;
                 *topRange = si->stack[si->count];
             }
             
-            inline void push (RSStringStackInfo *si, const RSStringDeferredRange *newRange) {
+            inline void push (StringStackInfo *si, const StringDeferredRange *newRange) {
                 if (si->count == si->capacity) {
                     // increase size of the stack
                     si->capacity = (si->capacity + 4) * 2;
                     if (si->hasMalloced) {
-                        si->stack = (RSStringDeferredRange *)realloc(si->stack, si->capacity * sizeof(RSStringDeferredRange));
-//                        si->stack = (RSStringDeferredRange *)RSAllocatorReallocate(RSAllocatorSystemDefault, si->stack, si->capacity * sizeof(RSStringDeferredRange));
+                        si->stack = (StringDeferredRange *)realloc(si->stack, si->capacity * sizeof(StringDeferredRange));
+//                        si->stack = (StringDeferredRange *)AllocatorReallocate(AllocatorSystemDefault, si->stack, si->capacity * sizeof(StringDeferredRange));
                     } else {
-                        RSStringDeferredRange *newStack = (RSStringDeferredRange *)malloc(si->capacity * sizeof(RSStringDeferredRange));
-                        memmove(newStack, si->stack, si->count * sizeof(RSStringDeferredRange));
+                        StringDeferredRange *newStack = (StringDeferredRange *)malloc(si->capacity * sizeof(StringDeferredRange));
+                        memmove(newStack, si->stack, si->count * sizeof(StringDeferredRange));
                         si->stack = newStack;
                         si->hasMalloced = YES;
                     }
@@ -221,9 +222,9 @@ namespace RSFoundation {
             {
                 
 #define origStackSize 10
-                RSStringDeferredRange origStack[origStackSize];
-                RSStringStackInfo si = {origStackSize, 0, origStack, NO, {0, 0, 0}};
-                RSStringDeferredRange currentNonRange = {0, 0, 0};
+                StringDeferredRange origStack[origStackSize];
+                StringStackInfo si = {origStackSize, 0, origStack, NO, {0, 0, 0}};
+                StringDeferredRange currentNonRange = {0, 0, 0};
                 RSIndex currentRange = 0;
                 RSIndex amountShifted = 0;
                 
@@ -286,22 +287,22 @@ namespace RSFoundation {
                 RSIndex dstLocationInBytes = 0;	// ditto
                 RSIndex srcBlockSize = srcIsUnicode ? sizeof(UniChar) : sizeof(uint8_t);
                 RSIndex insertLengthInBytes = insertLength * (dstIsUnicode ? sizeof(UniChar) : sizeof(uint8_t));
-                RSIndex rangeIndex = 0;
+                RSIndex rangeRSIndex = 0;
                 RSIndex srcToDstMultiplier = (srcIsUnicode == dstIsUnicode) ? 1 : (sizeof(UniChar) / sizeof(uint8_t));
                 
                 // Loop over the ranges, copying the range to be preserved (right before each range)
-                while (rangeIndex < numRanges) {
-                    RSIndex srcLengthInBytes = ranges[rangeIndex].location * srcBlockSize - srcLocationInBytes;	// srcLengthInBytes is in terms of bytes, not blocks; represents length of region to be preserved
+                while (rangeRSIndex < numRanges) {
+                    RSIndex srcLengthInBytes = ranges[rangeRSIndex].location * srcBlockSize - srcLocationInBytes;	// srcLengthInBytes is in terms of bytes, not blocks; represents length of region to be preserved
                     if (srcLengthInBytes > 0) {
                         if (srcIsUnicode == dstIsUnicode) {
                             memmove(dstBuffer + dstLocationInBytes, srcBuffer + srcLocationInBytes, srcLengthInBytes);
                         } else {
-//                            __RSStrConvertBytesToUnicode(srcBuffer + srcLocationInBytes, (UniChar *)(dstBuffer + dstLocationInBytes), srcLengthInBytes);
+//                            __StrConvertBytesToUnicode(srcBuffer + srcLocationInBytes, (UniChar *)(dstBuffer + dstLocationInBytes), srcLengthInBytes);
                         }
                     }
-                    srcLocationInBytes += srcLengthInBytes + ranges[rangeIndex].length * srcBlockSize;	// Skip over the just-copied and to-be-deleted stuff
+                    srcLocationInBytes += srcLengthInBytes + ranges[rangeRSIndex].length * srcBlockSize;	// Skip over the just-copied and to-be-deleted stuff
                     dstLocationInBytes += srcLengthInBytes * srcToDstMultiplier + insertLengthInBytes;
-                    rangeIndex++;
+                    rangeRSIndex++;
                 }
                 
                 // Do last range (the one beyond last range)
@@ -309,7 +310,7 @@ namespace RSFoundation {
                     if (srcIsUnicode == dstIsUnicode) {
                         memmove(dstBuffer + dstLocationInBytes, srcBuffer + srcLocationInBytes, srcLength * srcBlockSize - srcLocationInBytes);
                     } else {
-//                        __RSStrConvertBytesToUnicode(srcBuffer + srcLocationInBytes, (UniChar *)(dstBuffer + dstLocationInBytes), srcLength * srcBlockSize - srcLocationInBytes);
+//                        __StrConvertBytesToUnicode(srcBuffer + srcLocationInBytes, (UniChar *)(dstBuffer + dstLocationInBytes), srcLength * srcBlockSize - srcLocationInBytes);
                     }
                 }
             }
@@ -321,7 +322,7 @@ namespace RSFoundation {
             }
             
             enum {
-                __RSVarWidthLocalBufferSize = 1008
+                __VarWidthLocalBufferSize = 1008
             };
             
             typedef struct {      /* A simple struct to maintain ASCII/Unicode versions of the same buffer. */
@@ -330,15 +331,15 @@ namespace RSFoundation {
                     UniChar *unicode;
                 } chars;
                 BOOL isASCII;	/* This really does mean 7-bit ASCII, not _NSDefaultCStringEncoding() */
-                BOOL shouldFreeChars;	/* If the number of bytes exceeds __RSVarWidthLocalBufferSize, bytes are allocated */
+                BOOL shouldFreeChars;	/* If the number of bytes exceeds __VarWidthLocalBufferSize, bytes are allocated */
                 BOOL _unused1;
                 BOOL _unused2;
                 Allocator<String> *allocator;	/* Use this allocator to allocate, reallocate, and deallocate the bytes */
                 RSIndex numChars;	/* This is in terms of ascii or unicode; that is, if isASCII, it is number of 7-bit chars; otherwise it is number of UniChars; note that the actual allocated space might be larger */
-                UInt8 localBuffer[__RSVarWidthLocalBufferSize];	/* private; 168 ISO2022JP chars, 504 Unicode chars, 1008 ASCII chars */
-            } RSVarWidthCharBuffer;
+                UInt8 localBuffer[__VarWidthLocalBufferSize];	/* private; 168 ISO2022JP chars, 504 Unicode chars, 1008 ASCII chars */
+            } VarWidthCharBuffer;
             
-            enum {_RSStringErrNone = 0, _RSStringErrNotMutable = 1, _RSStringErrNilArg = 2, _RSStringErrBounds = 3};
+            enum {_StringErrNone = 0, _StringErrNotMutable = 1, _StringErrNilArg = 2, _StringErrBounds = 3};
             
             namespace StringEncodeDecode {
                 
@@ -347,8 +348,8 @@ namespace RSFoundation {
 #define CharConversionBufferLength 512
                 
                 
-#define MAX_LOCAL_CHARS		(sizeof(buffer->localBuffer) / sizeof(uint8_t))
-#define MAX_LOCAL_UNICHARS	(sizeof(buffer->localBuffer) / sizeof(UniChar))
+#define MAX_LOCAL_CHA		(sizeof(buffer->localBuffer) / sizeof(uint8_t))
+#define MAX_LOCAL_UNICHA	(sizeof(buffer->localBuffer) / sizeof(UniChar))
                 
                 enum class CodingMode : RSIndex {
                     NonLossyErrorMode = -1,
@@ -361,18 +362,18 @@ namespace RSFoundation {
                 };
                 
                 static bool __WantsToUseASCIICompatibleConversion = NO;
-                inline UInt32 __RSGetASCIICompatibleFlag(void) { return __WantsToUseASCIICompatibleConversion; }
+                inline UInt32 __GetASCIICompatibleFlag(void) { return __WantsToUseASCIICompatibleConversion; }
                 
-                void _RSStringEncodingSetForceASCIICompatibility(bool flag) {
-                    __WantsToUseASCIICompatibleConversion = (flag ? (RSUInt32)true : (RSUInt32)false);
+                void _StringEncodingSetForceASCIICompatibility(bool flag) {
+                    __WantsToUseASCIICompatibleConversion = (flag ? (UInt32)true : (UInt32)false);
                 }
                 
                 
-                BOOL __RSStringDecodeByteStream3(const uint8_t *bytes, RSIndex len, Encoding encoding, BOOL alwaysUnicode, RSVarWidthCharBuffer *buffer, BOOL *useClientsMemoryPtr, UInt32 converterFlags) {
+                bool __StringDecodeByteStream3(const uint8_t *bytes, RSIndex len, String::Encoding encoding, BOOL alwaysUnicode, VarWidthCharBuffer *buffer, BOOL *useClientsMemoryPtr, UInt32 converterFlags) {
                     RSIndex idx;
                     const uint8_t *chars = (const uint8_t *)bytes;
                     const uint8_t *end = chars + len;
-                    BOOL result = YES;
+                    bool result = YES;
                     
                     if (useClientsMemoryPtr) *useClientsMemoryPtr = NO;
                     
@@ -384,26 +385,26 @@ namespace RSFoundation {
                     
                     buffer->allocator = (buffer->allocator ? buffer->allocator : &Allocator<String>::AllocatorSystemDefault);
                     
-                    if ((encoding == Encoding::UTF16) || (encoding == Encoding::UTF16BE) || (encoding == Encoding::UTF16LE)) {
+                    if ((encoding == String::Encoding::UTF16) || (encoding == String::Encoding::UTF16BE) || (encoding == String::Encoding::UTF16LE)) {
                         // UTF-16
                         const UTF16Char *src = (const UTF16Char *)bytes;
                         const UTF16Char *limit = src + (len / sizeof(UTF16Char)); // <rdar://problem/7854378> avoiding odd len issue
                         bool swap = NO;
                         
-                        if (Encoding::UTF16 == encoding) {
+                        if (String::Encoding::UTF16 == encoding) {
                             UTF16Char bom = ((*src == 0xFFFE) || (*src == 0xFEFF) ? *(src++) : 0);
                             
-#if __RS_BIG_ENDIAN__
+#if ___BIG_ENDIAN__
                             if (bom == 0xFFFE) swap = YES;
 #else
                             if (bom != 0xFEFF) swap = YES;
 #endif
                             if (bom) useClientsMemoryPtr = nil;
                         } else {
-#if __RS_BIG_ENDIAN__
-                            if (Encoding::UTF16LE == encoding) swap = YES;
+#if ___BIG_ENDIAN__
+                            if (String::Encoding::UTF16LE == encoding) swap = YES;
 #else
-                            if (Encoding::UTF16BE == encoding) swap = YES;
+                            if (String::Encoding::UTF16BE == encoding) swap = YES;
 #endif
                         }
                         
@@ -432,8 +433,8 @@ namespace RSFoundation {
                                 uint8_t *dst;
                                 if (nil == buffer->chars.ascii) {
                                     // we never reallocate when buffer is supplied
-                                    if (buffer->numChars > MAX_LOCAL_CHARS) {
-                                        buffer->chars.ascii = buffer->allocator->Allocate<RSUInt8>((buffer->numChars));
+                                    if (buffer->numChars > MAX_LOCAL_CHA) {
+                                        buffer->chars.ascii = buffer->allocator->Allocate<UInt8>((buffer->numChars));
                                         if (!buffer->chars.ascii) goto memoryErrorExit;
                                         buffer->shouldFreeChars = YES;
                                     } else {
@@ -452,7 +453,7 @@ namespace RSFoundation {
                                 
                                 if (nil == buffer->chars.unicode) {
                                     // we never reallocate when buffer is supplied
-                                    if (buffer->numChars > MAX_LOCAL_UNICHARS) {
+                                    if (buffer->numChars > MAX_LOCAL_UNICHA) {
                                         buffer->chars.unicode = buffer->allocator->Allocate<UniChar>(buffer->numChars);
                                         if (!buffer->chars.unicode) goto memoryErrorExit;
                                         buffer->shouldFreeChars = YES;
@@ -469,7 +470,7 @@ namespace RSFoundation {
                                 }
                             }
                         }
-                    } else if ((encoding == Encoding::UTF32) || (encoding == Encoding::UTF32BE) || (encoding == Encoding::UTF32LE)) {
+                    } else if ((encoding == String::Encoding::UTF32) || (encoding == String::Encoding::UTF32BE) || (encoding == String::Encoding::UTF32LE)) {
                         const UTF32Char *src = (const UTF32Char *)bytes;
                         const UTF32Char *limit =  src + (len / sizeof(UTF32Char)); // <rdar://problem/7854378> avoiding odd len issue
                         bool swap = NO;
@@ -477,19 +478,19 @@ namespace RSFoundation {
                         
                         if ((bool)-1 == strictUTF32) strictUTF32 = (1 != 0);
                         
-                        if (Encoding::UTF32 == encoding) {
+                        if (String::Encoding::UTF32 == encoding) {
                             UTF32Char bom = ((*src == 0xFFFE0000) || (*src == 0x0000FEFF) ? *(src++) : 0);
                             
-#if __RS_BIG_ENDIAN__
+#if ___BIG_ENDIAN__
                             if (bom == 0xFFFE0000) swap = YES;
 #else
                             if (bom != 0x0000FEFF) swap = YES;
 #endif
                         } else {
-#if __RS_BIG_ENDIAN__
+#if ___BIG_ENDIAN__
                             if (Encoding::UTF32LE == encoding) swap = YES;
 #else
-                            if (Encoding::UTF32BE == encoding) swap = YES;
+                            if (String::Encoding::UTF32BE == encoding) swap = YES;
 #endif
                         }
                         
@@ -517,8 +518,8 @@ namespace RSFoundation {
                             uint8_t *dst;
                             if (nil == buffer->chars.ascii) {
                                 // we never reallocate when buffer is supplied
-                                if (buffer->numChars > MAX_LOCAL_CHARS) {
-                                    buffer->chars.ascii = buffer->allocator->Allocate<RSUInt8>(buffer->numChars);
+                                if (buffer->numChars > MAX_LOCAL_CHA) {
+                                    buffer->chars.ascii = buffer->allocator->Allocate<UInt8>(buffer->numChars);
                                     if (!buffer->chars.ascii) goto memoryErrorExit;
                                     buffer->shouldFreeChars = YES;
                                 } else {
@@ -535,7 +536,7 @@ namespace RSFoundation {
                         } else {
                             if (nil == buffer->chars.unicode) {
                                 // we never reallocate when buffer is supplied
-                                if (buffer->numChars > MAX_LOCAL_UNICHARS) {
+                                if (buffer->numChars > MAX_LOCAL_UNICHA) {
                                     buffer->chars.unicode = buffer->allocator->Allocate<UTF16Char>(buffer->numChars);
                                     if (!buffer->chars.unicode) goto memoryErrorExit;
                                     buffer->shouldFreeChars = YES;
@@ -543,9 +544,9 @@ namespace RSFoundation {
                                     buffer->chars.unicode = (UTF16Char *)buffer->localBuffer;
                                 }
                             }
-                            result = (RSUniCharFromUTF32(src, limit - src, buffer->chars.unicode, (strictUTF32 ? NO : YES), __RS_BIG_ENDIAN__ ? !swap : swap) ? YES : NO);
+                            result = (Encoding::UniCharFromUTF32(src, limit - src, buffer->chars.unicode, (strictUTF32 ? NO : YES), __RS_BIG_ENDIAN__ ? !swap : swap) ? YES : NO);
                         }
-                    } else if (Encoding::UTF8 == encoding) {
+                    } else if (String::Encoding::UTF8 == encoding) {
                         if ((len >= 3) && (chars[0] == 0xef) && (chars[1] == 0xbb) && (chars[2] == 0xbf)) {	// If UTF8 BOM, skip
                             chars += 3;
                             len -= 3;
@@ -561,26 +562,26 @@ namespace RSFoundation {
                         }
                         if (buffer->isASCII) {
                             buffer->numChars = len;
-                            buffer->shouldFreeChars = !buffer->chars.ascii && (len <= MAX_LOCAL_CHARS) ? NO : YES;
-                            buffer->chars.ascii = (buffer->chars.ascii ? buffer->chars.ascii : (len <= MAX_LOCAL_CHARS) ? (uint8_t *)buffer->localBuffer : (UInt8 *)RSAllocatorAllocate(buffer->allocator, len * sizeof(uint8_t)));
+                            buffer->shouldFreeChars = !buffer->chars.ascii && (len <= MAX_LOCAL_CHA) ? NO : YES;
+                            buffer->chars.ascii = (buffer->chars.ascii ? buffer->chars.ascii : (len <= MAX_LOCAL_CHA) ? (uint8_t *)buffer->localBuffer : buffer->allocator->Allocate<UInt8>(len));
                             if (!buffer->chars.ascii) goto memoryErrorExit;
                             memmove(buffer->chars.ascii, chars, len * sizeof(uint8_t));
                         } else {
                             RSIndex numDone;
-                            static RSStringEncodingToUnicodeProc __RSFromUTF8 = nil;
+                            static Encoding::StringEncodingToUnicodeProc __FromUTF8 = nil;
                             
-                            if (!__RSFromUTF8) {
-                                const RSStringEncodingConverter *converter = RSStringEncodingGetConverter(Encoding::UTF8);
-                                __RSFromUTF8 = (RSStringEncodingToUnicodeProc)converter->toUnicode;
+                            if (!__FromUTF8) {
+                                const Encoding::StringEncodingConverter *converter = Encoding::StringEncodingGetConverter(String::Encoding::UTF8);
+                                __FromUTF8 = (Encoding::StringEncodingToUnicodeProc)converter->toUnicode;
                             }
                             
-                            buffer->shouldFreeChars = !buffer->chars.unicode && (len <= MAX_LOCAL_UNICHARS) ? NO : YES;
-                            buffer->chars.unicode = (buffer->chars.unicode ? buffer->chars.unicode : (len <= MAX_LOCAL_UNICHARS) ? (UniChar *)buffer->localBuffer : (UniChar *)RSAllocatorAllocate(buffer->allocator, len * sizeof(UniChar)));
+                            buffer->shouldFreeChars = !buffer->chars.unicode && (len <= MAX_LOCAL_UNICHA) ? NO : YES;
+                            buffer->chars.unicode = (buffer->chars.unicode ? buffer->chars.unicode : (len <= MAX_LOCAL_UNICHA) ? (UniChar *)buffer->localBuffer : buffer->allocator->Allocate<UniChar>(len));
                             if (!buffer->chars.unicode) goto memoryErrorExit;
                             buffer->numChars = 0;
                             while (chars < end) {
                                 numDone = 0;
-                                chars += __RSFromUTF8(converterFlags, chars, end - chars, &(buffer->chars.unicode[buffer->numChars]), len - buffer->numChars, &numDone);
+                                chars += __FromUTF8(converterFlags, chars, end - chars, &(buffer->chars.unicode[buffer->numChars]), len - buffer->numChars, &numDone);
                                 
                                 if (0 == numDone)
                                 {
@@ -590,14 +591,14 @@ namespace RSFoundation {
                                 buffer->numChars += numDone;
                             }
                         }
-                    } else if (Encoding::NonLossyASCII == encoding) {
+                    } else if (String::Encoding::NonLossyASCII == encoding) {
                         UTF16Char currentValue = 0;
                         uint8_t character;
-                        int8_t mode = NonLossyASCIIMode;
+                        StringEncodeDecode::CodingMode mode = StringEncodeDecode::CodingMode::NonLossyASCIIMode;
                         
                         buffer->isASCII = NO;
-                        buffer->shouldFreeChars = !buffer->chars.unicode && (len <= MAX_LOCAL_UNICHARS) ? NO : YES;
-                        buffer->chars.unicode = (buffer->chars.unicode ? buffer->chars.unicode : (len <= MAX_LOCAL_UNICHARS) ? (UniChar *)buffer->localBuffer : (UniChar *)RSAllocatorAllocate(buffer->allocator, len * sizeof(UniChar)));
+                        buffer->shouldFreeChars = !buffer->chars.unicode && (len <= MAX_LOCAL_UNICHA) ? NO : YES;
+                        buffer->chars.unicode = (buffer->chars.unicode ? buffer->chars.unicode : (len <= MAX_LOCAL_UNICHA) ? (UniChar *)buffer->localBuffer : (UniChar *)buffer->allocator->Allocate<UniChar>(len));
                         if (!buffer->chars.unicode) goto memoryErrorExit;
                         buffer->numChars = 0;
                         
@@ -605,69 +606,75 @@ namespace RSFoundation {
                             character = (*chars++);
                             
                             switch (mode) {
-                                case NonLossyASCIIMode:
+                                case CodingMode::NonLossyASCIIMode:
                                     if (character == '\\') {
-                                        mode = NonLossyBackslashMode;
+                                        mode = CodingMode::NonLossyBackslashMode;
                                     } else if (character < 0x80) {
                                         currentValue = character;
                                     } else {
-                                        mode = NonLossyErrorMode;
+                                        mode = CodingMode::NonLossyErrorMode;
                                     }
                                     break;
                                     
-                                case NonLossyBackslashMode:
+                                case CodingMode::NonLossyBackslashMode:
                                     if ((character == 'U') || (character == 'u')) {
-                                        mode = NonLossyHexInitialMode;
+                                        mode = CodingMode::NonLossyHexInitialMode;
                                         currentValue = 0;
                                     } else if ((character >= '0') && (character <= '9')) {
-                                        mode = NonLossyOctalInitialMode;
+                                        mode = CodingMode::NonLossyOctalInitialMode;
                                         currentValue = character - '0';
                                     } else if (character == '\\') {
-                                        mode = NonLossyASCIIMode;
+                                        mode = CodingMode::NonLossyASCIIMode;
                                         currentValue = character;
                                     } else {
-                                        mode = NonLossyErrorMode;
+                                        mode = CodingMode::NonLossyErrorMode;
                                     }
                                     break;
                                     
                                 default:
-                                    if (mode < NonLossyHexFinalMode) {
+                                    if (mode < CodingMode::NonLossyHexFinalMode) {
                                         if ((character >= '0') && (character <= '9')) {
                                             currentValue = (currentValue << 4) | (character - '0');
-                                            if (++mode == NonLossyHexFinalMode) mode = NonLossyASCIIMode;
+                                            RSIndex mod = RSIndex(mode);
+                                            if (CodingMode(++mod) == CodingMode::NonLossyHexFinalMode) mode = CodingMode::NonLossyASCIIMode;
+                                            else mode = CodingMode(mod);
                                         } else {
                                             if (character >= 'a') character -= ('a' - 'A');
                                             if ((character >= 'A') && (character <= 'F')) {
                                                 currentValue = (currentValue << 4) | ((character - 'A') + 10);
-                                                if (++mode == NonLossyHexFinalMode) mode = NonLossyASCIIMode;
+                                                RSIndex mod = RSIndex(mode);
+                                                if (CodingMode(++mod) == CodingMode::NonLossyHexFinalMode) mode = CodingMode::NonLossyASCIIMode;
+                                                else mode = CodingMode(mod);
                                             } else {
-                                                mode = NonLossyErrorMode;
+                                                mode = CodingMode::NonLossyErrorMode;
                                             }
                                         }
                                     } else {
                                         if ((character >= '0') && (character <= '9')) {
                                             currentValue = (currentValue << 3) | (character - '0');
-                                            if (++mode == NonLossyOctalFinalMode) mode = NonLossyASCIIMode;
+                                            RSIndex mod = RSIndex(mode);
+                                            if (CodingMode(++mod) == CodingMode::NonLossyOctalFinalMode) mode = CodingMode::NonLossyASCIIMode;
+                                            else mode = CodingMode(mod);
                                         } else {
-                                            mode = NonLossyErrorMode;
+                                            mode = CodingMode::NonLossyErrorMode;
                                         }
                                     }
                                     break;
                             }
                             
-                            if (mode == NonLossyASCIIMode) {
+                            if (mode == CodingMode::NonLossyASCIIMode) {
                                 buffer->chars.unicode[buffer->numChars++] = currentValue;
-                            } else if (mode == NonLossyErrorMode) {
+                            } else if (mode == CodingMode::NonLossyErrorMode) {
                                 break;
                             }
                         }
-                        result = ((mode == NonLossyASCIIMode) ? YES : NO);
+                        result = ((mode == CodingMode::NonLossyASCIIMode) ? YES : NO);
                     } else {
-                        const RSStringEncodingConverter *converter = RSStringEncodingGetConverter(encoding);
+                        const Encoding::StringEncodingConverter *converter = Encoding::StringEncodingGetConverter(encoding);
                         
                         if (!converter) return NO;
                         
-                        BOOL isASCIISuperset = __RSStringEncodingIsSupersetOfASCII(encoding);
+                        BOOL isASCIISuperset = _IsSupersetOfASCII(encoding);
                         
                         if (!isASCIISuperset) buffer->isASCII = NO;
                         
@@ -680,26 +687,26 @@ namespace RSFoundation {
                             }
                         }
                         
-                        if (converter->encodingClass == RSStringEncodingConverterCheapEightBit) {
+                        if (converter->encodingClass == Encoding::StringEncodingConverterCheapEightBit) {
                             if (buffer->isASCII) {
                                 buffer->numChars = len;
-                                buffer->shouldFreeChars = !buffer->chars.ascii && (len <= MAX_LOCAL_CHARS) ? NO : YES;
-                                buffer->chars.ascii = (buffer->chars.ascii ? buffer->chars.ascii : (len <= MAX_LOCAL_CHARS) ? (uint8_t *)buffer->localBuffer : (UInt8 *)RSAllocatorAllocate(buffer->allocator, len * sizeof(uint8_t)));
+                                buffer->shouldFreeChars = !buffer->chars.ascii && (len <= MAX_LOCAL_CHA) ? NO : YES;
+                                buffer->chars.ascii = (buffer->chars.ascii ? buffer->chars.ascii : (len <= MAX_LOCAL_CHA) ? (uint8_t *)buffer->localBuffer : buffer->allocator->Allocate<uint8_t>(len));
                                 if (!buffer->chars.ascii) goto memoryErrorExit;
                                 memmove(buffer->chars.ascii, chars, len * sizeof(uint8_t));
                             } else {
-                                buffer->shouldFreeChars = !buffer->chars.unicode && (len <= MAX_LOCAL_UNICHARS) ? NO : YES;
-                                buffer->chars.unicode = (buffer->chars.unicode ? buffer->chars.unicode : (len <= MAX_LOCAL_UNICHARS) ? (UniChar *)buffer->localBuffer : (UniChar *)RSAllocatorAllocate(buffer->allocator, len * sizeof(UniChar)));
+                                buffer->shouldFreeChars = !buffer->chars.unicode && (len <= MAX_LOCAL_UNICHA) ? NO : YES;
+                                buffer->chars.unicode = (buffer->chars.unicode ? buffer->chars.unicode : (len <= MAX_LOCAL_UNICHA) ? (UniChar *)buffer->localBuffer : buffer->allocator->Allocate<UniChar>(len));
                                 if (!buffer->chars.unicode) goto memoryErrorExit;
                                 buffer->numChars = len;
-                                if (Encoding::ASCII == encoding || Encoding::ISOLatin1 == encoding) {
+                                if (String::Encoding::ASCII == encoding || String::Encoding::ISOLatin1 == encoding) {
                                     for (idx = 0; idx < len; idx++) buffer->chars.unicode[idx] = (UniChar)chars[idx];
                                 } else {
                                     for (idx = 0; idx < len; idx++) {
                                         if (chars[idx] < 0x80 && isASCIISuperset) {
                                             buffer->chars.unicode[idx] = (UniChar)chars[idx];
                                         }
-                                        else if (!((RSStringEncodingCheapEightBitToUnicodeProc)converter->toUnicode)(0, chars[idx], buffer->chars.unicode + idx)) {
+                                        else if (!((Encoding::StringEncodingCheapEightBitToUnicodeProc)converter->toUnicode)(0, chars[idx], buffer->chars.unicode + idx)) {
                                             result = NO;
                                             break;
                                         }
@@ -709,21 +716,21 @@ namespace RSFoundation {
                         } else {
                             if (buffer->isASCII) {
                                 buffer->numChars = len;
-                                buffer->shouldFreeChars = !buffer->chars.ascii && (len <= MAX_LOCAL_CHARS) ? NO : YES;
-                                buffer->chars.ascii = (buffer->chars.ascii ? buffer->chars.ascii : (len <= MAX_LOCAL_CHARS) ? (uint8_t *)buffer->localBuffer : (UInt8 *)RSAllocatorAllocate(buffer->allocator, len * sizeof(uint8_t)));
+                                buffer->shouldFreeChars = !buffer->chars.ascii && (len <= MAX_LOCAL_CHA) ? NO : YES;
+                                buffer->chars.ascii = (buffer->chars.ascii ? buffer->chars.ascii : (len <= MAX_LOCAL_CHA) ? (uint8_t *)buffer->localBuffer : buffer->allocator->Allocate<uint8_t>(len));
                                 if (!buffer->chars.ascii) goto memoryErrorExit;
                                 memmove(buffer->chars.ascii, chars, len * sizeof(uint8_t));
                             } else {
-                                RSIndex guessedLength = RSStringEncodingCharLengthForBytes(encoding, 0, bytes, len);
+                                RSIndex guessedLength = Encoding::StringEncodingCharLengthForBytes(encoding, 0, bytes, len);
                                 static UInt32 lossyFlag = (UInt32)-1;
                                 
-                                buffer->shouldFreeChars = !buffer->chars.unicode && (guessedLength <= MAX_LOCAL_UNICHARS) ? NO : YES;
-                                buffer->chars.unicode = (buffer->chars.unicode ? buffer->chars.unicode : (guessedLength <= MAX_LOCAL_UNICHARS) ? (UniChar *)buffer->localBuffer : (UniChar *)RSAllocatorAllocate(buffer->allocator, guessedLength * sizeof(UniChar)));
+                                buffer->shouldFreeChars = !buffer->chars.unicode && (guessedLength <= MAX_LOCAL_UNICHA) ? NO : YES;
+                                buffer->chars.unicode = (buffer->chars.unicode ? buffer->chars.unicode : (guessedLength <= MAX_LOCAL_UNICHA) ? (UniChar *)buffer->localBuffer : buffer->allocator->Allocate<UniChar>(guessedLength));
                                 if (!buffer->chars.unicode) goto memoryErrorExit;
                                 
                                 if (lossyFlag == (UInt32)-1) lossyFlag = 0;
                                 
-                                if (RSStringEncodingBytesToUnicode(encoding, lossyFlag|__RSGetASCIICompatibleFlag(), bytes, len, nil, buffer->chars.unicode, (guessedLength > MAX_LOCAL_UNICHARS ? guessedLength : MAX_LOCAL_UNICHARS), &(buffer->numChars))) result = NO;
+                                if (Encoding::StringEncodingBytesToUnicode(encoding, lossyFlag|__GetASCIICompatibleFlag(), bytes, len, nil, buffer->chars.unicode, (guessedLength > MAX_LOCAL_UNICHA ? guessedLength : MAX_LOCAL_UNICHA), &(buffer->numChars))) result = NO;
                             }
                         }
                     }
@@ -731,7 +738,7 @@ namespace RSFoundation {
                     if (NO == result) {
                     memoryErrorExit:	// Added for <rdar://problem/6581621>, but it's not clear whether an exception would be a better option
                         result = NO;	// In case we come here from a goto
-                        if (buffer->shouldFreeChars && buffer->chars.unicode) RSAllocatorDeallocate(buffer->allocator, buffer->chars.unicode);
+                        if (buffer->shouldFreeChars && buffer->chars.unicode) buffer->allocator->Deallocate(buffer->chars.unicode);
                         buffer->isASCII = !alwaysUnicode;
                         buffer->shouldFreeChars = NO;
                         buffer->chars.ascii = nil;
@@ -751,13 +758,13 @@ namespace RSFoundation {
                                               bool hasNullByte,
                                               bool noCopy,
                                               Allocator<String> *contentsDeallocator,
-                                              RSUInt32 reservedFlags) {
+                                              UInt32 reservedFlags) {
                 if (!bytes) {
                     return MoveValue(String::Empty);
                 }
                 
                 String str;
-                RSVarWidthCharBuffer vBuf = {0};
+                VarWidthCharBuffer vBuf = {0};
                 
                 RSIndex size = 0;
                 bool useLengthByte = NO;
@@ -767,9 +774,9 @@ namespace RSFoundation {
                     allocator = &Allocator<String>::AllocatorDefault;
                 }
                 
-#define ALLOCATORSFREEFUNC ((Allocator<String>*)-1)
+#define ALLOCATOFREEFUNC ((Allocator<String>*)-1)
                 
-                if (contentsDeallocator == ALLOCATORSFREEFUNC) {
+                if (contentsDeallocator == ALLOCATOFREEFUNC) {
                     contentsDeallocator = &Allocator<String>::AllocatorDefault;
                 } else if (contentsDeallocator == nullptr) {
                     contentsDeallocator = &Allocator<String>::AllocatorDefault;
@@ -781,15 +788,14 @@ namespace RSFoundation {
                         // See 2365208... This change was done after Sonata; before we didn't free the bytes at all (leak).
                         contentsDeallocator->Deallocate((void *)bytes);
                     }
-                    str = String::Empty;
-                    return MoveValue(str);
-//                    return (RSStringRef)RSRetain(_RSEmptyString);	// Quick exit; won't catch all empty strings, but most
+                    return MoveValue(String::Empty);
+//                    return (StringRef)Retain(_EmptyString);	// Quick exit; won't catch all empty strings, but most
                 }
                 vBuf.shouldFreeChars = false;
-                bool stringSupportsEightBitRSRepresentation = encoding != String::Encoding::Unicode && _CanUseEightBitRSStringForBytes((const uint8_t *)bytes, numBytes, encoding);
+                bool stringSupportsEightBitRepresentation = encoding != String::Encoding::Unicode && _CanUseEightBitStringForBytes((const uint8_t *)bytes, numBytes, encoding);
                 bool stringROMShouldIgnoreNoCopy = false;
-                if ((encoding == Encoding::Unicode && possiblyExternalFormat) ||
-                    (encoding != Encoding::Unicode && !stringSupportsEightBitRSRepresentation)) {
+                if ((encoding == String::Encoding::Unicode && possiblyExternalFormat) ||
+                    (encoding != String::Encoding::Unicode && !stringSupportsEightBitRepresentation)) {
                     const void *realBytes = (uint8_t *)bytes + (hasLengthByte ? 1 : 0);
                     RSIndex realNumBytes = numBytes - (hasLengthByte ? 1 : 0);
                     bool usingPassedInMemory = false;

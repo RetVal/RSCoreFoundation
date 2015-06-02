@@ -11,7 +11,6 @@
 
 #include <RSFoundation/BasicTypeDefine.h>
 #include <RSFoundation/TypeTraits.h>
-#include <array>
 
 namespace RSFoundation {
     namespace Basic {

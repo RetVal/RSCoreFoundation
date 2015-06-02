@@ -23,7 +23,7 @@ namespace RSFoundation {
                 WindowsLatin1 = 0x0500, /* ANSI codepage 1252 */
                 ISOLatin1 = 0x0201, /* ISO 8859-1 */
                 NextStepLatin = 0x0B01, /* NextStep encoding*/
-                ASCII = 0x0600, /* 0..127 (in creating RSString, values greater than 0x7F are treated as corresponding Unicode value) */
+                ASCII = 0x0600, /* 0..127 (in creating , values greater than 0x7F are treated as corresponding Unicode value) */
                 Unicode = 0x0100, /* kTextEncodingUnicodeDefault  + kTextEncodingDefaultFormat (aka kUnicode16BitFormat) */
                 UTF8 = 0x08000100, /* kTextEncodingUnicodeDefault + kUnicodeUTF8Format */
                 NonLossyASCII = 0x0BFF, /* 7bit Unicode variants used by Cocoa & Java */
@@ -35,7 +35,7 @@ namespace RSFoundation {
                 UTF32 = 0x0c000100, /* kTextEncodingUnicodeDefault + kUnicodeUTF32Format */
                 UTF32BE = 0x18000100, /* kTextEncodingUnicodeDefault + kUnicodeUTF32BEFormat */
                 UTF32LE = 0x1c000100, /* kTextEncodingUnicodeDefault + kUnicodeUTF32LEFormat */
-                /*  MacRoman = 0L, defined in CoreFoundation/RSString.h */
+                /*  MacRoman = 0L, defined in CoreFoundation/.h */
                 MacJapanese = 1,
                 MacChineseTrad = 2,
                 MacKorean = 3,
@@ -86,10 +86,10 @@ namespace RSFoundation {
                 MacHFS = 0xFF,	/* Meta-value, should never appear in a table */
                 
                 /* Unicode & ISO UCS encodings begin at 0x100 */
-                /* We don't use Unicode variations defined in TextEncoding; use the ones in RSString.h, instead. */
+                /* We don't use Unicode variations defined in TextEncoding; use the ones in .h, instead. */
                 
                 /* ISO 8-bit and 7-bit encodings begin at 0x200 */
-                /*  ISOLatin1 = 0x0201, defined in CoreFoundation/RSString.h */
+                /*  ISOLatin1 = 0x0201, defined in CoreFoundation/.h */
                 ISOLatin2 = 0x0202,	/* ISO 8859-2 */
                 ISOLatin3 = 0x0203,	/* ISO 8859-3 */
                 ISOLatin4 = 0x0204,	/* ISO 8859-4 */
@@ -127,7 +127,7 @@ namespace RSFoundation {
                 DOSChineseSimplif = 0x0421, /* code page 936, also for Windows */
                 DOSKorean = 0x0422,	/* code page 949, also for Windows; Unified Hangul Code */
                 DOSChineseTrad = 0x0423,	/* code page 950, also for Windows */
-                /*  WindowsLatin1 = 0x0500, defined in CoreFoundation/RSString.h */
+                /*  WindowsLatin1 = 0x0500, defined in CoreFoundation/.h */
                 WindowsLatin2 = 0x0501,	/* code page 1250, Central Europe */
                 WindowsCyrillic = 0x0502,	/* code page 1251, Slavic Cyrillic */
                 WindowsGreek = 0x0503,	/* code page 1253 */
@@ -139,7 +139,7 @@ namespace RSFoundation {
                 WindowsKoreanJohab = 0x0510, /* code page 1361, for Windows NT */
                 
                 /* Various national standards begin at 0x600 */
-                /*  ASCII = 0x0600, defined in CoreFoundation/RSString.h */
+                /*  ASCII = 0x0600, defined in CoreFoundation/.h */
                 ANSEL = 0x0601,	/* ANSEL (ANSI Z39.47) */
                 JIS_X0201_76 = 0x0620,
                 JIS_X0208_83 = 0x0621,
@@ -184,7 +184,7 @@ namespace RSFoundation {
                 Big5_E = 0x0A09,	/* Taiwan Big-5E standard */
                 
                 /* Other platform encodings*/
-                /*  NextStepLatin = 0x0B01, defined in CoreFoundation/RSString.h */
+                /*  NextStepLatin = 0x0B01, defined in CoreFoundation/.h */
                 NextStepJapanese = 0x0B02,	/* NextStep Japanese encoding */
                 
                 /* EBCDIC & IBM host encodings begin at 0xC00 */
@@ -197,21 +197,43 @@ namespace RSFoundation {
                 /* Deprecated constants */
                 ShiftJIS_X0213_00 = 0x0628 /* Shift-JIS format encoding of JIS X0213 planes 1 and 2 (DEPRECATED) */
             };
+            
+            enum class EncodingConfiguration : RSIndex {
+                AllowLossyConversion = (1UL << 0), // Uses fallback functions to substitutes non mappable chars
+                BasicDirectionLeftToRight = (1UL << 1), // Converted with original direction left-to-right.
+                BasicDirectionRightToLeft = (1UL << 2), // Converted with original direction right-to-left.
+                SubstituteCombinings = (1UL << 3), // Uses fallback function to combining chars.
+                ComposeCombinings = (1UL << 4), // Checks mappable precomposed equivalents for decomposed sequences.  This is the default behavior.
+                IgnoreCombinings = (1UL << 5), // Ignores combining chars.
+                UseCanonical = (1UL << 6), // Always use canonical form
+                UseHFSPlusCanonical = (1UL << 7), // Always use canonical form but leaves 0x2000 ranges
+                PrependBOM = (1UL << 8), // Prepend BOM sequence (i.e. ISO2022KR)
+                DisableCorporateArea = (1UL << 9), // Disable the usage of 0xF8xx area for Apple proprietary chars in converting to UniChar, resulting loosely mapping.
+                ASCIICompatibleConversion = (1UL << 10), // This flag forces strict ASCII compatible converion. i.e. MacJapanese 0x5C maps to Unicode 0x5C.
+                LenientUTF8Conversion = (1UL << 11), // 10.1 (Puma) compatible lenient UTF-8 conversion.
+                PartialInput = (1UL << 12), // input buffer is a part of stream
+                PartialOutput = (1UL << 13) // output buffer streaming
+            };
+            
             enum ConversionResult {
-                ConversionSuccess = 0,
+                Success = 0,
                 InvalidInputStream = 1,
                 InsufficientOutputBufferLength = 2,
-                ConverterUnavailable = 3
+                Unavailable = 3
             };
             
         public:
             String() {
                 
             };
+            
+            String(const char*);
+            
             ~String() {
                 
             }
             
+            static String Empty;
         private:
             enum {
                 FreeContentsWhenDoneMask = 0x020,
@@ -516,6 +538,8 @@ namespace RSFoundation {
                 }
             } _variants;
         };
+        
+        String String::Empty = String();
     }
 }
 

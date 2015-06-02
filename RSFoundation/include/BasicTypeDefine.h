@@ -88,6 +88,8 @@
 #endif
 #endif
 
+#define Private
+
 #if (__cplusplus && __cplusplus >= 201103L && (__has_extension(cxx_strong_enums) || __has_feature(objc_fixed_enum))) || (!__cplusplus && __has_feature(objc_fixed_enum))
 #define RS_FOUNDATION_ENUM(_type, _name) enum _name : _type _name; enum _name : _type
 #if (__cplusplus)

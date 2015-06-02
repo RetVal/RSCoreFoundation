@@ -16,13 +16,15 @@ namespace RSFoundation {
 #define UniCharConvertCountToFlag(count)	((count & 0x1F) << 24)
 #define UniCharConvertFlagToCount(flag)	((flag >> 24) & 0x1F)
         
-        enum class UnicharMappingType : RSIndex {
-            CanonicalDecompMapping = (UniCharCaseFold + 1),
-            CanonicalPrecompMapping,
-            CompatibilityDecompMapping
-        };
-        
-        const void *UniCharGetMappingData(UnicharMappingType type);
+        namespace Encoding {
+            enum class UnicharMappingType : RSIndex {
+                CanonicalDecompMapping = (UniCharCaseFold + 1),
+                CanonicalPrecompMapping,
+                CompatibilityDecompMapping
+            };
+            
+            const void *UniCharGetMappingData(UnicharMappingType type);
+        }
     }
 }
 

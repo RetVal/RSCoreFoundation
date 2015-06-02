@@ -12,6 +12,8 @@
 #include <RSFoundation/Object.h>
 #include <RSFoundation/Nullable.h>
 
+#include <typeinfo>
+
 #include <malloc/malloc.h>
 
 namespace RSFoundation {
@@ -33,7 +35,10 @@ namespace RSFoundation {
             
             template<typename T2>
             T2 *Allocate(size_t size) {
-                return new T2(size);
+                if (POD<T2>::Result) {
+                    return static_cast<T2*>(malloc_zone_malloc(zone, size * sizeof(T2)));
+                }
+                return new T2[size];
             }
             
             void Deallocate(void *ptr) {
