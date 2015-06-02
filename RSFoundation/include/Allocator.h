@@ -17,20 +17,23 @@
 namespace RSFoundation {
     namespace Basic {
         template<typename T>
-        class Allocator : public Object {
+        class Allocator : public Object, private Counter<RSUInt32> {
         public:
-            Allocator() {
-                zone = malloc_default_zone();
-            }
             static Allocator<T> AllocatorSystemDefault;
             static Allocator<T> AllocatorDefault;
             
         public:
             template<typename ...Args>
-            T *Allocate(Args... args, size_t size = sizeof(T)) {
-                void *ptr = malloc_zone_malloc(zone, size);
+            T *Allocate(Args... args) {
+                void *ptr = malloc_zone_malloc(zone, sizeof(T));
                 T *t = new (ptr) T(args...);
+                Inc();
                 return t;
+            }
+            
+            template<typename T2>
+            T2 *Allocate(size_t size) {
+                return new T2(size);
             }
             
             void Deallocate(void *ptr) {
@@ -40,6 +43,7 @@ namespace RSFoundation {
             void Deallocate(T *t) {
                 t->T::~T();
                 malloc_zone_free(zone, static_cast<void*>(t));
+                Dec();
             }
 
             void Deallocate(Nullable<T> &obj) {
@@ -54,7 +58,14 @@ namespace RSFoundation {
             }
             
         private:
+            Allocator() {
+                zone = malloc_default_zone();
+                name = typeid(T).name();
+            }
+            
+        private:
             malloc_zone_t *zone;
+            const char *name;
         };
         
         template<typename T>

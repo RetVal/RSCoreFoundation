@@ -7,6 +7,7 @@
 //
 
 #include <RSFoundation/BasicTypeDefine.h>
+#include <RSFoundation/Order.h>
 #include <RSFoundation/BasicAlgorithm.h>
 #include <RSFoundation/TypeTraits.h>
 #include <RSFoundation/Object.h>

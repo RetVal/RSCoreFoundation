@@ -15,7 +15,7 @@
 #include "RSInternal.h"
 #include "RSUniCharPrivate.h"
 
-// Canonical Decomposition
+// Canonical 
 static UTF32Char *__RSUniCharDecompositionTable = nil;
 static uint32_t __RSUniCharDecompositionTableLength = 0;
 static UTF32Char *__RSUniCharMultipleDecompositionTable = nil;

@@ -262,4 +262,7 @@ namespace RSFoundation {
     
 #include <RSFoundation/BasicAlgorithm.h>
 #define DEPLOYMENT_TARGET_MACOSX 1
+#define DEPLOYMENT_TARGET_LINUX 0
+#define DEPLOYMENT_TARGET_WINDOWS 0
+#define DEPLOYMENT_TARGET_IPHONEOS 0
 #endif
