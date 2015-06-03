@@ -59,7 +59,7 @@ namespace RSFoundation {
                 StringEncodingIsValidCombiningCharacterProc isValidCombiningChar;
             } StringEncodingConverter;
             
-            extern const StringEncodingConverter *StringEncodingGetConverter(uint32_t encoding);
+            extern const StringEncodingConverter *StringEncodingGetConverter(String::Encoding encoding);
             
             enum {
                 StringEncodingGetConverterSelector = 0,

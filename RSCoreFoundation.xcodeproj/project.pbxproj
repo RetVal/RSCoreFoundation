@@ -11,6 +11,10 @@
 		300CB714189932A6004298E2 /* RSFunctional.h in Headers */ = {isa = PBXBuildFile; fileRef = 300CB713189932A6004298E2 /* RSFunctional.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		300CB717189A3349004298E2 /* RSList.c in Sources */ = {isa = PBXBuildFile; fileRef = 300CB715189A3349004298E2 /* RSList.c */; };
 		300CB718189A3349004298E2 /* RSList.h in Headers */ = {isa = PBXBuildFile; fileRef = 300CB716189A3349004298E2 /* RSList.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		300F80EA1B1EAB0F009B062B /* UnicodePrecomposition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300F80E81B1EAB0F009B062B /* UnicodePrecomposition.cpp */; };
+		300F80EB1B1EAB0F009B062B /* UnicodePrecomposition.h in Headers */ = {isa = PBXBuildFile; fileRef = 300F80E91B1EAB0F009B062B /* UnicodePrecomposition.h */; };
+		300F80EC1B1EB22B009B062B /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 41813436168B394500B08722 /* libicucore.dylib */; };
+		300F80ED1B1EB2B1009B062B /* libldap.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 412925091822BADE00F2D71B /* libldap.dylib */; };
 		30217B891875D18D00BC813A /* RSURL+Extension.c in Sources */ = {isa = PBXBuildFile; fileRef = 30217B881875D18D00BC813A /* RSURL+Extension.c */; };
 		30217B8B1875D19700BC813A /* RSURL+Extension.h in Headers */ = {isa = PBXBuildFile; fileRef = 30217B8A1875D19700BC813A /* RSURL+Extension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		304AF1261B1582A0008E6365 /* Date.h in Headers */ = {isa = PBXBuildFile; fileRef = 304AF1241B1582A0008E6365 /* Date.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -804,6 +808,8 @@
 		300CB713189932A6004298E2 /* RSFunctional.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSFunctional.h; sourceTree = "<group>"; };
 		300CB715189A3349004298E2 /* RSList.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSList.c; sourceTree = "<group>"; };
 		300CB716189A3349004298E2 /* RSList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSList.h; sourceTree = "<group>"; };
+		300F80E81B1EAB0F009B062B /* UnicodePrecomposition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UnicodePrecomposition.cpp; sourceTree = "<group>"; };
+		300F80E91B1EAB0F009B062B /* UnicodePrecomposition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnicodePrecomposition.h; sourceTree = "<group>"; };
 		30217B881875D18D00BC813A /* RSURL+Extension.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "RSURL+Extension.c"; sourceTree = "<group>"; };
 		30217B8A1875D19700BC813A /* RSURL+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RSURL+Extension.h"; sourceTree = "<group>"; };
 		304AF1241B1582A0008E6365 /* Date.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Date.h; sourceTree = "<group>"; };
@@ -1514,6 +1520,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				300F80ED1B1EB2B1009B062B /* libldap.dylib in Frameworks */,
+				300F80EC1B1EB22B009B062B /* libicucore.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1708,6 +1716,8 @@
 				30EC72E31B1E18FD002BB58B /* ICUConverters.h */,
 				30EC72E61B1E1F1C002BB58B /* BultinConverters.cpp */,
 				30EC72E71B1E1F1C002BB58B /* BultinConverters.h */,
+				300F80E81B1EAB0F009B062B /* UnicodePrecomposition.cpp */,
+				300F80E91B1EAB0F009B062B /* UnicodePrecomposition.h */,
 			);
 			path = include;
 			sourceTree = "<group>";
@@ -2789,6 +2799,7 @@
 				30A5B80B1B1DA52200679E74 /* UniChar.h in Headers */,
 				30A5B8191B1DA91500679E74 /* Lock.h in Headers */,
 				30D3341C1B15B781005F8673 /* String.hpp in Headers */,
+				300F80EB1B1EAB0F009B062B /* UnicodePrecomposition.h in Headers */,
 				30A5B8091B1DA43D00679E74 /* Internal.h in Headers */,
 				30A5B80F1B1DA71E00679E74 /* UnicharPrivate.h in Headers */,
 				30A5B8271B1DDB4000679E74 /* DataBase.h in Headers */,
@@ -3609,6 +3620,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				300F80EA1B1EAB0F009B062B /* UnicodePrecomposition.cpp in Sources */,
 				30EC72E41B1E18FD002BB58B /* ICUConverters.cpp in Sources */,
 				309903491B1452770081278B /* Object.cpp in Sources */,
 				30A5B8151B1DA7C700679E74 /* UnicodeDecomposition.cpp in Sources */,

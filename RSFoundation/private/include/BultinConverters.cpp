@@ -10,6 +10,7 @@
 #include <RSFoundation/UniChar.h>
 #include <RSFoundation/StringConverterExt.h>
 #include <RSFoundation/UnicodeDecomposition.h>
+#include <RSFoundation/UnicodePrecomposition.h>
 
 namespace RSFoundation {
     namespace Collection {

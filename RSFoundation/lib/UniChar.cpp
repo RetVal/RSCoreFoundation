@@ -52,6 +52,34 @@ namespace RSFoundation {
 #define USE_MACHO_SEGMENT 1
 #endif
             
+#if (DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED) && USE_MACHO_SEGMENT
+            extern "C" {
+#include <mach-o/getsect.h>
+#include <mach-o/dyld.h>
+#include <mach-o/ldsyms.h>
+                
+#if (DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED) && USE_MACHO_SEGMENT
+                static const void *__GetSectDataPtr(const char *segname, const char *sectname, uint64_t *sizep) {
+                    uint32_t idx, cnt = _dyld_image_count();
+                    for (idx = 0; idx < cnt; idx++) {
+                        void *mh = (void *)_dyld_get_image_header(idx);
+                        if (mh != &_mh_dylib_header) continue;
+#if __LP64__
+                        const struct section_64 *sect = getsectbynamefromheader_64((struct mach_header_64 *)mh, segname, sectname);
+#else
+                        const struct section *sect = getsectbynamefromheader((struct mach_header *)mh, segname, sectname);
+#endif
+                        if (!sect) break;
+                        if (sizep) *sizep = (uint64_t)sect->size;
+                        return (char *)sect->addr + _dyld_get_image_vmaddr_slide(idx);
+                    }
+                    if (sizep) *sizep = 0ULL;
+                    return nullptr;
+                }
+#endif
+            }
+#endif
+
             enum {
                 LastExternalSet = NewlineCharacterSet,
                 FirstInternalSet = CompatibilityDecomposableCharacterSet,
@@ -61,30 +89,7 @@ namespace RSFoundation {
             
             inline CharacterSet __MapExternalSetToInternalIndex(CharacterSet cset) { return CharacterSet(((FirstInternalSet <= cset) ? ((cset - FirstInternalSet) + LastExternalSet) : cset) - FirstBitmapSet); }
             inline CharacterSet __MapCompatibilitySetID(CharacterSet cset) { return ((cset == ControlCharacterSet) ? ControlAndFormatterCharacterSet : (((cset > LastExternalSet) && (cset < FirstInternalSet)) ? CharacterSet((cset - LastExternalSet) + FirstInternalSet) : cset)); }
-            
-#if (DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED) && USE_MACHO_SEGMENT
-#include <mach-o/getsect.h>
-#include <mach-o/dyld.h>
-#include <mach-o/ldsyms.h>
-            
-            static const void *__GetSectDataPtr(const char *segname, const char *sectname, uint64_t *sizep) {
-                uint32_t idx, cnt = _dyld_image_count();
-                for (idx = 0; idx < cnt; idx++) {
-                    void *mh = (void *)_dyld_get_image_header(idx);
-                    if (mh != &_mh_dylib_header) continue;
-#if __LP64__
-                    const struct section_64 *sect = getsectbynamefromheader_64((struct mach_header_64 *)mh, segname, sectname);
-#else
-                    const struct section *sect = getsectbynamefromheader((struct mach_header *)mh, segname, sectname);
-#endif
-                    if (!sect) break;
-                    if (sizep) *sizep = (uint64_t)sect->size;
-                    return (char *)sect->addr + _dyld_get_image_vmaddr_slide(idx);
-                }
-                if (sizep) *sizep = 0ULL;
-                return nullptr;
-            }
-#endif
+        
             
 #if !USE_MACHO_SEGMENT
             
@@ -650,7 +655,7 @@ namespace RSFoundation {
 #error Unknown or unspecified DEPLOYMENT_TARGET
 #endif
                         
-                        Private const void *UniCharGetMappingData(uint32_t type) {
+                        Private const void *UniCharGetMappingData(UnicharMappingType type) {
                             
                             
                             __UniCharMappingTableLock.Acquire();
@@ -692,7 +697,7 @@ namespace RSFoundation {
                             
                             __UniCharMappingTableLock.Release();
                             
-                            return __UniCharMappingTables[type];
+                            return __UniCharMappingTables[(RSIndex)type];
                         }
                         
                         // Case mapping functions

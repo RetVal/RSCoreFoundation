@@ -87,13 +87,9 @@ namespace RSFoundation {
             
             static String::Encoding __DefaultEightBitStringEncoding;
             
-            Private String::Encoding _GetSystemEncoding() {
-                return String::UTF8;
-            }
-            
             static String::Encoding _ComputeEightBitStringEncoding(void) {
                 if (__DefaultEightBitStringEncoding == String::InvalidId) {
-                    String::Encoding systemEncoding = _GetSystemEncoding();
+                    String::Encoding systemEncoding = String::GetSystemEncoding();
                     if (systemEncoding == String::InvalidId) { // We're right in the middle of querying system encoding from default database. Delaying to set until system encoding is determined.
                         return String::ASCII;
                     } else if (_CanBeStoredInEightBit(systemEncoding)) {
@@ -824,5 +820,12 @@ namespace RSFoundation {
                 
             }
         }
+        
+        String::Encoding String::GetSystemEncoding() {
+            return String::UTF8;
+        }
+        
+        
+        String String::Empty = String();
     }
 }

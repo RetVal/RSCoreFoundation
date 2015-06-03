@@ -234,6 +234,8 @@ namespace RSFoundation {
             }
             
             static String Empty;
+            static String::Encoding GetSystemEncoding();
+            
         private:
             enum {
                 FreeContentsWhenDoneMask = 0x020,
@@ -539,7 +541,6 @@ namespace RSFoundation {
             } _variants;
         };
         
-        String String::Empty = String();
     }
 }
 

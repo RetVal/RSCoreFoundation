@@ -23,11 +23,11 @@ namespace RSFoundation {
             extern  const StringEncodingConverter __ConverterUTF8;
             
             extern  String::Encoding *__StringEncodingCreateListOfAvailablePlatformConverters(RSIndex *numberOfConverters);
-            extern  const StringEncodingConverter *__StringEncodingGetExternalConverter(uint32_t encoding);
-            extern  RSIndex __StringEncodingPlatformUnicodeToBytes(uint32_t encoding, uint32_t flags, const UniChar *characters, RSIndex numChars, RSIndex *usedCharLen, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen);
-            extern  RSIndex __StringEncodingPlatformBytesToUnicode(uint32_t encoding, uint32_t flags, const uint8_t *bytes, RSIndex numBytes, RSIndex *usedByteLen, UniChar *characters, RSIndex maxCharLen, RSIndex *usedCharLen);
-            extern  RSIndex __StringEncodingPlatformCharLengthForBytes(uint32_t encoding, uint32_t flags, const uint8_t *bytes, RSIndex numBytes);
-            extern  RSIndex __StringEncodingPlatformByteLengthForCharacters(uint32_t encoding, uint32_t flags, const UniChar *characters, RSIndex numChars);
+            extern  const StringEncodingConverter *__StringEncodingGetExternalConverter(String::Encoding encoding);
+            extern  RSIndex __StringEncodingPlatformUnicodeToBytes(String::Encoding encoding, uint32_t flags, const UniChar *characters, RSIndex numChars, RSIndex *usedCharLen, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen);
+            extern  RSIndex __StringEncodingPlatformBytesToUnicode(String::Encoding encoding, uint32_t flags, const uint8_t *bytes, RSIndex numBytes, RSIndex *usedByteLen, UniChar *characters, RSIndex maxCharLen, RSIndex *usedCharLen);
+            extern  RSIndex __StringEncodingPlatformCharLengthForBytes(String::Encoding encoding, uint32_t flags, const uint8_t *bytes, RSIndex numBytes);
+            extern  RSIndex __StringEncodingPlatformByteLengthForCharacters(String::Encoding encoding, uint32_t flags, const UniChar *characters, RSIndex numChars);
         }
     }
 }

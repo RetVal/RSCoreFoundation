@@ -12,7 +12,9 @@
 #include <RSFoundation/UnicodeDecomposition.h>
 #include <RSFoundation/StringConverterExt.h>
 #include <RSFoundation/Lock.h>
+#include <RSFoundation/BultinConverters.h>
 #include <stdlib.h>
+#include <map>
 
 namespace RSFoundation {
     namespace Collection {
@@ -32,7 +34,7 @@ namespace RSFoundation {
             /* Macros
              */
 #define TO_BYTE(conv,flags,chars,numChars,bytes,max,used) (conv->toBytes ? conv->toBytes(conv,flags,chars,numChars,bytes,max,used) : ((StringEncodingToBytesProc)conv->definition->toBytes)(flags,chars,numChars,bytes,max,used))
-#define TO_UNICODE(conv,flags,bytes,numBytes,chars,max,used) (conv->toUnicode ?  (flags & (StringEncodingUseCanonical|StringEncodingUseHFSPlusCanonical) ? conv->toCanonicalUnicode(conv,flags,bytes,numBytes,chars,max,used) : conv->toUnicode(conv,flags,bytes,numBytes,chars,max,used)) : ((StringEncodingToUnicodeProc)conv->definition->toUnicode)(flags,bytes,numBytes,chars,max,used))
+#define TO_UNICODE(conv,flags,bytes,numBytes,chars,max,used) (conv->toUnicode ?  (flags & ((uint32_t)String::EncodingConfiguration::UseCanonical|(uint32_t)String::EncodingConfiguration::UseHFSPlusCanonical) ? conv->toCanonicalUnicode(conv,flags,bytes,numBytes,chars,max,used) : conv->toUnicode(conv,flags,bytes,numBytes,chars,max,used)) : ((StringEncodingToUnicodeProc)conv->definition->toUnicode)(flags,bytes,numBytes,chars,max,used))
             
 #define ASCIINewLine 0x0a
 #define kSurrogateHighStart 0xD800
@@ -587,7 +589,7 @@ namespace RSFoundation {
                 }
             }
             
-//            static MutableDictionaryRef mappingTable = nil;
+            static std::map<String::Encoding, const _EncodingConverter*> *mappingTable = nullptr;
             static _EncodingConverter *mappingTableCommonConverters[3] = {nil, nil, nil}; // UTF8, MacRoman/WinLatin1, and the default encoding*
             static SpinLock mappingTableGetConverterLock;
             
@@ -620,43 +622,39 @@ namespace RSFoundation {
                     case String::Encoding::ISOLatin1: commonConverterSlot = (const _EncodingConverter **)(&(commonConverters[1])); break;
 #endif
                         
-                    default: if (String::StringGetSystemEncoding() == encoding) commonConverterSlot = (const _EncodingConverter **)&(mappingTableCommonConverters[2]); break;
+                    default: if (String::GetSystemEncoding() == encoding) commonConverterSlot = (const _EncodingConverter **)&(mappingTableCommonConverters[2]); break;
                 }
                 
                 mappingTableGetConverterLock.Acquire();
-                converter = ((nil == commonConverterSlot) ? ((nil == mappingTable) ? nil : (const _EncodingConverter *)DictionaryGetValue(mappingTable, (const void *)(uintptr_t)encoding)) : *commonConverterSlot);
-                SpinLockUnlock(&mappingTableGetConverterLock);
+                converter = ((nil == commonConverterSlot) ? ((nil == mappingTable) ? nil : (*mappingTable)[encoding]) : *commonConverterSlot);
+                mappingTableGetConverterLock.Release();
                 
-                if (nil == converter)
-                {
+                if (nil == converter) {
                     const StringEncodingConverter *definition = __StringEncodingConverterGetDefinition(encoding);
                     
-                    if (nil != definition)
-                    {
-                        SpinLockLock(&mappingTableGetConverterLock);
-                        converter = ((nil == commonConverterSlot) ? ((nil == mappingTable) ? nil : (const _EncodingConverter *)DictionaryGetValue(mappingTable, (const void *)(uintptr_t)encoding)) : *commonConverterSlot);
+                    if (nil != definition) {
+                        mappingTableGetConverterLock.Acquire();
+                        converter = ((nil == commonConverterSlot) ? ((nil == mappingTable) ? nil : (*mappingTable)[encoding]) : *commonConverterSlot);
                         
-                        if (nil == converter)
-                        {
+                        if (nil == converter) {
                             converter = __EncodingConverterFromDefinition(definition, encoding);
                             
-                            if (nil == commonConverterSlot)
-                            {
-                                if (nil == mappingTable)
-                                {
-                                    mappingTable = DictionaryCreateMutable(nil, 0, nil);
+                            if (nil == commonConverterSlot) {
+                                if (nil == mappingTable) {
+                                    mappingTable = Allocator<std::map<String::Encoding, const _EncodingConverter*>>::AllocatorSystemDefault.Allocate();
+//                                    mappingTable = DictionaryCreateMutable(nil, 0, nil);
                                     //                        Autorelease(mappingTable);
-                                    __EncodingMappingTableRegister(mappingTable);
+//                                    __EncodingMappingTableRegister(mappingTable);
                                 }
-                                
-                                DictionarySetValue(mappingTable, (const void *)(uintptr_t)encoding, converter);
+                                (*mappingTable)[encoding] = converter;
+//                                DictionarySetValue(mappingTable, (const void *)(uintptr_t)encoding, converter);
                             }
                             else
                             {
                                 *commonConverterSlot = converter;
                             }
                         }
-                        SpinLockUnlock(&mappingTableGetConverterLock);
+                        mappingTableGetConverterLock.Release();
                     }
                 }
                 
@@ -665,18 +663,18 @@ namespace RSFoundation {
             
             /* Public API
              */
-            uint32_t StringEncodingUnicodeToBytes(uint32_t encoding, uint32_t flags, const UniChar *characters, RSIndex numChars, RSIndex *usedCharLen, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen) {
-                if (encoding == StringEncodingUTF8) {
+            uint32_t StringEncodingUnicodeToBytes(String::Encoding encoding, uint32_t flags, const UniChar *characters, RSIndex numChars, RSIndex *usedCharLen, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen) {
+                if (encoding == String::Encoding::UTF8) {
                     static StringEncodingToBytesProc __ToUTF8 = nil;
                     RSIndex convertedCharLen;
                     RSIndex usedLen;
                     
                     
-                    if ((flags & StringEncodingUseCanonical) || (flags & StringEncodingUseHFSPlusCanonical)) {
-                        (void)UniCharDecompose(characters, numChars, &convertedCharLen, (void *)bytes, maxByteLen, &usedLen, YES, UniCharUTF8Format, (flags & StringEncodingUseHFSPlusCanonical ? YES : NO));
+                    if ((flags & (uint32_t)String::EncodingConfiguration::UseCanonical) || (flags & (uint32_t)String::EncodingConfiguration::UseHFSPlusCanonical)) {
+                        (void)UnicodeDecoposition::Decompose(characters, numChars, &convertedCharLen, (void *)bytes, maxByteLen, &usedLen, YES, UniCharEncodingFormat::UTF8Format, (flags & (uint32_t)String::EncodingConfiguration::UseHFSPlusCanonical ? YES : NO));
                     } else {
                         if (!__ToUTF8) {
-                            const StringEncodingConverter *utf8Converter = StringEncodingGetConverter(StringEncodingUTF8);
+                            const StringEncodingConverter *utf8Converter = StringEncodingGetConverter(String::Encoding::UTF8);
                             __ToUTF8 = (StringEncodingToBytesProc)utf8Converter->toBytes;
                         }
                         convertedCharLen = __ToUTF8(0, characters, numChars, bytes, maxByteLen, &usedLen);
@@ -685,34 +683,34 @@ namespace RSFoundation {
                     if (usedByteLen) *usedByteLen = usedLen;
                     
                     if (convertedCharLen == numChars) {
-                        return StringEncodingConversionSuccess;
+                        return String::ConversionResult::Success;
                     } else if ((maxByteLen > 0) && ((maxByteLen - usedLen) < 10)) { // could be filled outbuf
                         UTF16Char character = characters[convertedCharLen];
                         
-                        if (((character >= kSurrogateLowStart) && (character <= kSurrogateLowEnd)) || ((character >= kSurrogateHighStart) && (character <= kSurrogateHighEnd) && ((1 == (numChars - convertedCharLen)) || (characters[convertedCharLen + 1] < kSurrogateLowStart) || (characters[convertedCharLen + 1] > kSurrogateLowEnd)))) return StringEncodingInvalidInputStream;
+                        if (((character >= kSurrogateLowStart) && (character <= kSurrogateLowEnd)) || ((character >= kSurrogateHighStart) && (character <= kSurrogateHighEnd) && ((1 == (numChars - convertedCharLen)) || (characters[convertedCharLen + 1] < kSurrogateLowStart) || (characters[convertedCharLen + 1] > kSurrogateLowEnd)))) return String::ConversionResult::InvalidInputStream;
                         
-                        return StringEncodingInsufficientOutputBufferLength;
+                        return String::ConversionResult::InsufficientOutputBufferLength;
                     } else {
-                        return StringEncodingInvalidInputStream;
+                        return String::ConversionResult::InvalidInputStream;
                     }
                 } else {
                     const _EncodingConverter *converter = __GetConverter(encoding);
                     RSIndex usedLen = 0;
                     RSIndex localUsedByteLen;
                     RSIndex theUsedByteLen = 0;
-                    uint32_t theResult = StringEncodingConversionSuccess;
+                    uint32_t theResult = String::ConversionResult::Success;
                     StringEncodingToBytesPrecomposeProc toBytesPrecompose = nil;
                     StringEncodingIsValidCombiningCharacterProc isValidCombiningChar = nil;
                     
-                    if (!converter) return StringEncodingConverterUnavailable;
+                    if (!converter) return String::ConversionResult::Unavailable;
                     
-                    if (flags & StringEncodingSubstituteCombinings) {
-                        if (!(flags & StringEncodingAllowLossyConversion)) isValidCombiningChar = converter->definition->isValidCombiningChar;
+                    if (flags & (uint32_t)String::EncodingConfiguration::SubstituteCombinings) {
+                        if (!(flags & (uint32_t)String::EncodingConfiguration::AllowLossyConversion)) isValidCombiningChar = converter->definition->isValidCombiningChar;
                     } else {
                         isValidCombiningChar = converter->definition->isValidCombiningChar;
-                        if (!(flags & StringEncodingIgnoreCombinings)) {
+                        if (!(flags & (uint32_t)String::EncodingConfiguration::IgnoreCombinings)) {
                             toBytesPrecompose = converter->definition->toBytesPrecompose;
-                            flags |= StringEncodingComposeCombinings;
+                            flags |= (uint32_t)String::EncodingConfiguration::ComposeCombinings;
                         }
                     }
                     
@@ -743,10 +741,10 @@ namespace RSFoundation {
                                         usedLen += localUsedLen;
                                         if ((usedLen < numChars) && isValidCombiningChar(characters[usedLen])) { // There is a non-base char not combined remaining
                                             theUsedByteLen += localUsedByteLen;
-                                            theResult = StringEncodingInvalidInputStream;
+                                            theResult = String::ConversionResult::InvalidInputStream;
                                             break;
                                         }
-                                    } else if (flags & StringEncodingAllowLossyConversion) {
+                                    } else if (flags & (uint32_t)String::EncodingConfiguration::AllowLossyConversion) {
                                         uint8_t lossyByte = StringEncodingMaskToLossyByte(flags);
                                         
                                         if (lossyByte) {
@@ -758,14 +756,14 @@ namespace RSFoundation {
                                             usedLen += TO_BYTE_FALLBACK(converter, characters + usedLen, numChars - usedLen, bytes + theUsedByteLen, (maxByteLen ? maxByteLen - theUsedByteLen : 0), &localUsedByteLen);
                                         }
                                     } else {
-                                        theResult = StringEncodingInvalidInputStream;
+                                        theResult = String::ConversionResult::InvalidInputStream;
                                         break;
                                     }
                                 } else if (maxByteLen && ((maxByteLen == theUsedByteLen + localUsedByteLen) || TO_BYTE(converter, flags, characters + usedLen, numChars - usedLen, nil, 0, &dummy))) { // buffer was filled up
                                     theUsedByteLen += localUsedByteLen;
-                                    theResult = StringEncodingInsufficientOutputBufferLength;
+                                    theResult = String::ConversionResult::InsufficientOutputBufferLength;
                                     break;
-                                } else if (flags & StringEncodingIgnoreCombinings) {
+                                } else if (flags & (uint32_t)String::EncodingConfiguration::IgnoreCombinings) {
                                     while ((++usedLen < numChars) && isValidCombiningChar(characters[usedLen]));
                                 } else {
                                     uint8_t lossyByte = StringEncodingMaskToLossyByte(flags);
@@ -782,15 +780,15 @@ namespace RSFoundation {
                             } else if (maxByteLen && ((maxByteLen == theUsedByteLen + localUsedByteLen) || TO_BYTE(converter, flags, characters + usedLen, numChars - usedLen, nil, 0, &dummy))) { // buffer was filled up
                                 theUsedByteLen += localUsedByteLen;
                                 
-                                if (flags & StringEncodingAllowLossyConversion && !StringEncodingMaskToLossyByte(flags)) {
+                                if (flags & (uint32_t)String::EncodingConfiguration::AllowLossyConversion && !StringEncodingMaskToLossyByte(flags)) {
                                     RSIndex localUsedLen;
                                     
                                     localUsedByteLen = 0;
                                     while ((usedLen < numChars) && !localUsedByteLen && (localUsedLen = TO_BYTE_FALLBACK(converter, characters + usedLen, numChars - usedLen, nil, 0, &localUsedByteLen))) usedLen += localUsedLen;
                                 }
-                                if (usedLen < numChars) theResult = StringEncodingInsufficientOutputBufferLength;
+                                if (usedLen < numChars) theResult = String::ConversionResult::InsufficientOutputBufferLength;
                                 break;
-                            } else if (flags & StringEncodingAllowLossyConversion) {
+                            } else if (flags & (uint32_t)String::EncodingConfiguration::AllowLossyConversion) {
                                 uint8_t lossyByte = StringEncodingMaskToLossyByte(flags);
                                 
                                 theUsedByteLen += localUsedByteLen;
@@ -803,21 +801,21 @@ namespace RSFoundation {
                                 }
                             } else {
                                 theUsedByteLen += localUsedByteLen;
-                                theResult = StringEncodingInvalidInputStream;
+                                theResult = String::ConversionResult::InvalidInputStream;
                                 break;
                             }
                         }
                         theUsedByteLen += localUsedByteLen;
                     }
                     
-                    if (usedLen < numChars && maxByteLen && theResult == StringEncodingConversionSuccess) {
-                        if (flags & StringEncodingAllowLossyConversion && !StringEncodingMaskToLossyByte(flags)) {
+                    if (usedLen < numChars && maxByteLen && theResult == String::ConversionResult::Success) {
+                        if (flags & (uint32_t)String::EncodingConfiguration::AllowLossyConversion && !StringEncodingMaskToLossyByte(flags)) {
                             RSIndex localUsedLen;
                             
                             localUsedByteLen = 0;
                             while ((usedLen < numChars) && !localUsedByteLen && (localUsedLen = TO_BYTE_FALLBACK(converter, characters + usedLen, numChars - usedLen, nil, 0, &localUsedByteLen))) usedLen += localUsedLen;
                         }
-                        if (usedLen < numChars) theResult = StringEncodingInsufficientOutputBufferLength;
+                        if (usedLen < numChars) theResult = String::ConversionResult::InsufficientOutputBufferLength;
                     }
                     if (usedByteLen) *usedByteLen = theUsedByteLen;
                     if (usedCharLen) *usedCharLen = usedLen;
@@ -826,14 +824,14 @@ namespace RSFoundation {
                 }
             }
             
-            uint32_t StringEncodingBytesToUnicode(uint32_t encoding, uint32_t flags, const uint8_t *bytes, RSIndex numBytes, RSIndex *usedByteLen, UniChar *characters, RSIndex maxCharLen, RSIndex *usedCharLen) {
+            uint32_t StringEncodingBytesToUnicode(String::Encoding encoding, uint32_t flags, const uint8_t *bytes, RSIndex numBytes, RSIndex *usedByteLen, UniChar *characters, RSIndex maxCharLen, RSIndex *usedCharLen) {
                 const _EncodingConverter *converter = __GetConverter(encoding);
                 RSIndex usedLen = 0;
                 RSIndex theUsedCharLen = 0;
                 RSIndex localUsedCharLen;
-                uint32_t theResult = StringEncodingConversionSuccess;
+                uint32_t theResult = String::ConversionResult::Success;
                 
-                if (!converter) return StringEncodingConverterUnavailable;
+                if (!converter) return String::ConversionResult::Unavailable;
                 
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
                 if (StringEncodingConverterICU == converter->definition->encodingClass) return (uint32_t)__StringEncodingICUToUnicode((const char *)converter->toBytes, flags, bytes, numBytes, usedByteLen, characters, maxCharLen, usedCharLen);
@@ -846,24 +844,24 @@ namespace RSFoundation {
                     if ((usedLen += TO_UNICODE(converter, flags, bytes + usedLen, numBytes - usedLen, characters + theUsedCharLen, (maxCharLen ? maxCharLen - theUsedCharLen : 0), &localUsedCharLen)) < numBytes) {
                         RSIndex tempUsedCharLen;
                         
-                        if (maxCharLen && ((maxCharLen == theUsedCharLen + localUsedCharLen) || (((flags & (StringEncodingUseCanonical|StringEncodingUseHFSPlusCanonical)) || (maxCharLen == theUsedCharLen + localUsedCharLen + 1)) && TO_UNICODE(converter, flags, bytes + usedLen, numBytes - usedLen, nil, 0, &tempUsedCharLen)))) { // buffer was filled up
+                        if (maxCharLen && ((maxCharLen == theUsedCharLen + localUsedCharLen) || (((flags & ((uint32_t)String::EncodingConfiguration::UseCanonical|(uint32_t)String::EncodingConfiguration::UseHFSPlusCanonical)) || (maxCharLen == theUsedCharLen + localUsedCharLen + 1)) && TO_UNICODE(converter, flags, bytes + usedLen, numBytes - usedLen, nil, 0, &tempUsedCharLen)))) { // buffer was filled up
                             theUsedCharLen += localUsedCharLen;
-                            theResult = StringEncodingInsufficientOutputBufferLength;
+                            theResult = String::ConversionResult::InsufficientOutputBufferLength;
                             break;
-                        } else if (flags & StringEncodingAllowLossyConversion) {
+                        } else if (flags & (uint32_t)String::EncodingConfiguration::AllowLossyConversion) {
                             theUsedCharLen += localUsedCharLen;
                             usedLen += TO_UNICODE_FALLBACK(converter, bytes + usedLen, numBytes - usedLen, characters + theUsedCharLen, (maxCharLen ? maxCharLen - theUsedCharLen : 0), &localUsedCharLen);
                         } else {
                             theUsedCharLen += localUsedCharLen;
-                            theResult = StringEncodingInvalidInputStream;
+                            theResult = String::ConversionResult::InvalidInputStream;
                             break;
                         }
                     }
                     theUsedCharLen += localUsedCharLen;
                 }
                 
-                if (usedLen < numBytes && maxCharLen && theResult == StringEncodingConversionSuccess) {
-                    theResult = StringEncodingInsufficientOutputBufferLength;
+                if (usedLen < numBytes && maxCharLen && theResult == String::ConversionResult::Success) {
+                    theResult = String::ConversionResult::InsufficientOutputBufferLength;
                 }
                 if (usedCharLen) *usedCharLen = theUsedCharLen;
                 if (usedByteLen) *usedByteLen = usedLen;
@@ -871,11 +869,11 @@ namespace RSFoundation {
                 return theResult;
             }
             
-            Private bool StringEncodingIsValidEncoding(uint32_t encoding) {
+            Private bool StringEncodingIsValidEncoding(String::Encoding encoding) {
                 return (StringEncodingGetConverter(encoding) ? YES : NO);
             }
             
-            Private RSIndex StringEncodingCharLengthForBytes(uint32_t encoding, uint32_t flags, const uint8_t *bytes, RSIndex numBytes) {
+            Private RSIndex StringEncodingCharLengthForBytes(String::Encoding encoding, uint32_t flags, const uint8_t *bytes, RSIndex numBytes) {
                 const _EncodingConverter *converter = __GetConverter(encoding);
                 
                 if (converter) {
@@ -900,7 +898,7 @@ namespace RSFoundation {
                             totalLength += usedCharLen;
                             
                             if (numBytes > 0) {
-                                if (0 == (flags & StringEncodingAllowLossyConversion)) return 0;
+                                if (0 == (flags & (uint32_t)String::EncodingConfiguration::AllowLossyConversion)) return 0;
                                 
                                 usedByteLen = TO_UNICODE_FALLBACK(converter, bytes, numBytes, nil, 0, &usedCharLen);
                                 
@@ -919,7 +917,7 @@ namespace RSFoundation {
                 return 0;
             }
             
-            Private RSIndex StringEncodingByteLengthForCharacters(uint32_t encoding, uint32_t flags, const UniChar *characters, RSIndex numChars)
+            Private RSIndex StringEncodingByteLengthForCharacters(String::Encoding encoding, uint32_t flags, const UniChar *characters, RSIndex numChars)
             {
                 const _EncodingConverter *converter = __GetConverter(encoding);
                 
@@ -935,7 +933,7 @@ namespace RSFoundation {
                     if (nil == converter->definition->toBytesLen) {
                         RSIndex usedByteLen;
                         
-                        return ((StringEncodingConversionSuccess == StringEncodingUnicodeToBytes(encoding, flags, characters, numChars, nil, nil, 0, &usedByteLen)) ? usedByteLen : 0);
+                        return ((String::ConversionResult::Success == StringEncodingUnicodeToBytes(encoding, flags, characters, numChars, nil, nil, 0, &usedByteLen)) ? usedByteLen : 0);
                     } else {
                         return converter->definition->toBytesLen(flags, characters, numChars);
                     }
@@ -944,7 +942,7 @@ namespace RSFoundation {
                 return 0;
             }
             
-            Private void StringEncodingRegisterFallbackProcedures(uint32_t encoding, StringEncodingToBytesFallbackProc toBytes, StringEncodingToUnicodeFallbackProc toUnicode) {
+            Private void StringEncodingRegisterFallbackProcedures(String::Encoding encoding, StringEncodingToBytesFallbackProc toBytes, StringEncodingToUnicodeFallbackProc toUnicode) {
                 _EncodingConverter *converter = (_EncodingConverter *)__GetConverter(encoding);
                 
                 if (nil != converter) {
@@ -955,47 +953,47 @@ namespace RSFoundation {
                 }
             }
             
-            Private const StringEncodingConverter *StringEncodingGetConverter(uint32_t encoding) {
+            Private const StringEncodingConverter *StringEncodingGetConverter(String::Encoding encoding) {
                 const _EncodingConverter *converter = __GetConverter(encoding);
                 
                 return ((nil == converter) ? nil : converter->definition);
             }
             
-            static const StringEncoding __BuiltinEncodings[] = {
-                StringEncodingMacRoman,
-                StringEncodingWindowsLatin1,
-                StringEncodingISOLatin1,
-                StringEncodingNextStepLatin,
-                StringEncodingASCII,
-                StringEncodingUTF8,
+            static const String::Encoding __BuiltinEncodings[] = {
+                String::Encoding::MacRoman,
+                String::Encoding::WindowsLatin1,
+                String::Encoding::ISOLatin1,
+                String::Encoding::NextStepLatin,
+                String::Encoding::ASCII,
+                String::Encoding::UTF8,
                 /* These seven are available only in String-level */
-                StringEncodingNonLossyASCII,
+                String::Encoding::NonLossyASCII,
                 
-                StringEncodingUTF16,
-                StringEncodingUTF16BE,
-                StringEncodingUTF16LE,
+                String::Encoding::UTF16,
+                String::Encoding::UTF16BE,
+                String::Encoding::UTF16LE,
                 
-                StringEncodingUTF32,
-                StringEncodingUTF32BE,
-                StringEncodingUTF32LE,
+                String::Encoding::UTF32,
+                String::Encoding::UTF32BE,
+                String::Encoding::UTF32LE,
                 
-                StringEncodingInvalidId,
+                String::Encoding::InvalidId,
             };
             
             static ComparisonResult __StringEncodingComparator(const void *v1, const void *v2, void *context) {
-                ComparisonResult val1 = (*(const StringEncoding *)v1) & 0xFFFF;
-                ComparisonResult val2 = (*(const StringEncoding *)v2) & 0xFFFF;
+                ComparisonResult val1 = ComparisonResult((*(const RSIndex *)v1) & 0xFFFF);
+                ComparisonResult val2 = ComparisonResult((*(const RSIndex *)v2) & 0xFFFF);
                 
-                return ((val1 == val2) ? ((ComparisonResult)(*(const StringEncoding *)v1) - (ComparisonResult)(*(const StringEncoding *)v2)) : val1 - val2);
+                return ((val1 == val2) ? ComparisonResult((RSIndex)(*(const RSIndex *)v1) - (RSIndex)(*(const RSIndex *)v2)) : ComparisonResult(val1 - val2));
             }
             
-            static void __StringEncodingFliterDupes(StringEncoding *encodings, RSIndex numSlots) {
-                StringEncoding last = StringEncodingInvalidId;
-                const StringEncoding *limitEncodings = encodings + numSlots;
+            static void __StringEncodingFliterDupes(String::Encoding *encodings, RSIndex numSlots) {
+                String::Encoding last = String::Encoding::InvalidId;
+                const String::Encoding *limitEncodings = encodings + numSlots;
                 
                 while (encodings < limitEncodings) {
                     if (last == *encodings) {
-                        if ((encodings + 1) < limitEncodings) memmove(encodings, encodings + 1, sizeof(StringEncoding) * (limitEncodings - encodings - 1));
+                        if ((encodings + 1) < limitEncodings) memmove(encodings, encodings + 1, sizeof(String::Encoding) * (limitEncodings - encodings - 1));
                         --limitEncodings;
                     } else {
                         last = *(encodings++);
@@ -1003,42 +1001,45 @@ namespace RSFoundation {
                 }
             }
             
-            Private const StringEncoding *StringEncodingListOfAvailableEncodings(void) {
-                static const StringEncoding *encodings = nil;
+            Private const String::Encoding *StringEncodingListOfAvailableEncodings(void) {
+                static const String::Encoding *encodings = nil;
                 
                 if (nil == encodings) {
-                    StringEncoding *list = (StringEncoding *)__BuiltinEncodings;
+                    String::Encoding *list = (String::Encoding *)__BuiltinEncodings;
                     RSIndex numICUConverters = 0, numPlatformConverters = 0;
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
-                    StringEncoding *icuConverters = __StringEncodingCreateICUEncodings(nil, &numICUConverters);
+                    String::Encoding *icuConverters = __StringEncodingCreateICUEncodings(&numICUConverters);
 #else
-                    StringEncoding *icuConverters = nil;
+                    String::Encoding *icuConverters = nil;
 #endif
-                    StringEncoding *platformConverters = __StringEncodingCreateListOfAvailablePlatformConverters(nil, &numPlatformConverters);
+                    String::Encoding *platformConverters = __StringEncodingCreateListOfAvailablePlatformConverters(&numPlatformConverters);
+                    auto allocator = &Allocator<String::Encoding>::AllocatorSystemDefault;
                     
                     if ((nil != icuConverters) || (nil != platformConverters)) {
                         RSIndex numSlots = (sizeof(__BuiltinEncodings) / sizeof(*__BuiltinEncodings)) + numICUConverters + numPlatformConverters;
                         
-                        list = (StringEncoding *)AllocatorAllocate(nil, sizeof(StringEncoding) * numSlots);
+                        list = allocator->Allocate<String::Encoding>(numSlots);
+//                        list = (StringEncoding *)AllocatorAllocate(nil, sizeof(StringEncoding) * numSlots);
                         
                         memcpy(list, __BuiltinEncodings, sizeof(__BuiltinEncodings));
                         
                         if (nil != icuConverters) {
-                            memcpy(list + (sizeof(__BuiltinEncodings) / sizeof(*__BuiltinEncodings)), icuConverters, sizeof(StringEncoding) * numICUConverters);
-                            AllocatorDeallocate(nil, icuConverters);
+                            memcpy(list + (sizeof(__BuiltinEncodings) / sizeof(*__BuiltinEncodings)), icuConverters, sizeof(String::Encoding) * numICUConverters);
+                            allocator->Deallocate(icuConverters);
                         }
                         
                         if (nil != platformConverters) {
-                            memcpy(list + (sizeof(__BuiltinEncodings) / sizeof(*__BuiltinEncodings)) + numICUConverters, platformConverters, sizeof(StringEncoding) * numPlatformConverters);
-                            AllocatorDeallocate(nil, platformConverters);
+                            memcpy(list + (sizeof(__BuiltinEncodings) / sizeof(*__BuiltinEncodings)) + numICUConverters, platformConverters, sizeof(String::Encoding) * numPlatformConverters);
+                            allocator->Deallocate(platformConverters);
                         }
                         //            extern void QSortArray(void **list, RSIndex count, RSIndex elementSize, ComparatorFunction comparator, bool ascending);
-                        SortArray((void **)&list, numSlots, sizeof(StringEncoding), OrderedDescending, (ComparatorFunction)__StringEncodingComparator, nil);
+//                        SortArray((void **)&list, numSlots, sizeof(StringEncoding), OrderedDescending, (ComparatorFunction)__StringEncodingComparator, nil);
                         
                         __StringEncodingFliterDupes(list, numSlots);
                     }
-                    if (!OSAtomicCompareAndSwapPtrBarrier(nil, list, (void * volatile *)&encodings) && (list != __BuiltinEncodings)) AllocatorDeallocate(nil, list);
-                    __AutoReleaseISA(nil, (ISA)encodings);
+                    if (!OSAtomicCompareAndSwapPtrBarrier(nil, list, (void * volatile *)&encodings) && (list != __BuiltinEncodings))
+                        allocator->Deallocate(list);
+//                    __AutoReleaseISA(nil, (ISA)encodings);
                 }
                 
                 return encodings;
@@ -1055,41 +1056,7 @@ namespace RSFoundation {
 #undef TO_UNICODE_FALLBACK
 #undef EXTRA_BASE
 #undef NUM_OF_ENTRIES_CYCLE
-            
-            /*
-             * Copyright (c) 2012 Apple Inc. All rights reserved.
-             *
-             * @APPLE_LICENSE_HEADER_START@
-             *
-             * This file contains Original Code and/or Modifications of Original Code
-             * as defined in and that are subject to the Apple Public Source License
-             * Version 2.0 (the 'License'). You may not use this file except in
-             * compliance with the License. Please obtain a copy of the License at
-             * http://www.opensource.apple.com/apsl/ and read it before using this
-             * file.
-             *
-             * The Original Code and all software distributed under the License are
-             * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
-             * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
-             * INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
-             * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
-             * Please see the License for the specific language governing rights and
-             * limitations under the License.
-             *
-             * @APPLE_LICENSE_HEADER_END@
-             */
-            
-            /*	PlatformConverters.c
-             Copyright (c) 1998-2012, Apple Inc. All rights reserved.
-             Responsibility: Aki Inoue
-             */
-            
-#include "Internal.h"
-#include <CoreFoundation/String.h>
-#include "StringEncodingConverterExt.h"
-#include "UniChar.h"
-#include "UnicodeDecomposition.h"
-#include "StringEncodingConverterPrivate.h"
+
 #include "ICUConverters.h"
             
             
@@ -1132,7 +1099,7 @@ namespace RSFoundation {
             }
             
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED
-            Private StringEncoding *__StringEncodingCreateListOfAvailablePlatformConverters(AllocatorRef allocator, RSIndex *numberOfConverters) {
+            Private String::Encoding *__StringEncodingCreateListOfAvailablePlatformConverters(RSIndex *numberOfConverters) {
                 
                 return nil;
             }
@@ -1177,7 +1144,7 @@ namespace RSFoundation {
             Private StringEncoding *__StringEncodingCreateListOfAvailablePlatformConverters(AllocatorRef allocator, RSIndex *numberOfConverters) { return nil; }
 #endif
             
-            Private RSIndex __StringEncodingPlatformUnicodeToBytes(uint32_t encoding, uint32_t flags, const UniChar *characters, RSIndex numChars, RSIndex *usedCharLen, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen) {
+            Private RSIndex __StringEncodingPlatformUnicodeToBytes(String::Encoding encoding, uint32_t flags, const UniChar *characters, RSIndex numChars, RSIndex *usedCharLen, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen) {
                 
 #if DEPLOYMENT_TARGET_WINDOWS
                 WORD dwFlags = 0;
@@ -1185,8 +1152,8 @@ namespace RSFoundation {
                 
                 if ((StringEncodingUTF7 != encoding) && (StringEncodingGB_18030_2000 != encoding) && (0x0800 != (encoding & 0x0F00))) { // not UTF-7/GB18030/ISO-2022-*
                     dwFlags |= (flags & (StringEncodingAllowLossyConversion|StringEncodingSubstituteCombinings) ? WC_DEFAULTCHAR : 0);
-                    dwFlags |= (flags & StringEncodingComposeCombinings ? WC_COMPOSITECHECK : 0);
-                    dwFlags |= (flags & StringEncodingIgnoreCombinings ? WC_DISCARDNS : 0);
+                    dwFlags |= (flags & (uint32_t)String::EncodingConfiguration::ComposeCombinings ? WC_COMPOSITECHECK : 0);
+                    dwFlags |= (flags & (uint32_t)String::EncodingConfiguration::IgnoreCombinings ? WC_DISCARDNS : 0);
                 }
                 
                 if ((usedLen = WideCharToMultiByte(StringConvertEncodingToWindowsCodepage(encoding), dwFlags, (LPCWSTR)characters, numChars, (LPSTR)bytes, maxByteLen, nil, nil)) == 0) {
@@ -1225,10 +1192,10 @@ namespace RSFoundation {
                 }
 #endif /* DEPLOYMENT_TARGET_WINDOWS */
                 
-                return StringEncodingConverterUnavailable;
+                return String::ConversionResult::Unavailable;
             }
             
-            Private RSIndex __StringEncodingPlatformBytesToUnicode(uint32_t encoding, uint32_t flags, const uint8_t *bytes, RSIndex numBytes, RSIndex *usedByteLen, UniChar *characters, RSIndex maxCharLen, RSIndex *usedCharLen) {
+            Private RSIndex __StringEncodingPlatformBytesToUnicode(String::Encoding encoding, uint32_t flags, const uint8_t *bytes, RSIndex numBytes, RSIndex *usedByteLen, UniChar *characters, RSIndex maxCharLen, RSIndex *usedCharLen) {
                 
 #if DEPLOYMENT_TARGET_WINDOWS
                 WORD dwFlags = 0;
@@ -1270,17 +1237,17 @@ namespace RSFoundation {
                 }
 #endif /* DEPLOYMENT_TARGET_WINDOWS */
                 
-                return StringEncodingConverterUnavailable;
+                return String::ConversionResult::Unavailable;
             }
             
-            Private RSIndex __StringEncodingPlatformCharLengthForBytes(uint32_t encoding, uint32_t flags, const uint8_t *bytes, RSIndex numBytes) {
+            Private RSIndex __StringEncodingPlatformCharLengthForBytes(String::Encoding encoding, uint32_t flags, const uint8_t *bytes, RSIndex numBytes) {
                 RSIndex usedCharLen;
-                return (__StringEncodingPlatformBytesToUnicode(encoding, flags, bytes, numBytes, nil, nil, 0, &usedCharLen) == StringEncodingConversionSuccess ? usedCharLen : 0);
+                return (__StringEncodingPlatformBytesToUnicode(encoding, flags, bytes, numBytes, nil, nil, 0, &usedCharLen) == String::ConversionResult::Success ? usedCharLen : 0);
             }
             
-            Private RSIndex __StringEncodingPlatformByteLengthForCharacters(uint32_t encoding, uint32_t flags, const UniChar *characters, RSIndex numChars) {
+            Private RSIndex __StringEncodingPlatformByteLengthForCharacters(String::Encoding encoding, uint32_t flags, const UniChar *characters, RSIndex numChars) {
                 RSIndex usedByteLen;
-                return (__StringEncodingPlatformUnicodeToBytes(encoding, flags, characters, numChars, nil, nil, 0, &usedByteLen) == StringEncodingConversionSuccess ? usedByteLen : 0);
+                return (__StringEncodingPlatformUnicodeToBytes(encoding, flags, characters, numChars, nil, nil, 0, &usedByteLen) == String::ConversionResult::Success ? usedByteLen : 0);
             }
             
 #undef __CarbonCore_GetTextEncodingBase0
