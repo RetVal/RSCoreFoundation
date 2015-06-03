@@ -24,12 +24,12 @@ namespace RSFoundation {
                     return UniCharIsMemberOf(character, HFSPlusDecomposableCharacterSet);
                 }
                 
-                static RSIndex DecomposeCharacter(UTF32Char character, UTF32Char *convertedChars, RSIndex maxBufferLength);
-                static RSIndex CompatibilityDecompose(UTF32Char *convertedChars, RSIndex length, RSIndex maxBufferLength);
+                static Index DecomposeCharacter(UTF32Char character, UTF32Char *convertedChars, Index maxBufferLength);
+                static Index CompatibilityDecompose(UTF32Char *convertedChars, Index length, Index maxBufferLength);
                 
-                static bool Decompose(const UTF16Char *src, RSIndex length, RSIndex *consumedLength, void *dst, RSIndex maxLength, RSIndex *filledLength, bool needToReorder, UniCharEncodingFormat dstFormat, bool isHFSPlus);
+                static bool Decompose(const UTF16Char *src, Index length, Index *consumedLength, void *dst, Index maxLength, Index *filledLength, bool needToReorder, UniCharEncodingFormat dstFormat, bool isHFSPlus);
                 
-                static void PrioritySort(UTF32Char *characters, RSIndex length);
+                static void PrioritySort(UTF32Char *characters, Index length);
             };
         }
     }

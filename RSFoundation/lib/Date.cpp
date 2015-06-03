@@ -21,85 +21,85 @@
 namespace RSFoundation {
     namespace Basic {
         namespace {
-            constexpr static const RSUInt8 daysInMonth[16] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 0, 0, 0};
-            constexpr static const RSUInt16 daysBeforeMonth[16] = {0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365, 0, 0};
-            constexpr static const RSUInt16 daysAfterMonth[16] = {365, 334, 306, 275, 245, 214, 184, 153, 122, 92, 61, 31, 0, 0, 0, 0};
+            constexpr static const UInt8 daysInMonth[16] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 0, 0, 0};
+            constexpr static const UInt16 daysBeforeMonth[16] = {0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365, 0, 0};
+            constexpr static const UInt16 daysAfterMonth[16] = {365, 334, 306, 275, 245, 214, 184, 153, 122, 92, 61, 31, 0, 0, 0, 0};
             
-            RSFoundationInline RSInt32 __mod2Int(Date::AbsoluteTime d, RSInt32 modulus) {
-                RSInt32 result = (RSInt32)(Date::AbsoluteTime)floor(d - floor(d / modulus) * modulus);
+            inline Int32 __mod2Int(Date::AbsoluteTime d, Int32 modulus) {
+                Int32 result = (Int32)(Date::AbsoluteTime)floor(d - floor(d / modulus) * modulus);
                 if (result < 0) result += modulus;
                 return result;
             }
             
-            RSFoundationInline Date::AbsoluteTime __doubleMod(Date::AbsoluteTime d, RSInt32 modulus) {
+            inline Date::AbsoluteTime __doubleMod(Date::AbsoluteTime d, Int32 modulus) {
                 Date::AbsoluteTime result = d - floor(d / modulus) * modulus;
                 if (result < 0.0) result += (Date::AbsoluteTime)modulus;
                 return result;
             }
             
-            RSFoundationInline bool isleap(RSInt64 year) {
-                RSInt64 y = (year + 1) % 400;
+            inline bool isleap(Int64 year) {
+                Int64 y = (year + 1) % 400;
                 if (y < 0) y = -y;
                 return (0 == (y & 3) && 100 != y && 200 != y && 300 != y);
             }
             
-            RSFoundationInline RSUInt8 __RSDaysInMonth(RSUInt8 month, RSInt64 year, bool leap) {
+            inline UInt8 __DaysInMonth(UInt8 month, Int64 year, bool leap) {
                 return daysInMonth[month] + (2 == month && leap);
             }
             
-            RSFoundationInline RSUInt16 __RSDaysBeforeMonth(RSUInt8 month, RSInt64 year, bool leap) {
+            inline UInt16 __DaysBeforeMonth(UInt8 month, Int64 year, bool leap) {
                 return daysBeforeMonth[month] + (2 < month && leap);
             }
             
-            RSFoundationInline RSUInt16 __RSDaysAfterMonth(RSUInt8 month, RSInt64 year, bool leap) {
+            inline UInt16 __DaysAfterMonth(UInt8 month, Int64 year, bool leap) {
                 return daysAfterMonth[month] + (month < 2 && leap);
             }
             
-            static Date::AbsoluteTime __RSAbsoluteFromYMD(RSInt64 year, RSInt8 month, RSInt8 day) {
+            static Date::AbsoluteTime __AbsoluteFromYMD(Int64 year, Int8 month, Int8 day) {
                 Date::AbsoluteTime absolute = 0.0;
-                RSInt64 idx;
-                RSInt64 b = year / 400; // take care of as many multiples of 400 years as possible
+                Int64 idx;
+                Int64 b = year / 400; // take care of as many multiples of 400 years as possible
                 absolute += b * 146097.0;
                 year -= b * 400;
                 if (year < 0) {
                     for (idx = year; idx < 0; idx++)
-                        absolute -= __RSDaysAfterMonth(0, idx, isleap(idx));
+                        absolute -= __DaysAfterMonth(0, idx, isleap(idx));
                 } else {
                     for (idx = 0; idx < year; idx++)
-                        absolute += __RSDaysAfterMonth(0, idx, isleap(idx));
+                        absolute += __DaysAfterMonth(0, idx, isleap(idx));
                 }
                 /* Now add the days into the original year */
-                absolute += __RSDaysBeforeMonth(month, year, isleap(year)) + day - 1;
+                absolute += __DaysBeforeMonth(month, year, isleap(year)) + day - 1;
                 return absolute;
             }
             
-            static void __RSYMDFromAbsolute(RSInt64 absolute, RSInt64 *year, RSInt8 *month, RSInt8 *day) {
-                RSInt64 b = absolute / 146097; // take care of as many multiples of 400 years as possible
-                RSInt64 y = b * 400;
-                RSUInt16 ydays;
+            static void __YMDFromAbsolute(Int64 absolute, Int64 *year, Int8 *month, Int8 *day) {
+                Int64 b = absolute / 146097; // take care of as many multiples of 400 years as possible
+                Int64 y = b * 400;
+                UInt16 ydays;
                 absolute -= b * 146097;
                 while (absolute < 0)
                 {
                     y -= 1;
-                    absolute += __RSDaysAfterMonth(0, y, isleap(y));
+                    absolute += __DaysAfterMonth(0, y, isleap(y));
                 }
                 /* Now absolute is non-negative days to add to year */
-                ydays = __RSDaysAfterMonth(0, y, isleap(y));
+                ydays = __DaysAfterMonth(0, y, isleap(y));
                 while (ydays <= absolute)
                 {
                     y += 1;
                     absolute -= ydays;
-                    ydays = __RSDaysAfterMonth(0, y, isleap(y));
+                    ydays = __DaysAfterMonth(0, y, isleap(y));
                 }
                 /* Now we have year and days-into-year */
                 if (year) *year = y;
                 if (month || day)
                 {
-                    RSInt8 m = absolute / 33 + 1; /* search from the approximation */
+                    Int8 m = absolute / 33 + 1; /* search from the approximation */
                     bool leap = isleap(y);
-                    while (__RSDaysBeforeMonth(m + 1, y, leap) <= absolute) m++;
+                    while (__DaysBeforeMonth(m + 1, y, leap) <= absolute) m++;
                     if (month) *month = m;
-                    if (day) *day = absolute - __RSDaysBeforeMonth(m, y, leap) + 1;
+                    if (day) *day = absolute - __DaysBeforeMonth(m, y, leap) + 1;
                 }
             }
         }
@@ -172,23 +172,23 @@ namespace RSFoundation {
         
         Date::GregorianDate Date::GetGregorianDate() const {
             GregorianDate gdate;
-            RSInt64 absolute, year;
-            RSInt8 month, day;
+            Int64 absolute, year;
+            Int8 month, day;
             AbsoluteTime fixedat;
             const AbsoluteTime at = time;
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
             //    if (nil != tz) {
-            //        __RSGenericValidateType(tz, RSTimeZoneGetTypeID());
+            //        __GenericValidateType(tz, TimeZoneGetTypeID());
             //    }
-//            fixedat = at + (nil != tz ? RSTimeZoneGetSecondsFromGMT(tz, 0) : 0.0);
+//            fixedat = at + (nil != tz ? TimeZoneGetSecondsFromGMT(tz, 0) : 0.0);
             fixedat = at;
 #else
             fixedat = at;
 #endif
-            absolute = (RSInt64)floor(fixedat / 86400.0);
-            __RSYMDFromAbsolute(absolute, &year, &month, &day);
+            absolute = (Int64)floor(fixedat / 86400.0);
+            __YMDFromAbsolute(absolute, &year, &month, &day);
             if (INT32_MAX - 2001 < year) year = INT32_MAX - 2001;
-            gdate.year = (RSInt8)year + 2001;
+            gdate.year = (Int8)year + 2001;
             gdate.month = month;
             gdate.day = day;
             gdate.hour = __mod2Int(floor(fixedat / 3600.0), 24);
@@ -202,57 +202,57 @@ namespace RSFoundation {
             return time - value.time;
         }
         
-        RSUInt32 Date::GetDayOfWeek() const {
-            RSInt64 absolute;
+        UInt32 Date::GetDayOfWeek() const {
+            Int64 absolute;
             AbsoluteTime fixedat;
             AbsoluteTime at = time;
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
 //            if (tz) {
-//                if (RSTimeZoneGetTypeID() != RSGetTypeID(tz)) HALTWithError(RSInvalidArgumentException, "timezone is not kind of RSTimeZone");
+//                if (TimeZoneGetTypeID() != GetTypeID(tz)) HALTWithError(InvalidArgumentException, "timezone is not kind of TimeZone");
 //            }
-            fixedat = at ;//+ (nil != tz ? RSTimeZoneGetSecondsFromGMT(tz, at) : 0.0);
+            fixedat = at ;//+ (nil != tz ? TimeZoneGetSecondsFromGMT(tz, at) : 0.0);
 #else
             fixedat = at;
 #endif
-            absolute = (RSInt64)floor(fixedat / 86400.0);
+            absolute = (Int64)floor(fixedat / 86400.0);
             return (absolute < 0) ? ((absolute + 1) % 7 + 7) : (absolute % 7 + 1); /* Monday = 1, etc. */
         }
         
-        RSUInt32 Date::GetDayOfYear() const {
+        UInt32 Date::GetDayOfYear() const {
             AbsoluteTime fixedat;
-            RSInt64 absolute, year;
-            RSInt8 month, day;
+            Int64 absolute, year;
+            Int8 month, day;
             AbsoluteTime at = time;
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
 //            if (tz) {
-//                if (RSTimeZoneGetTypeID() != RSGetTypeID(tz)) HALTWithError(RSInvalidArgumentException, "timezone is not kind of RSTimeZone");
+//                if (TimeZoneGetTypeID() != GetTypeID(tz)) HALTWithError(InvalidArgumentException, "timezone is not kind of TimeZone");
 //            }
-            fixedat = at;// + (nil != tz ? RSTimeZoneGetSecondsFromGMT(tz, at) : 0.0);
+            fixedat = at;// + (nil != tz ? TimeZoneGetSecondsFromGMT(tz, at) : 0.0);
 #else
             fixedat = at;
 #endif
-            absolute = (RSInt64)floor(fixedat / 86400.0);
-            __RSYMDFromAbsolute(absolute, &year, &month, &day);
-            return __RSDaysBeforeMonth(month, year, isleap(year)) + day;
+            absolute = (Int64)floor(fixedat / 86400.0);
+            __YMDFromAbsolute(absolute, &year, &month, &day);
+            return __DaysBeforeMonth(month, year, isleap(year)) + day;
         }
         
-        RSUInt32 Date::GetWeekOfYear() const {
-            RSInt64 absolute, year;
-            RSInt8 month, day;
+        UInt32 Date::GetWeekOfYear() const {
+            Int64 absolute, year;
+            Int8 month, day;
             AbsoluteTime fixedat;
             AbsoluteTime at = time;
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
 //            if (tz) {
-//                if (RSTimeZoneGetTypeID() != RSGetTypeID(tz)) HALTWithError(RSInvalidArgumentException, "timezone is not kind of RSTimeZone");
+//                if (TimeZoneGetTypeID() != GetTypeID(tz)) HALTWithError(InvalidArgumentException, "timezone is not kind of TimeZone");
 //            }
-            fixedat = at;// + (nil != tz ? RSTimeZoneGetSecondsFromGMT(tz, at) : 0.0);
+            fixedat = at;// + (nil != tz ? TimeZoneGetSecondsFromGMT(tz, at) : 0.0);
 #else
             fixedat = at;
 #endif
-            absolute = (RSInt64)floor(fixedat / 86400.0);
-            __RSYMDFromAbsolute(absolute, &year, &month, &day);
-            AbsoluteTime absolute0101 = __RSAbsoluteFromYMD(year, 1, 1);
-            RSInt64 dow0101 = __mod2Int(absolute0101, 7) + 1;
+            absolute = (Int64)floor(fixedat / 86400.0);
+            __YMDFromAbsolute(absolute, &year, &month, &day);
+            AbsoluteTime absolute0101 = __AbsoluteFromYMD(year, 1, 1);
+            Int64 dow0101 = __mod2Int(absolute0101, 7) + 1;
             /* First three and last three days of a year can end up in a week of a different year */
             if (1 == month && day < 4)
             {
@@ -262,15 +262,15 @@ namespace RSFoundation {
             }
             if (12 == month && 28 < day)
             {
-                AbsoluteTime absolute20101 = __RSAbsoluteFromYMD(year + 1, 1, 1);
-                RSInt64 dow20101 = __mod2Int(absolute20101, 7) + 1;
+                AbsoluteTime absolute20101 = __AbsoluteFromYMD(year + 1, 1, 1);
+                Int64 dow20101 = __mod2Int(absolute20101, 7) + 1;
                 if ((28 < day && 4 == dow20101) || (29 < day && 3 == dow20101) || (30 < day && 2 == dow20101))
                 {
                     return 1;
                 }
             }
             /* Days into year, plus a week-shifting correction, divided by 7. First week is 1. */
-            return (__RSDaysBeforeMonth(month, year, isleap(year)) + day + (dow0101 - 11) % 7 + 2) / 7 + 1;
+            return (__DaysBeforeMonth(month, year, isleap(year)) + day + (dow0101 - 11) % 7 + 2) / 7 + 1;
         }
     }
 }

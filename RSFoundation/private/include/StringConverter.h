@@ -29,18 +29,18 @@ namespace RSFoundation {
              If maxByteLen is 0, bytes is ignored. You can pass lossyByte by passing the value in flags argument.
              i.e. StringEncodingUnicodeToBytes(encoding, StringEncodingLossyByteToMask(lossByte), ....)
              */
-            uint32_t StringEncodingUnicodeToBytes(String::Encoding encoding, uint32_t flags, const UniChar *characters, RSIndex numChars, RSIndex *usedCharLen, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen);
+            uint32_t StringEncodingUnicodeToBytes(String::Encoding encoding, uint32_t flags, const UniChar *characters, Index numChars, Index *usedCharLen, uint8_t *bytes, Index maxByteLen, Index *usedByteLen);
             
             /* Converts bytes in the specified encoding into unicode.  Returns the constants defined above.
              maxCharLen & usdCharLen are in UniChar length, not byte length.
              If maxCharLen is 0, characters is ignored.
              */
-            uint32_t StringEncodingBytesToUnicode(String::Encoding encoding, uint32_t flags, const uint8_t *bytes, RSIndex numBytes, RSIndex *usedByteLen, UniChar *characters, RSIndex maxCharLen, RSIndex *usedCharLen);
+            uint32_t StringEncodingBytesToUnicode(String::Encoding encoding, uint32_t flags, const uint8_t *bytes, Index numBytes, Index *usedByteLen, UniChar *characters, Index maxCharLen, Index *usedCharLen);
             
             /* Fallback functions used when allowLossy
              */
-            typedef RSIndex (*StringEncodingToBytesFallbackProc)(const UniChar *characters, RSIndex numChars, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen);
-            typedef RSIndex (*StringEncodingToUnicodeFallbackProc)(const uint8_t *bytes, RSIndex numBytes, UniChar *characters, RSIndex maxCharLen, RSIndex *usedCharLen);
+            typedef Index (*StringEncodingToBytesFallbackProc)(const UniChar *characters, Index numChars, uint8_t *bytes, Index maxByteLen, Index *usedByteLen);
+            typedef Index (*StringEncodingToUnicodeFallbackProc)(const uint8_t *bytes, Index numBytes, UniChar *characters, Index maxCharLen, Index *usedCharLen);
             
             bool StringEncodingIsValidEncoding(String::Encoding encoding);
             
@@ -50,8 +50,8 @@ namespace RSFoundation {
             
             /* Returns required length of destination buffer for conversion.  These functions are faster than specifying 0 to maxByteLen (maxCharLen), but unnecessarily optimal length
              */
-            RSIndex StringEncodingCharLengthForBytes(String::Encoding encoding, uint32_t flags, const uint8_t *bytes, RSIndex numBytes);
-            RSIndex StringEncodingByteLengthForCharacters(String::Encoding encoding, uint32_t flags, const UniChar *characters, RSIndex numChars);
+            Index StringEncodingCharLengthForBytes(String::Encoding encoding, uint32_t flags, const uint8_t *bytes, Index numBytes);
+            Index StringEncodingByteLengthForCharacters(String::Encoding encoding, uint32_t flags, const UniChar *characters, Index numChars);
             
             /* Can register functions used for lossy conversion.  Reregisters default procs if nil
              */

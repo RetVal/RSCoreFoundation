@@ -34,10 +34,10 @@ namespace RSFoundation {
                 return ((character >= 0x300) && (character < 0x360) && (__Latin1CombiningCharBitmap[(character - 0x300) / 32] & (1 << (31 - ((character - 0x300) % 32)))) ? YES : NO);
             }
             
-            UniChar StringEncodingPrecomposeLatinCharacter(const UniChar *character, RSIndex numChars, RSIndex *usedChars) {
+            UniChar StringEncodingPrecomposeLatinCharacter(const UniChar *character, Index numChars, Index *usedChars) {
                 if (numChars > 0) {
                     UTF32Char ch = *(character++), nextCh, composedChar;
-                    RSIndex usedCharLen = 1;
+                    Index usedCharLen = 1;
                     
                     if (UniCharIsSurrogateHighCharacter(ch) || UniCharIsSurrogateLowCharacter(ch)) {
                         if (usedChars) (*usedChars) = usedCharLen;
@@ -111,9 +111,9 @@ namespace RSFoundation {
                 return YES;
             }
             
-            static RSIndex __ToISOLatin1Precompose(uint32_t flags, const UniChar *character, RSIndex numChars, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen) {
+            static Index __ToISOLatin1Precompose(uint32_t flags, const UniChar *character, Index numChars, uint8_t *bytes, Index maxByteLen, Index *usedByteLen) {
                 uint8_t byte;
-                RSIndex usedCharLen;
+                Index usedCharLen;
                 
                 if (__ToISOLatin1(flags, StringEncodingPrecomposeLatinCharacter(character, numChars, &usedCharLen), &byte) && byte && (usedCharLen > 1)) {
                     if (maxByteLen) *bytes = byte;
@@ -408,9 +408,9 @@ namespace RSFoundation {
                 return YES;
             }
             
-            static RSIndex __ToMacRomanPrecompose(uint32_t flags, const UniChar *character, RSIndex numChars, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen) {
+            static Index __ToMacRomanPrecompose(uint32_t flags, const UniChar *character, Index numChars, uint8_t *bytes, Index maxByteLen, Index *usedByteLen) {
                 uint8_t byte;
-                RSIndex usedCharLen;
+                Index usedCharLen;
                 
                 if (__ToMacRoman(flags, StringEncodingPrecomposeLatinCharacter(character, numChars, &usedCharLen), &byte) && byte && (usedCharLen > 1)) {
                     if (maxByteLen) *bytes = byte;
@@ -506,9 +506,9 @@ namespace RSFoundation {
                 return (*character != 0xFFFD);
             }
             
-            static RSIndex __ToWinLatin1Precompose(uint32_t flags, const UniChar *character, RSIndex numChars, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen) {
+            static Index __ToWinLatin1Precompose(uint32_t flags, const UniChar *character, Index numChars, uint8_t *bytes, Index maxByteLen, Index *usedByteLen) {
                 uint8_t byte;
-                RSIndex usedCharLen;
+                Index usedCharLen;
                 
                 if (__ToWinLatin1(flags, StringEncodingPrecomposeLatinCharacter(character, numChars, &usedCharLen), &byte) && byte && (usedCharLen > 1)) {
                     if (maxByteLen) *bytes = byte;
@@ -806,9 +806,9 @@ namespace RSFoundation {
                 return ((*character = (byte < 0x80 ? (UniChar)byte : NSToPrecompUnicodeTable[byte - 0x80])) != 0xFFFD);
             }
             
-            static RSIndex __ToNextStepLatinPrecompose(uint32_t flags, const UniChar *character, RSIndex numChars, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen) {
+            static Index __ToNextStepLatinPrecompose(uint32_t flags, const UniChar *character, Index numChars, uint8_t *bytes, Index maxByteLen, Index *usedByteLen) {
                 uint8_t byte = 0;
-                RSIndex usedCharLen = 0;
+                Index usedCharLen = 0;
                 
                 if (__ToNextStepLatin(flags, StringEncodingPrecomposeLatinCharacter(character, numChars, &usedCharLen), &byte) && byte && (usedCharLen > 1)) {
                     if (maxByteLen) *bytes = byte;
@@ -861,7 +861,7 @@ namespace RSFoundation {
             static const uint32_t kSurrogateLowEnd	= 0xDFFFUL;
             
             /*
-             * RSIndex into the table below with the first byte of a UTF-8 sequence to
+             * Index into the table below with the first byte of a UTF-8 sequence to
              * get the number of trailing bytes that are supposed to follow it.
              */
             static const char trailingBytesForUTF8[256] = {
@@ -925,7 +925,7 @@ namespace RSFoundation {
                 return bytesToWrite;
             }
             
-            static RSIndex __ToUTF8(uint32_t flags, const UniChar *characters, RSIndex numChars, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen) {
+            static Index __ToUTF8(uint32_t flags, const UniChar *characters, Index numChars, uint8_t *bytes, Index maxByteLen, Index *usedByteLen) {
                 uint16_t bytesWritten;
                 uint32_t ch;
                 const UniChar *beginCharacter = characters;
@@ -978,7 +978,7 @@ namespace RSFoundation {
              * definition of UTF-8 goes up to 4-byte sequences.
              */
             
-            inline bool __IsLegalUTF8(const uint8_t *source, RSIndex length) {
+            inline bool __IsLegalUTF8(const uint8_t *source, Index length) {
                 if (length > 4) return NO;
                 
                 const uint8_t *srcptr = source+length;
@@ -992,16 +992,16 @@ namespace RSFoundation {
                 return YES;
             }
             
-            static RSIndex __FromUTF8(uint32_t flags, const uint8_t *bytes, RSIndex numBytes, UniChar *characters, RSIndex maxCharLen, RSIndex *usedCharLen) {
+            static Index __FromUTF8(uint32_t flags, const uint8_t *bytes, Index numBytes, UniChar *characters, Index maxCharLen, Index *usedCharLen) {
                 const uint8_t *source = bytes;
                 uint16_t extraBytesToRead;
-                RSIndex theUsedCharLen = 0;
+                Index theUsedCharLen = 0;
                 uint32_t ch;
                 bool isHFSPlus = (flags & (uint32_t)String::EncodingConfiguration::UseHFSPlusCanonical ? YES : NO);
                 bool needsToDecompose = (flags & (uint32_t)String::EncodingConfiguration::UseCanonical || isHFSPlus ? YES : NO);
                 bool strictUTF8 = (flags & (uint32_t)String::EncodingConfiguration::LenientUTF8Conversion ? NO : YES);
                 UTF32Char decomposed[MAX_DECOMPOSED_LENGTH];
-                RSIndex decompLength;
+                Index decompLength;
                 bool isStrict = !isHFSPlus;
                 
                 while (numBytes && (!maxCharLen || (theUsedCharLen < maxCharLen))) {
@@ -1087,7 +1087,7 @@ namespace RSFoundation {
                 return source - bytes;
             }
             
-            static RSIndex __ToUTF8Len(uint32_t flags, const UniChar *characters, RSIndex numChars) {
+            static Index __ToUTF8Len(uint32_t flags, const UniChar *characters, Index numChars) {
                 uint32_t bytesToWrite = 0;
                 uint32_t ch;
                 
@@ -1104,15 +1104,15 @@ namespace RSFoundation {
                 return bytesToWrite;
             }
             
-            static RSIndex __FromUTF8Len(uint32_t flags, const uint8_t *source, RSIndex numBytes) {
+            static Index __FromUTF8Len(uint32_t flags, const uint8_t *source, Index numBytes) {
                 uint16_t extraBytesToRead;
-                RSIndex theUsedCharLen = 0;
+                Index theUsedCharLen = 0;
                 uint32_t ch;
                 bool isHFSPlus = (flags & (uint32_t)String::EncodingConfiguration::UseHFSPlusCanonical ? YES : NO);
                 bool needsToDecompose = (flags & (uint32_t)String::EncodingConfiguration::UseCanonical || isHFSPlus ? YES : NO);
                 bool strictUTF8 = (flags & (uint32_t)String::EncodingConfiguration::LenientUTF8Conversion ? NO : YES);
                 UTF32Char decomposed[MAX_DECOMPOSED_LENGTH];
-                RSIndex decompLength;
+                Index decompLength;
                 bool isStrict = !isHFSPlus;
                 
                 while (numBytes) {

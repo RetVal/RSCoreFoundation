@@ -127,7 +127,7 @@ namespace RSFoundation {
 #define HANGUL_TCOUNT 28
 #define HANGUL_NCOUNT (HANGUL_VCOUNT * HANGUL_TCOUNT)
             
-            inline void __UniCharMoveBufferFromEnd0(UTF16Char *convertedChars, RSIndex length, RSIndex delta) {
+            inline void __UniCharMoveBufferFromEnd0(UTF16Char *convertedChars, Index length, Index delta) {
                 const UTF16Char *limit = convertedChars;
                 UTF16Char *dstP;
                 
@@ -137,9 +137,9 @@ namespace RSFoundation {
                 while (convertedChars > limit) *(--dstP) = *(--convertedChars);
             }
             
-            bool UniCharPrecompose(const UTF16Char *characters, RSIndex length, RSIndex *consumedLength, UTF16Char *precomposed, RSIndex maxLength, RSIndex *filledLength) {
+            bool UniCharPrecompose(const UTF16Char *characters, Index length, Index *consumedLength, UTF16Char *precomposed, Index maxLength, Index *filledLength) {
                 UTF32Char currentChar = 0, lastChar = 0, precomposedChar = 0xFFFD;
-                RSIndex originalLength = length, usedLength = 0;
+                Index originalLength = length, usedLength = 0;
                 UTF16Char *currentBase = precomposed;
                 uint8_t currentClass, lastClass = 0;
                 bool currentBaseIsBMP = true;
@@ -183,25 +183,25 @@ namespace RSFoundation {
                         }
                     } else {
                         if ((currentChar >= HANGUL_LBASE) && (currentChar < (HANGUL_LBASE + 0xFF))) { // Hangul Jamo
-                            int8_t lRSIndex = currentChar - HANGUL_LBASE;
+                            int8_t lIndex = currentChar - HANGUL_LBASE;
                             
-                            if ((length > 0) && (0 <= lRSIndex) && (lRSIndex <= HANGUL_LCOUNT)) {
-                                int16_t vRSIndex = *characters - HANGUL_VBASE;
+                            if ((length > 0) && (0 <= lIndex) && (lIndex <= HANGUL_LCOUNT)) {
+                                int16_t vIndex = *characters - HANGUL_VBASE;
                                 
-                                if ((vRSIndex >= 0) && (vRSIndex <= HANGUL_VCOUNT)) {
-                                    int16_t tRSIndex = 0;
+                                if ((vIndex >= 0) && (vIndex <= HANGUL_VCOUNT)) {
+                                    int16_t tIndex = 0;
                                     
                                     ++characters; --length;
                                     
                                     if (length > 0) {
-                                        tRSIndex = *characters - HANGUL_TBASE;
-                                        if ((tRSIndex < 0) || (tRSIndex > HANGUL_TCOUNT)) {
-                                            tRSIndex = 0;
+                                        tIndex = *characters - HANGUL_TBASE;
+                                        if ((tIndex < 0) || (tIndex > HANGUL_TCOUNT)) {
+                                            tIndex = 0;
                                         } else {
                                             ++characters; --length;
                                         }
                                     }
-                                    currentChar = (lRSIndex * HANGUL_VCOUNT + vRSIndex) * HANGUL_TCOUNT + tRSIndex + HANGUL_SBASE;
+                                    currentChar = (lIndex * HANGUL_VCOUNT + vIndex) * HANGUL_TCOUNT + tIndex + HANGUL_SBASE;
                                 }
                             }
                         }

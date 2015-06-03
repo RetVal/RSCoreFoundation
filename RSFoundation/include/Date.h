@@ -17,20 +17,20 @@ namespace RSFoundation {
         class Date : public Object {
         public:
             struct GregorianDate {
-                RSInt32 year;
-                RSUInt8 month;
-                RSUInt8 day;
-                RSUInt8 hour;
-                RSUInt8 minute;
-                RSTimeInterval second;
+                Int32 year;
+                UInt8 month;
+                UInt8 day;
+                UInt8 hour;
+                UInt8 minute;
+                TimeInterval second;
                 
                 GregorianDate() = default;
                 GregorianDate(const GregorianDate&) = default;
                 
-                GregorianDate(RSInt32 year, RSInt8 month, RSInt8 day, RSInt8 hour, RSInt8 minute, RSTimeInterval second) : year(year), month(month), hour(hour), minute(minute), second(second) {}
+                GregorianDate(Int32 year, Int8 month, Int8 day, Int8 hour, Int8 minute, TimeInterval second) : year(year), month(month), hour(hour), minute(minute), second(second) {}
             };
             
-            typedef RSTimeInterval AbsoluteTime;
+            typedef TimeInterval AbsoluteTime;
             static AbsoluteTime GetCurrentTime();
             Date();
             Date(AbsoluteTime time);
@@ -53,9 +53,9 @@ namespace RSFoundation {
             AbsoluteTime GetTime() const { return time; }
             GregorianDate GetGregorianDate() const;
             AbsoluteTime GetTimeSince(const Date&value) const;
-            RSUInt32 GetDayOfWeek() const;
-            RSUInt32 GetDayOfYear() const;
-            RSUInt32 GetWeekOfYear() const;
+            UInt32 GetDayOfWeek() const;
+            UInt32 GetDayOfYear() const;
+            UInt32 GetWeekOfYear() const;
             
         public:
             constexpr static const AbsoluteTime Since1970 = 978307200.0L;

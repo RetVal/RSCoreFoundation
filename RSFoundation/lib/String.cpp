@@ -34,7 +34,7 @@ namespace RSFoundation {
                 }
             }
             
-            static inline bool _BytesInASCII(const uint8_t *bytes, RSIndex len) {
+            static inline bool _BytesInASCII(const uint8_t *bytes, Index len) {
 #if __LP64__
                 /* A bit of unrolling; go by 32s, 16s, and 8s first */
                 while (len >= 32) {
@@ -145,7 +145,7 @@ namespace RSFoundation {
                 }
             }
             
-            static inline bool _CanUseEightBitStringForBytes(const uint8_t *bytes, RSIndex len, String::Encoding encoding) {
+            static inline bool _CanUseEightBitStringForBytes(const uint8_t *bytes, Index len, String::Encoding encoding) {
                 
                 // If the encoding is the same as the 8-bit String encoding, we can just use the bytes as-is.
                 // One exception is ASCII, which unfortunately needs to mean ISOLatin1 for compatibility reasons <rdar://problem/5458321>.
@@ -154,7 +154,7 @@ namespace RSFoundation {
                 return NO;
             }
             
-            static inline bool _CanUseLengthByte(RSIndex len) {
+            static inline bool _CanUseLengthByte(Index len) {
                 return (len <= 255) ? true : false;
             }
 
@@ -173,14 +173,14 @@ namespace RSFoundation {
              
              */
             typedef struct _StringDeferredRange {
-                RSIndex beginning;
-                RSIndex length;
-                RSIndex shift;
+                Index beginning;
+                Index length;
+                Index shift;
             } StringDeferredRange;
             
             typedef struct _StringStackInfo {
-                RSIndex capacity;		// Capacity (if capacity == count, need to realloc to add another)
-                RSIndex count;			// Number of elements actually stored
+                Index capacity;		// Capacity (if capacity == count, need to realloc to add another)
+                Index count;			// Number of elements actually stored
                 StringDeferredRange *stack;
                 BOOL hasMalloced;	// Indicates "stack" is allocated and needs to be deallocated when done
                 char _padding[3];
@@ -210,19 +210,19 @@ namespace RSFoundation {
             }
 
             static void rearrangeBlocks(uint8_t *buffer,
-                                        RSIndex numBlocks,
-                                        RSIndex blockSize,
-                                        const RSRange *ranges,
-                                        RSIndex numRanges,
-                                        RSIndex insertLength)
+                                        Index numBlocks,
+                                        Index blockSize,
+                                        const Range *ranges,
+                                        Index numRanges,
+                                        Index insertLength)
             {
                 
 #define origStackSize 10
                 StringDeferredRange origStack[origStackSize];
                 StringStackInfo si = {origStackSize, 0, origStack, NO, {0, 0, 0}};
                 StringDeferredRange currentNonRange = {0, 0, 0};
-                RSIndex currentRange = 0;
-                RSIndex amountShifted = 0;
+                Index currentRange = 0;
+                Index amountShifted = 0;
                 
                 // must have at least 1 range left.
                 
@@ -273,22 +273,22 @@ namespace RSFoundation {
              */
             static void copyBlocks(const uint8_t *srcBuffer,
                                    uint8_t *dstBuffer,
-                                   RSIndex srcLength,
+                                   Index srcLength,
                                    BOOL srcIsUnicode,
                                    BOOL dstIsUnicode,
-                                   const RSRange *ranges,
-                                   RSIndex numRanges,
-                                   RSIndex insertLength) {
-                RSIndex srcLocationInBytes = 0;	// in order to avoid multiplying all the time, this is in terms of bytes, not blocks
-                RSIndex dstLocationInBytes = 0;	// ditto
-                RSIndex srcBlockSize = srcIsUnicode ? sizeof(UniChar) : sizeof(uint8_t);
-                RSIndex insertLengthInBytes = insertLength * (dstIsUnicode ? sizeof(UniChar) : sizeof(uint8_t));
-                RSIndex rangeRSIndex = 0;
-                RSIndex srcToDstMultiplier = (srcIsUnicode == dstIsUnicode) ? 1 : (sizeof(UniChar) / sizeof(uint8_t));
+                                   const Range *ranges,
+                                   Index numRanges,
+                                   Index insertLength) {
+                Index srcLocationInBytes = 0;	// in order to avoid multiplying all the time, this is in terms of bytes, not blocks
+                Index dstLocationInBytes = 0;	// ditto
+                Index srcBlockSize = srcIsUnicode ? sizeof(UniChar) : sizeof(uint8_t);
+                Index insertLengthInBytes = insertLength * (dstIsUnicode ? sizeof(UniChar) : sizeof(uint8_t));
+                Index rangeIndex = 0;
+                Index srcToDstMultiplier = (srcIsUnicode == dstIsUnicode) ? 1 : (sizeof(UniChar) / sizeof(uint8_t));
                 
                 // Loop over the ranges, copying the range to be preserved (right before each range)
-                while (rangeRSIndex < numRanges) {
-                    RSIndex srcLengthInBytes = ranges[rangeRSIndex].location * srcBlockSize - srcLocationInBytes;	// srcLengthInBytes is in terms of bytes, not blocks; represents length of region to be preserved
+                while (rangeIndex < numRanges) {
+                    Index srcLengthInBytes = ranges[rangeIndex].location * srcBlockSize - srcLocationInBytes;	// srcLengthInBytes is in terms of bytes, not blocks; represents length of region to be preserved
                     if (srcLengthInBytes > 0) {
                         if (srcIsUnicode == dstIsUnicode) {
                             memmove(dstBuffer + dstLocationInBytes, srcBuffer + srcLocationInBytes, srcLengthInBytes);
@@ -296,9 +296,9 @@ namespace RSFoundation {
 //                            __StrConvertBytesToUnicode(srcBuffer + srcLocationInBytes, (UniChar *)(dstBuffer + dstLocationInBytes), srcLengthInBytes);
                         }
                     }
-                    srcLocationInBytes += srcLengthInBytes + ranges[rangeRSIndex].length * srcBlockSize;	// Skip over the just-copied and to-be-deleted stuff
+                    srcLocationInBytes += srcLengthInBytes + ranges[rangeIndex].length * srcBlockSize;	// Skip over the just-copied and to-be-deleted stuff
                     dstLocationInBytes += srcLengthInBytes * srcToDstMultiplier + insertLengthInBytes;
-                    rangeRSIndex++;
+                    rangeIndex++;
                 }
                 
                 // Do last range (the one beyond last range)
@@ -331,7 +331,7 @@ namespace RSFoundation {
                 BOOL _unused1;
                 BOOL _unused2;
                 Allocator<String> *allocator;	/* Use this allocator to allocate, reallocate, and deallocate the bytes */
-                RSIndex numChars;	/* This is in terms of ascii or unicode; that is, if isASCII, it is number of 7-bit chars; otherwise it is number of UniChars; note that the actual allocated space might be larger */
+                Index numChars;	/* This is in terms of ascii or unicode; that is, if isASCII, it is number of 7-bit chars; otherwise it is number of UniChars; note that the actual allocated space might be larger */
                 UInt8 localBuffer[__VarWidthLocalBufferSize];	/* private; 168 ISO2022JP chars, 504 Unicode chars, 1008 ASCII chars */
             } VarWidthCharBuffer;
             
@@ -347,7 +347,7 @@ namespace RSFoundation {
 #define MAX_LOCAL_CHA		(sizeof(buffer->localBuffer) / sizeof(uint8_t))
 #define MAX_LOCAL_UNICHA	(sizeof(buffer->localBuffer) / sizeof(UniChar))
                 
-                enum class CodingMode : RSIndex {
+                enum class CodingMode : Index {
                     NonLossyErrorMode = -1,
                     NonLossyASCIIMode = 0,
                     NonLossyBackslashMode = 1,
@@ -365,8 +365,8 @@ namespace RSFoundation {
                 }
                 
                 
-                bool __StringDecodeByteStream3(const uint8_t *bytes, RSIndex len, String::Encoding encoding, BOOL alwaysUnicode, VarWidthCharBuffer *buffer, BOOL *useClientsMemoryPtr, UInt32 converterFlags) {
-                    RSIndex idx;
+                bool __StringDecodeByteStream3(const uint8_t *bytes, Index len, String::Encoding encoding, BOOL alwaysUnicode, VarWidthCharBuffer *buffer, BOOL *useClientsMemoryPtr, UInt32 converterFlags) {
+                    Index idx;
                     const uint8_t *chars = (const uint8_t *)bytes;
                     const uint8_t *end = chars + len;
                     bool result = YES;
@@ -563,7 +563,7 @@ namespace RSFoundation {
                             if (!buffer->chars.ascii) goto memoryErrorExit;
                             memmove(buffer->chars.ascii, chars, len * sizeof(uint8_t));
                         } else {
-                            RSIndex numDone;
+                            Index numDone;
                             static Encoding::StringEncodingToUnicodeProc __FromUTF8 = nil;
                             
                             if (!__FromUTF8) {
@@ -631,14 +631,14 @@ namespace RSFoundation {
                                     if (mode < CodingMode::NonLossyHexFinalMode) {
                                         if ((character >= '0') && (character <= '9')) {
                                             currentValue = (currentValue << 4) | (character - '0');
-                                            RSIndex mod = RSIndex(mode);
+                                            Index mod = Index(mode);
                                             if (CodingMode(++mod) == CodingMode::NonLossyHexFinalMode) mode = CodingMode::NonLossyASCIIMode;
                                             else mode = CodingMode(mod);
                                         } else {
                                             if (character >= 'a') character -= ('a' - 'A');
                                             if ((character >= 'A') && (character <= 'F')) {
                                                 currentValue = (currentValue << 4) | ((character - 'A') + 10);
-                                                RSIndex mod = RSIndex(mode);
+                                                Index mod = Index(mode);
                                                 if (CodingMode(++mod) == CodingMode::NonLossyHexFinalMode) mode = CodingMode::NonLossyASCIIMode;
                                                 else mode = CodingMode(mod);
                                             } else {
@@ -648,7 +648,7 @@ namespace RSFoundation {
                                     } else {
                                         if ((character >= '0') && (character <= '9')) {
                                             currentValue = (currentValue << 3) | (character - '0');
-                                            RSIndex mod = RSIndex(mode);
+                                            Index mod = Index(mode);
                                             if (CodingMode(++mod) == CodingMode::NonLossyOctalFinalMode) mode = CodingMode::NonLossyASCIIMode;
                                             else mode = CodingMode(mod);
                                         } else {
@@ -717,7 +717,7 @@ namespace RSFoundation {
                                 if (!buffer->chars.ascii) goto memoryErrorExit;
                                 memmove(buffer->chars.ascii, chars, len * sizeof(uint8_t));
                             } else {
-                                RSIndex guessedLength = Encoding::StringEncodingCharLengthForBytes(encoding, 0, bytes, len);
+                                Index guessedLength = Encoding::StringEncodingCharLengthForBytes(encoding, 0, bytes, len);
                                 static UInt32 lossyFlag = (UInt32)-1;
                                 
                                 buffer->shouldFreeChars = !buffer->chars.unicode && (guessedLength <= MAX_LOCAL_UNICHA) ? NO : YES;
@@ -746,7 +746,7 @@ namespace RSFoundation {
             
             String &&_CreateInstanceImmutable(Allocator<String> *allocator,
                                               const void *bytes,
-                                              RSIndex numBytes,
+                                              Index numBytes,
                                               String::Encoding encoding,
                                               bool possiblyExternalFormat,
                                               bool tryToReduceUnicode,
@@ -762,7 +762,7 @@ namespace RSFoundation {
                 String str;
                 VarWidthCharBuffer vBuf = {0};
                 
-                RSIndex size = 0;
+                Index size = 0;
                 bool useLengthByte = NO;
                 bool useNullByte = NO;
                 bool useInlineData = NO;
@@ -793,7 +793,7 @@ namespace RSFoundation {
                 if ((encoding == String::Encoding::Unicode && possiblyExternalFormat) ||
                     (encoding != String::Encoding::Unicode && !stringSupportsEightBitRepresentation)) {
                     const void *realBytes = (uint8_t *)bytes + (hasLengthByte ? 1 : 0);
-                    RSIndex realNumBytes = numBytes - (hasLengthByte ? 1 : 0);
+                    Index realNumBytes = numBytes - (hasLengthByte ? 1 : 0);
                     bool usingPassedInMemory = false;
                     vBuf.allocator = &Allocator<String>::AllocatorSystemDefault;
                     vBuf.chars.unicode = nullptr;

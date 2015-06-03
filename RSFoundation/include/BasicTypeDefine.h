@@ -180,19 +180,19 @@ typedef signed char BOOL;
 namespace RSFoundation {
     typedef decltype(nullptr) nullptr_t;
     
-    typedef int8_t  RSInt8;    //-128 to 127
-    typedef int16_t RSInt16;   //-32,768 to 32,767
-    typedef int32_t RSInt32;   //-2,147,483,648 to 2,147,483,647
-    typedef int64_t RSInt64;   //-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
-    typedef uint8_t RSUInt8;   //0 to 255
-    typedef uint16_t RSUInt16; //0 to 65,535
-    typedef uint32_t RSUInt32; //0 to 4,294,967,295
-    typedef uint64_t RSUInt64; //0 to 18,446,744,073,709,551,615
+    typedef int8_t  Int8;    //-128 to 127
+    typedef int16_t Int16;   //-32,768 to 32,767
+    typedef int32_t Int32;   //-2,147,483,648 to 2,147,483,647
+    typedef int64_t Int64;   //-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
+    typedef uint8_t UInt8;   //0 to 255
+    typedef uint16_t UInt16; //0 to 65,535
+    typedef uint32_t UInt32; //0 to 4,294,967,295
+    typedef uint64_t UInt64; //0 to 18,446,744,073,709,551,615
     
 #if __LP64__
-    typedef RSUInt64 RSBGNumber;
+    typedef UInt64 BGNumber;
 #else
-    typedef RSUInt32 RSBGNumber;
+    typedef UInt32 BGNumber;
 #endif
     
 #if   (TARGET_OS_MAC)||(TARGET_OS_IPHONE)
@@ -205,33 +205,33 @@ namespace RSFoundation {
 #endif
     
 #if __LP64__ || (TARGET_OS_EMBEDDED && !TARGET_OS_IPHONE) || TARGET_OS_WIN32 || NS_BUILD_32_LIKE_64
-    typedef long RSInteger;
-    typedef unsigned long RSUInteger;
-    typedef double RSFloat;
+    typedef long Integer;
+    typedef unsigned long UInteger;
+    typedef double Float;
 #else
-    typedef int RSInteger;
-    typedef unsigned int RSUInteger;
-    typedef float RSFloat;
+    typedef int Integer;
+    typedef unsigned int UInteger;
+    typedef float Float;
 #endif
     
-    typedef double RSTimeInterval;
+    typedef double TimeInterval;
     typedef float  Float32;
     typedef double Float64;
     
-    typedef RSInt16 RSCode;
+    typedef Int16 Code;
     
-    typedef RSCode RSErrorCode;
+    typedef Code ErrorCode;
     
 #if __LP64__
-    typedef unsigned long long RSTypeID;
-    typedef unsigned long long RSOptionFlags;
-    typedef unsigned long long RSHashCode;
-    typedef signed long long RSIndex;
+    typedef unsigned long long TypeID;
+    typedef unsigned long long OptionFlags;
+    typedef unsigned long long HashCode;
+    typedef signed long long Index;
 #else
-    typedef unsigned long RSTypeID;
-    typedef unsigned long RSOptionFlags;
-    typedef unsigned long RSHashCode;
-    typedef signed long RSIndex;
+    typedef unsigned long TypeID;
+    typedef unsigned long OptionFlags;
+    typedef unsigned long HashCode;
+    typedef signed long Index;
 #endif
     
     enum ComparisonResult {
@@ -248,18 +248,18 @@ namespace RSFoundation {
     typedef ComparisonResult (*ComparatorFunction)(const void *val1, const void *val2, void *context);
     
     typedef struct {
-        RSIndex location;
-        RSIndex length;
-    } RSRange;
+        Index location;
+        Index length;
+    } Range;
     
-    RSFoundationInline RSRange RSMakeRange(RSIndex location, RSIndex length) {
-        RSRange range;
+    RSFoundationInline Range RSMakeRange(Index location, Index length) {
+        Range range;
         range.location = location;
         range.length = length;
         return range;
     }
     
-    typedef RS_FOUNDATION_ENUM(RSInteger, RSFoundationComparisonOrder) {Ascending = -1L, Same, Descending};
+    typedef RS_FOUNDATION_ENUM(Integer, ComparisonOrder) {Ascending = -1L, Same, Descending};
     }
     
 #include <RSFoundation/BasicAlgorithm.h>

@@ -13,18 +13,18 @@
 
 namespace RSFoundation {
     namespace Basic {
-#if ((TARGET_OS_MAC && !(TARGET_OS_EMBEDDED || TARGET_OS_IPHONE)) || (TARGET_OS_EMBEDDED || TARGET_OS_IPHONE)) && !defined(RS_USE_OSBYTEORDER_H)
+#if ((TARGET_OS_MAC && !(TARGET_OS_EMBEDDED || TARGET_OS_IPHONE)) || (TARGET_OS_EMBEDDED || TARGET_OS_IPHONE)) && !defined(_USE_OSBYTEORDER_H)
 #include <libkern/OSByteOrder.h>
-#define RS_USE_OSBYTEORDER_H 1
+#define _USE_OSBYTEORDER_H 1
 #endif
-        enum class ByteOrder : RSIndex {
+        enum class ByteOrder : Index {
             Unknown,
             LittleEndian,
             BigEndian
         };
         
         inline ByteOrder ByteOrderGetCurrent(void) {
-#if RS_USE_OSBYTEORDER_H
+#if _USE_OSBYTEORDER_H
             int32_t byteOrder = OSHostByteOrder();
             switch (byteOrder) {
                 case OSLittleEndian: return ByteOrder::LittleEndian;
@@ -44,7 +44,7 @@ namespace RSFoundation {
         }
         
         inline uint16_t SwapInt16(uint16_t arg) {
-#if RS_USE_OSBYTEORDER_H
+#if _USE_OSBYTEORDER_H
             return OSSwapInt16(arg);
 #else
             uint16_t result;
@@ -54,7 +54,7 @@ namespace RSFoundation {
         }
         
         inline uint32_t SwapInt32(uint32_t arg) {
-#if RS_USE_OSBYTEORDER_H
+#if _USE_OSBYTEORDER_H
             return OSSwapInt32(arg);
 #else
             uint32_t result;
@@ -64,7 +64,7 @@ namespace RSFoundation {
         }
         
         inline uint64_t SwapInt64(uint64_t arg) {
-#if RS_USE_OSBYTEORDER_H
+#if _USE_OSBYTEORDER_H
             return OSSwapInt64(arg);
 #else
             union Swap {
@@ -79,7 +79,7 @@ namespace RSFoundation {
         }
         
         inline uint16_t SwapInt16BigToHost(uint16_t arg) {
-#if RS_USE_OSBYTEORDER_H
+#if _USE_OSBYTEORDER_H
             return OSSwapBigToHostInt16(arg);
 #elif __BIG_ENDIAN__
             return arg;
@@ -89,7 +89,7 @@ namespace RSFoundation {
         }
         
         inline uint32_t SwapInt32BigToHost(uint32_t arg) {
-#if RS_USE_OSBYTEORDER_H
+#if _USE_OSBYTEORDER_H
             return OSSwapBigToHostInt32(arg);
 #elif __BIG_ENDIAN__
             return arg;
@@ -99,7 +99,7 @@ namespace RSFoundation {
         }
         
         inline uint64_t SwapInt64BigToHost(uint64_t arg) {
-#if RS_USE_OSBYTEORDER_H
+#if _USE_OSBYTEORDER_H
             return OSSwapBigToHostInt64(arg);
 #elif __BIG_ENDIAN__
             return arg;
@@ -109,7 +109,7 @@ namespace RSFoundation {
         }
         
         inline uint16_t SwapInt16HostToBig(uint16_t arg) {
-#if RS_USE_OSBYTEORDER_H
+#if _USE_OSBYTEORDER_H
             return OSSwapHostToBigInt16(arg);
 #elif __BIG_ENDIAN__
             return arg;
@@ -119,7 +119,7 @@ namespace RSFoundation {
         }
         
         inline uint32_t SwapInt32HostToBig(uint32_t arg) {
-#if RS_USE_OSBYTEORDER_H
+#if _USE_OSBYTEORDER_H
             return OSSwapHostToBigInt32(arg);
 #elif __BIG_ENDIAN__
             return arg;
@@ -129,7 +129,7 @@ namespace RSFoundation {
         }
         
         inline uint64_t SwapInt64HostToBig(uint64_t arg) {
-#if RS_USE_OSBYTEORDER_H
+#if _USE_OSBYTEORDER_H
             return OSSwapHostToBigInt64(arg);
 #elif __BIG_ENDIAN__
             return arg;
@@ -139,7 +139,7 @@ namespace RSFoundation {
         }
         
         inline uint16_t SwapInt16LittleToHost(uint16_t arg) {
-#if RS_USE_OSBYTEORDER_H
+#if _USE_OSBYTEORDER_H
             return OSSwapLittleToHostInt16(arg);
 #elif __LITTLE_ENDIAN__
             return arg;
@@ -149,7 +149,7 @@ namespace RSFoundation {
         }
         
         inline uint32_t SwapInt32LittleToHost(uint32_t arg) {
-#if RS_USE_OSBYTEORDER_H
+#if _USE_OSBYTEORDER_H
             return OSSwapLittleToHostInt32(arg);
 #elif __LITTLE_ENDIAN__
             return arg;
@@ -159,7 +159,7 @@ namespace RSFoundation {
         }
         
         inline uint64_t SwapInt64LittleToHost(uint64_t arg) {
-#if RS_USE_OSBYTEORDER_H
+#if _USE_OSBYTEORDER_H
             return OSSwapLittleToHostInt64(arg);
 #elif __LITTLE_ENDIAN__
             return arg;
@@ -169,7 +169,7 @@ namespace RSFoundation {
         }
         
         inline uint16_t SwapInt16HostToLittle(uint16_t arg) {
-#if RS_USE_OSBYTEORDER_H
+#if _USE_OSBYTEORDER_H
             return OSSwapHostToLittleInt16(arg);
 #elif __LITTLE_ENDIAN__
             return arg;
@@ -179,7 +179,7 @@ namespace RSFoundation {
         }
         
         inline uint32_t SwapInt32HostToLittle(uint32_t arg) {
-#if RS_USE_OSBYTEORDER_H
+#if _USE_OSBYTEORDER_H
             return OSSwapHostToLittleInt32(arg);
 #elif __LITTLE_ENDIAN__
             return arg;
@@ -189,7 +189,7 @@ namespace RSFoundation {
         }
         
         inline uint64_t SwapInt64HostToLittle(uint64_t arg) {
-#if RS_USE_OSBYTEORDER_H
+#if _USE_OSBYTEORDER_H
             return OSSwapHostToLittleInt64(arg);
 #elif __LITTLE_ENDIAN__
             return arg;

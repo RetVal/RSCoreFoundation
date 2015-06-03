@@ -11,10 +11,15 @@
 		300CB714189932A6004298E2 /* RSFunctional.h in Headers */ = {isa = PBXBuildFile; fileRef = 300CB713189932A6004298E2 /* RSFunctional.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		300CB717189A3349004298E2 /* RSList.c in Sources */ = {isa = PBXBuildFile; fileRef = 300CB715189A3349004298E2 /* RSList.c */; };
 		300CB718189A3349004298E2 /* RSList.h in Headers */ = {isa = PBXBuildFile; fileRef = 300CB716189A3349004298E2 /* RSList.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		300F80EA1B1EAB0F009B062B /* UnicodePrecomposition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300F80E81B1EAB0F009B062B /* UnicodePrecomposition.cpp */; };
-		300F80EB1B1EAB0F009B062B /* UnicodePrecomposition.h in Headers */ = {isa = PBXBuildFile; fileRef = 300F80E91B1EAB0F009B062B /* UnicodePrecomposition.h */; };
+		300F80EB1B1EAB0F009B062B /* UnicodePrecomposition.h in Headers */ = {isa = PBXBuildFile; fileRef = 300F80E91B1EAB0F009B062B /* UnicodePrecomposition.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		300F80EC1B1EB22B009B062B /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 41813436168B394500B08722 /* libicucore.dylib */; };
 		300F80ED1B1EB2B1009B062B /* libldap.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 412925091822BADE00F2D71B /* libldap.dylib */; };
+		300F80F41B1EC1DD009B062B /* UnicodePrecomposition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300F80EE1B1EC1DD009B062B /* UnicodePrecomposition.cpp */; };
+		300F80F51B1EC1DD009B062B /* BultinConverters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300F80EF1B1EC1DD009B062B /* BultinConverters.cpp */; };
+		300F80F61B1EC1DD009B062B /* ICUConverters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300F80F01B1EC1DD009B062B /* ICUConverters.cpp */; };
+		300F80F71B1EC1DD009B062B /* DataBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300F80F11B1EC1DD009B062B /* DataBase.cpp */; };
+		300F80F81B1EC1DD009B062B /* StringConverter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300F80F21B1EC1DD009B062B /* StringConverter.cpp */; };
+		300F80F91B1EC1DD009B062B /* StringConverterExt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300F80F31B1EC1DD009B062B /* StringConverterExt.cpp */; };
 		30217B891875D18D00BC813A /* RSURL+Extension.c in Sources */ = {isa = PBXBuildFile; fileRef = 30217B881875D18D00BC813A /* RSURL+Extension.c */; };
 		30217B8B1875D19700BC813A /* RSURL+Extension.h in Headers */ = {isa = PBXBuildFile; fileRef = 30217B8A1875D19700BC813A /* RSURL+Extension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		304AF1261B1582A0008E6365 /* Date.h in Headers */ = {isa = PBXBuildFile; fileRef = 304AF1241B1582A0008E6365 /* Date.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -45,11 +50,8 @@
 		30A5B8151B1DA7C700679E74 /* UnicodeDecomposition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30A5B8141B1DA7C700679E74 /* UnicodeDecomposition.cpp */; };
 		30A5B8191B1DA91500679E74 /* Lock.h in Headers */ = {isa = PBXBuildFile; fileRef = 30A5B8171B1DA91500679E74 /* Lock.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30A5B81B1B1DA93100679E74 /* Lock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30A5B81A1B1DA93100679E74 /* Lock.cpp */; };
-		30A5B81E1B1DBD0700679E74 /* StringConverterExt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30A5B81C1B1DBD0700679E74 /* StringConverterExt.cpp */; };
 		30A5B81F1B1DBD0700679E74 /* StringConverterExt.h in Headers */ = {isa = PBXBuildFile; fileRef = 30A5B81D1B1DBD0700679E74 /* StringConverterExt.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		30A5B8221B1DBE5600679E74 /* StringConverter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30A5B8201B1DBE5600679E74 /* StringConverter.cpp */; };
 		30A5B8231B1DBE5600679E74 /* StringConverter.h in Headers */ = {isa = PBXBuildFile; fileRef = 30A5B8211B1DBE5600679E74 /* StringConverter.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		30A5B8261B1DDB4000679E74 /* DataBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30A5B8241B1DDB4000679E74 /* DataBase.cpp */; };
 		30A5B8271B1DDB4000679E74 /* DataBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 30A5B8251B1DDB4000679E74 /* DataBase.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		30AE4B721B155A2600740933 /* ObjectBox.h in Headers */ = {isa = PBXBuildFile; fileRef = 30AE4B701B155A2600740933 /* ObjectBox.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30AE4B7B1B155B8F00740933 /* ObjectBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30AE4B7A1B155B8F00740933 /* ObjectBox.cpp */; };
@@ -67,10 +69,8 @@
 		30D334241B15B92D005F8673 /* Allocator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30D334231B15B92D005F8673 /* Allocator.cpp */; };
 		30D845901875164C004DEBE0 /* regex.h in Headers */ = {isa = PBXBuildFile; fileRef = 30D8458F1875164C004DEBE0 /* regex.h */; };
 		30E217721B1B82A20077F430 /* BasicAlgorithm.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E217711B1B82A20077F430 /* BasicAlgorithm.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		30EC72E41B1E18FD002BB58B /* ICUConverters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30EC72E21B1E18FD002BB58B /* ICUConverters.cpp */; };
 		30EC72E51B1E18FD002BB58B /* ICUConverters.h in Headers */ = {isa = PBXBuildFile; fileRef = 30EC72E31B1E18FD002BB58B /* ICUConverters.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		30EC72E81B1E1F1C002BB58B /* BultinConverters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30EC72E61B1E1F1C002BB58B /* BultinConverters.cpp */; };
-		30EC72E91B1E1F1C002BB58B /* BultinConverters.h in Headers */ = {isa = PBXBuildFile; fileRef = 30EC72E71B1E1F1C002BB58B /* BultinConverters.h */; };
+		30EC72E91B1E1F1C002BB58B /* BultinConverters.h in Headers */ = {isa = PBXBuildFile; fileRef = 30EC72E71B1E1F1C002BB58B /* BultinConverters.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		30F32B3A1860318300A45125 /* RSHTTPCookieStorage.c in Sources */ = {isa = PBXBuildFile; fileRef = 30F32B381860318300A45125 /* RSHTTPCookieStorage.c */; };
 		30F32B3B1860318300A45125 /* RSHTTPCookieStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F32B391860318300A45125 /* RSHTTPCookieStorage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30F9A85818752F27006EC81B /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 30F9A85718752F27006EC81B /* libicucore.dylib */; };
@@ -808,8 +808,13 @@
 		300CB713189932A6004298E2 /* RSFunctional.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSFunctional.h; sourceTree = "<group>"; };
 		300CB715189A3349004298E2 /* RSList.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSList.c; sourceTree = "<group>"; };
 		300CB716189A3349004298E2 /* RSList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSList.h; sourceTree = "<group>"; };
-		300F80E81B1EAB0F009B062B /* UnicodePrecomposition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UnicodePrecomposition.cpp; sourceTree = "<group>"; };
 		300F80E91B1EAB0F009B062B /* UnicodePrecomposition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnicodePrecomposition.h; sourceTree = "<group>"; };
+		300F80EE1B1EC1DD009B062B /* UnicodePrecomposition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UnicodePrecomposition.cpp; sourceTree = "<group>"; };
+		300F80EF1B1EC1DD009B062B /* BultinConverters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BultinConverters.cpp; sourceTree = "<group>"; };
+		300F80F01B1EC1DD009B062B /* ICUConverters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ICUConverters.cpp; sourceTree = "<group>"; };
+		300F80F11B1EC1DD009B062B /* DataBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DataBase.cpp; sourceTree = "<group>"; };
+		300F80F21B1EC1DD009B062B /* StringConverter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringConverter.cpp; sourceTree = "<group>"; };
+		300F80F31B1EC1DD009B062B /* StringConverterExt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringConverterExt.cpp; sourceTree = "<group>"; };
 		30217B881875D18D00BC813A /* RSURL+Extension.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "RSURL+Extension.c"; sourceTree = "<group>"; };
 		30217B8A1875D19700BC813A /* RSURL+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RSURL+Extension.h"; sourceTree = "<group>"; };
 		304AF1241B1582A0008E6365 /* Date.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Date.h; sourceTree = "<group>"; };
@@ -841,11 +846,8 @@
 		30A5B8141B1DA7C700679E74 /* UnicodeDecomposition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UnicodeDecomposition.cpp; sourceTree = "<group>"; };
 		30A5B8171B1DA91500679E74 /* Lock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Lock.h; sourceTree = "<group>"; };
 		30A5B81A1B1DA93100679E74 /* Lock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Lock.cpp; sourceTree = "<group>"; };
-		30A5B81C1B1DBD0700679E74 /* StringConverterExt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringConverterExt.cpp; sourceTree = "<group>"; };
 		30A5B81D1B1DBD0700679E74 /* StringConverterExt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringConverterExt.h; sourceTree = "<group>"; };
-		30A5B8201B1DBE5600679E74 /* StringConverter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringConverter.cpp; sourceTree = "<group>"; };
 		30A5B8211B1DBE5600679E74 /* StringConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringConverter.h; sourceTree = "<group>"; };
-		30A5B8241B1DDB4000679E74 /* DataBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DataBase.cpp; sourceTree = "<group>"; };
 		30A5B8251B1DDB4000679E74 /* DataBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataBase.h; sourceTree = "<group>"; };
 		30AE4B701B155A2600740933 /* ObjectBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjectBox.h; sourceTree = "<group>"; };
 		30AE4B7A1B155B8F00740933 /* ObjectBox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectBox.cpp; sourceTree = "<group>"; };
@@ -862,9 +864,7 @@
 		30D334231B15B92D005F8673 /* Allocator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Allocator.cpp; sourceTree = "<group>"; };
 		30D8458F1875164C004DEBE0 /* regex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = regex.h; sourceTree = "<group>"; };
 		30E217711B1B82A20077F430 /* BasicAlgorithm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasicAlgorithm.h; sourceTree = "<group>"; };
-		30EC72E21B1E18FD002BB58B /* ICUConverters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ICUConverters.cpp; sourceTree = "<group>"; };
 		30EC72E31B1E18FD002BB58B /* ICUConverters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ICUConverters.h; sourceTree = "<group>"; };
-		30EC72E61B1E1F1C002BB58B /* BultinConverters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BultinConverters.cpp; sourceTree = "<group>"; };
 		30EC72E71B1E1F1C002BB58B /* BultinConverters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BultinConverters.h; sourceTree = "<group>"; };
 		30F32B381860318300A45125 /* RSHTTPCookieStorage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSHTTPCookieStorage.c; sourceTree = "<group>"; };
 		30F32B391860318300A45125 /* RSHTTPCookieStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSHTTPCookieStorage.h; sourceTree = "<group>"; };
@@ -1704,19 +1704,13 @@
 			isa = PBXGroup;
 			children = (
 				30A5B8081B1DA43D00679E74 /* Internal.h */,
+				30A5B8251B1DDB4000679E74 /* DataBase.h */,
 				30A5B80E1B1DA71E00679E74 /* UnicharPrivate.h */,
-				30A5B8201B1DBE5600679E74 /* StringConverter.cpp */,
 				30A5B8211B1DBE5600679E74 /* StringConverter.h */,
-				30A5B81C1B1DBD0700679E74 /* StringConverterExt.cpp */,
 				30A5B81D1B1DBD0700679E74 /* StringConverterExt.h */,
 				30A5B8111B1DA7AC00679E74 /* UnicodeDecomposition.h */,
-				30A5B8241B1DDB4000679E74 /* DataBase.cpp */,
-				30A5B8251B1DDB4000679E74 /* DataBase.h */,
-				30EC72E21B1E18FD002BB58B /* ICUConverters.cpp */,
 				30EC72E31B1E18FD002BB58B /* ICUConverters.h */,
-				30EC72E61B1E1F1C002BB58B /* BultinConverters.cpp */,
 				30EC72E71B1E1F1C002BB58B /* BultinConverters.h */,
-				300F80E81B1EAB0F009B062B /* UnicodePrecomposition.cpp */,
 				300F80E91B1EAB0F009B062B /* UnicodePrecomposition.h */,
 			);
 			path = include;
@@ -1725,6 +1719,12 @@
 		30A5B8071B1DA42500679E74 /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				300F80F11B1EC1DD009B062B /* DataBase.cpp */,
+				300F80EE1B1EC1DD009B062B /* UnicodePrecomposition.cpp */,
+				300F80EF1B1EC1DD009B062B /* BultinConverters.cpp */,
+				300F80F01B1EC1DD009B062B /* ICUConverters.cpp */,
+				300F80F21B1EC1DD009B062B /* StringConverter.cpp */,
+				300F80F31B1EC1DD009B062B /* StringConverterExt.cpp */,
 				30A5B8141B1DA7C700679E74 /* UnicodeDecomposition.cpp */,
 			);
 			path = lib;
@@ -2795,16 +2795,16 @@
 				30D334221B15B8CF005F8673 /* Allocator.h in Headers */,
 				30D334141B15B540005F8673 /* Protocol.h in Headers */,
 				30A5B8041B1DA03C00679E74 /* Order.h in Headers */,
-				30EC72E91B1E1F1C002BB58B /* BultinConverters.h in Headers */,
 				30A5B80B1B1DA52200679E74 /* UniChar.h in Headers */,
 				30A5B8191B1DA91500679E74 /* Lock.h in Headers */,
 				30D3341C1B15B781005F8673 /* String.hpp in Headers */,
-				300F80EB1B1EAB0F009B062B /* UnicodePrecomposition.h in Headers */,
 				30A5B8091B1DA43D00679E74 /* Internal.h in Headers */,
 				30A5B80F1B1DA71E00679E74 /* UnicharPrivate.h in Headers */,
 				30A5B8271B1DDB4000679E74 /* DataBase.h in Headers */,
 				30A5B8231B1DBE5600679E74 /* StringConverter.h in Headers */,
 				30A5B81F1B1DBD0700679E74 /* StringConverterExt.h in Headers */,
+				30EC72E91B1E1F1C002BB58B /* BultinConverters.h in Headers */,
+				300F80EB1B1EAB0F009B062B /* UnicodePrecomposition.h in Headers */,
 				30EC72E51B1E18FD002BB58B /* ICUConverters.h in Headers */,
 				30A5B8131B1DA7AC00679E74 /* UnicodeDecomposition.h in Headers */,
 				30AE4B7F1B155BFF00740933 /* Nullable.h in Headers */,
@@ -3620,22 +3620,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				300F80EA1B1EAB0F009B062B /* UnicodePrecomposition.cpp in Sources */,
-				30EC72E41B1E18FD002BB58B /* ICUConverters.cpp in Sources */,
+				300F80F41B1EC1DD009B062B /* UnicodePrecomposition.cpp in Sources */,
 				309903491B1452770081278B /* Object.cpp in Sources */,
+				300F80F61B1EC1DD009B062B /* ICUConverters.cpp in Sources */,
+				300F80F81B1EC1DD009B062B /* StringConverter.cpp in Sources */,
 				30A5B8151B1DA7C700679E74 /* UnicodeDecomposition.cpp in Sources */,
-				30A5B8221B1DBE5600679E74 /* StringConverter.cpp in Sources */,
+				300F80F91B1EC1DD009B062B /* StringConverterExt.cpp in Sources */,
 				30A5B81B1B1DA93100679E74 /* Lock.cpp in Sources */,
-				30A5B81E1B1DBD0700679E74 /* StringConverterExt.cpp in Sources */,
 				30D334161B15B59A005F8673 /* Protocol.cpp in Sources */,
+				300F80F51B1EC1DD009B062B /* BultinConverters.cpp in Sources */,
+				300F80F71B1EC1DD009B062B /* DataBase.cpp in Sources */,
 				30D3341E1B15B787005F8673 /* String.cpp in Sources */,
 				30AE4B7B1B155B8F00740933 /* ObjectBox.cpp in Sources */,
 				30A5B80D1B1DA64E00679E74 /* UniChar.cpp in Sources */,
 				30D3340C1B158E88005F8673 /* Nullable.cpp in Sources */,
-				30A5B8261B1DDB4000679E74 /* DataBase.cpp in Sources */,
 				309903501B1454740081278B /* TypeTraits.cpp in Sources */,
 				30D3340B1B158E88005F8673 /* Date.cpp in Sources */,
-				30EC72E81B1E1F1C002BB58B /* BultinConverters.cpp in Sources */,
 				30D334241B15B92D005F8673 /* Allocator.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

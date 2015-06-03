@@ -31,7 +31,7 @@ namespace RSFoundation {
             }
             
             // The following values coinside TextEncodingFormat format defines in TextCommon.h
-            enum class UniCharEncodingFormat : RSIndex {
+            enum class UniCharEncodingFormat : Index {
                 UTF16Format = 0,
                 UTF8Format = 2,
                 UTF32Format = 3
@@ -49,7 +49,7 @@ namespace RSFoundation {
                 bitmap[(theChar) >> UniCharBitShiftForByte] &= ~(((uint32_t)1) << (theChar & UniCharBitShiftForMask));
             }
             
-            enum CharacterSet : RSIndex {
+            enum CharacterSet : Index {
                 ControlCharacterSet = 1,
                 WhitespaceCharacterSet,
                 WhitespaceAndNewlineCharacterSet,
@@ -110,9 +110,9 @@ namespace RSFoundation {
                 UniCharCaseMapGreekTonos = (1UL << 4)
             };
             
-            RSIndex UniCharMapCaseTo(UTF32Char theChar, UTF16Char *convertedChar, RSIndex maxLength, uint32_t ctype, uint32_t flags, const uint8_t *langCode);
+            Index UniCharMapCaseTo(UTF32Char theChar, UTF16Char *convertedChar, Index maxLength, uint32_t ctype, uint32_t flags, const uint8_t *langCode);
             
-            uint32_t UniCharGetConditionalCaseMappingFlags(UTF32Char theChar, UTF16Char *buffer, RSIndex currentIndex, RSIndex length, uint32_t type, const uint8_t *langCode, uint32_t lastFlags);
+            uint32_t UniCharGetConditionalCaseMappingFlags(UTF32Char theChar, UTF16Char *buffer, Index currentIndex, Index length, uint32_t type, const uint8_t *langCode, uint32_t lastFlags);
             
             enum {
                 UniCharBiDiPropertyON = 0,
@@ -172,11 +172,11 @@ namespace RSFoundation {
             uint32_t UniCharGetNumberOfPlanesForUnicodePropertyData(uint32_t propertyType);
             uint32_t UniCharGetUnicodeProperty(UTF32Char character, uint32_t propertyType);
             
-            bool UniCharFillDestinationBuffer(const UTF32Char *src, RSIndex srcLength, void **dst, RSIndex dstLength, RSIndex *filledLength, UniCharEncodingFormat dstFormat);
+            bool UniCharFillDestinationBuffer(const UTF32Char *src, Index srcLength, void **dst, Index dstLength, Index *filledLength, UniCharEncodingFormat dstFormat);
             
             // UTF32 support
             
-            inline bool UniCharToUTF32(const UTF16Char *src, RSIndex length, UTF32Char *dst, bool allowLossy, bool isBigEndien) {
+            inline bool UniCharToUTF32(const UTF16Char *src, Index length, UTF32Char *dst, bool allowLossy, bool isBigEndien) {
                 const UTF16Char *limit = src + length;
                 UTF32Char character;
                 
@@ -201,7 +201,7 @@ namespace RSFoundation {
                 return YES;
             }
             
-            inline bool UniCharFromUTF32(const UTF32Char *src, RSIndex length, UTF16Char *dst, bool allowLossy, bool isBigEndien) {
+            inline bool UniCharFromUTF32(const UTF32Char *src, Index length, UTF16Char *dst, bool allowLossy, bool isBigEndien) {
                 const UTF32Char *limit = src + length;
                 UTF32Char character;
                 

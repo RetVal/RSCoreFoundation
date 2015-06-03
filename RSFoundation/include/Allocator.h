@@ -19,7 +19,7 @@
 namespace RSFoundation {
     namespace Basic {
         template<typename T>
-        class Allocator : public Object, private Counter<RSUInt32> {
+        class Allocator : public Object, private Counter<UInt32> {
         public:
             static Allocator<T> AllocatorSystemDefault;
             static Allocator<T> AllocatorDefault;

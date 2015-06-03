@@ -68,11 +68,13 @@ namespace RSFoundation {
                 
                 if (String::Encoding::UTF7_IMAP == encoding) return "IMAP-mailbox-name";
                 
-                if (String::Encoding::Unicode != (encoding & 0x0F00)) codepage = __StringEncodingGetWindowsCodePage(encoding); // we don't use codepage for UTF to avoid little endian weirdness of Windows
+                const DataBase& db = DataBase::SharedDataBase();
+                
+                if (String::Encoding::Unicode != (encoding & 0x0F00)) codepage = db.GetWindowsCodePage(encoding); // we don't use codepage for UTF to avoid little endian weirdness of Windows
                 
                 if ((0 != codepage) && (snprintf(buffer, STACK_BUFFER_SIZE, "windows-%d", codepage) < STACK_BUFFER_SIZE) && (nil != (result = ucnv_getAlias(buffer, 0, &errorCode)))) return result;
                 
-                if (__StringEncodingGetCanonicalName(encoding, buffer, STACK_BUFFER_SIZE)) result = ucnv_getAlias(buffer, 0, &errorCode);
+                if (db.GetCanonicalName(encoding, buffer, STACK_BUFFER_SIZE)) result = ucnv_getAlias(buffer, 0, &errorCode);
                 
                 return result;
 #undef STACK_BUFFER_SIZE
@@ -81,8 +83,8 @@ namespace RSFoundation {
             Private String::Encoding __StringEncodingGetFromICUName(const char *icuName) {
                 uint32_t codepage;
                 UErrorCode errorCode = U_ZERO_ERROR;
-                
-                if ((0 == strncasecmp_l(icuName, "windows-", strlen("windows-"), nil)) && (0 != (codepage = (uint32_t)strtol(icuName + strlen("windows-"), nil, 10)))) return __StringEncodingGetFromWindowsCodePage(codepage);
+                const DataBase& db = DataBase::SharedDataBase();
+                if ((0 == strncasecmp_l(icuName, "windows-", strlen("windows-"), nil)) && (0 != (codepage = (uint32_t)strtol(icuName + strlen("windows-"), nil, 10)))) return db.GetFromWindowsCodePage(codepage);
                 
                 if (0 != ucnv_countAliases(icuName, &errorCode)) {
                     String::Encoding encoding;
@@ -92,18 +94,18 @@ namespace RSFoundation {
                     name = ucnv_getStandardName(icuName, "WINDOWS", &errorCode);
                     
                     if (nil != name) {
-                        if ((0 == strncasecmp_l(name, "windows-", strlen("windows-"), nil)) && (0 != (codepage = (uint32_t)strtol(name + strlen("windows-"), nil, 10)))) return __StringEncodingGetFromWindowsCodePage(codepage);
+                        if ((0 == strncasecmp_l(name, "windows-", strlen("windows-"), nil)) && (0 != (codepage = (uint32_t)strtol(name + strlen("windows-"), nil, 10)))) return db.GetFromWindowsCodePage(codepage);
                         
-                        if (strncasecmp_l(icuName, name, strlen(name), nil) && (String::Encoding::InvalidId != (encoding = __StringEncodingGetFromCanonicalName(name)))) return encoding;
+                        if (strncasecmp_l(icuName, name, strlen(name), nil) && (String::Encoding::InvalidId != (encoding = db.GetFromCanonicalName(name)))) return encoding;
                     }
                     
                     // Try JAVA platform
                     name = ucnv_getStandardName(icuName, "JAVA", &errorCode);
-                    if ((nil != name) && strncasecmp_l(icuName, name, strlen(name), nil) && (String::Encoding::InvalidId != (encoding = __StringEncodingGetFromCanonicalName(name)))) return encoding;
+                    if ((nil != name) && strncasecmp_l(icuName, name, strlen(name), nil) && (String::Encoding::InvalidId != (encoding = db.GetFromCanonicalName(name)))) return encoding;
                     
                     // Try MIME platform
                     name = ucnv_getStandardName(icuName, "MIME", &errorCode);
-                    if ((nil != name) && strncasecmp_l(icuName, name, strlen(name), nil) && (String::Encoding::InvalidId != (encoding = __StringEncodingGetFromCanonicalName(name)))) return encoding;
+                    if ((nil != name) && strncasecmp_l(icuName, name, strlen(name), nil) && (String::Encoding::InvalidId != (encoding = db.GetFromCanonicalName(name)))) return encoding;
                 }
                 
                 return String::Encoding::InvalidId;
@@ -146,7 +148,7 @@ namespace RSFoundation {
 #define ICU_CONVERTER_SLOT_INCREMENT (10)
 #define ICU_CONVERTER_MAX_SLOT (255)
             
-            static RSIndex __StringEncodingConverterReleaseICUConverter(UConverter *converter, uint32_t flags, String::ConversionResult status) {
+            static Index __StringEncodingConverterReleaseICUConverter(UConverter *converter, uint32_t flags, String::ConversionResult status) {
                 uint8_t streamID = StringEncodingStreamIDFromMask(flags);
                 
                 if ((String::ConversionResult::InvalidInputStream != status) && ((0 != (flags & (uint32_t)String::EncodingConfiguration::PartialInput)) || ((String::ConversionResult::InsufficientOutputBufferLength == status) && (0 != (flags & (uint32_t)String::EncodingConfiguration::PartialOutput))))) {
@@ -159,7 +161,7 @@ namespace RSFoundation {
                             data->_numSlots = ICU_CONVERTER_SLOT_INCREMENT;
                             data->_nextSlot = 0;
                         } else if ((data->_nextSlot >= data->_numSlots) || (nil != data->_converters[data->_nextSlot])) { // Need to find one
-                            RSIndex index;
+                            Index index;
                             
                             for (index = 0;index < data->_numSlots;index++) {
                                 if (nil == data->_converters[index]) {
@@ -170,7 +172,7 @@ namespace RSFoundation {
                             
                             if (index >= data->_numSlots) { // we're full
                                 UConverter **newConverters;
-                                RSIndex newSize = data->_numSlots + ICU_CONVERTER_SLOT_INCREMENT;
+                                Index newSize = data->_numSlots + ICU_CONVERTER_SLOT_INCREMENT;
                                 
                                 if (newSize > ICU_CONVERTER_MAX_SLOT) { // something is terribly wrong
 //                                    Log(LogLevelError, String("Per-thread streaming ID for ICU converters exhausted. Ignoring..."));
@@ -232,7 +234,7 @@ namespace RSFoundation {
 #define HAS_ICU_BUG_6024743 (1)
 #define HAS_ICU_BUG_6025527 (1)
             
-            Private RSIndex __StringEncodingICUToBytes(const char *icuName, uint32_t flags, const UniChar *characters, RSIndex numChars, RSIndex *usedCharLen, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen) {
+            Private Index __StringEncodingICUToBytes(const char *icuName, uint32_t flags, const UniChar *characters, Index numChars, Index *usedCharLen, uint8_t *bytes, Index maxByteLen, Index *usedByteLen) {
                 UConverter *converter;
                 UErrorCode errorCode = U_ZERO_ERROR;
                 const UTF16Char *source = characters;
@@ -240,13 +242,13 @@ namespace RSFoundation {
                 char *destination = (char *)bytes;
                 const char *destinationLimit = destination + maxByteLen;
                 BOOL flush = ((0 == (flags & (uint32_t)String::EncodingConfiguration::PartialInput)) ? YES : NO);
-                RSIndex status;
+                Index status;
                 
                 if (nil == (converter = __StringEncodingConverterCreateICUConverter(icuName, flags, NO))) return String::ConversionResult::Unavailable;
                 
                 if (0 == maxByteLen) {
                     char buffer[MAX_BUFFER_SIZE];
-                    RSIndex totalLength = 0;
+                    Index totalLength = 0;
                     
                     while ((source < sourceLimit) && (U_ZERO_ERROR == errorCode)) {
                         destination = buffer;
@@ -334,7 +336,7 @@ namespace RSFoundation {
                 return status;
             }
             
-            Private RSIndex __StringEncodingICUToUnicode(const char *icuName, uint32_t flags, const uint8_t *bytes, RSIndex numBytes, RSIndex *usedByteLen, UniChar *characters, RSIndex maxCharLen, RSIndex *usedCharLen) {
+            Private Index __StringEncodingICUToUnicode(const char *icuName, uint32_t flags, const uint8_t *bytes, Index numBytes, Index *usedByteLen, UniChar *characters, Index maxCharLen, Index *usedCharLen) {
                 UConverter *converter;
                 UErrorCode errorCode = U_ZERO_ERROR;
                 const char *source = (const char *)bytes;
@@ -342,13 +344,13 @@ namespace RSFoundation {
                 UTF16Char *destination = characters;
                 const UTF16Char *destinationLimit = destination + maxCharLen;
                 BOOL flush = ((0 == (flags & (uint32_t)String::EncodingConfiguration::PartialInput)) ? YES : NO);
-                RSIndex status;
+                Index status;
                 
                 if (nil == (converter = __StringEncodingConverterCreateICUConverter(icuName, flags, YES))) return String::ConversionResult::Unavailable;
                 
                 if (0 == maxCharLen) {
                     UTF16Char buffer[MAX_BUFFER_SIZE];
-                    RSIndex totalLength = 0;
+                    Index totalLength = 0;
                     
                     while ((source < sourceLimit) && (U_ZERO_ERROR == errorCode)) {
                         destination = buffer;
@@ -405,29 +407,29 @@ namespace RSFoundation {
                 return status;
             }
             
-            Private RSIndex __StringEncodingICUCharLength(const char *icuName, uint32_t flags, const uint8_t *bytes, RSIndex numBytes) {
-                RSIndex usedCharLen;
+            Private Index __StringEncodingICUCharLength(const char *icuName, uint32_t flags, const uint8_t *bytes, Index numBytes) {
+                Index usedCharLen;
                 return (__StringEncodingICUToUnicode(icuName, flags, bytes, numBytes, nil, nil, 0, &usedCharLen) == String::ConversionResult::Success ? usedCharLen : 0);
             }
             
-            Private RSIndex __StringEncodingICUByteLength(const char *icuName, uint32_t flags, const UniChar *characters, RSIndex numChars) {
-                RSIndex usedByteLen;
+            Private Index __StringEncodingICUByteLength(const char *icuName, uint32_t flags, const UniChar *characters, Index numChars) {
+                Index usedByteLen;
                 return (__StringEncodingICUToBytes(icuName, flags, characters, numChars, nil, nil, 0, &usedByteLen) == String::ConversionResult::Success ? usedByteLen : 0);
             }
             
-            Private String::Encoding *__StringEncodingCreateICUEncodings(RSIndex *numberOfRSIndex) {
-                RSIndex count = ucnv_countAvailable();
-                RSIndex numEncodings = 0;
+            Private String::Encoding *__StringEncodingCreateICUEncodings(Index *numberOfIndex) {
+                Index count = ucnv_countAvailable();
+                Index numEncodings = 0;
                 String::Encoding *encodings;
                 String::Encoding encoding;
-                RSIndex index;
+                Index index;
                 
                 if (0 == count) return nil;
                 auto allocator = &Allocator<String::Encoding>::AllocatorSystemDefault;
                 encodings = allocator->Allocate<String::Encoding>(count);
                 
                 for (index = 0;index < count;index++) {
-                    encoding = __StringEncodingGetFromICUName(ucnv_getAvailableName((RSUInt32)index));
+                    encoding = __StringEncodingGetFromICUName(ucnv_getAvailableName((UInt32)index));
                     
                     if (String::Encoding::InvalidId != encoding) encodings[numEncodings++] = encoding;
                 }
@@ -437,7 +439,7 @@ namespace RSFoundation {
                     encodings = nil;
                 }
                 
-                *numberOfRSIndex = numEncodings;
+                *numberOfIndex = numEncodings;
                 
                 return encodings;
             }

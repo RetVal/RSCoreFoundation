@@ -547,7 +547,7 @@ namespace RSFoundation {
                                 if (plane) return (isInverted ? UniCharBitmapAll : UniCharBitmapEmpty);
                                 
                                 uint8_t *bitmapBase = (uint8_t *)bitmap;
-                                RSIndex idx;
+                                Index idx;
                                 uint8_t nonFillValue = (isInverted ? (uint8_t)0xFF : (uint8_t)0);
                                 
 #if defined (__cplusplus)
@@ -697,7 +697,7 @@ namespace RSFoundation {
                             
                             __UniCharMappingTableLock.Release();
                             
-                            return __UniCharMappingTables[(RSIndex)type];
+                            return __UniCharMappingTables[(Index)type];
                         }
                         
                         // Case mapping functions
@@ -730,7 +730,7 @@ namespace RSFoundation {
                             return 0;
                         }
                         
-#define NUM_CASE_MAP_DATA (RSIndex(UniCharCaseFold + 1))
+#define NUM_CASE_MAP_DATA (Index(UniCharCaseFold + 1))
                         
                         static bool __UniCharLoadCaseMappingTable(void) {
                             uint32_t *countArray;
@@ -776,7 +776,7 @@ namespace RSFoundation {
 #define GREEK_LANG_CODE		(0x6C65) // el
 #endif
                         
-                        RSIndex UniCharMapCaseTo(UTF32Char theChar, UTF16Char *convertedChar, RSIndex maxLength, uint32_t ctype, uint32_t flags, const uint8_t *langCode) {
+                        Index UniCharMapCaseTo(UTF32Char theChar, UTF16Char *convertedChar, Index maxLength, uint32_t ctype, uint32_t flags, const uint8_t *langCode) {
                             __UniCharBitmapData *data;
                             uint8_t planeNo = (theChar >> 16) & 0xFF;
                             
@@ -799,7 +799,7 @@ namespace RSFoundation {
                                         return 1;
                                     } else if (UniCharIsMemberOf(theChar, DecomposableCharacterSet)) {
                                         UTF32Char buffer[MAX_DECOMPOSED_LENGTH];
-                                        RSIndex length = Encoding::UnicodeDecoposition::DecomposeCharacter(theChar, buffer, MAX_DECOMPOSED_LENGTH);
+                                        Index length = Encoding::UnicodeDecoposition::DecomposeCharacter(theChar, buffer, MAX_DECOMPOSED_LENGTH);
                                         
                                         if (length > 1) {
                                             UTF32Char *characters = buffer + 1;
@@ -811,7 +811,7 @@ namespace RSFoundation {
                                             }
                                             
                                             if (characters < tail) { // found a tonos
-                                                RSIndex convertedLength = UniCharMapCaseTo(*buffer, convertedChar, maxLength, ctype, 0, langCode);
+                                                Index convertedLength = UniCharMapCaseTo(*buffer, convertedChar, maxLength, ctype, 0, langCode);
                                                 
                                                 if (convertedLength == 0) {
                                                     *convertedChar = (UTF16Char)*buffer;
@@ -920,7 +920,7 @@ namespace RSFoundation {
                             
                             if (nullptr == __UniCharBitmapDataArray) __UniCharLoadBitmapData();
                             
-                            data = __UniCharBitmapDataArray + __MapExternalSetToInternalIndex(__MapCompatibilitySetID(CharacterSet((ctype + (RSUInt32)HasNonSelfLowercaseCharacterSet))));
+                            data = __UniCharBitmapDataArray + __MapExternalSetToInternalIndex(__MapCompatibilitySetID(CharacterSet((ctype + (UInt32)HasNonSelfLowercaseCharacterSet))));
                             
                             if (planeNo < data->_numPlanes && data->_planes[planeNo] && UniCharIsMemberOfBitmap(theChar, data->_planes[planeNo]) && (__UniCharCaseMappingTableCounts || __UniCharLoadCaseMappingTable())) {
                                 uint32_t value = __UniCharGetMappedCase((const __UniCharCaseMappings *)__UniCharCaseMappingTable[ctype], __UniCharCaseMappingTableCounts[ctype], theChar);
@@ -931,7 +931,7 @@ namespace RSFoundation {
                                 }
                                 
                                 if (value) {
-                                    RSIndex count = UniCharConvertFlagToCount(value);
+                                    Index count = UniCharConvertFlagToCount(value);
                                     
                                     if (count == 1) {
                                         if (value & UniCharNonBmpFlag) {
@@ -949,7 +949,7 @@ namespace RSFoundation {
                                         const uint32_t *extraMapping = __UniCharCaseMappingExtraTable[ctype] + (value & 0xFFFFFF);
                                         
                                         if (value & UniCharNonBmpFlag) {
-                                            RSIndex copiedLen = 0;
+                                            Index copiedLen = 0;
                                             
                                             while (count-- > 0) {
                                                 value = *(extraMapping++);
@@ -965,7 +965,7 @@ namespace RSFoundation {
                                             }
                                             if (!count) return copiedLen;
                                         } else {
-                                            RSIndex idx;
+                                            Index idx;
                                             
                                             for (idx = 0;idx < count;idx++) *(convertedChar++) = (UTF16Char)*(extraMapping++);
                                             return count;
@@ -988,12 +988,12 @@ namespace RSFoundation {
                             }
                         }
                         
-                        RSIndex UniCharMapTo(UniChar theChar, UniChar *convertedChar, RSIndex maxLength, uint16_t ctype, uint32_t flags) {
+                        Index UniCharMapTo(UniChar theChar, UniChar *convertedChar, Index maxLength, uint16_t ctype, uint32_t flags) {
                             if (ctype == UniCharCaseFold + 1) { // UniCharDecompose
                                 if (UnicodeDecoposition::IsDecomposableCharacter(theChar, false)) {
                                     UTF32Char buffer[MAX_DECOMPOSED_LENGTH];
-                                    RSIndex usedLength = UnicodeDecoposition::DecomposeCharacter(theChar, buffer, MAX_DECOMPOSED_LENGTH);
-                                    RSIndex idx;
+                                    Index usedLength = UnicodeDecoposition::DecomposeCharacter(theChar, buffer, MAX_DECOMPOSED_LENGTH);
+                                    Index idx;
                                     
                                     for (idx = 0;idx < usedLength;idx++) *(convertedChar++) = buffer[idx];
                                     return usedLength;
@@ -1006,7 +1006,7 @@ namespace RSFoundation {
                             }
                         }
                         
-                        inline bool __UniCharIsMoreAbove(UTF16Char *buffer, RSIndex length) {
+                        inline bool __UniCharIsMoreAbove(UTF16Char *buffer, Index length) {
                             UTF32Char currentChar;
                             uint32_t property;
                             
@@ -1025,12 +1025,12 @@ namespace RSFoundation {
                             return false;
                         }
                         
-                        inline bool __UniCharIsAfter_i(UTF16Char *buffer, RSIndex length) {
+                        inline bool __UniCharIsAfter_i(UTF16Char *buffer, Index length) {
                             UTF32Char currentChar = 0;
                             uint32_t property;
                             UTF32Char decomposed[MAX_DECOMPOSED_LENGTH];
-                            RSIndex decompLength;
-                            RSIndex idx;
+                            Index decompLength;
+                            Index idx;
                             
                             if (length < 1) return 0;
                             
@@ -1070,7 +1070,7 @@ namespace RSFoundation {
                             return true;
                         }
                         
-                        Private uint32_t UniCharGetConditionalCaseMappingFlags(UTF32Char theChar, UTF16Char *buffer, RSIndex currentIndex, RSIndex length, uint32_t type, const uint8_t *langCode, uint32_t lastFlags) {
+                        Private uint32_t UniCharGetConditionalCaseMappingFlags(UTF32Char theChar, UTF16Char *buffer, Index currentIndex, Index length, uint32_t type, const uint8_t *langCode, uint32_t lastFlags) {
                             if (theChar == 0x03A3) { // GREEK CAPITAL LETTER SIGMA
                                 if ((type == UniCharToLowercase) && (currentIndex > 0)) {
                                     UTF16Char *start = buffer;
@@ -1281,10 +1281,10 @@ namespace RSFoundation {
                          */
 #define UNI_REPLACEMENT_CHAR (0x0000FFFDUL)
                         
-                        bool UniCharFillDestinationBuffer(const UTF32Char *src, RSIndex srcLength, void **dst, RSIndex dstLength, RSIndex *filledLength, UniCharEncodingFormat dstFormat)
+                        bool UniCharFillDestinationBuffer(const UTF32Char *src, Index srcLength, void **dst, Index dstLength, Index *filledLength, UniCharEncodingFormat dstFormat)
                         {
                             UTF32Char currentChar;
-                            RSIndex usedLength = *filledLength;
+                            Index usedLength = *filledLength;
                             
                             if (dstFormat == UniCharEncodingFormat::UTF16Format) {
                                 UTF16Char *dstBuffer = (UTF16Char *)*dst;

@@ -47,7 +47,7 @@ namespace RSFoundation {
                     __DecomposableBitmapForBMP = UniCharGetBitmapPtrForPlane(CanonicalDecomposableCharacterSet, 0);
                     __HFSPlusDecomposableBitmapForBMP = UniCharGetBitmapPtrForPlane(HFSPlusDecomposableCharacterSet, 0);
                     
-                    RSIndex idx;
+                    Index idx;
                     
                     __CombiningPriorityTableNumPlane = UniCharGetNumberOfPlanesForUnicodePropertyData(UniCharCombiningProperty);
                     
@@ -114,7 +114,7 @@ namespace RSFoundation {
                 return 0;
             }
             
-            static void __PrioritySort(UTF32Char *characters, RSIndex length) {
+            static void __PrioritySort(UTF32Char *characters, Index length) {
                 UTF32Char *end = characters + length;
                 
                 while ((characters < end) && (0 == __GetCombiningPropertyForCharacter(*characters))) ++characters;
@@ -140,12 +140,12 @@ namespace RSFoundation {
                 }
             }
             
-            static RSIndex __RecursivelyDecomposeCharacter(UTF32Char character, UTF32Char *convertedChars, RSIndex maxBufferLength) {
+            static Index __RecursivelyDecomposeCharacter(UTF32Char character, UTF32Char *convertedChars, Index maxBufferLength) {
                 uint32_t value = __GetMappedValue((const __DecomposeMappings *)__DecompositionTable, __DecompositionTableLength, character);
-                RSIndex length = UniCharConvertFlagToCount(value);
+                Index length = UniCharConvertFlagToCount(value);
                 UTF32Char firstChar = value & 0xFFFFFF;
                 UTF32Char *mappings = (length > 1 ? __MultipleDecompositionTable + firstChar : &firstChar);
-                RSIndex usedLength = 0;
+                Index usedLength = 0;
                 
                 if (maxBufferLength < length) return 0;
                 
@@ -175,10 +175,10 @@ namespace RSFoundation {
 #define HANGUL_TCOUNT 28
 #define HANGUL_NCOUNT (HANGUL_VCOUNT * HANGUL_TCOUNT)
             
-            RSIndex UnicodeDecoposition::DecomposeCharacter(UTF32Char character, UTF32Char *convertedChars, RSIndex maxBufferLength) {
+            Index UnicodeDecoposition::DecomposeCharacter(UTF32Char character, UTF32Char *convertedChars, Index maxBufferLength) {
                 if (nil == __DecompositionTable) __LoadDecompositionTable();
                 if (character >= HANGUL_SBASE && character <= (HANGUL_SBASE + HANGUL_SCOUNT)) {
-                    RSIndex length;
+                    Index length;
                     
                     character -= HANGUL_SBASE;
                     
@@ -195,20 +195,20 @@ namespace RSFoundation {
                 }
             }
             
-            inline bool __RSProcessReorderBuffer(UTF32Char *buffer, RSIndex length, void **dst, RSIndex dstLength, RSIndex *filledLength, UniCharEncodingFormat dstFormat) {
+            inline bool __ProcessReorderBuffer(UTF32Char *buffer, Index length, void **dst, Index dstLength, Index *filledLength, UniCharEncodingFormat dstFormat) {
                 if (length > 1) __PrioritySort(buffer, length);
                 return UniCharFillDestinationBuffer(buffer, length, dst, dstLength, filledLength, dstFormat);
             }
             
 #define MAX_BUFFER_LENGTH (32)
-            bool UnicodeDecoposition::Decompose(const UTF16Char *src, RSIndex length, RSIndex *consumedLength, void *dst, RSIndex maxLength, RSIndex *filledLength, bool needToReorder, UniCharEncodingFormat dstFormat, bool isHFSPlus) {
-                RSIndex usedLength = 0;
-                RSIndex originalLength = length;
+            bool UnicodeDecoposition::Decompose(const UTF16Char *src, Index length, Index *consumedLength, void *dst, Index maxLength, Index *filledLength, bool needToReorder, UniCharEncodingFormat dstFormat, bool isHFSPlus) {
+                Index usedLength = 0;
+                Index originalLength = length;
                 UTF32Char buffer[MAX_BUFFER_LENGTH];
                 UTF32Char *decompBuffer = buffer;
-                RSIndex decompBufferSize = MAX_BUFFER_LENGTH;
-                RSIndex decompBufferLen = 0;
-                RSIndex segmentLength = 0;
+                Index decompBufferSize = MAX_BUFFER_LENGTH;
+                Index decompBufferLen = 0;
+                Index segmentLength = 0;
                 UTF32Char currentChar;
                 
                 if (nil == __DecompositionTable) __LoadDecompositionTable();
@@ -218,7 +218,7 @@ namespace RSFoundation {
                     
                     if (currentChar < 0x80) {
                         if (decompBufferLen > 0) {
-                            if (!__RSProcessReorderBuffer(decompBuffer, decompBufferLen, &dst, maxLength, &usedLength, dstFormat)) break;
+                            if (!__ProcessReorderBuffer(decompBuffer, decompBufferLen, &dst, maxLength, &usedLength, dstFormat)) break;
                             length -= segmentLength;
                             segmentLength = 0;
                             decompBufferLen = 0;
@@ -252,12 +252,12 @@ namespace RSFoundation {
                                 
                                 decompBufferSize += MAX_BUFFER_LENGTH;
                                 newBuffer = Allocator<UTF32Char>::AllocatorSystemDefault.Allocate<UTF32Char>(decompBufferSize);
-                                //                        newBuffer = (UTF32Char *)RSAllocatorAllocate(RSAllocatorSystemDefault, sizeof(UTF32Char) * decompBufferSize);
+                                //                        newBuffer = (UTF32Char *)AllocatorAllocate(AllocatorSystemDefault, sizeof(UTF32Char) * decompBufferSize);
                                 memmove(newBuffer, decompBuffer, (decompBufferSize - MAX_BUFFER_LENGTH) * sizeof(UTF32Char));
                                 if (decompBuffer != buffer) {
                                     Allocator<UTF32Char>::AllocatorSystemDefault.Deallocate(decompBuffer);
                                 }
-                                //                        if (decompBuffer != buffer) RSAllocatorDeallocate(RSAllocatorSystemDefault, decompBuffer);
+                                //                        if (decompBuffer != buffer) AllocatorDeallocate(AllocatorSystemDefault, decompBuffer);
                                 decompBuffer = newBuffer;
                             }
                             
@@ -268,7 +268,7 @@ namespace RSFoundation {
                             }
                         } else {
                             if (decompBufferLen > 0) {
-                                if (!__RSProcessReorderBuffer(decompBuffer, decompBufferLen, &dst, maxLength, &usedLength, dstFormat)) break;
+                                if (!__ProcessReorderBuffer(decompBuffer, decompBufferLen, &dst, maxLength, &usedLength, dstFormat)) break;
                                 length -= segmentLength;
                                 segmentLength = 0;
                             }
@@ -291,7 +291,7 @@ namespace RSFoundation {
                         segmentLength += ((currentChar > 0xFFFF) ? 2 : 1);
                     }
                 }
-                if ((decompBufferLen > 0) && __RSProcessReorderBuffer(decompBuffer, decompBufferLen, &dst, maxLength, &usedLength, dstFormat)) length -= segmentLength;
+                if ((decompBufferLen > 0) && __ProcessReorderBuffer(decompBuffer, decompBufferLen, &dst, maxLength, &usedLength, dstFormat)) length -= segmentLength;
                 
                 if (decompBuffer != buffer) Allocator<UTF32Char>::AllocatorSystemDefault.Deallocate(decompBuffer);
                 
@@ -303,14 +303,14 @@ namespace RSFoundation {
             
 #define MAX_COMP_DECOMP_LEN (32)
             
-            static RSIndex __RecursivelyCompatibilityDecomposeCharacter(UTF32Char character, UTF32Char *convertedChars) {
+            static Index __RecursivelyCompatibilityDecomposeCharacter(UTF32Char character, UTF32Char *convertedChars) {
                 uint32_t value = __GetMappedValue((const __DecomposeMappings *)__CompatibilityDecompositionTable, __CompatibilityDecompositionTableLength, character);
-                RSIndex length = UniCharConvertFlagToCount(value);
+                Index length = UniCharConvertFlagToCount(value);
                 UTF32Char firstChar = value & 0xFFFFFF;
                 const UTF32Char *mappings = (length > 1 ? __CompatibilityMultipleDecompositionTable + firstChar : &firstChar);
-                RSIndex usedLength = length;
+                Index usedLength = length;
                 UTF32Char currentChar;
-                RSIndex currentLength;
+                Index currentLength;
                 
                 while (length-- > 0) {
                     currentChar = *(mappings++);
@@ -330,7 +330,7 @@ namespace RSFoundation {
                 return usedLength;
             }
             
-            inline void __MoveBufferFromEnd1(UTF32Char *convertedChars, RSIndex length, RSIndex delta) {
+            inline void __MoveBufferFromEnd1(UTF32Char *convertedChars, Index length, Index delta) {
                 const UTF32Char *limit = convertedChars;
                 UTF32Char *dstP;
                 
@@ -340,12 +340,12 @@ namespace RSFoundation {
                 while (convertedChars > limit) *(--dstP) = *(--convertedChars);
             }
             
-            RSIndex UnicodeDecoposition::CompatibilityDecompose(UTF32Char *convertedChars, RSIndex length, RSIndex maxBufferLength) {
+            Index UnicodeDecoposition::CompatibilityDecompose(UTF32Char *convertedChars, Index length, Index maxBufferLength) {
                 UTF32Char currentChar;
                 UTF32Char buffer[MAX_COMP_DECOMP_LEN];
                 const UTF32Char *bufferP;
                 const UTF32Char *limit = convertedChars + length;
-                RSIndex filledLength;
+                Index filledLength;
                 
                 if (nil == __CompatibilityDecompositionTable) __LoadCompatibilityDecompositionTable();
                 
@@ -370,7 +370,7 @@ namespace RSFoundation {
                 return length;
             }
             
-            void UnicodeDecoposition::PrioritySort(UTF32Char *characters, RSIndex length) {
+            void UnicodeDecoposition::PrioritySort(UTF32Char *characters, Index length) {
                 __PrioritySort(characters, length);
             }
             

@@ -17,7 +17,7 @@ namespace RSFoundation {
     namespace Collection {
         class String : public Object {
         public:
-            enum Encoding : RSUInt32 {
+            enum Encoding : Index {
                 InvalidId = 0xffffffffU,
                 MacRoman = 0,
                 WindowsLatin1 = 0x0500, /* ANSI codepage 1252 */
@@ -198,7 +198,7 @@ namespace RSFoundation {
                 ShiftJIS_X0213_00 = 0x0628 /* Shift-JIS format encoding of JIS X0213 planes 1 and 2 (DEPRECATED) */
             };
             
-            enum class EncodingConfiguration : RSIndex {
+            enum class EncodingConfiguration : Index {
                 AllowLossyConversion = (1UL << 0), // Uses fallback functions to substitutes non mappable chars
                 BasicDirectionLeftToRight = (1UL << 1), // Converted with original direction left-to-right.
                 BasicDirectionRightToLeft = (1UL << 2), // Converted with original direction right-to-left.
@@ -295,13 +295,13 @@ namespace RSFoundation {
                 return (_info1 & (IsMutableMask | HasLengthByteMask)) != HasLengthByte;
             }
             
-            inline RSUInt32 _SkipAnyLengthByte() const {
+            inline UInt32 _SkipAnyLengthByte() const {
                 return _HasLengthByte() ? 1 : 0;
             }
             
             inline const void *_Contents() const {
                 if (_IsInline()) {
-                    return (const void *)(((uintptr_t)&(this->_variants)) + (_HasExplicitLength() ? sizeof(RSIndex) : 0));
+                    return (const void *)(((uintptr_t)&(this->_variants)) + (_HasExplicitLength() ? sizeof(Index) : 0));
                 }
                 return this->_variants._notInlineImmutable1._buffer;
             }
@@ -330,7 +330,7 @@ namespace RSFoundation {
                 _ContentsAllocatorPtr() = allocator;
             }
             
-            inline RSIndex _Length() const {
+            inline Index _Length() const {
                 if (_HasExplicitLength()) {
                     if (_IsInline()) {
                         return this->_variants._inline1._length;
@@ -338,11 +338,11 @@ namespace RSFoundation {
                         return this->_variants._notInlineImmutable1._length;
                     }
                 } else {
-                    return (RSIndex)(*((RSUInt8 *)_Contents()));
+                    return (Index)(*((UInt8 *)_Contents()));
                 }
             }
             
-            inline RSIndex _Length2(const void *buffer) const {
+            inline Index _Length2(const void *buffer) const {
                 if (_HasExplicitLength()) {
                     if (_IsInline()) {
                         return this->_variants._inline1._length;
@@ -350,7 +350,7 @@ namespace RSFoundation {
                         return this->_variants._notInlineImmutable1._length;
                     }
                 } else {
-                    return (RSIndex)(*((RSUInt8 *)buffer));
+                    return (Index)(*((UInt8 *)buffer));
                 }
             }
             
@@ -358,7 +358,7 @@ namespace RSFoundation {
                 this->_variants._notInlineImmutable1._buffer = (void *)buffer;
             }
             
-            inline void _SetExplicitLength(RSIndex length) {
+            inline void _SetExplicitLength(Index length) {
                 if (_IsInline()) {
                     this->_variants._inline1._length = length;
                 } else {
@@ -418,19 +418,19 @@ namespace RSFoundation {
                 return _SetCapacityProvidedExternally(false);
             }
             
-            inline RSIndex _Capacity() const {
+            inline Index _Capacity() const {
                 return this->_variants._notInlineMutable1._capacity;
             }
             
-            inline void _SetCapacity(RSIndex capacity) {
+            inline void _SetCapacity(Index capacity) {
                 this->_variants._notInlineMutable1._capacity = capacity;
             }
             
-            inline RSIndex _DesiredCapacity() const {
+            inline Index _DesiredCapacity() const {
                 return this->_variants._notInlineMutable1._desiredCapacity;
             }
             
-            inline void _SetDesiredCapacity(RSIndex desiredCapacity) {
+            inline void _SetDesiredCapacity(Index desiredCapacity) {
                 this->_variants._notInlineMutable1._desiredCapacity = desiredCapacity;
             }
             
@@ -450,10 +450,10 @@ namespace RSFoundation {
 #if __LP64__
 #define GROWFACTOR(c) ((c * 3 + 1) / 2)
 #else
-#define GROWFACTOR(c) (((c) >= (ULONG_MAX / 3UL)) ? __RSMax(LONG_MAX - 4095, (c)) : (((unsigned long)c * 3 + 1) / 2))
+#define GROWFACTOR(c) (((c) >= (ULONG_MAX / 3UL)) ? __Max(LONG_MAX - 4095, (c)) : (((unsigned long)c * 3 + 1) / 2))
 #endif
             
-            inline RSIndex _NewCapacity(unsigned long reqCapacity, RSIndex capacity, BOOL leaveExtraRoom, RSIndex charSize)
+            inline Index _NewCapacity(unsigned long reqCapacity, Index capacity, BOOL leaveExtraRoom, Index charSize)
             {
                 if (capacity != 0 || reqCapacity != 0)
                 {
@@ -466,7 +466,7 @@ namespace RSFoundation {
                         /* ...we need to eliminate the extra space... */
                         if (reqCapacity > LONG_MAX) return -1;  /* Too big any way you cut it */
                         unsigned long newCapacity = leaveExtraRoom ? GROWFACTOR(reqCapacity) : reqCapacity;	/* Grow by 3/2 if extra room is desired */
-                        RSIndex desiredCapacity = _DesiredCapacity() * charSize;
+                        Index desiredCapacity = _DesiredCapacity() * charSize;
                         if (newCapacity < desiredCapacity) {
                             /* If less than desired, bump up to desired */
                             newCapacity = desiredCapacity;
@@ -477,26 +477,26 @@ namespace RSFoundation {
                         if (_HasContentsAllocator()) {
                             /* Also apply any preferred size from the allocator  */
                             newCapacity = newCapacity;
-//                            newCapacity = RSAllocatorSize(__RSStrContentsAllocator(str), newCapacity);
+//                            newCapacity = AllocatorSize(__StrContentsAllocator(str), newCapacity);
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
                         } else {
                             newCapacity = malloc_good_size(newCapacity);
 #endif
                         }
-                        return (newCapacity > LONG_MAX) ? -1 : (RSIndex)newCapacity; // If packing: __RSStrUnpackNumber(__RSStrPackNumber(newCapacity));
+                        return (newCapacity > LONG_MAX) ? -1 : (Index)newCapacity; // If packing: __StrUnpackNumber(__StrPackNumber(newCapacity));
                     }
                 }
                 return capacity;
             }
 
         private:
-            RSUInt32 _info1 : 8;
-            RSUInt32 _reserved : 24;
+            UInt32 _info1 : 8;
+            UInt32 _reserved : 24;
             
             struct __notInlineMutable {
                 void *_buffer;
-                RSIndex _length;
-                RSIndex _capacity;                           // Capacity in bytes
+                Index _length;
+                Index _capacity;                           // Capacity in bytes
                 unsigned long _hasGap:1;                      // Currently unused
                 unsigned long _isFixedCapacity:1;
                 unsigned long _isExternalMutable:1;
@@ -511,17 +511,17 @@ namespace RSFoundation {
             
             union __variants {
                 struct __inline1 {
-                    RSIndex _length;
+                    Index _length;
                 } _inline1;
                 
                 struct __inline2 {
-                    RSIndex _length;
+                    Index _length;
                     void *_buffer;
                 } _inline2;
                 
                 struct __notInlineImmutable1 {
                     void *_buffer;
-                    RSIndex _length;
+                    Index _length;
                     Allocator<String> &_contentsDeallocator;
                 } _notInlineImmutable1;
                 

@@ -19,13 +19,13 @@ namespace RSFoundation {
             extern String::Encoding __StringEncodingGetFromICUName(const char *icuName);
             
             
-            extern RSIndex __StringEncodingICUToBytes(const char *icuName, uint32_t flags, const UniChar *characters, RSIndex numChars, RSIndex *usedCharLen, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen);
-            extern RSIndex __StringEncodingICUToUnicode(const char *icuName, uint32_t flags, const uint8_t *bytes, RSIndex numBytes, RSIndex *usedByteLen, UniChar *characters, RSIndex maxCharLen, RSIndex *usedCharLen);
-            extern RSIndex __StringEncodingICUCharLength(const char *icuName, uint32_t flags, const uint8_t *bytes, RSIndex numBytes);
-            extern RSIndex __StringEncodingICUByteLength(const char *icuName, uint32_t flags, const UniChar *characters, RSIndex numChars);
+            extern Index __StringEncodingICUToBytes(const char *icuName, uint32_t flags, const UniChar *characters, Index numChars, Index *usedCharLen, uint8_t *bytes, Index maxByteLen, Index *usedByteLen);
+            extern Index __StringEncodingICUToUnicode(const char *icuName, uint32_t flags, const uint8_t *bytes, Index numBytes, Index *usedByteLen, UniChar *characters, Index maxCharLen, Index *usedCharLen);
+            extern Index __StringEncodingICUCharLength(const char *icuName, uint32_t flags, const uint8_t *bytes, Index numBytes);
+            extern Index __StringEncodingICUByteLength(const char *icuName, uint32_t flags, const UniChar *characters, Index numChars);
             
             // The caller is responsible for freeing the memory (use AllocatorDeallocate)
-            extern String::Encoding *__StringEncodingCreateICUEncodings(RSIndex *numberOfRSIndex);
+            extern String::Encoding *__StringEncodingCreateICUEncodings(Index *numberOfIndex);
         }
     }
 }

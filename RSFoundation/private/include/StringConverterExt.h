@@ -26,22 +26,22 @@ namespace RSFoundation {
             };
             
             /* StringEncodingConverterStandard */
-            typedef RSIndex (*StringEncodingToBytesProc)(uint32_t flags, const UniChar *characters, RSIndex numChars, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen);
-            typedef RSIndex (*StringEncodingToUnicodeProc)(uint32_t flags, const uint8_t *bytes, RSIndex numBytes, UniChar *characters, RSIndex maxCharLen, RSIndex *usedCharLen);
+            typedef Index (*StringEncodingToBytesProc)(uint32_t flags, const UniChar *characters, Index numChars, uint8_t *bytes, Index maxByteLen, Index *usedByteLen);
+            typedef Index (*StringEncodingToUnicodeProc)(uint32_t flags, const uint8_t *bytes, Index numBytes, UniChar *characters, Index maxCharLen, Index *usedCharLen);
             /* StringEncodingConverterCheapEightBit */
             typedef bool (*StringEncodingCheapEightBitToBytesProc)(uint32_t flags, UniChar character, uint8_t *byte);
             typedef bool (*StringEncodingCheapEightBitToUnicodeProc)(uint32_t flags, uint8_t byte, UniChar *character);
             /* StringEncodingConverterStandardEightBit */
-            typedef uint16_t (*StringEncodingStandardEightBitToBytesProc)(uint32_t flags, const UniChar *characters, RSIndex numChars, uint8_t *byte);
+            typedef uint16_t (*StringEncodingStandardEightBitToBytesProc)(uint32_t flags, const UniChar *characters, Index numChars, uint8_t *byte);
             typedef uint16_t (*StringEncodingStandardEightBitToUnicodeProc)(uint32_t flags, uint8_t byte, UniChar *characters);
             /* StringEncodingConverterCheapMultiByte */
             typedef uint16_t (*StringEncodingCheapMultiByteToBytesProc)(uint32_t flags, UniChar character, uint8_t *bytes);
-            typedef uint16_t (*StringEncodingCheapMultiByteToUnicodeProc)(uint32_t flags, const uint8_t *bytes, RSIndex numBytes, UniChar *character);
+            typedef uint16_t (*StringEncodingCheapMultiByteToUnicodeProc)(uint32_t flags, const uint8_t *bytes, Index numBytes, UniChar *character);
             
-            typedef RSIndex (*StringEncodingToBytesLenProc)(uint32_t flags, const UniChar *characters, RSIndex numChars);
-            typedef RSIndex (*StringEncodingToUnicodeLenProc)(uint32_t flags, const uint8_t *bytes, RSIndex numBytes);
+            typedef Index (*StringEncodingToBytesLenProc)(uint32_t flags, const UniChar *characters, Index numChars);
+            typedef Index (*StringEncodingToUnicodeLenProc)(uint32_t flags, const uint8_t *bytes, Index numBytes);
             
-            typedef RSIndex (*StringEncodingToBytesPrecomposeProc)(uint32_t flags, const UniChar *character, RSIndex numChars, uint8_t *bytes, RSIndex maxByteLen, RSIndex *usedByteLen);
+            typedef Index (*StringEncodingToBytesPrecomposeProc)(uint32_t flags, const UniChar *character, Index numChars, uint8_t *bytes, Index maxByteLen, Index *usedByteLen);
             typedef bool (*StringEncodingIsValidCombiningCharacterProc)(UniChar character);
             
             typedef struct {
@@ -78,7 +78,7 @@ namespace RSFoundation {
             /* This function does not precompose recursively nor to U+01E0 and U+01E1.
              */
             extern bool StringEncodingIsValidCombiningCharacterForLatin1(UniChar character);
-            extern UniChar StringEncodingPrecomposeLatinCharacter(const UniChar *character, RSIndex numChars, RSIndex *usedChars);
+            extern UniChar StringEncodingPrecomposeLatinCharacter(const UniChar *character, Index numChars, Index *usedChars);
             
             /* Convenience functions for converter development */
             typedef struct _StringEncodingUnicodeTo8BitCharMap {
@@ -88,7 +88,7 @@ namespace RSFoundation {
             } StringEncodingUnicodeTo8BitCharMap;
             
             /* Binary searches StringEncodingUnicodeTo8BitCharMap */
-            inline bool StringEncodingUnicodeTo8BitEncoding(const StringEncodingUnicodeTo8BitCharMap *theTable, RSIndex numElem, UniChar character, uint8_t *ch) {
+            inline bool StringEncodingUnicodeTo8BitEncoding(const StringEncodingUnicodeTo8BitCharMap *theTable, Index numElem, UniChar character, uint8_t *ch) {
                 const StringEncodingUnicodeTo8BitCharMap *p, *q, *divider;
                 
                 if ((character < theTable[0]._u) || (character > theTable[numElem-1]._u)) {
