@@ -9,15 +9,18 @@
 #ifndef __RSCoreFoundation__UnicodePrecomposition__
 #define __RSCoreFoundation__UnicodePrecomposition__
 
+#include <RSFoundation/Object.h>
 #include <RSFoundation/UniChar.h>
 
 namespace RSFoundation {
     namespace Collection {
         namespace Encoding {
-            // As you can see, this function cannot precompose Hangul Jamo
-            UTF32Char UniCharPrecomposeCharacter(UTF32Char base, UTF32Char combining);
             
-            bool UniCharPrecompose(const UTF16Char *characters, Index length, Index *consumedLength, UTF16Char *precomposed, Index maxLength, Index *filledLength);
+            class UniCharPrecompose : public Object, public NotCopyable {
+            public:
+                static UTF32Char PrecomposeCharacter(UTF32Char base, UTF32Char combining);
+                static bool Precompose(const UTF16Char *characters, Index length, Index *consumedLength, UTF16Char *precomposed, Index maxLength, Index *filledLength);
+            };
         }
     }
 }

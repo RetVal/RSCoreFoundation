@@ -49,7 +49,7 @@ namespace RSFoundation {
                         
                         if (UniCharIsSurrogateHighCharacter(nextCh) || UniCharIsSurrogateLowCharacter(nextCh)) break;
                         
-                        if (UniCharIsMemberOf(nextCh, NonBaseCharacterSet) && ((composedChar = UniCharPrecomposeCharacter(ch, nextCh)) != 0xFFFD)) {
+                        if (UniCharIsMemberOf(nextCh, NonBaseCharacterSet) && ((composedChar = UniCharPrecompose::PrecomposeCharacter(ch, nextCh)) != 0xFFFD)) {
                             if (composedChar > 0xFFFF) { // Non-base
                                 break;
                             } else {

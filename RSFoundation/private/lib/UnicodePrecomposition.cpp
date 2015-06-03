@@ -100,8 +100,7 @@ namespace RSFoundation {
                 return 0;
             }
             
-            __private_extern__
-            UTF32Char UniCharPrecomposeCharacter(UTF32Char base, UTF32Char combining) {
+            UTF32Char UniCharPrecompose::PrecomposeCharacter(UTF32Char base, UTF32Char combining)  {
                 uint32_t value;
                 
                 if (nil == __UniCharPrecompSourceTable) __UniCharLoadPrecompositionTable();
@@ -137,7 +136,7 @@ namespace RSFoundation {
                 while (convertedChars > limit) *(--dstP) = *(--convertedChars);
             }
             
-            bool UniCharPrecompose(const UTF16Char *characters, Index length, Index *consumedLength, UTF16Char *precomposed, Index maxLength, Index *filledLength) {
+            bool UniCharPrecompose::Precompose(const UTF16Char *characters, Index length, Index *consumedLength, UTF16Char *precomposed, Index maxLength, Index *filledLength){
                 UTF32Char currentChar = 0, lastChar = 0, precomposedChar = 0xFFFD;
                 Index originalLength = length, usedLength = 0;
                 UTF16Char *currentBase = precomposed;
@@ -163,7 +162,7 @@ namespace RSFoundation {
                         currentClass = (currentChar > 0xFFFF ? UniCharGetUnicodeProperty(currentChar, UniCharCombiningProperty) : UniCharGetCombiningPropertyForCharacter(currentChar, __UniCharCombiningClassForBMP));
                         
                         if ((lastClass == 0) || (currentClass > lastClass)) {
-                            if ((precomposedChar = UniCharPrecomposeCharacter(lastChar, currentChar)) == 0xFFFD) {
+                            if ((precomposedChar = UniCharPrecompose::PrecomposeCharacter(lastChar, currentChar)) == 0xFFFD) {
                                 if (isPrecomposed) precomposedChar = lastChar;
                                 lastClass = currentClass;
                             } else {
