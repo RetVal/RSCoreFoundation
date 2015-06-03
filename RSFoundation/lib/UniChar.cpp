@@ -654,10 +654,7 @@ namespace RSFoundation {
 #else
 #error Unknown or unspecified DEPLOYMENT_TARGET
 #endif
-                        
-                        Private const void *UniCharGetMappingData(UnicharMappingType type) {
-                            
-                            
+                        const void *UniCharEncodingPrivate::GetMappingData(UnicharMappingType type) {
                             __UniCharMappingTableLock.Acquire();
                             
                             if (nullptr == __UniCharMappingTables) {
@@ -736,7 +733,7 @@ namespace RSFoundation {
                             uint32_t *countArray;
                             int idx;
                             
-                            if (nullptr == __UniCharMappingTables) (void)UniCharGetMappingData(UnicharMappingType(UniCharToLowercase));
+                            if (nullptr == __UniCharMappingTables) (void)UniCharEncodingPrivate::GetMappingData(UnicharMappingType(UniCharToLowercase));
                             if (nullptr == __UniCharMappingTables) return false;
                             
                             __UniCharMappingTableLock.Acquire();

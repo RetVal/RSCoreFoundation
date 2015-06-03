@@ -59,7 +59,7 @@ namespace RSFoundation {
                 return data;
             }
             
-            Private const char *__StringEncodingGetICUName(String::Encoding encoding) {
+            const char* ICUConverters::GetICUName(String::Encoding encoding) {
 #define STACK_BUFFER_SIZE (60)
                 char buffer[STACK_BUFFER_SIZE];
                 const char *result = nil;
@@ -80,7 +80,7 @@ namespace RSFoundation {
 #undef STACK_BUFFER_SIZE
             }
             
-            Private String::Encoding __StringEncodingGetFromICUName(const char *icuName) {
+            String::Encoding ICUConverters::GetFromICUName(const char *icuName) {
                 uint32_t codepage;
                 UErrorCode errorCode = U_ZERO_ERROR;
                 const DataBase& db = DataBase::SharedDataBase();
@@ -234,7 +234,7 @@ namespace RSFoundation {
 #define HAS_ICU_BUG_6024743 (1)
 #define HAS_ICU_BUG_6025527 (1)
             
-            Private Index __StringEncodingICUToBytes(const char *icuName, uint32_t flags, const UniChar *characters, Index numChars, Index *usedCharLen, uint8_t *bytes, Index maxByteLen, Index *usedByteLen) {
+            Index ICUConverters::ICUToBytes(const char *icuName, uint32_t flags, const UniChar *characters, Index numChars, Index *usedCharLen, uint8_t *bytes, Index maxByteLen, Index *usedByteLen) {
                 UConverter *converter;
                 UErrorCode errorCode = U_ZERO_ERROR;
                 const UTF16Char *source = characters;
@@ -336,7 +336,7 @@ namespace RSFoundation {
                 return status;
             }
             
-            Private Index __StringEncodingICUToUnicode(const char *icuName, uint32_t flags, const uint8_t *bytes, Index numBytes, Index *usedByteLen, UniChar *characters, Index maxCharLen, Index *usedCharLen) {
+            Index ICUConverters::ICUToUnicode(const char *icuName, uint32_t flags, const uint8_t *bytes, Index numBytes, Index *usedByteLen, UniChar *characters, Index maxCharLen, Index *usedCharLen) {
                 UConverter *converter;
                 UErrorCode errorCode = U_ZERO_ERROR;
                 const char *source = (const char *)bytes;
@@ -407,17 +407,17 @@ namespace RSFoundation {
                 return status;
             }
             
-            Private Index __StringEncodingICUCharLength(const char *icuName, uint32_t flags, const uint8_t *bytes, Index numBytes) {
+            Index ICUConverters::ICUCharLength(const char *icuName, uint32_t flags, const uint8_t *bytes, Index numBytes) {
                 Index usedCharLen;
-                return (__StringEncodingICUToUnicode(icuName, flags, bytes, numBytes, nil, nil, 0, &usedCharLen) == String::ConversionResult::Success ? usedCharLen : 0);
+                return (ICUToUnicode(icuName, flags, bytes, numBytes, nil, nil, 0, &usedCharLen) == String::ConversionResult::Success ? usedCharLen : 0);
             }
             
-            Private Index __StringEncodingICUByteLength(const char *icuName, uint32_t flags, const UniChar *characters, Index numChars) {
+            Index ICUConverters::ICUByteLength(const char *icuName, uint32_t flags, const UniChar *characters, Index numChars) {
                 Index usedByteLen;
-                return (__StringEncodingICUToBytes(icuName, flags, characters, numChars, nil, nil, 0, &usedByteLen) == String::ConversionResult::Success ? usedByteLen : 0);
+                return (ICUToBytes(icuName, flags, characters, numChars, nil, nil, 0, &usedByteLen) == String::ConversionResult::Success ? usedByteLen : 0);
             }
             
-            Private String::Encoding *__StringEncodingCreateICUEncodings(Index *numberOfIndex) {
+            String::Encoding *ICUConverters::CreateICUEncodings(Index *numberOfIndex) {
                 Index count = ucnv_countAvailable();
                 Index numEncodings = 0;
                 String::Encoding *encodings;
@@ -429,7 +429,7 @@ namespace RSFoundation {
                 encodings = allocator->Allocate<String::Encoding>(count);
                 
                 for (index = 0;index < count;index++) {
-                    encoding = __StringEncodingGetFromICUName(ucnv_getAvailableName((UInt32)index));
+                    encoding = GetFromICUName(ucnv_getAvailableName((UInt32)index));
                     
                     if (String::Encoding::InvalidId != encoding) encodings[numEncodings++] = encoding;
                 }
@@ -443,7 +443,6 @@ namespace RSFoundation {
                 
                 return encodings;
             }
-
         }
     }
 }

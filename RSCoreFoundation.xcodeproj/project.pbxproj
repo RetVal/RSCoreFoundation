@@ -1705,11 +1705,11 @@
 			children = (
 				30A5B8081B1DA43D00679E74 /* Internal.h */,
 				30A5B8251B1DDB4000679E74 /* DataBase.h */,
+				30EC72E31B1E18FD002BB58B /* ICUConverters.h */,
 				30A5B80E1B1DA71E00679E74 /* UnicharPrivate.h */,
 				30A5B8211B1DBE5600679E74 /* StringConverter.h */,
 				30A5B81D1B1DBD0700679E74 /* StringConverterExt.h */,
 				30A5B8111B1DA7AC00679E74 /* UnicodeDecomposition.h */,
-				30EC72E31B1E18FD002BB58B /* ICUConverters.h */,
 				30EC72E71B1E1F1C002BB58B /* BultinConverters.h */,
 				300F80E91B1EAB0F009B062B /* UnicodePrecomposition.h */,
 			);

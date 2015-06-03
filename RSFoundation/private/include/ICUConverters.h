@@ -14,18 +14,19 @@
 namespace RSFoundation {
     namespace Collection {
         namespace Encoding {
-            extern const char *__StringEncodingGetICUName(String::Encoding encoding);
-            
-            extern String::Encoding __StringEncodingGetFromICUName(const char *icuName);
-            
-            
-            extern Index __StringEncodingICUToBytes(const char *icuName, uint32_t flags, const UniChar *characters, Index numChars, Index *usedCharLen, uint8_t *bytes, Index maxByteLen, Index *usedByteLen);
-            extern Index __StringEncodingICUToUnicode(const char *icuName, uint32_t flags, const uint8_t *bytes, Index numBytes, Index *usedByteLen, UniChar *characters, Index maxCharLen, Index *usedCharLen);
-            extern Index __StringEncodingICUCharLength(const char *icuName, uint32_t flags, const uint8_t *bytes, Index numBytes);
-            extern Index __StringEncodingICUByteLength(const char *icuName, uint32_t flags, const UniChar *characters, Index numChars);
-            
-            // The caller is responsible for freeing the memory (use AllocatorDeallocate)
-            extern String::Encoding *__StringEncodingCreateICUEncodings(Index *numberOfIndex);
+            class ICUConverters : public Object, public NotCopyable {
+            private:
+                ICUConverters() {}
+                ~ICUConverters() {}
+            public:
+                static const char* GetICUName(String::Encoding encoding);
+                static String::Encoding GetFromICUName(const char *icuName);
+                static Index ICUToBytes(const char *icuName, uint32_t flags, const UniChar *characters, Index numChars, Index *usedCharLen, uint8_t *bytes, Index maxByteLen, Index *usedByteLen);
+                static Index ICUToUnicode(const char *icuName, uint32_t flags, const uint8_t *bytes, Index numBytes, Index *usedByteLen, UniChar *characters, Index maxCharLen, Index *usedCharLen);
+                static Index ICUCharLength(const char *icuName, uint32_t flags, const uint8_t *bytes, Index numBytes);
+                static Index ICUByteLength(const char *icuName, uint32_t flags, const UniChar *characters, Index numChars);
+                static String::Encoding* CreateICUEncodings(Index *numberOfIndex);
+            };
         }
     }
 }

@@ -9,6 +9,8 @@
 #ifndef RSCoreFoundation_UnicharPrivate_h
 #define RSCoreFoundation_UnicharPrivate_h
 
+#include <RSFoundation/Object.h>
+
 namespace RSFoundation {
     namespace Collection {
 #define UniCharRecursiveDecompositionFlag	(1UL << 30)
@@ -23,7 +25,13 @@ namespace RSFoundation {
                 CompatibilityDecompMapping
             };
             
-            const void *UniCharGetMappingData(UnicharMappingType type);
+            class UniCharEncodingPrivate : public Object, public NotCopyable {
+            private:
+                UniCharEncodingPrivate() {}
+                ~UniCharEncodingPrivate() {}
+            public:
+                static const void *GetMappingData(UnicharMappingType type);
+            };
         }
     }
 }

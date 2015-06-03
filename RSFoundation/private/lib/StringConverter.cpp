@@ -545,7 +545,7 @@ namespace RSFoundation {
                         
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
                     case StringEncodingConverterICU:
-                        converter->toBytes = (_ToBytesProc)__StringEncodingGetICUName(encoding);
+                        converter->toBytes = (_ToBytesProc)ICUConverters::GetICUName(encoding);
                         break;
 #endif
                         
@@ -585,7 +585,7 @@ namespace RSFoundation {
                         
                         
                     default:
-                        return __StringEncodingGetExternalConverter(encoding);
+                        return BuiltinConverters::GetExternalConverter(encoding);
                 }
             }
             
@@ -715,11 +715,11 @@ namespace RSFoundation {
                     }
                     
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
-                    if (StringEncodingConverterICU == converter->definition->encodingClass) return (uint32_t)__StringEncodingICUToBytes((const char *)converter->toBytes, flags, characters, numChars, usedCharLen, bytes, maxByteLen, usedByteLen);
+                    if (StringEncodingConverterICU == converter->definition->encodingClass) return (uint32_t)ICUConverters::ICUToBytes((const char *)converter->toBytes, flags, characters, numChars, usedCharLen, bytes, maxByteLen, usedByteLen);
 #endif
                     
                     /* Platform converter */
-                    if (StringEncodingConverterPlatformSpecific == converter->definition->encodingClass) return (uint32_t)__StringEncodingPlatformUnicodeToBytes(encoding, flags, characters, numChars, usedCharLen, bytes, maxByteLen, usedByteLen);
+                    if (StringEncodingConverterPlatformSpecific == converter->definition->encodingClass) return (uint32_t)BuiltinConverters::PlatformUnicodeToBytes(encoding, flags, characters, numChars, usedCharLen, bytes, maxByteLen, usedByteLen);
                     
                     while ((usedLen < numChars) && (!maxByteLen || (theUsedByteLen < maxByteLen))) {
                         if ((usedLen += TO_BYTE(converter, flags, characters + usedLen, numChars - usedLen, bytes + theUsedByteLen, (maxByteLen ? maxByteLen - theUsedByteLen : 0), &localUsedByteLen)) < numChars) {
@@ -834,11 +834,11 @@ namespace RSFoundation {
                 if (!converter) return String::ConversionResult::Unavailable;
                 
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
-                if (StringEncodingConverterICU == converter->definition->encodingClass) return (uint32_t)__StringEncodingICUToUnicode((const char *)converter->toBytes, flags, bytes, numBytes, usedByteLen, characters, maxCharLen, usedCharLen);
+                if (StringEncodingConverterICU == converter->definition->encodingClass) return (uint32_t)ICUConverters::ICUToUnicode((const char *)converter->toBytes, flags, bytes, numBytes, usedByteLen, characters, maxCharLen, usedCharLen);
 #endif
                 
                 /* Platform converter */
-                if (StringEncodingConverterPlatformSpecific == converter->definition->encodingClass) return (uint32_t)__StringEncodingPlatformBytesToUnicode(encoding, flags, bytes, numBytes, usedByteLen, characters, maxCharLen, usedCharLen);
+                if (StringEncodingConverterPlatformSpecific == converter->definition->encodingClass) return (uint32_t)BuiltinConverters::PlatformBytesToUnicode(encoding, flags, bytes, numBytes, usedByteLen, characters, maxCharLen, usedCharLen);
                 
                 while ((usedLen < numBytes) && (!maxCharLen || (theUsedCharLen < maxCharLen))) {
                     if ((usedLen += TO_UNICODE(converter, flags, bytes + usedLen, numBytes - usedLen, characters + theUsedCharLen, (maxCharLen ? maxCharLen - theUsedCharLen : 0), &localUsedCharLen)) < numBytes) {
@@ -878,10 +878,10 @@ namespace RSFoundation {
                 
                 if (converter) {
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
-                    if (StringEncodingConverterICU == converter->definition->encodingClass) return __StringEncodingICUCharLength((const char *)converter->toBytes, flags, bytes, numBytes);
+                    if (StringEncodingConverterICU == converter->definition->encodingClass) return ICUConverters::ICUCharLength((const char *)converter->toBytes, flags, bytes, numBytes);
 #endif
                     
-                    if (StringEncodingConverterPlatformSpecific == converter->definition->encodingClass) return __StringEncodingPlatformCharLengthForBytes(encoding, flags, bytes, numBytes);
+                    if (StringEncodingConverterPlatformSpecific == converter->definition->encodingClass) return BuiltinConverters::PlatformCharLengthForBytes(encoding, flags, bytes, numBytes);
                     
                     if (1 == converter->definition->maxBytesPerChar) return numBytes;
                     
@@ -923,10 +923,10 @@ namespace RSFoundation {
                 
                 if (converter) {
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
-                    if (StringEncodingConverterICU == converter->definition->encodingClass) return __StringEncodingICUByteLength((const char *)converter->toBytes, flags, characters, numChars);
+                    if (StringEncodingConverterICU == converter->definition->encodingClass) return ICUConverters::ICUByteLength((const char *)converter->toBytes, flags, characters, numChars);
 #endif
                     
-                    if (StringEncodingConverterPlatformSpecific == converter->definition->encodingClass) return __StringEncodingPlatformByteLengthForCharacters(encoding, flags, characters, numChars);
+                    if (StringEncodingConverterPlatformSpecific == converter->definition->encodingClass) return BuiltinConverters::PlatformByteLengthForCharacters(encoding, flags, characters, numChars);
                     
                     if (1 == converter->definition->maxBytesPerChar) return numChars;
                     
@@ -1008,11 +1008,11 @@ namespace RSFoundation {
                     String::Encoding *list = (String::Encoding *)__BuiltinEncodings;
                     Index numICUConverters = 0, numPlatformConverters = 0;
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
-                    String::Encoding *icuConverters = __StringEncodingCreateICUEncodings(&numICUConverters);
+                    String::Encoding *icuConverters = ICUConverters::CreateICUEncodings(&numICUConverters);
 #else
                     String::Encoding *icuConverters = nil;
 #endif
-                    String::Encoding *platformConverters = __StringEncodingCreateListOfAvailablePlatformConverters(&numPlatformConverters);
+                    String::Encoding *platformConverters = BuiltinConverters::CreateListOfAvailablePlatformConverters(&numPlatformConverters);
                     auto allocator = &Allocator<String::Encoding>::AllocatorSystemDefault;
                     
                     if ((nil != icuConverters) || (nil != platformConverters)) {
@@ -1083,68 +1083,23 @@ namespace RSFoundation {
                 nil /* toUnicodeFallback */, nil /* toBytesPrecompose */, nil, /* isValidCombiningChar */
             };
             
-            Private const StringEncodingConverter *__StringEncodingGetExternalConverter(String::Encoding encoding) {
+            const StringEncodingConverter *BuiltinConverters::GetExternalConverter(String::Encoding encoding) {
                 
                 // we prefer Text Encoding Converter ICU since it's more reliable
                 if (__IsPlatformConverterAvailable(encoding)) {
                     return &__PlatformBootstrap;
                 } else {
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
-                    if (__StringEncodingGetICUName(encoding)) {
+                    if (ICUConverters::GetICUName(encoding)) {
                         return &__ICUBootstrap;
                     }
 #endif
                     return nil;
                 }
+                
             }
             
-#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED
-            Private String::Encoding *__StringEncodingCreateListOfAvailablePlatformConverters(Index *numberOfConverters) {
-                
-                return nil;
-            }
-#elif DEPLOYMENT_TARGET_WINDOWS
-            
-#include <tchar.h>
-            
-            static uint32_t __Win32EncodingIndex = 0;
-            static StringEncoding *__Win32EncodingList = nil;
-            
-            static char CALLBACK __Win32EnumCodePageProc(LPTSTR string) {
-                uint32_t encoding = StringConvertWindowsCodepageToEncoding(_tcstoul(string, nil, 10));
-                Index idx;
-                
-                if (encoding != StringEncodingInvalidId) { // We list only encodings we know
-                    if (__Win32EncodingList) {
-                        for (idx = 0;idx < (Index)__Win32EncodingIndex;idx++) if (__Win32EncodingList[idx] == encoding) break;
-                        if (idx != __Win32EncodingIndex) return YES;
-                        __Win32EncodingList[__Win32EncodingIndex] = encoding;
-                    }
-                    ++__Win32EncodingIndex;
-                }
-                return YES;
-            }
-            
-            Private StringEncoding *__StringEncodingCreateListOfAvailablePlatformConverters(AllocatorRef allocator, Index *numberOfConverters) {
-                StringEncoding *encodings;
-                
-                EnumSystemCodePages((CODEPAGE_ENUMPROC)&__Win32EnumCodePageProc, CP_INSTALLED);
-                __Win32EncodingList = (uint32_t *)AllocatorAllocate(allocator, sizeof(uint32_t) * __Win32EncodingIndex, 0);
-                EnumSystemCodePages((CODEPAGE_ENUMPROC)&__Win32EnumCodePageProc, CP_INSTALLED);
-                
-                *numberOfConverters = __Win32EncodingIndex;
-                encodings = __Win32EncodingList;
-                
-                __Win32EncodingIndex = 0;
-                __Win32EncodingList = nil;
-                
-                return encodings;
-            }
-#else
-            Private StringEncoding *__StringEncodingCreateListOfAvailablePlatformConverters(AllocatorRef allocator, Index *numberOfConverters) { return nil; }
-#endif
-            
-            Private Index __StringEncodingPlatformUnicodeToBytes(String::Encoding encoding, uint32_t flags, const UniChar *characters, Index numChars, Index *usedCharLen, uint8_t *bytes, Index maxByteLen, Index *usedByteLen) {
+            Index BuiltinConverters::PlatformUnicodeToBytes(String::Encoding encoding, uint32_t flags, const UniChar *characters, Index numChars, Index *usedCharLen, uint8_t *bytes, Index maxByteLen, Index *usedByteLen) {
                 
 #if DEPLOYMENT_TARGET_WINDOWS
                 WORD dwFlags = 0;
@@ -1195,7 +1150,7 @@ namespace RSFoundation {
                 return String::ConversionResult::Unavailable;
             }
             
-            Private Index __StringEncodingPlatformBytesToUnicode(String::Encoding encoding, uint32_t flags, const uint8_t *bytes, Index numBytes, Index *usedByteLen, UniChar *characters, Index maxCharLen, Index *usedCharLen) {
+            Index BuiltinConverters::PlatformBytesToUnicode(String::Encoding encoding, uint32_t flags, const uint8_t *bytes, Index numBytes, Index *usedByteLen, UniChar *characters, Index maxCharLen, Index *usedCharLen) {
                 
 #if DEPLOYMENT_TARGET_WINDOWS
                 WORD dwFlags = 0;
@@ -1240,15 +1195,16 @@ namespace RSFoundation {
                 return String::ConversionResult::Unavailable;
             }
             
-            Private Index __StringEncodingPlatformCharLengthForBytes(String::Encoding encoding, uint32_t flags, const uint8_t *bytes, Index numBytes) {
+            Index BuiltinConverters::PlatformCharLengthForBytes(String::Encoding encoding, uint32_t flags, const uint8_t *bytes, Index numBytes) {
                 Index usedCharLen;
-                return (__StringEncodingPlatformBytesToUnicode(encoding, flags, bytes, numBytes, nil, nil, 0, &usedCharLen) == String::ConversionResult::Success ? usedCharLen : 0);
+                return (PlatformBytesToUnicode(encoding, flags, bytes, numBytes, nil, nil, 0, &usedCharLen) == String::ConversionResult::Success ? usedCharLen : 0);
             }
             
-            Private Index __StringEncodingPlatformByteLengthForCharacters(String::Encoding encoding, uint32_t flags, const UniChar *characters, Index numChars) {
+            Index BuiltinConverters::PlatformByteLengthForCharacters(String::Encoding encoding, uint32_t flags, const UniChar *characters, Index numChars) {
                 Index usedByteLen;
-                return (__StringEncodingPlatformUnicodeToBytes(encoding, flags, characters, numChars, nil, nil, 0, &usedByteLen) == String::ConversionResult::Success ? usedByteLen : 0);
+                return (PlatformUnicodeToBytes(encoding, flags, characters, numChars, nil, nil, 0, &usedByteLen) == String::ConversionResult::Success ? usedByteLen : 0);
             }
+            
             
 #undef __CarbonCore_GetTextEncodingBase0
 

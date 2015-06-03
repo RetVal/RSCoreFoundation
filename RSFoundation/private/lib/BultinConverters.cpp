@@ -1177,6 +1177,50 @@ namespace RSFoundation {
                 (void*)__ToUTF8, (void*)__FromUTF8, 3, 2, StringEncodingConverterStandard,
                 __ToUTF8Len, __FromUTF8Len, nil, nil, nil, nil,
             };
+            
+#if DEPLOYMENT_TARGET_WINDOWS
+            static uint32_t __Win32EncodingIndex = 0;
+            static StringEncoding *__Win32EncodingList = nil;
+            
+            static char CALLBACK __Win32EnumCodePageProc(LPTSTR string) {
+                uint32_t encoding = StringConvertWindowsCodepageToEncoding(_tcstoul(string, nil, 10));
+                Index idx;
+                
+                if (encoding != StringEncodingInvalidId) { // We list only encodings we know
+                    if (__Win32EncodingList) {
+                        for (idx = 0;idx < (Index)__Win32EncodingIndex;idx++) if (__Win32EncodingList[idx] == encoding) break;
+                        if (idx != __Win32EncodingIndex) return YES;
+                        __Win32EncodingList[__Win32EncodingIndex] = encoding;
+                    }
+                    ++__Win32EncodingIndex;
+                }
+                return YES;
+            }
+#endif
+            
+            String::Encoding *BuiltinConverters::CreateListOfAvailablePlatformConverters(Index *numberOfConverters) {
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED
+                return nullptr;
+#elif DEPLOYMENT_TARGET_WINDOWS
+                StringEncoding *encodings;
+                
+                EnumSystemCodePages((CODEPAGE_ENUMPROC)&__Win32EnumCodePageProc, CP_INSTALLED);
+                __Win32EncodingList = (uint32_t *)AllocatorAllocate(allocator, sizeof(uint32_t) * __Win32EncodingIndex, 0);
+                EnumSystemCodePages((CODEPAGE_ENUMPROC)&__Win32EnumCodePageProc, CP_INSTALLED);
+                
+                *numberOfConverters = __Win32EncodingIndex;
+                encodings = __Win32EncodingList;
+                
+                __Win32EncodingIndex = 0;
+                __Win32EncodingList = nil;
+                
+                return encodings;
+#else
+                return nullptr;
+#endif
+            }
+            
+            
 
         }
     }

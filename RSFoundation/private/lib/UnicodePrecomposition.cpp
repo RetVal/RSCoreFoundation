@@ -30,7 +30,7 @@ namespace RSFoundation {
                 __UniCharPrecompositionTableLock.Acquire();
                 
                 if (nil == __UniCharPrecompSourceTable) {
-                    const uint32_t *bytes = (const uint32_t *)UniCharGetMappingData(UnicharMappingType::CanonicalPrecompMapping);
+                    const uint32_t *bytes = (const uint32_t *)UniCharEncodingPrivate::GetMappingData(UnicharMappingType::CanonicalPrecompMapping);
                     uint32_t bmpMappingLength;
                     
                     if (nil == bytes) {

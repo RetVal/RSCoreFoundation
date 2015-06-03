@@ -32,7 +32,7 @@ namespace RSFoundation {
                 __DecompositionTableLock.Acquire();
                 
                 if (nullptr == __DecompositionTable) {
-                    const uint32_t *bytes = (uint32_t *)UniCharGetMappingData(UnicharMappingType::CanonicalDecompMapping);
+                    const uint32_t *bytes = (uint32_t *)UniCharEncodingPrivate::GetMappingData(UnicharMappingType::CanonicalDecompMapping);
                     
                     if (nullptr == bytes) {
                         __DecompositionTableLock.Release();
@@ -67,7 +67,7 @@ namespace RSFoundation {
                 __CompatibilityDecompositionTableLock.Acquire();
                 
                 if (nullptr == __CompatibilityDecompositionTable) {
-                    const uint32_t *bytes = (uint32_t *)UniCharGetMappingData(UnicharMappingType::CompatibilityDecompMapping);
+                    const uint32_t *bytes = (uint32_t *)UniCharEncodingPrivate::GetMappingData(UnicharMappingType::CompatibilityDecompMapping);
                     
                     if (nullptr == bytes) {
                         __CompatibilityDecompositionTableLock.Release();
