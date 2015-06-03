@@ -907,31 +907,123 @@ namespace RSFoundation {
                     }
                 }
                 
-                str = allocator->Allocate<String>(size);
+                str = allocator->Allocate<String>(size + sizeof(UInt32));
                 if (nullptr != str) {
-                    OptionFlags allocBites = (contentsDeallocator == allocator ? String::NotInlineContentsDefaultFree : (contentsDeallocator == nullptr ? String::NotInlineContentsNoFree : String::NotInlineContentsCustomFree));
+                    OptionFlags allocBits = (contentsDeallocator == allocator ? String::NotInlineContentsDefaultFree : (contentsDeallocator == nullptr ? String::NotInlineContentsNoFree : String::NotInlineContentsCustomFree));
+                    UInt32 info = (UInt32)(useInlineData ? String::HasInlineContents : allocBits) |
+                     ((encoding == String::Encoding::Unicode) ? String::IsUnicode : 0) |
+                     (useNullByte ? String::HasNullByte : 0) |
+                     (useLengthByte ? String::HasLengthByte : 0);
+                    str->_SetInfo(info);
+                    if (!useLengthByte) {
+                        Index length = numBytes - (hasLengthByte ? 1 : 0);
+                        if (encoding == String::Encoding::Unicode) length /= sizeof(UniChar);
+                        str->_SetExplicitLength(length);
+                    }
                     
+                    if (useInlineData) {
+                        UInt8 *contents = (UInt8 *)str->_Contents();
+                        if (useLengthByte && !hasLengthByte) {
+                            *contents++ = (UInt8)numBytes;
+                        }
+                        memmove(contents, bytes, numBytes);
+                        if (useNullByte) contents[numBytes] = 0;
+                    } else {
+                        str->_SetContentPtr(bytes);
+                        if (str->_HasContentsDeallocator()) {
+                            str->_SetContentsDeallocator(contentsDeallocator);
+                        }
+                    }
+                } else {
+                    if (noCopy && (contentsDeallocator != nullptr)) {
+                        contentsDeallocator->Deallocate((void *)bytes);
+                    }
                 }
             }
-            return romResult;
+            if (vBuf.shouldFreeChars) {
+                vBuf.allocator->Deallocate((void *)bytes);
+            }
+            return str;
         }
         
         String::String(const char *cStr) {
-            bool isASCII = true;
-            // Given this code path is rarer these days, OK to do this extra work to verify the strings
-            const char *tmp = cStr;
-            while (*tmp) {
-                if (*(tmp++) & 0x80) {
-                    isASCII = false;
-                    break;
+//            bool isASCII = true;
+//            // Given this code path is rarer these days, OK to do this extra work to verify the strings
+//            const char *tmp = cStr;
+//            while (*tmp) {
+//                if (*(tmp++) & 0x80) {
+//                    isASCII = false;
+//                    break;
+//                }
+//            }
+//            
+//            if (!isASCII) {
+//                
+//            } else {
+//                
+//            }
+        }
+        
+        void String::_DeallocateMutableContents(void *buffer) {
+            auto alloc = _HasContentsAllocator() ? _ContentsAllocator() : &Allocator<String>::AllocatorSystemDefault;
+            
+            if (_IsMutable() && _HasContentsAllocator() && alloc->IsGC()) {
+                // do nothing
+            } else if (alloc->IsGC()) {
+                // GC:  for finalization safety, let collector reclaim the buffer in the next GC cycle.
+                //        auto_zone_release(objc_collectableZone(), buffer);
+            } else {
+                alloc->Deallocate(buffer);
+            }
+        }
+        
+        String::~String() {
+            
+            // If in DEBUG mode, check to see if the string a RSSTR, and complain.
+            //    RSAssert1(__RSConstantStringTableBeingFreed || !__RSStrIsConstantString((RSStringRef)RS), __RSLogAssertion, "Tried to deallocate RSSTR(\"%R\")", str);
+            //    if (!__RSConstantStringTableBeingFreed)
+            //    {
+            //        if (!(__RSRuntimeInstanceIsStackValue(str) || __RSRuntimeInstanceIsSpecial(str)) && __RSStrIsConstantString(str))
+            //            __RSCLog(RSLogLevelNotice, "constant string deallocate\n");
+            //    }
+            if (!_IsInline()) {
+                uint8_t *contents;
+                bool isMutable = _IsMutable();
+                if (_IsFreeContentsWhenDone() && (contents = (uint8_t *)_Contents())) {
+                    if (isMutable) {
+//                        _DeallocateMutableContents(contents);
+                    } else {
+                        if (_HasContentsDeallocator()) {
+                            Allocator<String> *allocator = _ContentsDeallocator();
+                            allocator->Deallocate(contents);
+//                            RSAllocatorDeallocate(allocator, contents);
+//                            RSRelease(allocator);
+                        } else {
+                            Allocator<String> *allocator = &Allocator<String>::AllocatorSystemDefault;
+//                            RSAllocatorRef alloc = __RSGetAllocator();
+//                            RSAllocatorDeallocate(alloc, contents);
+                            allocator->Deallocate(contents);
+                        }
+                    }
+                }
+                if (isMutable && _HasContentsAllocator()) {
+                    auto allocator __unused = _ContentsAllocator();
+                    
+                    //            if (!(RSAllocatorSystemDefaultGCRefZero == allocator || RSAllocatorDefaultGCRefZero == allocator))
+//                    RSRelease(allocator);
                 }
             }
-            
-            if (!isASCII) {
-                
-            } else {
-                
-            }
+        }
+        
+        const String *String::Create() {
+            return &String::Empty;
+        }
+        
+        const String *String::Create(const char * cStr, String::Encoding encoding) {
+            if (!cStr) return Create();
+            Index len = strlen(cStr);
+            Allocator<String> &allocator = Allocator<String>::AllocatorSystemDefault;
+            return _CreateInstanceImmutable(&allocator, cStr, len, encoding, false, false, false, true, false, nullptr, 0);
         }
         
         String::Encoding String::GetSystemEncoding() {

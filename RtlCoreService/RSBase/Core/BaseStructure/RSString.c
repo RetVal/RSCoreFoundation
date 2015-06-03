@@ -2277,12 +2277,12 @@ static void __RSStringDeallocate(RSTypeRef RS)
     RSStringRef str = (RSStringRef)RS;
     
     // If in DEBUG mode, check to see if the string a RSSTR, and complain.
-//    RSAssert1(__RSConstantStringTableBeingFreed || !__RSStrIsConstantString((RSStringRef)RS), __RSLogAssertion, "Tried to deallocate RSSTR(\"%R\")", str);
-//    if (!__RSConstantStringTableBeingFreed)
-//    {
-//        if (!(__RSRuntimeInstanceIsStackValue(str) || __RSRuntimeInstanceIsSpecial(str)) && __RSStrIsConstantString(str))
-//            __RSCLog(RSLogLevelNotice, "constant string deallocate\n");
-//    }
+    //    RSAssert1(__RSConstantStringTableBeingFreed || !__RSStrIsConstantString((RSStringRef)RS), __RSLogAssertion, "Tried to deallocate RSSTR(\"%R\")", str);
+    //    if (!__RSConstantStringTableBeingFreed)
+    //    {
+    //        if (!(__RSRuntimeInstanceIsStackValue(str) || __RSRuntimeInstanceIsSpecial(str)) && __RSStrIsConstantString(str))
+    //            __RSCLog(RSLogLevelNotice, "constant string deallocate\n");
+    //    }
     if (!__RSStrIsInline(str))
     {
         uint8_t *contents;
@@ -2311,7 +2311,7 @@ static void __RSStringDeallocate(RSTypeRef RS)
         if (isMutable && __RSStrHasContentsAllocator(str))
         {
             RSAllocatorRef allocator = __RSStrContentsAllocator((RSMutableStringRef)str);
-//            if (!(RSAllocatorSystemDefaultGCRefZero == allocator || RSAllocatorDefaultGCRefZero == allocator))
+            //            if (!(RSAllocatorSystemDefaultGCRefZero == allocator || RSAllocatorDefaultGCRefZero == allocator))
             RSRelease(allocator);
         }
     }

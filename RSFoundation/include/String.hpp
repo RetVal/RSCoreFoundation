@@ -221,25 +221,36 @@ namespace RSFoundation {
                 InsufficientOutputBufferLength = 2,
                 Unavailable = 3
             };
-            
+            String() {};
         private:
-            String() {
-                
-            };
+            
             
             String(const char*);
             
-            ~String() {
-                
-            }
-            template<typename T2>
-            friend T2 *Allocator<T2>::Allocate(size_t size);
+            friend String *_CreateInstanceImmutable(Allocator<String> *allocator,
+                                                    const void *bytes,
+                                                    Index numBytes,
+                                                    String::Encoding encoding,
+                                                    bool possiblyExternalFormat,
+                                                    bool tryToReduceUnicode,
+                                                    bool hasLengthByte,
+                                                    bool hasNullByte,
+                                                    bool noCopy,
+                                                    Allocator<String> *contentsDeallocator,
+                                                    UInt32 reservedFlags);
+//            template<>
+//            friend class Allocator<String>::_AllocateImpl<String, false>;
             
+//            template<>
+//            friend class Allocator<String>::_AllocateImpl<String, true>;
+            
+            
+            friend String *Allocator<String>::_AllocateImpl<String, false>::_Allocate(malloc_zone_t *zone, size_t size);
+//            friend RSFoundation::Collection::String* RSFoundation::Basic::Allocator<RSFoundation::Collection::String>::_AllocateImpl<RSFoundation::Collection::String, false>::_Allocate(malloc_zone_t *zone, size_t size);
         public:
-            const String *Create();
-            const String *Create(const char*);
-            
-            
+            static const String *Create();
+            static const String *Create(const char*cStr, String::Encoding encoding);
+            ~String();
         public:
             
             static String Empty;
@@ -278,12 +289,16 @@ namespace RSFoundation {
                 HasLengthByte = 0x04,
             };
             
+            inline void _SetInfo(UInt32 info) {
+                _info1 = info;
+            }
+            
             inline bool _IsMutable() const {
                 return (_info1 & IsMutableMask) == IsMutable;
             }
             
             inline bool _IsInline() const {
-                return (_info1 & ContentsMask) == ContentsMask;
+                return (_info1 & ContentsMask) == HasInlineContents;
             }
             
             inline bool _IsFreeContentsWhenDone() const {
@@ -320,33 +335,36 @@ namespace RSFoundation {
             
             inline const void *_Contents() const {
                 if (_IsInline()) {
-                    return (const void *)(((uintptr_t)&(this->_variants)) + (_HasExplicitLength() ? sizeof(Index) : 0));
+                    uintptr_t vbase = (uintptr_t)&(this->_variants);
+                    uintptr_t offset = (_HasExplicitLength() ? sizeof(Index) : 0);
+                    uintptr_t rst = vbase + offset;
+                    return (const void *)rst;
                 }
                 return this->_variants._notInlineImmutable1._buffer;
             }
             
-            inline Allocator<String>& _ContentsDeallocatorPtr() const {
-                return _HasExplicitLength() ? (this->_variants._notInlineImmutable1._contentsDeallocator) : (this->_variants._notInlineImmutable2._contentsDeallocator);
+            inline Allocator<String>** _ContentsDeallocatorPtr() const {
+                return _HasExplicitLength() ? (Allocator<String> **)(&(this->_variants._notInlineImmutable1._contentsDeallocator)) : (Allocator<String> **)(&this->_variants._notInlineImmutable2._contentsDeallocator);
             }
             
-            inline Allocator<String> _ContentsDeallocator() const {
-                return MoveValue(_ContentsDeallocatorPtr());
+            inline Allocator<String> *_ContentsDeallocator() const {
+                return *_ContentsDeallocatorPtr();
             }
             
-            void _SetContentsDeallocator(Allocator<String> &allocator) {
-                _ContentsDeallocatorPtr() = allocator;
+            void _SetContentsDeallocator(Allocator<String> *allocator) {
+                *_ContentsDeallocatorPtr() = allocator;
             }
             
-            inline Allocator<String> &_ContentsAllocatorPtr() const {
-                return (this->_variants._notInlineMutable1._contentsAllocator);
+            inline Allocator<String> **_ContentsAllocatorPtr() const {
+                return (Allocator<String> **)&this->_variants._notInlineMutable1._contentsAllocator;
             }
             
-            inline Allocator<String> _ContentsAllocator() const {
-                return MoveValue(_ContentsAllocatorPtr());
+            inline Allocator<String> *_ContentsAllocator() const {
+                return *_ContentsAllocatorPtr();
             }
             
-            inline void _SetContentsAllocator(Allocator<String> &allocator) {
-                _ContentsAllocatorPtr() = allocator;
+            inline void _SetContentsAllocator(Allocator<String> *allocator) {
+                *_ContentsAllocatorPtr() = allocator;
             }
             
             inline Index _Length() const {
@@ -507,11 +525,14 @@ namespace RSFoundation {
                 }
                 return capacity;
             }
+            
+            void _DeallocateMutableContents(void *buffer);
 
         private:
-            UInt32 _info1 : 8;
-            UInt32 _reserved : 24;
-            
+            UInt32 _info1;
+#ifdef __LP64__
+            UInt32 _reserved;
+#endif
             struct __notInlineMutable {
                 void *_buffer;
                 Index _length;
@@ -525,7 +546,7 @@ namespace RSFoundation {
 #else
                 unsigned long _desiredCapacity:28;
 #endif
-                Allocator<String>& _contentsAllocator;           // Optional
+                Allocator<String>* _contentsAllocator;           // Optional
             };
             
             union __variants {
@@ -541,12 +562,12 @@ namespace RSFoundation {
                 struct __notInlineImmutable1 {
                     void *_buffer;
                     Index _length;
-                    Allocator<String> &_contentsDeallocator;
+                    Allocator<String> *_contentsDeallocator;
                 } _notInlineImmutable1;
                 
                 struct __notInlineImmutable2 {
                     void *_buffer;
-                    Allocator<String> &_contentsDeallocator;
+                    Allocator<String> *_contentsDeallocator;
                 } _notInlineImmutable2;
                 struct __notInlineMutable _notInlineMutable1;
                 

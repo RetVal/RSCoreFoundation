@@ -15,9 +15,15 @@
 #include <typeinfo>
 
 #include <malloc/malloc.h>
+#include <new>
+#include <iostream>
 
 namespace RSFoundation {
+    namespace Collection {
+        class String;
+    }
     namespace Basic {
+        
         template<typename T>
         class Allocator : public Object, private Counter<UInt32> {
         public:
@@ -30,16 +36,50 @@ namespace RSFoundation {
                 void *ptr = malloc_zone_malloc(zone, sizeof(T));
                 T *t = new (ptr) T(args...);
                 Inc();
+                std::cout << Self << " inc " << name << " " << Val() << "\n";
                 return t;
             }
             
             template<typename T2>
             T2 *Allocate(size_t size) {
-                if (POD<T2>::Result) {
-                    return static_cast<T2*>(malloc_zone_malloc(zone, size * sizeof(T2)));
-                }
-                return new T2[size];
+                return _AllocateImpl<T2, std::is_pod<T2>::value>::_Allocate(zone, size);
             }
+            
+        private:
+            friend class RSFoundation::Collection::String;
+            template<typename T2, bool isPod>
+            class _AllocateImpl {
+                friend class Allocator;
+                friend class RSFoundation::Collection::String;
+                static T2 *_Allocate(malloc_zone_t *zone, size_t size) {
+                    return nullptr;
+                }
+            };
+            
+            template<typename T2>
+            class _AllocateImpl<T2, false> {
+                friend class Allocator;
+                friend class RSFoundation::Collection::String;
+                static T2 *_Allocate(malloc_zone_t *zone, size_t size) {
+                    size = 8 + size; // this +
+                    void *ptr = malloc_zone_malloc(zone, size);
+                    T2 *t = new (ptr) T2;
+                    Allocator<T2> *allocator = &Allocator<T2>::AllocatorSystemDefault;
+                    allocator->Inc();
+                    std::cout << allocator->Self << " inc " << allocator->name << " " << allocator->Val() << "\n";
+                    return t;
+                }
+            };
+            
+            template<typename T2>
+            class _AllocateImpl<T2, true> {
+                friend class Allocator;
+                friend class RSFoundation::Collection::String;
+                static T2 *_Allocate(malloc_zone_t *zone, size_t size) {
+                    return static_cast<T2*>(malloc_zone_malloc(zone, size * sizeof(T2)));;
+                }
+            };
+        public:
             
             template<typename T2>
             T2 *Reallocate(void *p, size_t size) {
@@ -56,6 +96,14 @@ namespace RSFoundation {
                 t->T::~T();
                 malloc_zone_free(zone, static_cast<void*>(t));
                 Dec();
+                std::cout << Self << " dec " << name << " " << Val() << "\n";
+            }
+            
+            void Deallocate(const T *t) {
+                t->T::~T();
+                malloc_zone_free(zone, (void*)(t));
+                Dec();
+                std::cout << Self << " dec " << name << " " << Val() << "\n";
             }
 
             void Deallocate(Nullable<T> &obj) {
@@ -69,15 +117,27 @@ namespace RSFoundation {
                 
             }
             
+            bool IsGC() const {
+                return false;
+            }
         private:
             Allocator() {
                 zone = malloc_default_zone();
-                name = typeid(T).name();
+                Object obj;
+                obj.template GetClassName<T>(name);
+                obj.template GetClassName<decltype(this)>(Self);
+                
+//                std::cout << Self << " init with " << name << "\n";
+            }
+            
+            ~Allocator() {
+//                std::cout << Self << " dealloc " << name << "\n";
             }
             
         private:
             malloc_zone_t *zone;
-            const char *name;
+            std::string name;
+            std::string Self;
         };
         
         template<typename T>

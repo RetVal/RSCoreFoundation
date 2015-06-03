@@ -13,7 +13,7 @@
 
 namespace RSFoundation {
     namespace Basic {
-        template<typename T, RSUInt64 minSize>
+        template<typename T, UInt64 minSize>
         union BinaryBitMap {
             T t;
             char bin[sizeof(T) > minSize ? sizeof(T) : minSize];

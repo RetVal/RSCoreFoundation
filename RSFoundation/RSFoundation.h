@@ -17,7 +17,7 @@
 #include <RSFoundation/BinaryBitMap.h>
 #include <RSFoundation/Protocol.h>
 #include <RSFoundation/Allocator.h>
-#include <RSFoundation/String.h>
+#include <RSFoundation/String.hpp>
 
 //! Project version number for RSFoundation.
 RSFOUNDATION_EXPORT double RSFoundationVersionNumber;

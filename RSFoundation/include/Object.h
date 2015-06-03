@@ -11,8 +11,11 @@
 
 #include <RSFoundation/BasicTypeDefine.h>
 #include <RSFoundation/TypeTraits.h>
+#include <string>
+#include <cxxabi.h>
 
 namespace RSFoundation {
+    using namespace __cxxabiv1;
     namespace Basic {
         class NotCopyable {
         private:
@@ -41,9 +44,29 @@ namespace RSFoundation {
         class Object {
         public:
             virtual ~Object();
+            template <typename T>
+            void GetClassName(std::string &className) {
+                char *output_buffer = nullptr;
+                size_t len = 0;
+                int status = 0;
+                const std::type_info& typeinfo = typeid(T);
+                __cxa_demangle(typeinfo.name(), nullptr, &len, &status);
+                if (len) {
+                    output_buffer = new char[len + 1];
+                    assert(output_buffer != nullptr && "尼玛");
+                    __cxa_demangle(typeinfo.name(), output_buffer, &len, &status);
+                    assert(status == 0 && "尼玛");
+                    className = std::string(output_buffer);
+                    delete[] output_buffer;
+                } else {
+                    className = std::string(typeinfo.name());
+                }
+            }
+            
+//            virtual void GetClassName(std::string &className) const;
+//            virtual void Description(std::string &desc, unsigned int indent = 0, bool debug = false) const;
+//            virtual void Dump() const;
         };
-        
-        
     }
 }
 

@@ -11,12 +11,15 @@
 
 using namespace RSFoundation;
 using namespace RSFoundation::Basic;
+using namespace RSFoundation::Collection;
 
 int main(int argc, char **argv) {
     Nullable<ObjectBox<char>> x = ObjectBox<char>('1');
     if (x) {
-        printf("%c", x.GetValue().Unbox());
+        printf("%c\n", x.GetValue().Unbox());
     }
     Date date;
+    const String* str = String::Create("str", String::Encoding::UTF8);
+    Allocator<String>::AllocatorSystemDefault.Deallocate(str);
     return 0;
 }

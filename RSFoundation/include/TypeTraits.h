@@ -142,6 +142,8 @@ namespace RSFoundation {
             static NoType Test(void *value);
             typedef decltype(Test((TFrom *)0)) YesNoType;
         };
+        
+        
     }
 }
 
