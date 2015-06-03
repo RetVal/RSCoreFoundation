@@ -17,7 +17,7 @@ namespace RSFoundation {
 #include <libkern/OSByteOrder.h>
 #define _USE_OSBYTEORDER_H 1
 #endif
-        enum class ByteOrder : Index {
+        enum  ByteOrder : Index {
             Unknown,
             LittleEndian,
             BigEndian

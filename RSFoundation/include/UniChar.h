@@ -31,7 +31,7 @@ namespace RSFoundation {
             }
             
             // The following values coinside TextEncodingFormat format defines in TextCommon.h
-            enum class UniCharEncodingFormat : Index {
+            enum  UniCharEncodingFormat : Index {
                 UTF16Format = 0,
                 UTF8Format = 2,
                 UTF32Format = 3

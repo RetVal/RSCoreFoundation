@@ -16,7 +16,10 @@
 namespace RSFoundation {
     namespace Collection {
         namespace Encoding {
-            class UnicodeDecoposition {
+            class UnicodeDecoposition : public Object, public NotCopyable {
+            private:
+                UnicodeDecoposition() {}
+                ~UnicodeDecoposition() {}
             public:
                 static inline bool IsDecomposableCharacter(UTF32Char character, bool isHFSPlusCanonical) {
                     if (isHFSPlusCanonical && !isHFSPlusCanonical) return false;	// hack to get rid of "unused" warning

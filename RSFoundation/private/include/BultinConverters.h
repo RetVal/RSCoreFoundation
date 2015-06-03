@@ -23,6 +23,9 @@ namespace RSFoundation {
             extern  const StringEncodingConverter __ConverterUTF8;
             
             class BuiltinConverters : public Object, public NotCopyable {
+            private:
+                BuiltinConverters() {}
+                ~BuiltinConverters() {}
             public:
                 static String::Encoding *CreateListOfAvailablePlatformConverters(Index *numberOfConverters);
                 static const StringEncodingConverter *GetExternalConverter(String::Encoding encoding);

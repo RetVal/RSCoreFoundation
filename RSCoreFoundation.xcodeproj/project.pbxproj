@@ -1685,8 +1685,8 @@
 				30D334231B15B92D005F8673 /* Allocator.cpp */,
 				30D334091B158E88005F8673 /* Date.cpp */,
 				30D334151B15B59A005F8673 /* Protocol.cpp */,
-				30D3341D1B15B787005F8673 /* String.cpp */,
 				30A5B80C1B1DA64E00679E74 /* UniChar.cpp */,
+				30D3341D1B15B787005F8673 /* String.cpp */,
 			);
 			path = lib;
 			sourceTree = "<group>";

@@ -198,7 +198,7 @@ namespace RSFoundation {
                 ShiftJIS_X0213_00 = 0x0628 /* Shift-JIS format encoding of JIS X0213 planes 1 and 2 (DEPRECATED) */
             };
             
-            enum class EncodingConfiguration : Index {
+            enum  EncodingConfiguration : Index {
                 AllowLossyConversion = (1UL << 0), // Uses fallback functions to substitutes non mappable chars
                 BasicDirectionLeftToRight = (1UL << 1), // Converted with original direction left-to-right.
                 BasicDirectionRightToLeft = (1UL << 2), // Converted with original direction right-to-left.
@@ -222,7 +222,7 @@ namespace RSFoundation {
                 Unavailable = 3
             };
             
-        public:
+        private:
             String() {
                 
             };
@@ -232,9 +232,28 @@ namespace RSFoundation {
             ~String() {
                 
             }
+            template<typename T2>
+            friend T2 *Allocator<T2>::Allocate(size_t size);
+            
+        public:
+            const String *Create();
+            const String *Create(const char*);
+            
+            
+        public:
             
             static String Empty;
             static String::Encoding GetSystemEncoding();
+            
+        public:
+            
+            Index GetLength() const;
+            Index GetCapacity() const;
+            
+        public:
+            bool operator==(const String &rhs) {
+                return GetLength() == rhs.GetLength();
+            }
             
         private:
             enum {

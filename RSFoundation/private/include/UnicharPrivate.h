@@ -19,7 +19,7 @@ namespace RSFoundation {
 #define UniCharConvertFlagToCount(flag)	((flag >> 24) & 0x1F)
         
         namespace Encoding {
-            enum class UnicharMappingType : Index {
+            enum  UnicharMappingType : Index {
                 CanonicalDecompMapping = (UniCharCaseFold + 1),
                 CanonicalPrecompMapping,
                 CompatibilityDecompMapping

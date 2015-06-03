@@ -41,6 +41,13 @@ namespace RSFoundation {
                 return new T2[size];
             }
             
+            template<typename T2>
+            T2 *Reallocate(void *p, size_t size) {
+                static_assert(POD<T2>::Result, "");
+                T2 *ptr = static_cast<T2*>(malloc_zone_realloc(zone, p, size * sizeof(T2)));
+                return ptr;
+            }
+            
             void Deallocate(void *ptr) {
                 malloc_zone_free(zone, ptr);
             }
