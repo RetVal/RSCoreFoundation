@@ -43,6 +43,7 @@ namespace RSFoundation {
         
         class Object {
         public:
+            Object();
             virtual ~Object();
             template <typename T>
             void GetClassName(std::string &className) {

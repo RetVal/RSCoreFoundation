@@ -221,7 +221,8 @@ namespace RSFoundation {
                 InsufficientOutputBufferLength = 2,
                 Unavailable = 3
             };
-            String() {};
+            String() {
+            };
         private:
             
             
@@ -257,9 +258,8 @@ namespace RSFoundation {
             static String::Encoding GetSystemEncoding();
             
         public:
-            
+            const String *Copy() const;
             Index GetLength() const;
-            Index GetCapacity() const;
             
         public:
             bool operator==(const String &rhs) {
@@ -291,6 +291,10 @@ namespace RSFoundation {
             
             inline void _SetInfo(UInt32 info) {
                 _info1 = info;
+            }
+            
+            inline bool _IsConstant() const {
+                return false;
             }
             
             inline bool _IsMutable() const {

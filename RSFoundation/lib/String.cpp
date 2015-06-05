@@ -1030,6 +1030,24 @@ namespace RSFoundation {
             return String::UTF8;
         }
         
+        const String *String::Copy() const {
+            if (GetLength() == 0) {
+                return &Empty;
+            }
+            
+            if (_IsMutable() && (_IsInline() || _IsFreeContentsWhenDone() || _IsConstant())) {
+                return this;
+            }
+            if (_IsEightBit()) {
+                const UInt8 *contents = (const UInt8 *)_Contents();
+                return _CreateInstanceImmutable(nullptr, contents + _SkipAnyLengthByte(), _Length2(contents), StringPrivate::_GetEightBitStringEncoding(), false, false, false, false, false, nullptr, 0);
+            }
+            return this;
+        }
+        
+        Index String::GetLength() const {
+            return _Length();
+        }
         
         String String::Empty = String();
     }

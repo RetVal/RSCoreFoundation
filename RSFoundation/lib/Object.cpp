@@ -76,6 +76,9 @@ namespace RSFoundation {
 //            desc.append("\t");
 //            std::cout << desc << std::endl;
 //        }
+        Object::Object() {
+            
+        }
         
         Object::~Object() {
         }
