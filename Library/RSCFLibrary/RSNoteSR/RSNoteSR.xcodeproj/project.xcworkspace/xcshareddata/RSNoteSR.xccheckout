@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>D5F72A69-C053-4335-945D-D974B2C07BA3</string>
+	<key>IDESourceControlProjectName</key>
+	<string>RSNoteSR</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>80F07BCAFEA9DCCF08B5AD95BD86E984B77A37DC</key>
+		<string>https://github.com/RetVal/RSCoreFoundation.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Library/RSCFLibrary/RSNoteSR/RSNoteSR.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>80F07BCAFEA9DCCF08B5AD95BD86E984B77A37DC</key>
+		<string>../../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/RetVal/RSCoreFoundation.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>80F07BCAFEA9DCCF08B5AD95BD86E984B77A37DC</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>80F07BCAFEA9DCCF08B5AD95BD86E984B77A37DC</string>
+			<key>IDESourceControlWCCName</key>
+			<string>RSCoreFoundation-1400</string>
+		</dict>
+	</array>
+</dict>
+</plist>
