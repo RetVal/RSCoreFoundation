@@ -82,7 +82,6 @@ namespace RSFoundation {
         }
         
         Object::~Object() {
-            print_stacktrace();
         }
     }
 }

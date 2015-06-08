@@ -7,6 +7,7 @@
 //
 
 #include <RSFoundation/RSFoundation.h>
+
 using namespace RSFoundation;
 using namespace RSFoundation::Basic;
 using namespace RSFoundation::Collection;
@@ -19,7 +20,7 @@ int main(int argc, char **argv) {
     }
     Date date;
     const String* str = String::Create("str", String::Encoding::UTF8);
-    Allocator<String>::AllocatorSystemDefault.Deallocate(str);
+//    Allocator<String>::AllocatorSystemDefault.Deallocate(str);
     
     __main();
     return 0;

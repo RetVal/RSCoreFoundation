@@ -21,6 +21,8 @@ struct foo * GC;
 #include "gc.h"
 #include "gc_allocator.h"
 
+#define GC
+
 extern "C" void GC_printf(const char *format, ...);
 
 // This is adapted from a benchmark written by John Ellis and Pete Kovac
@@ -278,32 +280,59 @@ struct GCBench {
         PrintDiagnostics();
         cout << "Completed in " << tElapsed << " msec" << endl;
 #		ifdef GC
-        cout << "Completed " << GC_gc_no << " collections" <<endl;
+        cout << "Completed " << GC_get_gc_no() << " collections" <<endl;
         cout << "Heap size is " << GC_get_heap_size() << endl;
 #		endif
     }
     
     ~GCBench() {
         while (GC_collect_a_little()) { }
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 1; i++) {
             GC_gcollect();
         }
-        GC_dump();
+//        GC_dump();
         printf("\n***************************************************************\n");
     }
 };
 
+#include "leak_detector.h"
+
+void GC_CALLBACK warn_proc(char *msg, GC_word p)
+{
+    GC_printf(msg, (unsigned long)p);
+    /*FAIL;*/
+}
 
 extern "C" int __main () {
-    for (int i = 0; i < 10; ++i) {
+    GC_set_warn_proc(warn_proc);
+    for (int i = 0; i < 1; ++i) {
         GCBench x;
         x.main();
     }
+    CHECK_LEAKS();
+    CHECK_LEAKS();
+    CHECK_LEAKS();
     return 0;
 }
 
 namespace RSFoundation {
     namespace Basic {
+        
+        extern "C" void *_malloc(malloc_zone_t *zone, size_t size) {
+            return GC_MALLOC(size);
+//            return malloc_zone_malloc(zone, size);
+        }
+        
+        extern "C" void *_realloc(malloc_zone_t *zone, void *ptr, size_t size) {
+            return GC_REALLOC(ptr, size);
+//            return malloc_zone_realloc(zone, ptr, size);
+        }
+        
+        extern "C" void _free(malloc_zone_t *zone, void *ptr) {
+            return GC_FREE(ptr);
+//            malloc_zone_free(zone, ptr);
+        }
+        
         class GCObject : public GC_NS_QUALIFY(gc) {
         public:
             GCObject() {
@@ -347,8 +376,12 @@ namespace RSFoundation {
             while (GC_collect_a_little()) { }
             for (int i = 0; i < 16; i++) {
                 GC_gcollect();
+                cout << "Completed " << GC_get_gc_no() << " collections" <<endl;
+                cout << "Heap size is " << GC_get_heap_size() << endl;
             }
             GC_dump();
+            cout << "Completed " << GC_get_gc_no() << " collections" <<endl;
+            cout << "Heap size is " << GC_get_heap_size() << endl;
             printf("\n***************************************************************\n");
         }
     }

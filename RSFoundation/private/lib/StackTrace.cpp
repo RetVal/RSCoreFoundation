@@ -10,7 +10,6 @@
 #include <cxxabi.h>
 #include <execinfo.h>
 
-using namespace __cxxabiv1;
 namespace RSFoundation {
     namespace Basic {
         Private void print_stacktrace(FILE *out, unsigned int max_frames) {
