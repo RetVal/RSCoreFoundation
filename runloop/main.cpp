@@ -11,6 +11,7 @@ using namespace RSFoundation;
 using namespace RSFoundation::Basic;
 using namespace RSFoundation::Collection;
 
+extern "C" int __main ();
 int main(int argc, char **argv) {
     Nullable<ObjectBox<char>> x = ObjectBox<char>('1');
     if (x) {
@@ -18,7 +19,8 @@ int main(int argc, char **argv) {
     }
     Date date;
     const String* str = String::Create("str", String::Encoding::UTF8);
-//    Allocator<String>::AllocatorSystemDefault.Deallocate(str);
-    Object *t = new Object();
+    Allocator<String>::AllocatorSystemDefault.Deallocate(str);
+    
+    __main();
     return 0;
 }

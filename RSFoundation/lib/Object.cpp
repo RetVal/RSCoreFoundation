@@ -8,6 +8,7 @@
 
 #include "Object.h"
 #include <iostream>
+#include "StackTrace.h"
 
 namespace RSFoundation {
     namespace Basic {
@@ -81,6 +82,7 @@ namespace RSFoundation {
         }
         
         Object::~Object() {
+            print_stacktrace();
         }
     }
 }
