@@ -23,14 +23,19 @@ namespace RSFoundation {
         class String;
     }
     namespace Basic {
+        class GCAllocator : public Object {
+        private:
+            template <typename T>
+            friend class Allocator;
+            GCAllocator() {};
+            ~GCAllocator() {};
+            static void *Allocate(size_t size);
+            static void *Reallocate(void* ptr, size_t size);
+            static void Free(void *ptr);
+        };
         
-        extern "C" void *_malloc(malloc_zone_t *zone, size_t size);
-        extern "C" void *_realloc(malloc_zone_t *zone, void *ptr, size_t size);
-        extern "C" void _free(malloc_zone_t *zone, void *ptr);
-        
-        template<typename T>
+        template <typename T>
         class Allocator : public Object, private Counter<UInt32> {
-        private:    
         public:
             static Allocator<T> AllocatorSystemDefault;
             static Allocator<T> AllocatorDefault;
@@ -38,7 +43,7 @@ namespace RSFoundation {
         public:
             template<typename ...Args>
             T *Allocate(Args... args) {
-                void *ptr = _malloc(zone, sizeof(T));
+                void *ptr = GCAllocator::Allocate(sizeof(T));
                 T *t = new (ptr) T(args...);
                 Inc();
                 std::cout << Self << " inc " << name << " " << Val() << "\n";
@@ -67,7 +72,7 @@ namespace RSFoundation {
                 friend class RSFoundation::Collection::String;
                 static T2 *_Allocate(malloc_zone_t *zone, size_t size) {
                     size = 8 + size; // this +
-                    void *ptr = _malloc(zone, size);
+                    void *ptr = GCAllocator::Allocate(size);
                     T2 *t = new (ptr) T2;
                     Allocator<T2> *allocator = &Allocator<T2>::AllocatorSystemDefault;
                     allocator->Inc();
@@ -81,7 +86,7 @@ namespace RSFoundation {
                 friend class Allocator;
                 friend class RSFoundation::Collection::String;
                 static T2 *_Allocate(malloc_zone_t *zone, size_t size) {
-                    return static_cast<T2*>(_malloc(zone, size * sizeof(T2)));;
+                    return static_cast<T2*>(GCAllocator::Allocate(size * sizeof(T2)));;
                 }
             };
         public:
@@ -89,24 +94,24 @@ namespace RSFoundation {
             template<typename T2>
             T2 *Reallocate(void *p, size_t size) {
                 static_assert(POD<T2>::Result, "");
-                T2 *ptr = static_cast<T2*>(_realloc(zone, p, size * sizeof(T2)));
+                T2 *ptr = static_cast<T2*>(GCAllocator::Reallocate(p, size * sizeof(T2)));
                 return ptr;
             }
             
             void Deallocate(void *ptr) {
-                _free(zone, ptr);
+                GCAllocator::Free(ptr);
             }
             
             void Deallocate(T *t) {
                 t->T::~T();
-                _free(zone, static_cast<void*>(t));
+                GCAllocator::Free(static_cast<void*>(t));
                 Dec();
                 std::cout << Self << " dec " << name << " " << Val() << "\n";
             }
             
             void Deallocate(const T *t) {
                 t->T::~T();
-                _free(zone, (void*)(t));
+                GCAllocator::Free((void*)(t));
                 Dec();
                 std::cout << Self << " dec " << name << " " << Val() << "\n";
             }
@@ -144,6 +149,7 @@ namespace RSFoundation {
             std::string name;
             std::string Self;
         };
+
         
         template<typename T>
         Allocator<T> Allocator<T>::AllocatorSystemDefault = Allocator<T>();

@@ -3615,7 +3615,7 @@
 		4158D5501625C4C60070E69F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0600;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = RetVal;
 				TargetAttributes = {
 					309903221B1452110081278B = {
@@ -4234,6 +4234,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.closure.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USER_HEADER_SEARCH_PATHS = "icu/** \"$(SRCROOT)/icu/common/\"/**";
@@ -4285,6 +4286,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.closure.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USER_HEADER_SEARCH_PATHS = "icu/** \"$(SRCROOT)/icu/common/\"/**";
@@ -4324,6 +4326,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.closure.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RSCoreFoundationLoader.app/Contents/MacOS/RSCoreFoundationLoader";
 			};
@@ -4357,6 +4360,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.closure.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RSCoreFoundationLoader.app/Contents/MacOS/RSCoreFoundationLoader";
 			};
@@ -4409,6 +4413,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -4520,6 +4525,7 @@
 					"$(USER_LIBRARY_DIR)/Frameworks",
 					"$(SDKROOT)/usr/lib/system",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.RetVal.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = RSCoreFoundation;
 				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -4594,6 +4600,7 @@
 					"$(USER_LIBRARY_DIR)/Frameworks",
 					"$(SDKROOT)/usr/lib/system",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.RetVal.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = RSCoreFoundation;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "icu/** \"$(SRCROOT)/icu/common/\"/**";
@@ -4653,6 +4660,7 @@
 				INSTALL_PATH = "@rpath";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks/ @loader_path/Frameworks/ $(HOME)/Library/Frameworks/ /Library/Frameworks/";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.retval.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = framework;
@@ -4682,6 +4690,7 @@
 				INSTALL_PATH = "@rpath";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks/ @loader_path/Frameworks/ $(HOME)/Library/Frameworks/ /Library/Frameworks/";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.retval.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = framework;
@@ -4701,6 +4710,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks/ @loader_path/Frameworks/ $(HOME)/Library/Frameworks/ /Library/Frameworks/ @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.RetVal.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = RSCoreFoundationLoader;
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
@@ -4720,6 +4730,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks/ @loader_path/Frameworks/ $(HOME)/Library/Frameworks/ /Library/Frameworks/ @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.RetVal.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = RSCoreFoundationLoader;
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;

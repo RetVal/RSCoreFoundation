@@ -82,7 +82,7 @@ extern "C" void GC_printf(const char *format, ...);
 
 /* Get the current time in milliseconds */
 using namespace std;
-unsigned
+unsigned long
 stats_rtclock( void )
 {
     struct timeval t;
@@ -317,6 +317,18 @@ extern "C" int __main () {
 
 namespace RSFoundation {
     namespace Basic {
+        
+        void *GCAllocator::Allocate(size_t size) {
+            return GC_MALLOC(size);
+        }
+        
+        void *GCAllocator::Reallocate(void *ptr, size_t size) {
+            return GC_REALLOC(ptr, size);
+        }
+        
+        void GCAllocator::Free(void *ptr) {
+            return GC_FREE(ptr);
+        }
         
         extern "C" void *_malloc(malloc_zone_t *zone, size_t size) {
             return GC_MALLOC(size);
