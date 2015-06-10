@@ -54,6 +54,8 @@
 		300DF9571B21669900E60428 /* String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300DF9561B21669900E60428 /* String.cpp */; };
 		300F80EC1B1EB22B009B062B /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 41813436168B394500B08722 /* libicucore.dylib */; };
 		300F80ED1B1EB2B1009B062B /* libldap.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 412925091822BADE00F2D71B /* libldap.dylib */; };
+		30178BA71B28259900C402A2 /* StringFormatSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30178BA51B28259900C402A2 /* StringFormatSupport.cpp */; };
+		30178BA81B28259900C402A2 /* StringFormatSupport.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 30178BA61B28259900C402A2 /* StringFormatSupport.hpp */; };
 		30217B891875D18D00BC813A /* RSURL+Extension.c in Sources */ = {isa = PBXBuildFile; fileRef = 30217B881875D18D00BC813A /* RSURL+Extension.c */; };
 		30217B8B1875D19700BC813A /* RSURL+Extension.h in Headers */ = {isa = PBXBuildFile; fileRef = 30217B8A1875D19700BC813A /* RSURL+Extension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		303BE25D1B258D0A00626DE4 /* StackTrace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 303BE25B1B258D0A00626DE4 /* StackTrace.cpp */; };
@@ -881,6 +883,8 @@
 		300DF9431B21665100E60428 /* UnicodePrecomposition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UnicodePrecomposition.cpp; sourceTree = "<group>"; };
 		300DF9541B21668E00E60428 /* String.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = String.hpp; sourceTree = "<group>"; };
 		300DF9561B21669900E60428 /* String.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = String.cpp; sourceTree = "<group>"; };
+		30178BA51B28259900C402A2 /* StringFormatSupport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringFormatSupport.cpp; sourceTree = "<group>"; };
+		30178BA61B28259900C402A2 /* StringFormatSupport.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StringFormatSupport.hpp; sourceTree = "<group>"; };
 		30217B881875D18D00BC813A /* RSURL+Extension.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "RSURL+Extension.c"; sourceTree = "<group>"; };
 		30217B8A1875D19700BC813A /* RSURL+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RSURL+Extension.h"; sourceTree = "<group>"; };
 		303BE25B1B258D0A00626DE4 /* StackTrace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StackTrace.cpp; sourceTree = "<group>"; };
@@ -1773,6 +1777,8 @@
 				300DF9411B21665100E60428 /* StringConverterExt.cpp */,
 				300DF9421B21665100E60428 /* UnicodeDecomposition.cpp */,
 				300DF9431B21665100E60428 /* UnicodePrecomposition.cpp */,
+				30178BA51B28259900C402A2 /* StringFormatSupport.cpp */,
+				30178BA61B28259900C402A2 /* StringFormatSupport.hpp */,
 				303BE25B1B258D0A00626DE4 /* StackTrace.cpp */,
 			);
 			path = lib;
@@ -2951,6 +2957,7 @@
 				300DF90F1B21661600E60428 /* Lock.h in Headers */,
 				300DF9101B21661600E60428 /* Nullable.h in Headers */,
 				3062F7701B21A0BA006B0553 /* gc_hdrs.h in Headers */,
+				30178BA81B28259900C402A2 /* StringFormatSupport.hpp in Headers */,
 				3062F7631B21A0BA006B0553 /* gc_inline.h in Headers */,
 				300DF9111B21661600E60428 /* Object.h in Headers */,
 				300DF9121B21661600E60428 /* ObjectBox.h in Headers */,
@@ -3814,6 +3821,7 @@
 				300DF9241B21661D00E60428 /* Date.cpp in Sources */,
 				303BE25D1B258D0A00626DE4 /* StackTrace.cpp in Sources */,
 				300DF9531B21665100E60428 /* UnicodePrecomposition.cpp in Sources */,
+				30178BA71B28259900C402A2 /* StringFormatSupport.cpp in Sources */,
 				300DF94E1B21665100E60428 /* DataBase.cpp in Sources */,
 				300DF9521B21665100E60428 /* UnicodeDecomposition.cpp in Sources */,
 				300DF9301B21664000E60428 /* UniChar.cpp in Sources */,
@@ -4411,7 +4419,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -4444,7 +4452,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;

@@ -20,8 +20,11 @@ int main(int argc, char **argv) {
     }
     Date date;
     const String* str = String::Create("str", String::Encoding::UTF8);
-//    Allocator<String>::AllocatorSystemDefault.Deallocate(str);
+    Index length = str->GetLength();
+    const String* copy = str->Copy();
+    assert(length == copy->GetLength());
+    const String* copy2 = copy->Copy();
+    assert(length == copy2->GetLength());
     
-    __main();
     return 0;
 }

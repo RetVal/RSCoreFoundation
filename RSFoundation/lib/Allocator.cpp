@@ -359,34 +359,12 @@ namespace RSFoundation {
         
         
         __RS_FOUNDATION_INIT_ROUTINE(1000) void Initialize() {
-            GC_INIT();	/* Optional on Linux/X86; see below.  */
-//            printf("Heap size = %ld\n", GC_get_heap_size());
-//            for (int i = 0; i < 10000000; ++i)
-//            {
-//                int **p = (int **) GC_MALLOC(sizeof(int *));
-//                int *q = (int *) GC_MALLOC_ATOMIC(sizeof(int));
-//                assert(*p == 0);
-//                *p = (int *) GC_REALLOC(q, 2 * sizeof(int));
-//                if (i % 100000 == 0)
-//                    printf("Heap size = %ld\n", GC_get_heap_size());
-//            }
-//            printf("\n***************************************************************\n");
-//            GC_dump();
-//            printf("\n***************************************************************\n");
-//
-//            while ((ret = GC_collect_a_little())) { }
-//            for (int i = 0; i < 1; i++) {
-//                GC_gcollect();
-//                GC_dump();
-//                printf("\n***************************************************************\n");
-//            }
-//            return;
-            
+            GC_INIT();
         }
         
         __RS_FOUNDATION_FINAL_ROUTINE(1000)void Finalize() {
             while (GC_collect_a_little()) { }
-            for (int i = 0; i < 16; i++) {
+            for (int i = 0; i < 1; i++) {
                 GC_gcollect();
                 cout << "Completed " << GC_get_gc_no() << " collections" <<endl;
                 cout << "Heap size is " << GC_get_heap_size() << endl;

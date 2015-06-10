@@ -1041,6 +1041,9 @@ namespace RSFoundation {
             if (_IsEightBit()) {
                 const UInt8 *contents = (const UInt8 *)_Contents();
                 return _CreateInstanceImmutable(nullptr, contents + _SkipAnyLengthByte(), _Length2(contents), StringPrivate::_GetEightBitStringEncoding(), false, false, false, false, false, nullptr, 0);
+            } else {
+                const UniChar *contents = (const UniChar *)_Contents();
+                return _CreateInstanceImmutable(nullptr, contents, _Length2(contents) * sizeof(UniChar), UTF8, false, true, _HasLengthByte(), false, false, nullptr, 0);
             }
             return this;
         }
@@ -1050,5 +1053,6 @@ namespace RSFoundation {
         }
         
         String String::Empty = String();
+        
     }
 }
