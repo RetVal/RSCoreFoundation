@@ -14,7 +14,7 @@
 namespace RSFoundation {
     namespace Collection {
         namespace Encoding {
-            class ICUConverters : public Object, public NotCopyable {
+            class ICUConverters : public Object {
             private:
                 ICUConverters() {}
                 ~ICUConverters() {}

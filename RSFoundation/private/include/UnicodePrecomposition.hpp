@@ -15,8 +15,7 @@
 namespace RSFoundation {
     namespace Collection {
         namespace Encoding {
-            
-            class UniCharPrecompose : public Object, public NotCopyable {
+            class UniCharPrecompose : public Object {
             public:
                 static UTF32Char PrecomposeCharacter(UTF32Char base, UTF32Char combining);
                 static bool Precompose(const UTF16Char *characters, Index length, Index *consumedLength, UTF16Char *precomposed, Index maxLength, Index *filledLength);

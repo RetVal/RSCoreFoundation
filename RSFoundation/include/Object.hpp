@@ -11,19 +11,13 @@
 
 #include <RSFoundation/BasicTypeDefine.hpp>
 #include <RSFoundation/TypeTraits.hpp>
+#include <RSFoundation/Protocol.hpp>
 #include <string>
 #include <cxxabi.h>
 
 namespace RSFoundation {
     using namespace __cxxabiv1;
     namespace Basic {
-        class NotCopyable {
-        private:
-            NotCopyable(const NotCopyable &);
-            NotCopyable& operator=(const NotCopyable &);
-        public:
-            NotCopyable();
-        };
         
         template<typename T, size_t _Size = 1>
         class Counter {
@@ -41,7 +35,7 @@ namespace RSFoundation {
             const T& Val(size_t x = 0) { return __elems_[x]; }
         };
         
-        class Object {
+        class Object : public virtual Hashable {
         public:
             Object();
             virtual ~Object();

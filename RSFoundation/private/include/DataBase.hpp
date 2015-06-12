@@ -15,7 +15,7 @@ namespace RSFoundation {
     namespace Collection {
         namespace Encoding {
             
-            class DataBase : public Object, public NotCopyable {
+            class DataBase : public Object {
             private:
                 DataBase();
                 ~DataBase();

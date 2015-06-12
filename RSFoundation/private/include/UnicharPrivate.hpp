@@ -25,7 +25,7 @@ namespace RSFoundation {
                 CompatibilityDecompMapping
             };
             
-            class UniCharEncodingPrivate : public Object, public NotCopyable {
+            class UniCharEncodingPrivate : public Object {
             private:
                 UniCharEncodingPrivate() {}
                 ~UniCharEncodingPrivate() {}

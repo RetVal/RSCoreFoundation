@@ -11,11 +11,12 @@
 
 #include <RSFoundation/Object.hpp>
 #include <RSFoundation/Allocator.hpp>
+#include <RSFoundation/Protocol.hpp>
 
 namespace RSFoundation {
     using namespace Basic;
     namespace Collection {
-        class String : public Object {
+        class String : public Object, public virtual Copying, public virtual Hashable {
         public:
             enum Encoding : Index {
                 InvalidId = 0xffffffffU,
@@ -260,6 +261,7 @@ namespace RSFoundation {
             static String::Encoding GetSystemEncoding();
             
         public:
+            HashCode Hash() const;
             const String *Copy() const;
             Index GetLength() const;
             

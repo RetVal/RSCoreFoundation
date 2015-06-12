@@ -14,7 +14,7 @@
 
 namespace RSFoundation {
     namespace Collection {
-        class StringFormat : public Object, public NotCopyable {
+        class StringFormat : public Object {
         public:
         private:
             enum class FormatType : Int16 {

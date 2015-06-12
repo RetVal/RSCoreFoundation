@@ -9,7 +9,7 @@
 #ifndef __RSCoreFoundation__BinaryBitMap__
 #define __RSCoreFoundation__BinaryBitMap__
 
-#include <RSFoundation/BasicTypeDefine.h>
+#include <RSFoundation/BasicTypeDefine.hpp>
 
 namespace RSFoundation {
     namespace Basic {

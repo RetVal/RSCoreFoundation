@@ -22,7 +22,7 @@
 
 namespace RSFoundation {
     namespace Basic {
-        class Lock : public Object, public NotCopyable {
+        class Lock : public Object {
         public:
             Lock() {} ;
             virtual ~Lock() {};

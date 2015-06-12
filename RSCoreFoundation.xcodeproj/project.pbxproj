@@ -4766,7 +4766,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
-					"/SourceCache/Library/RSCoreFoundation-1400/Library/RSCFLibrary/RSRenrenCore/Build/Products/Debug",
 					"$(USER_LIBRARY_DIR)/Frameworks",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -4801,7 +4800,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
-					"/SourceCache/Library/RSCoreFoundation-1400/Library/RSCFLibrary/RSRenrenCore/Build/Products/Debug",
 					"$(USER_LIBRARY_DIR)/Frameworks",
 				);
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;

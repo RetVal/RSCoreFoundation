@@ -11,18 +11,7 @@
 #include "StackTrace.hpp"
 
 namespace RSFoundation {
-    namespace Basic {
-        NotCopyable::NotCopyable() {
-        }
-        
-        NotCopyable::NotCopyable(const NotCopyable &) {
-        }
-        
-        NotCopyable& NotCopyable::operator=(const NotCopyable &) {
-            return *this;
-        }
-        
-        
+    namespace Basic { 
         std::string string_format(const std::string fmt_str, ...) {
             int final_n, n = ((int)fmt_str.size()) * 2; /* Reserve two times as much as the length of the fmt_str */
             std::string str;

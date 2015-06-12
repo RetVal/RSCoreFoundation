@@ -152,10 +152,10 @@ namespace RSFoundation {
 
         
         template<typename T>
-        Allocator<T> Allocator<T>::SystemDefault = Allocator<T>();
+        Allocator<T> Allocator<T>::SystemDefault;
         
         template<typename T>
-        Allocator<T> Allocator<T>::Default = Allocator<T>();
+        Allocator<T> Allocator<T>::Default;
     }
 }
 

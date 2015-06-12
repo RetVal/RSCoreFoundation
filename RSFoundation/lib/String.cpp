@@ -1052,7 +1052,88 @@ namespace RSFoundation {
             return _Length();
         }
         
-        String String::Empty = String();
+#define HashEverythingLimit 96
+        
+#define HashNextFourUniChars(accessStart, accessEnd, pointer) \
+{result = result * 67503105 + (accessStart 0 accessEnd) * 16974593  + (accessStart 1 accessEnd) * 66049  + (accessStart 2 accessEnd) * 257 + (accessStart 3 accessEnd); pointer += 4;}
+        
+#define HashNextUniChar(accessStart, accessEnd, pointer) \
+{result = result * 257 + (accessStart 0 accessEnd); pointer++;}
+        inline HashCode _HashCharacters(const UniChar *uContents, Index len, Index actualLen) {
+            HashCode result = actualLen;
+            if (len <= HashEverythingLimit)
+            {
+                const UniChar *end4 = uContents + (len & ~3);
+                const UniChar *end = uContents + len;
+                while (uContents < end4) HashNextFourUniChars(uContents[, ], uContents); 	// First count in fours
+                while (uContents < end) HashNextUniChar(uContents[, ], uContents);		// Then for the last <4 chars, count in ones...
+            } else {
+                const UniChar *contents, *end;
+                contents = uContents;
+                end = contents + 32;
+                while (contents < end) HashNextFourUniChars(contents[, ], contents);
+                contents = uContents + (len >> 1) - 16;
+                end = contents + 32;
+                while (contents < end) HashNextFourUniChars(contents[, ], contents);
+                end = uContents + len;
+                contents = end - 32;
+                while (contents < end) HashNextFourUniChars(contents[, ], contents);
+            }
+            return result + (result << (actualLen & 31));
+        }
+        
+        extern "C" bool (*__RSCharToUniCharFunc)(UInt32 flags, uint8_t ch, UniChar *unicodeChar);
+        extern "C" UniChar __RSCharToUniCharTable[256];
+        inline HashCode _HashEightBit(const UInt8 *cContents, Index len) {
+#if defined(DEBUG)
+            if (!__RSCharToUniCharFunc) {	// A little sanity verification: If this is not set, trying to hash high byte chars would be a bad idea
+                Index cnt;
+                BOOL err = NO;
+                if (len <= HashEverythingLimit) {
+                    for (cnt = 0; cnt < len; cnt++) if (cContents[cnt] >= 128) err = YES;
+                } else {
+                    for (cnt = 0; cnt < 32; cnt++) if (cContents[cnt] >= 128) err = YES;
+                    for (cnt = (len >> 1) - 16; cnt < (len >> 1) + 16; cnt++) if (cContents[cnt] >= 128) err = YES;
+                    for (cnt = (len - 32); cnt < len; cnt++) if (cContents[cnt] >= 128) err = YES;
+                }
+                if (err) {
+                    // Can't do log here, as it might be too early
+                    fprintf(stderr, "Warning: String::Hash() attempting to hash RSFoundation::Collection::String containing high bytes before properly initialized to do so\n");
+                }
+            }
+#endif
+            HashCode result = len;
+            if (len <= HashEverythingLimit) {
+                const uint8_t *end4 = cContents + (len & ~3);
+                const uint8_t *end = cContents + len;
+                while (cContents < end4) HashNextFourUniChars(__RSCharToUniCharTable[cContents[, ]], cContents); 	// First count in fours
+                while (cContents < end) HashNextUniChar(__RSCharToUniCharTable[cContents[, ]], cContents);		// Then for the last <4 chars, count in ones...
+            } else {
+                const uint8_t *contents, *end;
+                contents = cContents;
+                end = contents + 32;
+                while (contents < end) HashNextFourUniChars(__RSCharToUniCharTable[contents[, ]], contents);
+                contents = cContents + (len >> 1) - 16;
+                end = contents + 32;
+                while (contents < end) HashNextFourUniChars(__RSCharToUniCharTable[contents[, ]], contents);
+                end = cContents + len;
+                contents = end - 32;
+                while (contents < end) HashNextFourUniChars(__RSCharToUniCharTable[contents[, ]], contents);
+            }
+            return result + (result << (len & 31));
+        }
+        
+        HashCode String::Hash() const {
+            const UInt8 *contents = (const UInt8 *)_Contents();
+            Index len = _Length2(contents);
+            if (_IsEightBit()) {
+                contents += _SkipAnyLengthByte();
+                return _HashEightBit(contents, len);
+            }
+            return _HashCharacters((const UniChar *)contents, len, len);
+        }
+        
+        String String::Empty;
         
     }
 }

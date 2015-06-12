@@ -16,7 +16,7 @@
 namespace RSFoundation {
     namespace Collection {
         namespace Encoding {
-            class UnicodeDecoposition : public Object, public NotCopyable {
+            class UnicodeDecoposition : public Object {
             private:
                 UnicodeDecoposition() {}
                 ~UnicodeDecoposition() {}

@@ -22,7 +22,7 @@ namespace RSFoundation {
             extern  const StringEncodingConverter __ConverterNextStepLatin;
             extern  const StringEncodingConverter __ConverterUTF8;
             
-            class BuiltinConverters : public Object, public NotCopyable {
+            class BuiltinConverters : public Object {
             private:
                 BuiltinConverters() {}
                 ~BuiltinConverters() {}
