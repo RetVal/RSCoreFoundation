@@ -40,9 +40,9 @@ namespace RSFoundation {
                         if (nil != converter) ucnv_close(*converter);
                         ++converter;
                     }
-                    Allocator<decltype(data->_converters)>::AllocatorSystemDefault.Deallocate(data->_converters);
+                    Allocator<decltype(data->_converters)>::SystemDefault.Deallocate(data->_converters);
                 }
-                Allocator<decltype(data)>::AllocatorSystemDefault.Deallocate(data);
+                Allocator<decltype(data)>::SystemDefault.Deallocate(data);
             }
             
             inline __ICUThreadData *__StringEncodingICUGetThreadData() {
@@ -156,7 +156,7 @@ namespace RSFoundation {
                         __ICUThreadData *data = __StringEncodingICUGetThreadData();
                         
                         if (nil == data->_converters) {
-                            data->_converters = Allocator<UConverter *>::AllocatorSystemDefault.Allocate<UConverter *>(ICU_CONVERTER_SLOT_INCREMENT);
+                            data->_converters = Allocator<UConverter *>::SystemDefault.Allocate<UConverter *>(ICU_CONVERTER_SLOT_INCREMENT);
                             memset(data->_converters, 0, sizeof(UConverter *) * ICU_CONVERTER_SLOT_INCREMENT);
                             data->_numSlots = ICU_CONVERTER_SLOT_INCREMENT;
                             data->_nextSlot = 0;
@@ -180,11 +180,11 @@ namespace RSFoundation {
                                     return 0;
                                 }
                                 
-                                newConverters = Allocator<UConverter *>::AllocatorSystemDefault.Allocate<UConverter *>(newSize);
+                                newConverters = Allocator<UConverter *>::SystemDefault.Allocate<UConverter *>(newSize);
 //                                newConverters = (UConverter **)AllocatorAllocate(nil, sizeof(UConverter *) * newSize);
                                 memset(newConverters, 0, sizeof(UConverter *) * newSize);
                                 memcpy(newConverters, data->_converters, sizeof(UConverter *) * data->_numSlots);
-                                Allocator<decltype(data->_converters)>::AllocatorSystemDefault.Deallocate(data->_converters);
+                                Allocator<decltype(data->_converters)>::SystemDefault.Deallocate(data->_converters);
 //                                AllocatorDeallocate(nil, data->_converters);
                                 data->_converters = newConverters;
                                 data->_nextSlot = data->_numSlots;
@@ -425,7 +425,7 @@ namespace RSFoundation {
                 Index index;
                 
                 if (0 == count) return nil;
-                auto allocator = &Allocator<String::Encoding>::AllocatorSystemDefault;
+                auto allocator = &Allocator<String::Encoding>::SystemDefault;
                 encodings = allocator->Allocate<String::Encoding>(count);
                 
                 for (index = 0;index < count;index++) {

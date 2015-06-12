@@ -505,8 +505,8 @@ namespace RSFoundation {
                     _allocatedEntries = nil;
                 }
                 if (_allocatedEntries == nil) { // Not allocated yet
-                    _allocatedEntries = Allocator<_EncodingConverter>::AllocatorSystemDefault.Allocate<_EncodingConverter>(NUM_OF_ENTRIES_CYCLE);
-//                    _allocatedEntries = (_EncodingConverter *)__AutoReleaseISA(AllocatorSystemDefault, AllocatorAllocate(AllocatorSystemDefault, sizeof(_EncodingConverter) * NUM_OF_ENTRIES_CYCLE));
+                    _allocatedEntries = Allocator<_EncodingConverter>::SystemDefault.Allocate<_EncodingConverter>(NUM_OF_ENTRIES_CYCLE);
+//                    _allocatedEntries = (_EncodingConverter *)__AutoReleaseISA(SystemDefault, AllocatorAllocate(SystemDefault, sizeof(_EncodingConverter) * NUM_OF_ENTRIES_CYCLE));
                     
                     _allocatedSize = NUM_OF_ENTRIES_CYCLE;
                     converter = &(_allocatedEntries[_currentIndex]);
@@ -601,7 +601,7 @@ namespace RSFoundation {
 //            }
             
 //            static void __EncodingMappingTableRegister(DictionaryRef dict) {
-//                NotificationCenterAddObserver(NotificationCenterGetDefault(), Autorelease(ObserverCreate(AllocatorSystemDefault, CoreFoundationWillDeallocateNotification, __EncodingMappingTableReleaseRoutine, nil)));
+//                NotificationCenterAddObserver(NotificationCenterGetDefault(), Autorelease(ObserverCreate(SystemDefault, CoreFoundationWillDeallocateNotification, __EncodingMappingTableReleaseRoutine, nil)));
 //            }
             
             static const _EncodingConverter *__GetConverter(String::Encoding encoding)
@@ -641,7 +641,7 @@ namespace RSFoundation {
                             
                             if (nil == commonConverterSlot) {
                                 if (nil == mappingTable) {
-                                    mappingTable = Allocator<std::map<String::Encoding, const _EncodingConverter*>>::AllocatorSystemDefault.Allocate();
+                                    mappingTable = Allocator<std::map<String::Encoding, const _EncodingConverter*>>::SystemDefault.Allocate();
 //                                    mappingTable = DictionaryCreateMutable(nil, 0, nil);
                                     //                        Autorelease(mappingTable);
 //                                    __EncodingMappingTableRegister(mappingTable);
@@ -1013,7 +1013,7 @@ namespace RSFoundation {
                     String::Encoding *icuConverters = nil;
 #endif
                     String::Encoding *platformConverters = BuiltinConverters::CreateListOfAvailablePlatformConverters(&numPlatformConverters);
-                    auto allocator = &Allocator<String::Encoding>::AllocatorSystemDefault;
+                    auto allocator = &Allocator<String::Encoding>::SystemDefault;
                     
                     if ((nil != icuConverters) || (nil != platformConverters)) {
                         Index numSlots = (sizeof(__BuiltinEncodings) / sizeof(*__BuiltinEncodings)) + numICUConverters + numPlatformConverters;

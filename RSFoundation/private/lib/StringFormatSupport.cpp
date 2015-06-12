@@ -312,7 +312,7 @@ sprintf(buffer, formatBuffer, value);	\
             }
             
             if (!cformat && !uformat) {
-                formatChars = (formatLen > FORMAT_BUFFER_LEN) ? (UniChar *)Allocator<UniChar>::AllocatorSystemDefault.Allocate<UniChar>(formatLen) : localFormatBuffer;
+                formatChars = (formatLen > FORMAT_BUFFER_LEN) ? (UniChar *)Allocator<UniChar>::SystemDefault.Allocate<UniChar>(formatLen) : localFormatBuffer;
                 // get characters
                 uformat = formatChars;
             }
@@ -324,7 +324,7 @@ sprintf(buffer, formatBuffer, value);	\
                 for (formatIdx = 0; formatIdx < formatLen; formatIdx++) if ('%' == uformat[formatIdx]) sizeSpecs++;
             }
             
-            specs = ((2 * sizeSpecs + 1) > VPRINTF_BUFFER_LEN) ? Allocator<FormatSpec>::AllocatorSystemDefault.Allocate<FormatSpec>(2 * sizeSpecs + 1) : localSpecsBuffer;
+            specs = ((2 * sizeSpecs + 1) > VPRINTF_BUFFER_LEN) ? Allocator<FormatSpec>::SystemDefault.Allocate<FormatSpec>(2 * sizeSpecs + 1) : localSpecsBuffer;
             //    if (specs != localSpecsBuffer && __RSOASafe) __RSSetLastAllocationEventName(specs, "RSString (temp)");
             
 //            configs = ((sizeSpecs < VPRINTF_BUFFER_LEN) ? localConfigs : (RSDictionaryRef *)RSAllocatorAllocate(tmpAlloc, sizeof(RSStringRef) * sizeSpecs));
@@ -372,7 +372,7 @@ sprintf(buffer, formatBuffer, value);	\
             // Max of three args per spec, reasoning thus: 1 width, 1 prec, 1 value
             sizeArgNum = ((nullptr == orignalValues) ? (3 * sizeSpecs + 1) : orignalValuesSize);
             
-            values = (sizeArgNum > VPRINTF_BUFFER_LEN) ? Allocator<PrintValue>::AllocatorSystemDefault.Allocate<PrintValue>(sizeArgNum) : localValuesBuffer;
+            values = (sizeArgNum > VPRINTF_BUFFER_LEN) ? Allocator<PrintValue>::SystemDefault.Allocate<PrintValue>(sizeArgNum) : localValuesBuffer;
             //    if (values != localValuesBuffer && __RSOASafe) __RSSetLastAllocationEventName(values, "RSString (temp)");
             memset(values, 0, sizeArgNum * sizeof(PrintValue));
             
@@ -399,9 +399,9 @@ sprintf(buffer, formatBuffer, value);	\
                     newMaxArgNum = specs[curSpec].widthArgNum;
                 }
                 if (sizeArgNum < newMaxArgNum) {
-                    if (specs != localSpecsBuffer) Allocator<FormatSpec*>::AllocatorSystemDefault.Deallocate(specs);
-                    if (values != localValuesBuffer) Allocator<PrintValue*>::AllocatorSystemDefault.Deallocate(values);
-                    if (formatChars && (formatChars != localFormatBuffer)) Allocator<decltype(formatChars)>::AllocatorSystemDefault.Deallocate(formatChars);
+                    if (specs != localSpecsBuffer) Allocator<FormatSpec*>::SystemDefault.Deallocate(specs);
+                    if (values != localValuesBuffer) Allocator<PrintValue*>::SystemDefault.Deallocate(values);
+                    if (formatChars && (formatChars != localFormatBuffer)) Allocator<decltype(formatChars)>::SystemDefault.Deallocate(formatChars);
                     return;  // more args than we expected!
                 }
                 /* It is actually incorrect to reorder some specs and not all; we just do some random garbage here */

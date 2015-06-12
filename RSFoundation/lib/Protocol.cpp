@@ -11,5 +11,9 @@
 namespace RSFoundation {
     namespace Basic {
         Protocol::~Protocol() {}
+        
+        Index Hashable::Hash() const { return (uintptr_t)this; }
+        
+        Object *Copying::Copy() const { return nullptr; }
     }
 }

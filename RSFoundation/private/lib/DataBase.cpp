@@ -75,7 +75,7 @@ namespace RSFoundation {
                     if (nullptr == mappingTable) {
                         Index index, count = sizeof(DataBase::KnownEncodingList) / sizeof(*DataBase::KnownEncodingList);
                         
-                        mappingTable = Allocator<std::map<UInt16, String::Encoding>>::AllocatorSystemDefault.Allocate();
+                        mappingTable = Allocator<std::map<UInt16, String::Encoding>>::SystemDefault.Allocate();
                         //                        Autorelease(mappingTable);
                         for (index = 0;index < count;index++) {
                             if (0 != DataBase::WindowsCPList[index]) {
@@ -214,7 +214,7 @@ namespace RSFoundation {
                 if (nullptr == mappingTable) {
                     Index index, count = sizeof(DataBase::KnownEncodingList) / sizeof(*DataBase::KnownEncodingList);
                     
-                    mappingTable = Allocator<std::unordered_map<const char*, String::Encoding, CanonicalNameHash, CanonicalNameCompare>>::AllocatorSystemDefault.Allocate();
+                    mappingTable = Allocator<std::unordered_map<const char*, String::Encoding, CanonicalNameHash, CanonicalNameCompare>>::SystemDefault.Allocate();
                     //                    Autorelease(mappingTable);
                     // Add UTFs
                     (*mappingTable)["utf-7"] = String::Encoding::UTF7;

@@ -51,7 +51,7 @@ namespace RSFoundation {
                     
                     __CombiningPriorityTableNumPlane = UniCharGetNumberOfPlanesForUnicodePropertyData(UniCharCombiningProperty);
                     
-                    __CombiningPriorityTable = (const uint8_t **)Allocator<uint8_t*>::AllocatorSystemDefault.Allocate<uint8_t*>(__CombiningPriorityTableNumPlane);
+                    __CombiningPriorityTable = (const uint8_t **)Allocator<uint8_t*>::SystemDefault.Allocate<uint8_t*>(__CombiningPriorityTableNumPlane);
                     for (idx = 0;idx < __CombiningPriorityTableNumPlane;idx++) __CombiningPriorityTable[idx] = (const uint8_t *)UniCharGetUnicodePropertyDataForPlane(UniCharCombiningProperty, (uint32_t)idx);
                 }
                 
@@ -251,13 +251,13 @@ namespace RSFoundation {
                                 UTF32Char *newBuffer;
                                 
                                 decompBufferSize += MAX_BUFFER_LENGTH;
-                                newBuffer = Allocator<UTF32Char>::AllocatorSystemDefault.Allocate<UTF32Char>(decompBufferSize);
-                                //                        newBuffer = (UTF32Char *)AllocatorAllocate(AllocatorSystemDefault, sizeof(UTF32Char) * decompBufferSize);
+                                newBuffer = Allocator<UTF32Char>::SystemDefault.Allocate<UTF32Char>(decompBufferSize);
+                                //                        newBuffer = (UTF32Char *)AllocatorAllocate(SystemDefault, sizeof(UTF32Char) * decompBufferSize);
                                 memmove(newBuffer, decompBuffer, (decompBufferSize - MAX_BUFFER_LENGTH) * sizeof(UTF32Char));
                                 if (decompBuffer != buffer) {
-                                    Allocator<UTF32Char>::AllocatorSystemDefault.Deallocate(decompBuffer);
+                                    Allocator<UTF32Char>::SystemDefault.Deallocate(decompBuffer);
                                 }
-                                //                        if (decompBuffer != buffer) AllocatorDeallocate(AllocatorSystemDefault, decompBuffer);
+                                //                        if (decompBuffer != buffer) AllocatorDeallocate(SystemDefault, decompBuffer);
                                 decompBuffer = newBuffer;
                             }
                             
@@ -293,7 +293,7 @@ namespace RSFoundation {
                 }
                 if ((decompBufferLen > 0) && __ProcessReorderBuffer(decompBuffer, decompBufferLen, &dst, maxLength, &usedLength, dstFormat)) length -= segmentLength;
                 
-                if (decompBuffer != buffer) Allocator<UTF32Char>::AllocatorSystemDefault.Deallocate(decompBuffer);
+                if (decompBuffer != buffer) Allocator<UTF32Char>::SystemDefault.Deallocate(decompBuffer);
                 
                 if (consumedLength) *consumedLength = originalLength - length;
                 if (filledLength) *filledLength = usedLength;

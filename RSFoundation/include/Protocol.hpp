@@ -13,9 +13,19 @@
 
 namespace RSFoundation {
     namespace Basic {
-        class Protocol : public NotCopyable {
+        class Protocol : private NotCopyable {
         public:
             virtual ~Protocol();
+        };
+        
+        class Hashable : public virtual Protocol {
+        public:
+            Index Hash() const;
+        };
+        
+        class Copying : public virtual Protocol {
+        public:
+            Object *Copy() const;
         };
     }
 }

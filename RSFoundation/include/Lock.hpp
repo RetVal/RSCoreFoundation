@@ -110,6 +110,7 @@ namespace RSFoundation {
         private:
             Lock &_lock;
         };
+        
     }
 }
 

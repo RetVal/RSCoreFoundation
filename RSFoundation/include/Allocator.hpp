@@ -37,8 +37,8 @@ namespace RSFoundation {
         template <typename T>
         class Allocator : public Object, private Counter<UInt32> {
         public:
-            static Allocator<T> AllocatorSystemDefault;
-            static Allocator<T> AllocatorDefault;
+            static Allocator<T> SystemDefault;
+            static Allocator<T> Default;
             
         public:
             template<typename ...Args>
@@ -74,7 +74,7 @@ namespace RSFoundation {
                     size = 8 + size; // this +
                     void *ptr = GCAllocator::Allocate(size);
                     T2 *t = new (ptr) T2;
-                    Allocator<T2> *allocator = &Allocator<T2>::AllocatorSystemDefault;
+                    Allocator<T2> *allocator = &Allocator<T2>::SystemDefault;
                     allocator->Inc();
                     std::cout << allocator->Self << " inc " << allocator->name << " " << allocator->Val() << "\n";
                     return t;
@@ -152,10 +152,10 @@ namespace RSFoundation {
 
         
         template<typename T>
-        Allocator<T> Allocator<T>::AllocatorSystemDefault = Allocator<T>();
+        Allocator<T> Allocator<T>::SystemDefault = Allocator<T>();
         
         template<typename T>
-        Allocator<T> Allocator<T>::AllocatorDefault = Allocator<T>();
+        Allocator<T> Allocator<T>::Default = Allocator<T>();
     }
 }
 

@@ -199,7 +199,7 @@ namespace RSFoundation {
                     si->capacity = (si->capacity + 4) * 2;
                     if (si->hasMalloced) {
                         si->stack = (StringDeferredRange *)realloc(si->stack, si->capacity * sizeof(StringDeferredRange));
-                        //                        si->stack = (StringDeferredRange *)AllocatorReallocate(AllocatorSystemDefault, si->stack, si->capacity * sizeof(StringDeferredRange));
+                        //                        si->stack = (StringDeferredRange *)AllocatorReallocate(SystemDefault, si->stack, si->capacity * sizeof(StringDeferredRange));
                     } else {
                         StringDeferredRange *newStack = (StringDeferredRange *)malloc(si->capacity * sizeof(StringDeferredRange));
                         memmove(newStack, si->stack, si->count * sizeof(StringDeferredRange));
@@ -381,7 +381,7 @@ namespace RSFoundation {
                 
                 if (0 == len) return YES;
                 
-                buffer->allocator = (buffer->allocator ? buffer->allocator : &Allocator<String>::AllocatorSystemDefault);
+                buffer->allocator = (buffer->allocator ? buffer->allocator : &Allocator<String>::SystemDefault);
                 
                 if ((encoding == String::Encoding::UTF16) || (encoding == String::Encoding::UTF16BE) || (encoding == String::Encoding::UTF16LE)) {
                     // UTF-16
@@ -769,18 +769,18 @@ namespace RSFoundation {
             bool useNullByte = NO;
             bool useInlineData = NO;
             if (allocator == nullptr) {
-                allocator = &Allocator<String>::AllocatorDefault;
+                allocator = &Allocator<String>::Default;
             }
             
 #define ALLOCATOFREEFUNC ((Allocator<String>*)-1)
             
             if (contentsDeallocator == ALLOCATOFREEFUNC) {
-                contentsDeallocator = &Allocator<String>::AllocatorDefault;
+                contentsDeallocator = &Allocator<String>::Default;
             } else if (contentsDeallocator == nullptr) {
-                contentsDeallocator = &Allocator<String>::AllocatorDefault;
+                contentsDeallocator = &Allocator<String>::Default;
             }
             
-            if ((numBytes == 0) && (allocator == &Allocator<String>::AllocatorSystemDefault)) {
+            if ((numBytes == 0) && (allocator == &Allocator<String>::SystemDefault)) {
                 // If we are using the system default allocator, and the string is empty, then use the empty string!
                 if (noCopy) {
                     // See 2365208... This change was done after Sonata; before we didn't free the bytes at all (leak).
@@ -797,7 +797,7 @@ namespace RSFoundation {
                 const void *realBytes = (uint8_t *)bytes + (hasLengthByte ? 1 : 0);
                 Index realNumBytes = numBytes - (hasLengthByte ? 1 : 0);
                 bool usingPassedInMemory = false;
-                vBuf.allocator = &Allocator<String>::AllocatorSystemDefault;
+                vBuf.allocator = &Allocator<String>::SystemDefault;
                 vBuf.chars.unicode = nullptr;
                 if (!StringEncodeDecode::__StringDecodeByteStream3((const uint8_t *)realBytes, realNumBytes, encoding, NO, &vBuf, &usingPassedInMemory, reservedFlags)) {
                     return nullptr;
@@ -965,7 +965,7 @@ namespace RSFoundation {
         }
         
         void String::_DeallocateMutableContents(void *buffer) {
-            auto alloc = _HasContentsAllocator() ? _ContentsAllocator() : &Allocator<String>::AllocatorSystemDefault;
+            auto alloc = _HasContentsAllocator() ? _ContentsAllocator() : &Allocator<String>::SystemDefault;
             
             if (_IsMutable() && _HasContentsAllocator() && alloc->IsGC()) {
                 // do nothing
@@ -999,7 +999,7 @@ namespace RSFoundation {
 //                            RSAllocatorDeallocate(allocator, contents);
 //                            RSRelease(allocator);
                         } else {
-                            Allocator<String> *allocator = &Allocator<String>::AllocatorSystemDefault;
+                            Allocator<String> *allocator = &Allocator<String>::SystemDefault;
 //                            RSAllocatorRef alloc = __RSGetAllocator();
 //                            RSAllocatorDeallocate(alloc, contents);
                             allocator->Deallocate(contents);
@@ -1022,7 +1022,7 @@ namespace RSFoundation {
         const String *String::Create(const char * cStr, String::Encoding encoding) {
             if (!cStr) return Create();
             Index len = strlen(cStr);
-            Allocator<String> &allocator = Allocator<String>::AllocatorSystemDefault;
+            Allocator<String> &allocator = Allocator<String>::SystemDefault;
             return _CreateInstanceImmutable(&allocator, cStr, len, encoding, false, false, false, true, false, nullptr, 0);
         }
         

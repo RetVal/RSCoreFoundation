@@ -365,7 +365,7 @@ namespace RSFoundation {
                             headerSize -= (sizeof(uint32_t) * 2);
                             
                             __UniCharNumberOfBitmaps = headerSize / (sizeof(uint32_t) * 2);
-                            array = Allocator<__UniCharBitmapData>::AllocatorSystemDefault.Allocate<__UniCharBitmapData>(__UniCharNumberOfBitmaps);
+                            array = Allocator<__UniCharBitmapData>::SystemDefault.Allocate<__UniCharBitmapData>(__UniCharNumberOfBitmaps);
                             
                             for (idx = 0;idx < (int)__UniCharNumberOfBitmaps;idx++) {
                                 bitmap = (uint8_t *)bitmapBase + SwapInt32BigToHost(*((uint32_t *)bytes)); bytes = (uint8_t *)bytes + sizeof(uint32_t);
@@ -373,8 +373,8 @@ namespace RSFoundation {
                                 
                                 numPlanes = bitmapSize / (8 * 1024);
                                 numPlanes = *(const uint8_t *)((char *)bitmap + (((numPlanes - 1) * ((8 * 1024) + 1)) - 1)) + 1;
-                                //                            array[idx]._planes = (const uint8_t **)AllocatorAllocate(AllocatorSystemDefault, sizeof(const void *) * numPlanes);
-                                array[idx]._planes = (const uint8_t**)(Allocator<uint8_t*>::AllocatorSystemDefault.Allocate<uint8_t *>(numPlanes));
+                                //                            array[idx]._planes = (const uint8_t **)AllocatorAllocate(SystemDefault, sizeof(const void *) * numPlanes);
+                                array[idx]._planes = (const uint8_t**)(Allocator<uint8_t*>::SystemDefault.Allocate<uint8_t *>(numPlanes));
                                 
                                 array[idx]._numPlanes = numPlanes;
                                 
@@ -655,8 +655,7 @@ namespace RSFoundation {
 #error Unknown or unspecified DEPLOYMENT_TARGET
 #endif
                         const void *UniCharEncodingPrivate::GetMappingData(UnicharMappingType type) {
-                            __UniCharMappingTableLock.Acquire();
-                            
+                            LockRAII lock(__UniCharMappingTableLock);
                             if (nullptr == __UniCharMappingTables) {
                                 const void *bytes;
                                 const void *bodyBase;
@@ -665,7 +664,6 @@ namespace RSFoundation {
                                 int64_t fileSize;
                                 
                                 if (!__UniCharLoadFile(MAPPING_TABLE_FILE, &bytes, &fileSize) || !__SimpleFileSizeVerification(bytes, fileSize)) {
-                                    __UniCharMappingTableLock.Release();
                                     return nullptr;
                                 }
                                 
@@ -681,7 +679,7 @@ namespace RSFoundation {
                                 
                                 count = headerSize / sizeof(uint32_t);
                                 
-                                __UniCharMappingTables = Allocator<const void *>::AllocatorSystemDefault.Allocate<const void *>(count);
+                                __UniCharMappingTables = Allocator<const void *>::SystemDefault.Allocate<const void *>(count);
                                 
                                 for (idx = 0;idx < count;idx++) {
 #if defined (__cplusplus)
@@ -691,9 +689,6 @@ namespace RSFoundation {
 #endif
                                 }
                             }
-                            
-                            __UniCharMappingTableLock.Release();
-                            
                             return __UniCharMappingTables[(Index)type];
                         }
                         
@@ -736,14 +731,13 @@ namespace RSFoundation {
                             if (nullptr == __UniCharMappingTables) (void)UniCharEncodingPrivate::GetMappingData(UnicharMappingType(UniCharToLowercase));
                             if (nullptr == __UniCharMappingTables) return false;
                             
-                            __UniCharMappingTableLock.Acquire();
+                            LockRAII lock(__UniCharMappingTableLock);
                             
                             if (__UniCharCaseMappingTableCounts) {
-                                __UniCharMappingTableLock.Release();
                                 return true;
                             }
                             
-                            countArray = Allocator<uint32_t*>::AllocatorSystemDefault.Allocate<uint32_t>(NUM_CASE_MAP_DATA + NUM_CASE_MAP_DATA * 2);
+                            countArray = Allocator<uint32_t*>::SystemDefault.Allocate<uint32_t>(NUM_CASE_MAP_DATA + NUM_CASE_MAP_DATA * 2);
                             __UniCharCaseMappingTable = (uint32_t **)((char *)countArray + sizeof(uint32_t) * NUM_CASE_MAP_DATA);
                             __UniCharCaseMappingExtraTable = (const uint32_t **)(__UniCharCaseMappingTable + NUM_CASE_MAP_DATA);
                             
@@ -754,8 +748,6 @@ namespace RSFoundation {
                             }
                             
                             __UniCharCaseMappingTableCounts = countArray;
-                            
-                            __UniCharMappingTableLock.Release();
                             return true;
                         }
                         
@@ -1168,7 +1160,7 @@ namespace RSFoundation {
                         
                         const void *UniCharGetUnicodePropertyDataForPlane(uint32_t propertyType, uint32_t plane) {
 
-                            __UniCharPropTableLock.Acquire();
+                            LockRAII RAII(__UniCharPropTableLock);
                             if (nullptr == __UniCharUnicodePropertyTable) {
                                 __UniCharBitmapData *table;
                                 const void *bytes;
@@ -1181,7 +1173,6 @@ namespace RSFoundation {
                                 int64_t fileSize;
                                 
                                 if (!__UniCharLoadFile(PROP_DB_FILE, &bytes, &fileSize) || !__SimpleFileSizeVerification(bytes, fileSize)) {
-                                    __UniCharPropTableLock.Release();
                                     return nullptr;
                                 }
                                 
@@ -1199,12 +1190,12 @@ namespace RSFoundation {
                                 count = headerSize / sizeof(uint32_t);
                                 __UniCharUnicodePropertyTableCount = count;
                                 
-                                table = Allocator<__UniCharBitmapData>::AllocatorSystemDefault.Allocate<__UniCharBitmapData>(count);
+                                table = Allocator<__UniCharBitmapData>::SystemDefault.Allocate<__UniCharBitmapData>(count);
                                 
                                 for (idx = 0;idx < count;idx++) {
                                     planeCount = *((const uint8_t *)bodyBase);
                                     planeBase = (char *)bodyBase + planeCount + (planeCount % 4 ? 4 - (planeCount % 4) : 0);
-                                    table[idx]._planes = Allocator<const uint8_t**>::AllocatorSystemDefault.Allocate<const uint8_t*>(planeCount);
+                                    table[idx]._planes = Allocator<const uint8_t**>::SystemDefault.Allocate<const uint8_t*>(planeCount);
                                     for (planeIndex = 0;planeIndex < planeCount;planeIndex++) {
                                         if ((planeSize = ((const uint8_t *)bodyBase)[planeIndex + 1])) {
                                             table[idx]._planes[planeIndex] = (const uint8_t *)planeBase;
@@ -1229,8 +1220,6 @@ namespace RSFoundation {
                                 
                                 __UniCharUnicodePropertyTable = table;
                             }
-                            
-                            __UniCharPropTableLock.Release();
                             
                             return (plane < __UniCharUnicodePropertyTable[propertyType]._numPlanes ? __UniCharUnicodePropertyTable[propertyType]._planes[plane] : nullptr);
                         }
@@ -1379,11 +1368,11 @@ namespace RSFoundation {
                             
                             if (__UniCharBitmapDataArray != nullptr) {
                                 for (idx = 0; idx < (int)__UniCharNumberOfBitmaps; idx++) {
-                                    AllocatorDeallocate(AllocatorSystemDefault, __UniCharBitmapDataArray[idx]._planes);
+                                    AllocatorDeallocate(SystemDefault, __UniCharBitmapDataArray[idx]._planes);
                                     __UniCharBitmapDataArray[idx]._planes = nullptr;
                                 }
                                 
-                                AllocatorDeallocate(AllocatorSystemDefault, __UniCharBitmapDataArray);
+                                AllocatorDeallocate(SystemDefault, __UniCharBitmapDataArray);
                                 __UniCharBitmapDataArray = nullptr;
                                 __UniCharNumberOfBitmaps = 0;
                             }
@@ -1394,13 +1383,13 @@ namespace RSFoundation {
                             SpinLockLock(&__UniCharMappingTableLock);
                             
                             if (__UniCharMappingTables != nullptr) {
-                                AllocatorDeallocate(AllocatorSystemDefault, __UniCharMappingTables);
+                                AllocatorDeallocate(SystemDefault, __UniCharMappingTables);
                                 __UniCharMappingTables = nullptr;
                             }
                             
                             // cleanup memory allocated by __UniCharLoadCaseMappingTable()
                             if (__UniCharCaseMappingTableCounts != nullptr) {
-                                AllocatorDeallocate(AllocatorSystemDefault, __UniCharCaseMappingTableCounts);
+                                AllocatorDeallocate(SystemDefault, __UniCharCaseMappingTableCounts);
                                 __UniCharCaseMappingTableCounts = nullptr;
                                 
                                 __UniCharCaseMappingTable = nullptr;
@@ -1414,11 +1403,11 @@ namespace RSFoundation {
                             
                             if (__UniCharUnicodePropertyTable != nullptr) {
                                 for (idx = 0; idx < __UniCharUnicodePropertyTableCount; idx++) {
-                                    AllocatorDeallocate(AllocatorSystemDefault, __UniCharUnicodePropertyTable[idx]._planes);
+                                    AllocatorDeallocate(SystemDefault, __UniCharUnicodePropertyTable[idx]._planes);
                                     __UniCharUnicodePropertyTable[idx]._planes = nullptr;
                                 }
                                 
-                                AllocatorDeallocate(AllocatorSystemDefault, __UniCharUnicodePropertyTable);
+                                AllocatorDeallocate(SystemDefault, __UniCharUnicodePropertyTable);
                                 __UniCharUnicodePropertyTable = nullptr;
                                 __UniCharUnicodePropertyTableCount = 0;
                             }
