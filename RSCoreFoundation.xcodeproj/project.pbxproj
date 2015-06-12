@@ -12,18 +12,18 @@
 		300CB717189A3349004298E2 /* RSList.c in Sources */ = {isa = PBXBuildFile; fileRef = 300CB715189A3349004298E2 /* RSList.c */; };
 		300CB718189A3349004298E2 /* RSList.h in Headers */ = {isa = PBXBuildFile; fileRef = 300CB716189A3349004298E2 /* RSList.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		300DF8FA1B21653F00E60428 /* RSFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 309903231B1452110081278B /* RSFoundation.framework */; };
-		300DF90A1B21661600E60428 /* Allocator.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF8FC1B21661600E60428 /* Allocator.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		300DF90B1B21661600E60428 /* BasicAlgorithm.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF8FD1B21661600E60428 /* BasicAlgorithm.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		300DF90C1B21661600E60428 /* BasicTypeDefine.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF8FE1B21661600E60428 /* BasicTypeDefine.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		300DF90D1B21661600E60428 /* BinaryBitMap.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF8FF1B21661600E60428 /* BinaryBitMap.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		300DF90E1B21661600E60428 /* Date.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9001B21661600E60428 /* Date.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		300DF90F1B21661600E60428 /* Lock.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9011B21661600E60428 /* Lock.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		300DF9101B21661600E60428 /* Nullable.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9021B21661600E60428 /* Nullable.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		300DF9111B21661600E60428 /* Object.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9031B21661600E60428 /* Object.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		300DF9121B21661600E60428 /* ObjectBox.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9041B21661600E60428 /* ObjectBox.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		300DF9131B21661600E60428 /* Order.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9051B21661600E60428 /* Order.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		300DF9141B21661600E60428 /* Protocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9061B21661600E60428 /* Protocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		300DF9161B21661600E60428 /* TypeTraits.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9081B21661600E60428 /* TypeTraits.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		300DF90A1B21661600E60428 /* Allocator.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF8FC1B21661600E60428 /* Allocator.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		300DF90B1B21661600E60428 /* BasicAlgorithm.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF8FD1B21661600E60428 /* BasicAlgorithm.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		300DF90C1B21661600E60428 /* BasicTypeDefine.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF8FE1B21661600E60428 /* BasicTypeDefine.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		300DF90D1B21661600E60428 /* BinaryBitMap.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF8FF1B21661600E60428 /* BinaryBitMap.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		300DF90E1B21661600E60428 /* Date.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9001B21661600E60428 /* Date.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		300DF90F1B21661600E60428 /* Lock.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9011B21661600E60428 /* Lock.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		300DF9101B21661600E60428 /* Nullable.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9021B21661600E60428 /* Nullable.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		300DF9111B21661600E60428 /* Object.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9031B21661600E60428 /* Object.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		300DF9121B21661600E60428 /* ObjectBox.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9041B21661600E60428 /* ObjectBox.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		300DF9131B21661600E60428 /* Order.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9051B21661600E60428 /* Order.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		300DF9141B21661600E60428 /* Protocol.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9061B21661600E60428 /* Protocol.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		300DF9161B21661600E60428 /* TypeTraits.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9081B21661600E60428 /* TypeTraits.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		300DF9231B21661D00E60428 /* Allocator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300DF9191B21661D00E60428 /* Allocator.cpp */; };
 		300DF9241B21661D00E60428 /* Date.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300DF91A1B21661D00E60428 /* Date.cpp */; };
 		300DF9251B21661D00E60428 /* Lock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300DF91B1B21661D00E60428 /* Lock.cpp */; };
@@ -32,17 +32,17 @@
 		300DF9281B21661D00E60428 /* ObjectBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300DF91E1B21661D00E60428 /* ObjectBox.cpp */; };
 		300DF9291B21661D00E60428 /* Protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300DF91F1B21661D00E60428 /* Protocol.cpp */; };
 		300DF92B1B21661D00E60428 /* TypeTraits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300DF9211B21661D00E60428 /* TypeTraits.cpp */; };
-		300DF92E1B21663A00E60428 /* UniChar.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF92D1B21663A00E60428 /* UniChar.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		300DF92E1B21663A00E60428 /* UniChar.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF92D1B21663A00E60428 /* UniChar.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		300DF9301B21664000E60428 /* UniChar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300DF92F1B21664000E60428 /* UniChar.cpp */; };
-		300DF9441B21665100E60428 /* BultinConverters.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9331B21665100E60428 /* BultinConverters.h */; };
-		300DF9451B21665100E60428 /* DataBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9341B21665100E60428 /* DataBase.h */; };
-		300DF9461B21665100E60428 /* ICUConverters.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9351B21665100E60428 /* ICUConverters.h */; };
-		300DF9471B21665100E60428 /* Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9361B21665100E60428 /* Internal.h */; };
-		300DF9481B21665100E60428 /* StringConverter.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9371B21665100E60428 /* StringConverter.h */; };
-		300DF9491B21665100E60428 /* StringConverterExt.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9381B21665100E60428 /* StringConverterExt.h */; };
-		300DF94A1B21665100E60428 /* UnicharPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9391B21665100E60428 /* UnicharPrivate.h */; };
-		300DF94B1B21665100E60428 /* UnicodeDecomposition.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF93A1B21665100E60428 /* UnicodeDecomposition.h */; };
-		300DF94C1B21665100E60428 /* UnicodePrecomposition.h in Headers */ = {isa = PBXBuildFile; fileRef = 300DF93B1B21665100E60428 /* UnicodePrecomposition.h */; };
+		300DF9441B21665100E60428 /* BultinConverters.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9331B21665100E60428 /* BultinConverters.hpp */; };
+		300DF9451B21665100E60428 /* DataBase.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9341B21665100E60428 /* DataBase.hpp */; };
+		300DF9461B21665100E60428 /* ICUConverters.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9351B21665100E60428 /* ICUConverters.hpp */; };
+		300DF9471B21665100E60428 /* Internal.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9361B21665100E60428 /* Internal.hpp */; };
+		300DF9481B21665100E60428 /* StringConverter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9371B21665100E60428 /* StringConverter.hpp */; };
+		300DF9491B21665100E60428 /* StringConverterExt.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9381B21665100E60428 /* StringConverterExt.hpp */; };
+		300DF94A1B21665100E60428 /* UnicharPrivate.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF9391B21665100E60428 /* UnicharPrivate.hpp */; };
+		300DF94B1B21665100E60428 /* UnicodeDecomposition.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF93A1B21665100E60428 /* UnicodeDecomposition.hpp */; };
+		300DF94C1B21665100E60428 /* UnicodePrecomposition.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF93B1B21665100E60428 /* UnicodePrecomposition.hpp */; };
 		300DF94D1B21665100E60428 /* BultinConverters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300DF93D1B21665100E60428 /* BultinConverters.cpp */; };
 		300DF94E1B21665100E60428 /* DataBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300DF93E1B21665100E60428 /* DataBase.cpp */; };
 		300DF94F1B21665100E60428 /* ICUConverters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300DF93F1B21665100E60428 /* ICUConverters.cpp */; };
@@ -59,7 +59,7 @@
 		30217B891875D18D00BC813A /* RSURL+Extension.c in Sources */ = {isa = PBXBuildFile; fileRef = 30217B881875D18D00BC813A /* RSURL+Extension.c */; };
 		30217B8B1875D19700BC813A /* RSURL+Extension.h in Headers */ = {isa = PBXBuildFile; fileRef = 30217B8A1875D19700BC813A /* RSURL+Extension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		303BE25D1B258D0A00626DE4 /* StackTrace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 303BE25B1B258D0A00626DE4 /* StackTrace.cpp */; };
-		303BE2601B258F1800626DE4 /* StackTrace.h in Headers */ = {isa = PBXBuildFile; fileRef = 303BE25F1B258F1800626DE4 /* StackTrace.h */; };
+		303BE2601B258F1800626DE4 /* StackTrace.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 303BE25F1B258F1800626DE4 /* StackTrace.hpp */; };
 		304B3850186C36F300806E4B /* RSRegularExpression.c in Sources */ = {isa = PBXBuildFile; fileRef = 304B384E186C36F300806E4B /* RSRegularExpression.c */; };
 		304B3851186C36F300806E4B /* RSRegularExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 304B384F186C36F300806E4B /* RSRegularExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		305EC3B7189E14F00025E664 /* RSKVBucket.c in Sources */ = {isa = PBXBuildFile; fileRef = 305EC3B5189E14F00025E664 /* RSKVBucket.c */; };
@@ -103,6 +103,8 @@
 		3062F77B1B21A0BA006B0553 /* weakpointer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3062F7541B21A0BA006B0553 /* weakpointer.h */; };
 		3062F7821B21A752006B0553 /* libgc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3062F7801B21A752006B0553 /* libgc.a */; };
 		3062F7831B21A752006B0553 /* libgccpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3062F7811B21A752006B0553 /* libgccpp.a */; };
+		30734F131B2A8BFF0055A31A /* Dictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30734F111B2A8BFF0055A31A /* Dictionary.cpp */; };
+		30734F141B2A8BFF0055A31A /* Dictionary.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 30734F121B2A8BFF0055A31A /* Dictionary.hpp */; };
 		3098391E1868818400398AC3 /* RSRawHashTable.c in Sources */ = {isa = PBXBuildFile; fileRef = 3098391C1868818400398AC3 /* RSRawHashTable.c */; };
 		3098391F1868818400398AC3 /* RSRawHashTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 3098391D1868818400398AC3 /* RSRawHashTable.h */; };
 		309903281B1452110081278B /* RSFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = 309903271B1452110081278B /* RSFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -843,18 +845,18 @@
 		300CB713189932A6004298E2 /* RSFunctional.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSFunctional.h; sourceTree = "<group>"; };
 		300CB715189A3349004298E2 /* RSList.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSList.c; sourceTree = "<group>"; };
 		300CB716189A3349004298E2 /* RSList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSList.h; sourceTree = "<group>"; };
-		300DF8FC1B21661600E60428 /* Allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Allocator.h; sourceTree = "<group>"; };
-		300DF8FD1B21661600E60428 /* BasicAlgorithm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasicAlgorithm.h; sourceTree = "<group>"; };
-		300DF8FE1B21661600E60428 /* BasicTypeDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasicTypeDefine.h; sourceTree = "<group>"; };
-		300DF8FF1B21661600E60428 /* BinaryBitMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BinaryBitMap.h; sourceTree = "<group>"; };
-		300DF9001B21661600E60428 /* Date.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Date.h; sourceTree = "<group>"; };
-		300DF9011B21661600E60428 /* Lock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Lock.h; sourceTree = "<group>"; };
-		300DF9021B21661600E60428 /* Nullable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Nullable.h; sourceTree = "<group>"; };
-		300DF9031B21661600E60428 /* Object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Object.h; sourceTree = "<group>"; };
-		300DF9041B21661600E60428 /* ObjectBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjectBox.h; sourceTree = "<group>"; };
-		300DF9051B21661600E60428 /* Order.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Order.h; sourceTree = "<group>"; };
-		300DF9061B21661600E60428 /* Protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Protocol.h; sourceTree = "<group>"; };
-		300DF9081B21661600E60428 /* TypeTraits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TypeTraits.h; sourceTree = "<group>"; };
+		300DF8FC1B21661600E60428 /* Allocator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Allocator.hpp; sourceTree = "<group>"; };
+		300DF8FD1B21661600E60428 /* BasicAlgorithm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BasicAlgorithm.hpp; sourceTree = "<group>"; };
+		300DF8FE1B21661600E60428 /* BasicTypeDefine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BasicTypeDefine.hpp; sourceTree = "<group>"; };
+		300DF8FF1B21661600E60428 /* BinaryBitMap.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BinaryBitMap.hpp; sourceTree = "<group>"; };
+		300DF9001B21661600E60428 /* Date.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Date.hpp; sourceTree = "<group>"; };
+		300DF9011B21661600E60428 /* Lock.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Lock.hpp; sourceTree = "<group>"; };
+		300DF9021B21661600E60428 /* Nullable.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Nullable.hpp; sourceTree = "<group>"; };
+		300DF9031B21661600E60428 /* Object.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Object.hpp; sourceTree = "<group>"; };
+		300DF9041B21661600E60428 /* ObjectBox.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ObjectBox.hpp; sourceTree = "<group>"; };
+		300DF9051B21661600E60428 /* Order.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Order.hpp; sourceTree = "<group>"; };
+		300DF9061B21661600E60428 /* Protocol.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Protocol.hpp; sourceTree = "<group>"; };
+		300DF9081B21661600E60428 /* TypeTraits.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = TypeTraits.hpp; sourceTree = "<group>"; };
 		300DF9191B21661D00E60428 /* Allocator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Allocator.cpp; sourceTree = "<group>"; };
 		300DF91A1B21661D00E60428 /* Date.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Date.cpp; sourceTree = "<group>"; };
 		300DF91B1B21661D00E60428 /* Lock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Lock.cpp; sourceTree = "<group>"; };
@@ -863,17 +865,17 @@
 		300DF91E1B21661D00E60428 /* ObjectBox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectBox.cpp; sourceTree = "<group>"; };
 		300DF91F1B21661D00E60428 /* Protocol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Protocol.cpp; sourceTree = "<group>"; };
 		300DF9211B21661D00E60428 /* TypeTraits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TypeTraits.cpp; sourceTree = "<group>"; };
-		300DF92D1B21663A00E60428 /* UniChar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UniChar.h; sourceTree = "<group>"; };
+		300DF92D1B21663A00E60428 /* UniChar.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UniChar.hpp; sourceTree = "<group>"; };
 		300DF92F1B21664000E60428 /* UniChar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UniChar.cpp; sourceTree = "<group>"; };
-		300DF9331B21665100E60428 /* BultinConverters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BultinConverters.h; sourceTree = "<group>"; };
-		300DF9341B21665100E60428 /* DataBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataBase.h; sourceTree = "<group>"; };
-		300DF9351B21665100E60428 /* ICUConverters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ICUConverters.h; sourceTree = "<group>"; };
-		300DF9361B21665100E60428 /* Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Internal.h; sourceTree = "<group>"; };
-		300DF9371B21665100E60428 /* StringConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringConverter.h; sourceTree = "<group>"; };
-		300DF9381B21665100E60428 /* StringConverterExt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringConverterExt.h; sourceTree = "<group>"; };
-		300DF9391B21665100E60428 /* UnicharPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnicharPrivate.h; sourceTree = "<group>"; };
-		300DF93A1B21665100E60428 /* UnicodeDecomposition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnicodeDecomposition.h; sourceTree = "<group>"; };
-		300DF93B1B21665100E60428 /* UnicodePrecomposition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnicodePrecomposition.h; sourceTree = "<group>"; };
+		300DF9331B21665100E60428 /* BultinConverters.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BultinConverters.hpp; sourceTree = "<group>"; };
+		300DF9341B21665100E60428 /* DataBase.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DataBase.hpp; sourceTree = "<group>"; };
+		300DF9351B21665100E60428 /* ICUConverters.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ICUConverters.hpp; sourceTree = "<group>"; };
+		300DF9361B21665100E60428 /* Internal.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Internal.hpp; sourceTree = "<group>"; };
+		300DF9371B21665100E60428 /* StringConverter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StringConverter.hpp; sourceTree = "<group>"; };
+		300DF9381B21665100E60428 /* StringConverterExt.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StringConverterExt.hpp; sourceTree = "<group>"; };
+		300DF9391B21665100E60428 /* UnicharPrivate.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UnicharPrivate.hpp; sourceTree = "<group>"; };
+		300DF93A1B21665100E60428 /* UnicodeDecomposition.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UnicodeDecomposition.hpp; sourceTree = "<group>"; };
+		300DF93B1B21665100E60428 /* UnicodePrecomposition.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = UnicodePrecomposition.hpp; sourceTree = "<group>"; };
 		300DF93D1B21665100E60428 /* BultinConverters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BultinConverters.cpp; sourceTree = "<group>"; };
 		300DF93E1B21665100E60428 /* DataBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DataBase.cpp; sourceTree = "<group>"; };
 		300DF93F1B21665100E60428 /* ICUConverters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ICUConverters.cpp; sourceTree = "<group>"; };
@@ -888,7 +890,7 @@
 		30217B881875D18D00BC813A /* RSURL+Extension.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "RSURL+Extension.c"; sourceTree = "<group>"; };
 		30217B8A1875D19700BC813A /* RSURL+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RSURL+Extension.h"; sourceTree = "<group>"; };
 		303BE25B1B258D0A00626DE4 /* StackTrace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StackTrace.cpp; sourceTree = "<group>"; };
-		303BE25F1B258F1800626DE4 /* StackTrace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackTrace.h; sourceTree = "<group>"; };
+		303BE25F1B258F1800626DE4 /* StackTrace.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StackTrace.hpp; sourceTree = "<group>"; };
 		304B384E186C36F300806E4B /* RSRegularExpression.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRegularExpression.c; sourceTree = "<group>"; };
 		304B384F186C36F300806E4B /* RSRegularExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRegularExpression.h; sourceTree = "<group>"; };
 		3056A93D1AD4E75E00AE909D /* RSCoder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RSCoder.framework; path = ../../../../Users/closure/Library/Frameworks/RSCoder.framework; sourceTree = "<group>"; };
@@ -933,6 +935,8 @@
 		3062F7541B21A0BA006B0553 /* weakpointer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = weakpointer.h; sourceTree = "<group>"; };
 		3062F7801B21A752006B0553 /* libgc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgc.a; path = RSFoundation/deps/gc/libgc.a; sourceTree = "<group>"; };
 		3062F7811B21A752006B0553 /* libgccpp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgccpp.a; path = RSFoundation/deps/gc/libgccpp.a; sourceTree = "<group>"; };
+		30734F111B2A8BFF0055A31A /* Dictionary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Dictionary.cpp; sourceTree = "<group>"; };
+		30734F121B2A8BFF0055A31A /* Dictionary.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Dictionary.hpp; sourceTree = "<group>"; };
 		3098391C1868818400398AC3 /* RSRawHashTable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRawHashTable.c; sourceTree = "<group>"; };
 		3098391D1868818400398AC3 /* RSRawHashTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRawHashTable.h; sourceTree = "<group>"; };
 		309903231B1452110081278B /* RSFoundation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RSFoundation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1706,20 +1710,22 @@
 		300DF8FB1B21661600E60428 /* include */ = {
 			isa = PBXGroup;
 			children = (
-				300DF8FC1B21661600E60428 /* Allocator.h */,
-				300DF8FD1B21661600E60428 /* BasicAlgorithm.h */,
-				300DF8FE1B21661600E60428 /* BasicTypeDefine.h */,
-				300DF8FF1B21661600E60428 /* BinaryBitMap.h */,
-				300DF9001B21661600E60428 /* Date.h */,
-				300DF9011B21661600E60428 /* Lock.h */,
-				300DF9021B21661600E60428 /* Nullable.h */,
-				300DF9031B21661600E60428 /* Object.h */,
-				300DF9041B21661600E60428 /* ObjectBox.h */,
-				300DF9051B21661600E60428 /* Order.h */,
-				300DF9061B21661600E60428 /* Protocol.h */,
-				300DF9081B21661600E60428 /* TypeTraits.h */,
-				300DF92D1B21663A00E60428 /* UniChar.h */,
+				300DF8FC1B21661600E60428 /* Allocator.hpp */,
+				300DF8FD1B21661600E60428 /* BasicAlgorithm.hpp */,
+				300DF8FE1B21661600E60428 /* BasicTypeDefine.hpp */,
+				300DF8FF1B21661600E60428 /* BinaryBitMap.hpp */,
+				300DF9001B21661600E60428 /* Date.hpp */,
+				300DF9011B21661600E60428 /* Lock.hpp */,
+				300DF9021B21661600E60428 /* Nullable.hpp */,
+				300DF9031B21661600E60428 /* Object.hpp */,
+				300DF9041B21661600E60428 /* ObjectBox.hpp */,
+				300DF9051B21661600E60428 /* Order.hpp */,
+				300DF9061B21661600E60428 /* Protocol.hpp */,
+				300DF9081B21661600E60428 /* TypeTraits.hpp */,
+				300DF92D1B21663A00E60428 /* UniChar.hpp */,
 				300DF9541B21668E00E60428 /* String.hpp */,
+				30734F111B2A8BFF0055A31A /* Dictionary.cpp */,
+				30734F121B2A8BFF0055A31A /* Dictionary.hpp */,
 			);
 			path = include;
 			sourceTree = "<group>";
@@ -1753,16 +1759,16 @@
 		300DF9321B21665100E60428 /* include */ = {
 			isa = PBXGroup;
 			children = (
-				303BE25F1B258F1800626DE4 /* StackTrace.h */,
-				300DF9331B21665100E60428 /* BultinConverters.h */,
-				300DF9341B21665100E60428 /* DataBase.h */,
-				300DF9351B21665100E60428 /* ICUConverters.h */,
-				300DF9361B21665100E60428 /* Internal.h */,
-				300DF9371B21665100E60428 /* StringConverter.h */,
-				300DF9381B21665100E60428 /* StringConverterExt.h */,
-				300DF9391B21665100E60428 /* UnicharPrivate.h */,
-				300DF93A1B21665100E60428 /* UnicodeDecomposition.h */,
-				300DF93B1B21665100E60428 /* UnicodePrecomposition.h */,
+				303BE25F1B258F1800626DE4 /* StackTrace.hpp */,
+				300DF9331B21665100E60428 /* BultinConverters.hpp */,
+				300DF9341B21665100E60428 /* DataBase.hpp */,
+				300DF9351B21665100E60428 /* ICUConverters.hpp */,
+				300DF9361B21665100E60428 /* Internal.hpp */,
+				300DF9371B21665100E60428 /* StringConverter.hpp */,
+				300DF9381B21665100E60428 /* StringConverterExt.hpp */,
+				300DF9391B21665100E60428 /* UnicharPrivate.hpp */,
+				300DF93A1B21665100E60428 /* UnicodeDecomposition.hpp */,
+				300DF93B1B21665100E60428 /* UnicodePrecomposition.hpp */,
 			);
 			path = include;
 			sourceTree = "<group>";
@@ -2942,61 +2948,62 @@
 				3062F7571B21A0BA006B0553 /* cord.h in Headers */,
 				3062F7791B21A0BA006B0553 /* thread_local_alloc.h in Headers */,
 				3062F7751B21A0BA006B0553 /* msvc_dbg.h in Headers */,
+				30734F141B2A8BFF0055A31A /* Dictionary.hpp in Headers */,
 				3062F75F1B21A0BA006B0553 /* gc_config_macros.h in Headers */,
-				300DF90A1B21661600E60428 /* Allocator.h in Headers */,
-				300DF90B1B21661600E60428 /* BasicAlgorithm.h in Headers */,
+				300DF90A1B21661600E60428 /* Allocator.hpp in Headers */,
+				300DF90B1B21661600E60428 /* BasicAlgorithm.hpp in Headers */,
 				3062F7741B21A0BA006B0553 /* gcconfig.h in Headers */,
 				3062F7641B21A0BA006B0553 /* gc_mark.h in Headers */,
 				3062F7621B21A0BA006B0553 /* gc_gcj.h in Headers */,
-				300DF90C1B21661600E60428 /* BasicTypeDefine.h in Headers */,
+				300DF90C1B21661600E60428 /* BasicTypeDefine.hpp in Headers */,
 				3062F76B1B21A0BA006B0553 /* leak_detector.h in Headers */,
 				3062F7681B21A0BA006B0553 /* gc_version.h in Headers */,
 				3062F76E1B21A0BA006B0553 /* darwin_stop_world.h in Headers */,
-				300DF90D1B21661600E60428 /* BinaryBitMap.h in Headers */,
-				300DF90E1B21661600E60428 /* Date.h in Headers */,
-				300DF90F1B21661600E60428 /* Lock.h in Headers */,
-				300DF9101B21661600E60428 /* Nullable.h in Headers */,
+				300DF90D1B21661600E60428 /* BinaryBitMap.hpp in Headers */,
+				300DF90E1B21661600E60428 /* Date.hpp in Headers */,
+				300DF90F1B21661600E60428 /* Lock.hpp in Headers */,
+				300DF9101B21661600E60428 /* Nullable.hpp in Headers */,
 				3062F7701B21A0BA006B0553 /* gc_hdrs.h in Headers */,
 				30178BA81B28259900C402A2 /* StringFormatSupport.hpp in Headers */,
 				3062F7631B21A0BA006B0553 /* gc_inline.h in Headers */,
-				300DF9111B21661600E60428 /* Object.h in Headers */,
-				300DF9121B21661600E60428 /* ObjectBox.h in Headers */,
+				300DF9111B21661600E60428 /* Object.hpp in Headers */,
+				300DF9121B21661600E60428 /* ObjectBox.hpp in Headers */,
 				3062F7661B21A0BA006B0553 /* gc_tiny_fl.h in Headers */,
-				300DF9131B21661600E60428 /* Order.h in Headers */,
-				300DF9141B21661600E60428 /* Protocol.h in Headers */,
+				300DF9131B21661600E60428 /* Order.hpp in Headers */,
+				300DF9141B21661600E60428 /* Protocol.hpp in Headers */,
 				3062F75C1B21A0BA006B0553 /* gc.h in Headers */,
 				3062F75D1B21A0BA006B0553 /* gc_allocator.h in Headers */,
-				300DF9161B21661600E60428 /* TypeTraits.h in Headers */,
+				300DF9161B21661600E60428 /* TypeTraits.hpp in Headers */,
 				3062F75E1B21A0BA006B0553 /* gc_backptr.h in Headers */,
 				3062F7781B21A0BA006B0553 /* specific.h in Headers */,
-				300DF92E1B21663A00E60428 /* UniChar.h in Headers */,
+				300DF92E1B21663A00E60428 /* UniChar.hpp in Headers */,
 				3062F7731B21A0BA006B0553 /* gc_priv.h in Headers */,
 				3062F77B1B21A0BA006B0553 /* weakpointer.h in Headers */,
 				3062F76C1B21A0BA006B0553 /* new_gc_alloc.h in Headers */,
 				300DF9551B21668E00E60428 /* String.hpp in Headers */,
 				3062F7551B21A0BA006B0553 /* config.h in Headers */,
 				3062F7771B21A0BA006B0553 /* pthread_support.h in Headers */,
-				300DF9491B21665100E60428 /* StringConverterExt.h in Headers */,
+				300DF9491B21665100E60428 /* StringConverterExt.hpp in Headers */,
 				3062F7611B21A0BA006B0553 /* gc_disclaim.h in Headers */,
 				3062F7711B21A0BA006B0553 /* gc_locks.h in Headers */,
 				3062F7601B21A0BA006B0553 /* gc_cpp.h in Headers */,
 				3062F76F1B21A0BA006B0553 /* dbg_mlc.h in Headers */,
-				300DF94C1B21665100E60428 /* UnicodePrecomposition.h in Headers */,
+				300DF94C1B21665100E60428 /* UnicodePrecomposition.hpp in Headers */,
 				309903281B1452110081278B /* RSFoundation.h in Headers */,
-				300DF9471B21665100E60428 /* Internal.h in Headers */,
+				300DF9471B21665100E60428 /* Internal.hpp in Headers */,
 				3062F76D1B21A0BA006B0553 /* darwin_semaphore.h in Headers */,
-				300DF9441B21665100E60428 /* BultinConverters.h in Headers */,
+				300DF9441B21665100E60428 /* BultinConverters.hpp in Headers */,
 				3062F76A1B21A0BA006B0553 /* javaxfc.h in Headers */,
-				300DF94B1B21665100E60428 /* UnicodeDecomposition.h in Headers */,
+				300DF94B1B21665100E60428 /* UnicodeDecomposition.hpp in Headers */,
 				3062F7651B21A0BA006B0553 /* gc_pthread_redirects.h in Headers */,
 				3062F7591B21A0BA006B0553 /* ec.h in Headers */,
 				3062F7581B21A0BA006B0553 /* cord_pos.h in Headers */,
-				300DF9451B21665100E60428 /* DataBase.h in Headers */,
-				300DF94A1B21665100E60428 /* UnicharPrivate.h in Headers */,
+				300DF9451B21665100E60428 /* DataBase.hpp in Headers */,
+				300DF94A1B21665100E60428 /* UnicharPrivate.hpp in Headers */,
 				3062F7721B21A0BA006B0553 /* gc_pmark.h in Headers */,
-				303BE2601B258F1800626DE4 /* StackTrace.h in Headers */,
-				300DF9461B21665100E60428 /* ICUConverters.h in Headers */,
-				300DF9481B21665100E60428 /* StringConverter.h in Headers */,
+				303BE2601B258F1800626DE4 /* StackTrace.hpp in Headers */,
+				300DF9461B21665100E60428 /* ICUConverters.hpp in Headers */,
+				300DF9481B21665100E60428 /* StringConverter.hpp in Headers */,
 				3062F7761B21A0BA006B0553 /* pthread_stop_world.h in Headers */,
 				3062F7671B21A0BA006B0553 /* gc_typed.h in Headers */,
 			);
@@ -3826,6 +3833,7 @@
 				300DF9521B21665100E60428 /* UnicodeDecomposition.cpp in Sources */,
 				300DF9301B21664000E60428 /* UniChar.cpp in Sources */,
 				300DF9261B21661D00E60428 /* Nullable.cpp in Sources */,
+				30734F131B2A8BFF0055A31A /* Dictionary.cpp in Sources */,
 				300DF9501B21665100E60428 /* StringConverter.cpp in Sources */,
 				300DF9571B21669900E60428 /* String.cpp in Sources */,
 				300DF9251B21661D00E60428 /* Lock.cpp in Sources */,

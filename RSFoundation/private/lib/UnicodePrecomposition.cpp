@@ -6,11 +6,11 @@
 //  Copyright (c) 2015 RetVal. All rights reserved.
 //
 
-#include <RSFoundation/UnicodePrecomposition.h>
-#include <RSFoundation/UniChar.h>
-#include <RSFoundation/Lock.h>
-#include "Internal.h"
-#include <RSFoundation/UniCharPrivate.h>
+#include <RSFoundation/UnicodePrecomposition.hpp>
+#include <RSFoundation/UniChar.hpp>
+#include <RSFoundation/Lock.hpp>
+#include "Internal.hpp"
+#include <RSFoundation/UniCharPrivate.hpp>
 
 namespace RSFoundation {
     namespace Collection {

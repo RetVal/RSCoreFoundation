@@ -6,14 +6,14 @@
 //  Copyright (c) 2015 RetVal. All rights reserved.
 //
 
-#include <RSFoundation/ICUConverters.h>
+#include <RSFoundation/ICUConverters.hpp>
 
-#include <RSFoundation/Database.h>
-#include <RSFoundation/UniChar.h>
-#include <RSFoundation/Allocator.h>
-#include <RSFoundation/StringConverter.h>
+#include <RSFoundation/Database.hpp>
+#include <RSFoundation/UniChar.hpp>
+#include <RSFoundation/Allocator.hpp>
+#include <RSFoundation/StringConverter.hpp>
 
-#include "Internal.h"
+#include "Internal.hpp"
 
 #ifndef UCNV_H
 #include "unicode/ucnv.h"

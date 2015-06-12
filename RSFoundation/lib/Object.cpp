@@ -6,9 +6,9 @@
 //  Copyright (c) 2015 RetVal. All rights reserved.
 //
 
-#include "Object.h"
+#include "Object.hpp"
 #include <iostream>
-#include "StackTrace.h"
+#include "StackTrace.hpp"
 
 namespace RSFoundation {
     namespace Basic {

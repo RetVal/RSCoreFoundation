@@ -6,9 +6,9 @@
 //  Copyright (c) 2015 RetVal. All rights reserved.
 //
 
-#include <RSFoundation/UnicodeDecomposition.h>
-#include <RSFoundation/Lock.h>
-#include <RSFoundation/Allocator.h>
+#include <RSFoundation/UnicodeDecomposition.hpp>
+#include <RSFoundation/Lock.hpp>
+#include <RSFoundation/Allocator.hpp>
 
 using namespace RSFoundation::Basic;
 

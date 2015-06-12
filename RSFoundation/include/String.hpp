@@ -9,8 +9,8 @@
 #ifndef __RSCoreFoundation__String__
 #define __RSCoreFoundation__String__
 
-#include <RSFoundation/Object.h>
-#include <RSFoundation/Allocator.h>
+#include <RSFoundation/Object.hpp>
+#include <RSFoundation/Allocator.hpp>
 
 namespace RSFoundation {
     using namespace Basic;
@@ -227,6 +227,8 @@ namespace RSFoundation {
             
             
             String(const char*);
+            
+            friend class StringFormat;
             
             friend String *_CreateInstanceImmutable(Allocator<String> *allocator,
                                                     const void *bytes,

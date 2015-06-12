@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 RetVal. All rights reserved.
 //
 
-#include "StackTrace.h"
+#include "StackTrace.hpp"
 #include <cxxabi.h>
 #include <execinfo.h>
 

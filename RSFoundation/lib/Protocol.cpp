@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 RetVal. All rights reserved.
 //
 
-#include <RSFoundation/Protocol.h>
+#include <RSFoundation/Protocol.hpp>
 
 namespace RSFoundation {
     namespace Basic {

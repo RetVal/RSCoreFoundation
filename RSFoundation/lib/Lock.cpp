@@ -6,4 +6,4 @@
 //  Copyright (c) 2015 RetVal. All rights reserved.
 //
 
-#include "Lock.h"
+#include "Lock.hpp"

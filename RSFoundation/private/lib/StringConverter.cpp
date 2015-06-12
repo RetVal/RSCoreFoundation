@@ -6,13 +6,13 @@
 //  Copyright (c) 2015 RetVal. All rights reserved.
 //
 
-#include "StringConverter.h"
-#include <RSFoundation/ICUConverters.h>
-#include <RSFoundation/UniChar.h>
-#include <RSFoundation/UnicodeDecomposition.h>
-#include <RSFoundation/StringConverterExt.h>
-#include <RSFoundation/Lock.h>
-#include <RSFoundation/BultinConverters.h>
+#include "StringConverter.hpp"
+#include <RSFoundation/ICUConverters.hpp>
+#include <RSFoundation/UniChar.hpp>
+#include <RSFoundation/UnicodeDecomposition.hpp>
+#include <RSFoundation/StringConverterExt.hpp>
+#include <RSFoundation/Lock.hpp>
+#include <RSFoundation/BultinConverters.hpp>
 #include <stdlib.h>
 #include <map>
 
@@ -1057,7 +1057,7 @@ namespace RSFoundation {
 #undef EXTRA_BASE
 #undef NUM_OF_ENTRIES_CYCLE
 
-#include "ICUConverters.h"
+#include "ICUConverters.hpp"
             
             
             inline bool __IsPlatformConverterAvailable(String::Encoding encoding) {

@@ -6,17 +6,17 @@
 //  Copyright (c) 2015 RetVal. All rights reserved.
 //
 
-#include <RSFoundation/BasicTypeDefine.h>
-#include <RSFoundation/Order.h>
-#include <RSFoundation/BasicAlgorithm.h>
-#include <RSFoundation/TypeTraits.h>
-#include <RSFoundation/Object.h>
-#include <RSFoundation/Nullable.h>
-#include <RSFoundation/ObjectBox.h>
-#include <RSFoundation/Date.h>
-#include <RSFoundation/BinaryBitMap.h>
-#include <RSFoundation/Protocol.h>
-#include <RSFoundation/Allocator.h>
+#include <RSFoundation/BasicTypeDefine.hpp>
+#include <RSFoundation/Order.hpp>
+#include <RSFoundation/BasicAlgorithm.hpp>
+#include <RSFoundation/TypeTraits.hpp>
+#include <RSFoundation/Object.hpp>
+#include <RSFoundation/Nullable.hpp>
+#include <RSFoundation/ObjectBox.hpp>
+#include <RSFoundation/Date.hpp>
+#include <RSFoundation/BinaryBitMap.hpp>
+#include <RSFoundation/Protocol.hpp>
+#include <RSFoundation/Allocator.hpp>
 #include <RSFoundation/String.hpp>
 
 //! Project version number for RSFoundation.

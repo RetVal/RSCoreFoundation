@@ -6,14 +6,14 @@
 //  Copyright (c) 2015 RetVal. All rights reserved.
 //
 
-#include <RSFoundation/Allocator.h>
-#include <RSFoundation/Unichar.h>
-#include <RSFoundation/Order.h>
-#include <RSFoundation/Lock.h>
-#include <RSFoundation/UnicodeDecomposition.h>
+#include <RSFoundation/Allocator.hpp>
+#include <RSFoundation/Unichar.hpp>
+#include <RSFoundation/Order.hpp>
+#include <RSFoundation/Lock.hpp>
+#include <RSFoundation/UnicodeDecomposition.hpp>
 
-#include "Internal.h"
-#include <RSFoundation/UniCharPrivate.h>
+#include "Internal.hpp"
+#include <RSFoundation/UniCharPrivate.hpp>
 
 #ifndef MAX_DECOMPOSED_LENGTH
 #define MAX_DECOMPOSED_LENGTH (10)

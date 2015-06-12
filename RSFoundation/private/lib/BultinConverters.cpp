@@ -6,11 +6,11 @@
 //  Copyright (c) 2015 RetVal. All rights reserved.
 //
 
-#include <RSFoundation/BultinConverters.h>
-#include <RSFoundation/UniChar.h>
-#include <RSFoundation/StringConverterExt.h>
-#include <RSFoundation/UnicodeDecomposition.h>
-#include <RSFoundation/UnicodePrecomposition.h>
+#include <RSFoundation/BultinConverters.hpp>
+#include <RSFoundation/UniChar.hpp>
+#include <RSFoundation/StringConverterExt.hpp>
+#include <RSFoundation/UnicodeDecomposition.hpp>
+#include <RSFoundation/UnicodePrecomposition.hpp>
 
 namespace RSFoundation {
     namespace Collection {

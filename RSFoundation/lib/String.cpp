@@ -7,12 +7,12 @@
 //
 
 #include <RSFoundation/String.hpp>
-#include <RSFoundation/Order.h>
-#include <RSFoundation/UniChar.h>
-#include <RSFoundation/StringConverter.h>
-#include <RSFoundation/StringConverterExt.h>
+#include <RSFoundation/Order.hpp>
+#include <RSFoundation/UniChar.hpp>
+#include <RSFoundation/StringConverter.hpp>
+#include <RSFoundation/StringConverterExt.hpp>
 
-#include "Internal.h"
+#include "Internal.hpp"
 
 namespace RSFoundation {
     namespace Collection {

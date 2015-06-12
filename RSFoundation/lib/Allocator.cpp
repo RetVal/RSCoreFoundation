@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 RetVal. All rights reserved.
 //
 
-#include "Allocator.h"
+#include "Allocator.hpp"
 //#include "debug_new.h"
 //#define GC_DEBUG
 

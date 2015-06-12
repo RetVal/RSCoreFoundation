@@ -10,6 +10,7 @@
 #define StringFormatSupport_cpp
 
 #include <RSFoundation/String.hpp>
+#include <vector>
 
 namespace RSFoundation {
     namespace Collection {
@@ -55,9 +56,9 @@ namespace RSFoundation {
 #endif
             };
             
-            struct RSPrintValue {
-                Int16 type;
-                Int16 size;
+            struct PrintValue {
+                FormatType type;
+                FormatSize size;
                 union {
                     Int64 int64Value;
                     double doubleValue;
@@ -95,6 +96,11 @@ namespace RSFoundation {
             const static Index BUFFER_LEN = 512;
             
             void ParseFormatSpec(const UniChar *uformat, const uint8_t *cformat, Index *fmtIdx, Index fmtLen, FormatSpec *spec, String **configKeyPointer);
+            
+            void AppendFormatCore(String *outputString, void* options, String *formatString, Index initialArgPosition, const void*origValues, Index orginalValuesSize, va_list args);
+            
+//            void AppendFormatCore(String *outputString, void* options, String *formatString, Index initialArgPosition, const std::vector<void*> &origValues, va_list args);
+            
         };
     }
 }

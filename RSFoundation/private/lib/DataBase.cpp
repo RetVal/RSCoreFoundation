@@ -6,11 +6,11 @@
 //  Copyright (c) 2015 RetVal. All rights reserved.
 //
 
-#include <RSFoundation/DataBase.h>
-#include <RSFoundation/Allocator.h>
+#include <RSFoundation/DataBase.hpp>
+#include <RSFoundation/Allocator.hpp>
 #include <RSFoundation/String.hpp>
-#include <RSFoundation/Lock.h>
-#include "Internal.h"
+#include <RSFoundation/Lock.hpp>
+#include "Internal.hpp"
 #include <map>
 #include <unordered_map>
 
