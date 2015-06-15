@@ -11,9 +11,11 @@
 
 #include <RSFoundation/Object.hpp>
 #include <RSFoundation/Allocator.hpp>
-
+#include <RSFoundation/String.hpp>
+#include <vector>
 namespace RSFoundation {
     using namespace Basic;
+    
     namespace Collection {
         template <typename KT, typename VT>
         class Dictionary : public Object {

@@ -103,7 +103,6 @@
 		3062F77B1B21A0BA006B0553 /* weakpointer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3062F7541B21A0BA006B0553 /* weakpointer.h */; };
 		3062F7821B21A752006B0553 /* libgc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3062F7801B21A752006B0553 /* libgc.a */; };
 		3062F7831B21A752006B0553 /* libgccpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3062F7811B21A752006B0553 /* libgccpp.a */; };
-		30734F131B2A8BFF0055A31A /* Dictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30734F111B2A8BFF0055A31A /* Dictionary.cpp */; };
 		30734F141B2A8BFF0055A31A /* Dictionary.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 30734F121B2A8BFF0055A31A /* Dictionary.hpp */; };
 		3098391E1868818400398AC3 /* RSRawHashTable.c in Sources */ = {isa = PBXBuildFile; fileRef = 3098391C1868818400398AC3 /* RSRawHashTable.c */; };
 		3098391F1868818400398AC3 /* RSRawHashTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 3098391D1868818400398AC3 /* RSRawHashTable.h */; };
@@ -112,6 +111,7 @@
 		309903371B1452120081278B /* RSFoundationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 309903361B1452120081278B /* RSFoundationTests.mm */; };
 		3099033A1B1452120081278B /* RSFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 309903231B1452110081278B /* RSFoundation.framework */; };
 		3099033B1B1452120081278B /* RSFoundation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 309903231B1452110081278B /* RSFoundation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		309D6DC01B2D785000A82BFC /* Dictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 309D6DBF1B2D785000A82BFC /* Dictionary.cpp */; };
 		30A15D3918A9C5170055B9A1 /* RSCoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4158D55A1625C4C60070E69F /* RSCoreFoundation.framework */; };
 		30A4B615189E029800DF6FA4 /* RSMultidimensionalDictionary.c in Sources */ = {isa = PBXBuildFile; fileRef = 30A4B613189E029800DF6FA4 /* RSMultidimensionalDictionary.c */; };
 		30A4B616189E029800DF6FA4 /* RSMultidimensionalDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 30A4B614189E029800DF6FA4 /* RSMultidimensionalDictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -935,7 +935,6 @@
 		3062F7541B21A0BA006B0553 /* weakpointer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = weakpointer.h; sourceTree = "<group>"; };
 		3062F7801B21A752006B0553 /* libgc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgc.a; path = RSFoundation/deps/gc/libgc.a; sourceTree = "<group>"; };
 		3062F7811B21A752006B0553 /* libgccpp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgccpp.a; path = RSFoundation/deps/gc/libgccpp.a; sourceTree = "<group>"; };
-		30734F111B2A8BFF0055A31A /* Dictionary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Dictionary.cpp; sourceTree = "<group>"; };
 		30734F121B2A8BFF0055A31A /* Dictionary.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Dictionary.hpp; sourceTree = "<group>"; };
 		3098391C1868818400398AC3 /* RSRawHashTable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRawHashTable.c; sourceTree = "<group>"; };
 		3098391D1868818400398AC3 /* RSRawHashTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRawHashTable.h; sourceTree = "<group>"; };
@@ -945,6 +944,8 @@
 		3099032D1B1452110081278B /* RSFoundationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RSFoundationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		309903351B1452120081278B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		309903361B1452120081278B /* RSFoundationTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RSFoundationTests.mm; sourceTree = "<group>"; };
+		309D6DBD1B2D767500A82BFC /* BasicHashFindBucket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BasicHashFindBucket.cpp; sourceTree = "<group>"; };
+		309D6DBF1B2D785000A82BFC /* Dictionary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Dictionary.cpp; sourceTree = "<group>"; };
 		30A4B613189E029800DF6FA4 /* RSMultidimensionalDictionary.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSMultidimensionalDictionary.c; sourceTree = "<group>"; };
 		30A4B614189E029800DF6FA4 /* RSMultidimensionalDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSMultidimensionalDictionary.h; sourceTree = "<group>"; };
 		30D8458F1875164C004DEBE0 /* regex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = regex.h; sourceTree = "<group>"; };
@@ -1724,7 +1725,6 @@
 				300DF9081B21661600E60428 /* TypeTraits.hpp */,
 				300DF92D1B21663A00E60428 /* UniChar.hpp */,
 				300DF9541B21668E00E60428 /* String.hpp */,
-				30734F111B2A8BFF0055A31A /* Dictionary.cpp */,
 				30734F121B2A8BFF0055A31A /* Dictionary.hpp */,
 			);
 			path = include;
@@ -1743,6 +1743,8 @@
 				300DF9211B21661D00E60428 /* TypeTraits.cpp */,
 				300DF92F1B21664000E60428 /* UniChar.cpp */,
 				300DF9561B21669900E60428 /* String.cpp */,
+				309D6DBF1B2D785000A82BFC /* Dictionary.cpp */,
+				309D6DBD1B2D767500A82BFC /* BasicHashFindBucket.cpp */,
 			);
 			path = lib;
 			sourceTree = "<group>";
@@ -3828,12 +3830,12 @@
 				300DF9241B21661D00E60428 /* Date.cpp in Sources */,
 				303BE25D1B258D0A00626DE4 /* StackTrace.cpp in Sources */,
 				300DF9531B21665100E60428 /* UnicodePrecomposition.cpp in Sources */,
+				309D6DC01B2D785000A82BFC /* Dictionary.cpp in Sources */,
 				30178BA71B28259900C402A2 /* StringFormatSupport.cpp in Sources */,
 				300DF94E1B21665100E60428 /* DataBase.cpp in Sources */,
 				300DF9521B21665100E60428 /* UnicodeDecomposition.cpp in Sources */,
 				300DF9301B21664000E60428 /* UniChar.cpp in Sources */,
 				300DF9261B21661D00E60428 /* Nullable.cpp in Sources */,
-				30734F131B2A8BFF0055A31A /* Dictionary.cpp in Sources */,
 				300DF9501B21665100E60428 /* StringConverter.cpp in Sources */,
 				300DF9571B21669900E60428 /* String.cpp in Sources */,
 				300DF9251B21661D00E60428 /* Lock.cpp in Sources */,

@@ -869,11 +869,11 @@ namespace RSFoundation {
                 return theResult;
             }
             
-            Private bool StringEncodingIsValidEncoding(String::Encoding encoding) {
+            RSPrivate bool StringEncodingIsValidEncoding(String::Encoding encoding) {
                 return (StringEncodingGetConverter(encoding) ? YES : NO);
             }
             
-            Private Index StringEncodingCharLengthForBytes(String::Encoding encoding, uint32_t flags, const uint8_t *bytes, Index numBytes) {
+            RSPrivate Index StringEncodingCharLengthForBytes(String::Encoding encoding, uint32_t flags, const uint8_t *bytes, Index numBytes) {
                 const _EncodingConverter *converter = __GetConverter(encoding);
                 
                 if (converter) {
@@ -917,7 +917,7 @@ namespace RSFoundation {
                 return 0;
             }
             
-            Private Index StringEncodingByteLengthForCharacters(String::Encoding encoding, uint32_t flags, const UniChar *characters, Index numChars)
+            RSPrivate Index StringEncodingByteLengthForCharacters(String::Encoding encoding, uint32_t flags, const UniChar *characters, Index numChars)
             {
                 const _EncodingConverter *converter = __GetConverter(encoding);
                 
@@ -942,7 +942,7 @@ namespace RSFoundation {
                 return 0;
             }
             
-            Private void StringEncodingRegisterFallbackProcedures(String::Encoding encoding, StringEncodingToBytesFallbackProc toBytes, StringEncodingToUnicodeFallbackProc toUnicode) {
+            RSPrivate void StringEncodingRegisterFallbackProcedures(String::Encoding encoding, StringEncodingToBytesFallbackProc toBytes, StringEncodingToUnicodeFallbackProc toUnicode) {
                 _EncodingConverter *converter = (_EncodingConverter *)__GetConverter(encoding);
                 
                 if (nil != converter) {
@@ -953,7 +953,7 @@ namespace RSFoundation {
                 }
             }
             
-            Private const StringEncodingConverter *StringEncodingGetConverter(String::Encoding encoding) {
+            RSPrivate const StringEncodingConverter *StringEncodingGetConverter(String::Encoding encoding) {
                 const _EncodingConverter *converter = __GetConverter(encoding);
                 
                 return ((nil == converter) ? nil : converter->definition);
@@ -1001,7 +1001,7 @@ namespace RSFoundation {
                 }
             }
             
-            Private const String::Encoding *StringEncodingListOfAvailableEncodings(void) {
+            RSPrivate const String::Encoding *StringEncodingListOfAvailableEncodings(void) {
                 static const String::Encoding *encodings = nil;
                 
                 if (nil == encodings) {
@@ -1208,8 +1208,8 @@ namespace RSFoundation {
             
 #undef __CarbonCore_GetTextEncodingBase0
 
-            Private "C" bool (*__RSCharToUniCharFunc)(UInt32 flags, uint8_t ch, UniChar *unicodeChar) = nil;
-            Private "C" UniChar __RSCharToUniCharTable[256] = {
+            RSPrivateExtern bool (*__RSCharToUniCharFunc)(UInt32 flags, uint8_t ch, UniChar *unicodeChar) = nil;
+            RSPrivateExtern UniChar __RSCharToUniCharTable[256] = {
                 0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15,
                 16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,
                 32,  33,  34,  35,  36,  37,  38,  39,  40,  41,  42,  43,  44,  45,  46,  47,
@@ -1228,7 +1228,7 @@ namespace RSFoundation {
                 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255
             };
             
-            Private void __RSSetCharToUniCharFunc(bool (*func)(UInt32 flags, UInt8 ch, UniChar *unicodeChar)) {
+            RSPrivateExtern void __RSSetCharToUniCharFunc(bool (*func)(UInt32 flags, UInt8 ch, UniChar *unicodeChar)) {
                 if (__RSCharToUniCharFunc != func) {
                     int ch;
                     __RSCharToUniCharFunc = func;
@@ -1243,7 +1243,7 @@ namespace RSFoundation {
                 }
             }
             
-            Private void __RSStrConvertBytesToUnicode(const uint8_t *bytes, UniChar *buffer, Index numChars) {
+            RSPrivateExtern void __RSStrConvertBytesToUnicode(const uint8_t *bytes, UniChar *buffer, Index numChars) {
                 Index idx;
                 for (idx = 0; idx < numChars; idx++) buffer[idx] = __RSCharToUniCharTable[bytes[idx]];
             }

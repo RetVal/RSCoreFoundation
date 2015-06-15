@@ -13,7 +13,7 @@
  *
  */
 
-/* Private declarations of GC marker data structures and macros */
+/* RSPrivate declarations of GC marker data structures and macros */
 
 /*
  * Declarations of mark stack.  Needed by marker and client supplied mark

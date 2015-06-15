@@ -55,6 +55,11 @@ namespace RSFoundation {
                 return _AllocateImpl<T2, std::is_pod<T2>::value>::_Allocate(zone, size);
             }
             
+            template<void*>
+            void *Allocate(size_t size) {
+                return GCAllocator::Allocate(size);
+            }
+            
         private:
             friend class RSFoundation::Collection::String;
             template<typename T2, bool isPod>

@@ -402,7 +402,7 @@ namespace RSFoundation {
                             return true;
                         }
                         
-                        Private const char *__UniCharGetUnicodeVersionString(void) {
+                        RSPrivate const char *__UniCharGetUnicodeVersionString(void) {
                             if (nullptr == __UniCharBitmapDataArray) __UniCharLoadBitmapData();
                             return __UniCharUnicodeVersionString;
                         }
@@ -600,7 +600,7 @@ namespace RSFoundation {
                             return (isInverted ? UniCharBitmapAll : UniCharBitmapEmpty);
                         }
                         
-                        Private uint32_t UniCharGetNumberOfPlanes(CharacterSet charset) {
+                        RSPrivate uint32_t UniCharGetNumberOfPlanes(CharacterSet charset) {
                             if ((charset == ControlCharacterSet) || (charset == ControlAndFormatterCharacterSet)) {
                                 return 15; // 0 to 14
                             } else if (charset < DecimalDigitCharacterSet) {
@@ -1059,7 +1059,7 @@ namespace RSFoundation {
                             return true;
                         }
                         
-                        Private uint32_t UniCharGetConditionalCaseMappingFlags(UTF32Char theChar, UTF16Char *buffer, Index currentIndex, Index length, uint32_t type, const uint8_t *langCode, uint32_t lastFlags) {
+                        RSPrivate uint32_t UniCharGetConditionalCaseMappingFlags(UTF32Char theChar, UTF16Char *buffer, Index currentIndex, Index length, uint32_t type, const uint8_t *langCode, uint32_t lastFlags) {
                             if (theChar == 0x03A3) { // GREEK CAPITAL LETTER SIGMA
                                 if ((type == UniCharToLowercase) && (currentIndex > 0)) {
                                     UTF16Char *start = buffer;
@@ -1224,12 +1224,12 @@ namespace RSFoundation {
                             return (plane < __UniCharUnicodePropertyTable[propertyType]._numPlanes ? __UniCharUnicodePropertyTable[propertyType]._planes[plane] : nullptr);
                         }
                         
-                        Private uint32_t UniCharGetNumberOfPlanesForUnicodePropertyData(uint32_t propertyType) {
+                        RSPrivate uint32_t UniCharGetNumberOfPlanesForUnicodePropertyData(uint32_t propertyType) {
                             (void)UniCharGetUnicodePropertyDataForPlane(propertyType, 0);
                             return __UniCharUnicodePropertyTable[propertyType]._numPlanes;
                         }
                         
-                        Private uint32_t UniCharGetUnicodeProperty(UTF32Char character, uint32_t propertyType) {
+                        RSPrivate uint32_t UniCharGetUnicodeProperty(UTF32Char character, uint32_t propertyType) {
                             if (propertyType == UniCharCombiningProperty) {
                                 return UniCharGetCombiningPropertyForCharacter(character, (const uint8_t *)UniCharGetUnicodePropertyDataForPlane(propertyType, (character >> 16) & 0xFF));
                             } else if (propertyType == UniCharBidiProperty) {

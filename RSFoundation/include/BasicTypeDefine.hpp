@@ -88,7 +88,15 @@
 #endif
 #endif
 
-#define Private __private_extern__
+#ifdef __cplusplus
+#define RSExtern		extern "C"
+#define RSPrivateExtern	__attribute__((visibility("hidden"))) extern "C"
+#define RSPrivate          __attribute__((visibility("hidden")))
+#else
+#define RSExtern		extern
+#define RSPrivateExtern	__attribute__((visibility("hidden"))) extern
+#define RSPrivate          __attribute__((visibility("hidden")))
+#endif
 
 #if (__cplusplus && __cplusplus >= 201103L && (__has_extension(cxx_strong_enums) || __has_feature(objc_fixed_enum))) || (!__cplusplus && __has_feature(objc_fixed_enum))
 #define RS_FOUNDATION_ENUM(_type, _name) enum _name : _type _name; enum _name : _type

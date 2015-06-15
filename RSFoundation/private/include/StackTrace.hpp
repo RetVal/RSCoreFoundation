@@ -13,7 +13,7 @@
 
 namespace RSFoundation {
     namespace Basic {
-        Private void print_stacktrace(FILE *out = stderr, unsigned int max_frames = 63);
+        RSPrivate void print_stacktrace(FILE *out = stderr, unsigned int max_frames = 63);
     }
 }
 

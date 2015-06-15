@@ -12,7 +12,7 @@
 
 namespace RSFoundation {
     namespace Basic {
-        Private void print_stacktrace(FILE *out, unsigned int max_frames) {
+        RSPrivate void print_stacktrace(FILE *out, unsigned int max_frames) {
             fprintf(out, "stack trace:\n");
             // storage array for stack trace address data
             void* addrlist[max_frames+1];
