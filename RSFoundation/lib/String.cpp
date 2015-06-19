@@ -1016,7 +1016,7 @@ namespace RSFoundation {
         }
         
         const String *String::Create() {
-            return &String::Empty;
+            return Allocator<String>::SystemDefault.Allocate();
         }
         
         const String *String::Create(const char * cStr, String::Encoding encoding) {
@@ -1032,7 +1032,7 @@ namespace RSFoundation {
         
         const String *String::Copy() const {
             if (GetLength() == 0) {
-                return &Empty;
+                return Create();
             }
             
             if (_IsMutable() && (_IsInline() || _IsFreeContentsWhenDone() || _IsConstant())) {

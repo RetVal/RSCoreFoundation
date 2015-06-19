@@ -45,7 +45,7 @@
 #if FIND_BUCKET_FOR_REHASH
 Index
 #else
-BasicHashBucket
+Bucket &&
 #endif
 FIND_BUCKET_NAME (uintptr_t stack_key
 #if FIND_BUCKET_FOR_REHASH
@@ -104,7 +104,7 @@ FIND_BUCKET_NAME (uintptr_t stack_key
 #endif
     
     COCOA_HASHTABLE_PROBING_START(this, num_buckets);
-    Value *keys = (bits.keys_offset) ? _GetKeys() : _GetValues();
+    Value *keys = (bits.keys_offset) ? (Value *)_GetKeys() : _GetValues();
 #if !FIND_BUCKET_FOR_REHASH
     uintptr_t *hashes = (_HasHashCache()) ? _GetHashes() : nil;
 #endif
@@ -120,12 +120,12 @@ FIND_BUCKET_NAME (uintptr_t stack_key
 #if FIND_BUCKET_FOR_REHASH
             Index result = (NotFound == deleted_idx) ? probe : deleted_idx;
 #else
-            BasicHashBucket result;
+            Bucket result;
             result.idx = (NotFound == deleted_idx) ? probe : deleted_idx;
             result.count = 0;
 #endif
             COCOA_HASHTABLE_PROBING_END(this, idx + 1);
-            return result;
+            return MoveValue(result);
 #if !FIND_BUCKET_FOR_REHASH
         } else if (curr_key == ~0UL) {
             COCOA_HASHTABLE_PROBE_DELETED(this, probe);
@@ -144,14 +144,15 @@ FIND_BUCKET_NAME (uintptr_t stack_key
                 COCOA_HASHTABLE_PROBING_END(this, idx + 1);
 #if FIND_BUCKET_FOR_REHASH
                 Index result = probe;
+                return result;
 #else
-                BasicHashBucket result;
+                Bucket result;
                 result.idx = probe;
                 result.weak_value = _GetValue(probe);
                 result.weak_key = curr_key;
                 result.count = (bits.counts_offset) ? _GetSlotCount(probe) : 1;
+                return MoveValue(result);
 #endif
-                return result;
             }
 #endif
         }
@@ -189,12 +190,15 @@ FIND_BUCKET_NAME (uintptr_t stack_key
     COCOA_HASHTABLE_PROBING_END(this, num_buckets);
 #if FIND_BUCKET_FOR_REHASH
     Index result = deleted_idx;
+    return result;
 #else
-    BasicHashBucket result;
-    result.idx = deleted_idx;
-    result.count = 0;
+    Bucket result = {
+        .count = 0,
+        .idx = deleted_idx
+    };
+    return MoveValue(result);
 #endif
-    return result; // all buckets full or deleted, return first deleted element which was found
+     // all buckets full or deleted, return first deleted element which was found
 }
 
 #undef FIND_BUCKET_NAME

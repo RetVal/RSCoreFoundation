@@ -222,10 +222,10 @@ namespace RSFoundation {
                 InsufficientOutputBufferLength = 2,
                 Unavailable = 3
             };
+            
+        private:
             String() {
             };
-        private:
-            
             
             String(const char*);
             
@@ -249,7 +249,17 @@ namespace RSFoundation {
 //            friend class Allocator<String>::_AllocateImpl<String, true>;
             
             
-            friend String *Allocator<String>::_AllocateImpl<String, false>::_Allocate(malloc_zone_t *zone, size_t size);
+            friend String *Allocator<String>::_AllocateImpl<String, false>::_Allocate(size_t size);
+            friend class Allocator<String>;
+            friend class Allocator<String>::_AllocateImpl<String, false>;
+            
+            void *operator new(size_t size) noexcept {
+                return nullptr;
+            }
+            
+            void *operator new(size_t size, void *memory) noexcept {
+                return memory;
+            }
 //            friend RSFoundation::Collection::String* RSFoundation::Basic::Allocator<RSFoundation::Collection::String>::_AllocateImpl<RSFoundation::Collection::String, false>::_Allocate(malloc_zone_t *zone, size_t size);
         public:
             static const String *Create();

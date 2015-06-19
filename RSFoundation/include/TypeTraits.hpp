@@ -143,7 +143,27 @@ namespace RSFoundation {
             typedef decltype(Test((TFrom *)0)) YesNoType;
         };
         
+
+        namespace __is_base_of_impl {
+            template <typename B, typename D>
+            struct Host
+            {
+                operator B*() const;
+                operator D*();
+            };
+        }
         
+        template <typename B, typename D>
+        struct is_base_of {
+            typedef char (&yes)[1];
+            typedef char (&no)[2];
+            
+            template <typename T>
+            static yes check(D*, T);
+            static no check(B*, int);
+            
+            static const bool value = sizeof(check(__is_base_of_impl::Host<B,D>(), int())) == sizeof(yes);
+        };
     }
 }
 

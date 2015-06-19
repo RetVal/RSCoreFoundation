@@ -19,31 +19,67 @@
 #include <iostream>
 
 namespace RSFoundation {
+    class Equal;
+    namespace Basic {
+        class Hash;
+    }
+    
     namespace Collection {
         class String;
     }
     namespace Basic {
-        class GCAllocator : public Object {
-        private:
-            template <typename T>
+        class AllocatorProtocol : public virtual Protocol {
+        public:
+            AllocatorProtocol() {};
+            ~AllocatorProtocol() {};
+            static void *Allocate(size_t size) {return nullptr;}
+            static void *Reallocate(void* ptr, size_t size) {return nullptr;}
+            static void Free(void *ptr) {return;}
+            static size_t Size(void *ptr) {return 0;}
+        };
+        
+        class GCAllocator : public virtual AllocatorProtocol {
+        public:
+            template <typename T, typename U>
             friend class Allocator;
             GCAllocator() {};
             ~GCAllocator() {};
             static void *Allocate(size_t size);
             static void *Reallocate(void* ptr, size_t size);
             static void Free(void *ptr);
+            static size_t Size(void *ptr);
         };
         
-        template <typename T>
-        class Allocator : public Object, private Counter<UInt32> {
+        class OSXAllocator : public virtual AllocatorProtocol {
         public:
-            static Allocator<T> SystemDefault;
-            static Allocator<T> Default;
+            template <typename T, typename U>
+            friend class Allocator;
+            OSXAllocator() {};
+            ~OSXAllocator() {};
+            static void *Allocate(size_t size);
+            static void *Reallocate(void* ptr, size_t size);
+            static void Free(void *ptr);
+            static size_t Size(void *ptr);
+        private:
+        };
+        
+        template <typename T, typename IMPL =
+#if defined(RS_FOUNDATION_GC)
+        GCAllocator
+#else
+        OSXAllocator
+#endif
+        >
+        class Allocator : public Object, private Counter<UInt32> {
+            static_assert(std::is_base_of<AllocatorProtocol, IMPL>::value, "IMPL should inherit from AllocatorProtocol");
+        public:
+            static Allocator<T, IMPL> SystemDefault;
+            static Allocator<T, IMPL> Default;
             
         public:
             template<typename ...Args>
             T *Allocate(Args... args) {
-                void *ptr = GCAllocator::Allocate(sizeof(T));
+                void *ptr = IMPL::Allocate(sizeof(T));
                 T *t = new (ptr) T(args...);
                 Inc();
                 std::cout << Self << " inc " << name << " " << Val() << "\n";
@@ -52,21 +88,25 @@ namespace RSFoundation {
             
             template<typename T2>
             T2 *Allocate(size_t size) {
-                return _AllocateImpl<T2, std::is_pod<T2>::value>::_Allocate(zone, size);
+                return _AllocateImpl<T2, std::is_pod<T2>::value>::_Allocate(size);
             }
             
             template<void*>
             void *Allocate(size_t size) {
-                return GCAllocator::Allocate(size);
+                return IMPL::Allocate(size);
             }
             
         private:
             friend class RSFoundation::Collection::String;
+            friend class RSFoundation::Basic::Hash;
+            
             template<typename T2, bool isPod>
             class _AllocateImpl {
                 friend class Allocator;
                 friend class RSFoundation::Collection::String;
-                static T2 *_Allocate(malloc_zone_t *zone, size_t size) {
+                friend class RSFoundation::Basic::Hash;
+                
+                static T2 *_Allocate(size_t size) {
                     return nullptr;
                 }
             };
@@ -75,9 +115,11 @@ namespace RSFoundation {
             class _AllocateImpl<T2, false> {
                 friend class Allocator;
                 friend class RSFoundation::Collection::String;
-                static T2 *_Allocate(malloc_zone_t *zone, size_t size) {
+                friend class RSFoundation::Basic::Hash;
+                
+                static T2 *_Allocate(size_t size) {
                     size = 8 + size; // this +
-                    void *ptr = GCAllocator::Allocate(size);
+                    void *ptr = IMPL::Allocate(size);
                     T2 *t = new (ptr) T2;
                     Allocator<T2> *allocator = &Allocator<T2>::SystemDefault;
                     allocator->Inc();
@@ -90,8 +132,10 @@ namespace RSFoundation {
             class _AllocateImpl<T2, true> {
                 friend class Allocator;
                 friend class RSFoundation::Collection::String;
-                static T2 *_Allocate(malloc_zone_t *zone, size_t size) {
-                    return static_cast<T2*>(GCAllocator::Allocate(size * sizeof(T2)));;
+                friend class RSFoundation::Basic::Hash;
+                
+                static T2 *_Allocate(size_t size) {
+                    return static_cast<T2*>(IMPL::Allocate(size * sizeof(T2)));;
                 }
             };
         public:
@@ -99,24 +143,24 @@ namespace RSFoundation {
             template<typename T2>
             T2 *Reallocate(void *p, size_t size) {
                 static_assert(POD<T2>::Result, "");
-                T2 *ptr = static_cast<T2*>(GCAllocator::Reallocate(p, size * sizeof(T2)));
+                T2 *ptr = static_cast<T2*>(IMPL::Reallocate(p, size * sizeof(T2)));
                 return ptr;
             }
             
             void Deallocate(void *ptr) {
-                GCAllocator::Free(ptr);
+                IMPL::Free(ptr);
             }
             
             void Deallocate(T *t) {
                 t->T::~T();
-                GCAllocator::Free(static_cast<void*>(t));
+                IMPL::Free(static_cast<void*>(t));
                 Dec();
                 std::cout << Self << " dec " << name << " " << Val() << "\n";
             }
             
             void Deallocate(const T *t) {
                 t->T::~T();
-                GCAllocator::Free((void*)(t));
+                IMPL::Free((void*)(t));
                 Dec();
                 std::cout << Self << " dec " << name << " " << Val() << "\n";
             }
@@ -132,35 +176,34 @@ namespace RSFoundation {
                 
             }
             
+            size_t GetSize(void *ptr) {
+                return IMPL::Size(ptr);
+            }
+            
             bool IsGC() const {
-                return false;
+                return is_base_of<GCAllocator, IMPL>::value ? true : false;
             }
         private:
             Allocator() {
-                zone = malloc_default_zone();
                 Object obj;
                 obj.template GetClassName<T>(name);
                 obj.template GetClassName<decltype(this)>(Self);
-                
-//                std::cout << Self << " init with " << name << "\n";
             }
             
             ~Allocator() {
-//                std::cout << Self << " dealloc " << name << "\n";
             }
             
         private:
-            malloc_zone_t *zone;
             std::string name;
             std::string Self;
         };
 
         
-        template<typename T>
-        Allocator<T> Allocator<T>::SystemDefault;
+        template<typename T, typename IMPL>
+        Allocator<T, IMPL> Allocator<T, IMPL>::SystemDefault;
         
-        template<typename T>
-        Allocator<T> Allocator<T>::Default;
+        template<typename T, typename IMPL>
+        Allocator<T, IMPL> Allocator<T, IMPL>::Default;
     }
 }
 

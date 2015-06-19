@@ -19,12 +19,19 @@ int main(int argc, char **argv) {
         printf("%c\n", x.GetValue().Unbox());
     }
     Date date;
+    
+//    std::auto_ptr<String> ptr(new String());
+    
+    
+    auto allocator = &Allocator<String>::SystemDefault;
     const String* str = String::Create("str", String::Encoding::UTF8);
-    Index length = str->GetLength();
+    allocator->Deallocate(str);
+//    Index length = str->GetLength();
     const String* copy = str->Copy();
-    assert(length == copy->GetLength());
-    const String* copy2 = copy->Copy();
-    assert(length == copy2->GetLength());
+    allocator->Deallocate(copy);
+//    assert(length == copy->GetLength());
+//    const String* copy2 = copy->Copy();
+//    assert(length == copy2->GetLength());
     
     return 0;
 }

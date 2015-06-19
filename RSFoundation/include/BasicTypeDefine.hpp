@@ -233,12 +233,12 @@ namespace RSFoundation {
 #if __LP64__
     typedef unsigned long long TypeID;
     typedef unsigned long long OptionFlags;
-    typedef unsigned long long HashCode;
+    typedef uintptr_t HashCode;
     typedef signed long long Index;
 #else
     typedef unsigned long TypeID;
     typedef unsigned long OptionFlags;
-    typedef unsigned long HashCode;
+    typedef uintptr_t HashCode;
     typedef signed long Index;
 #endif
     
