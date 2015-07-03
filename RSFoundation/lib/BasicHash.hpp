@@ -10,6 +10,7 @@
 #define BasicHash_cpp
 
 #include <RSFoundation/String.hpp>
+#include <RSFoundation/Allocator.hpp>
 
 namespace RSFoundation {
     namespace Basic {
@@ -283,7 +284,7 @@ namespace RSFoundation {
                             counts16[idx2] = counts08[idx2];
                         }
                         _SetCounts(counts16);
-                        auto allocator = &Allocator<char*>::SystemDefault;
+                        auto allocator = &Allocator<uint8_t*>::SystemDefault;
                         if (!allocator->IsGC()) {
                             allocator->Deallocate(counts08);
                         }
@@ -300,7 +301,7 @@ namespace RSFoundation {
                             counts32[idx2] = counts16[idx2];
                         }
                         _SetCounts(counts32);
-                        auto allocator = &Allocator<char*>::SystemDefault;
+                        auto allocator = &Allocator<uint16_t*>::SystemDefault;
                         if (!allocator->IsGC()) {
                             allocator->Deallocate(counts16);
                         }
@@ -317,7 +318,7 @@ namespace RSFoundation {
                             counts64[idx2] = counts32[idx2];
                         }
                         _SetCounts(counts64);
-                        auto allocator = &Allocator<char*>::SystemDefault;
+                        auto allocator = &Allocator<uint32_t*>::SystemDefault;
                         if (!allocator->IsGC()) {
                             allocator->Deallocate(counts32);
                         }
@@ -890,7 +891,7 @@ namespace RSFoundation {
             }
             
         public:
-            friend Hash *Allocator<Hash>::_AllocateImpl<Hash, false>::_Allocate(size_t size);
+//            friend Hash *Allocator<Hash>::_AllocateImpl<Hash, false>::_Allocate(size_t size);
             
             static Hash *Create(OptionFlags flags) {
                 size_t size = sizeof(Hash);
@@ -898,7 +899,7 @@ namespace RSFoundation {
                 if (flags & HasCounts) size += sizeof(void *); // counts
                 if (flags & HasHashCache) size += sizeof(uintptr_t *); // hashes
                 auto allocator = &Allocator<Hash>::SystemDefault;
-                Hash *ht = allocator->template Allocate<Hash>(size);
+                Hash *ht = (Hash *)allocator->Allocate<char *>(size);
                 if (nullptr == ht) return nullptr;
                 ht->bits.finalized = 0;
                 ht->bits.hash_style = (flags >> 13) & 0x3;

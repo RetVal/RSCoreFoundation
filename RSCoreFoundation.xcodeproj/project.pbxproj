@@ -62,12 +62,12 @@
 		303BE2601B258F1800626DE4 /* StackTrace.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 303BE25F1B258F1800626DE4 /* StackTrace.hpp */; };
 		304B3850186C36F300806E4B /* RSRegularExpression.c in Sources */ = {isa = PBXBuildFile; fileRef = 304B384E186C36F300806E4B /* RSRegularExpression.c */; };
 		304B3851186C36F300806E4B /* RSRegularExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 304B384F186C36F300806E4B /* RSRegularExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		305C021C1B43CC4900F6753B /* StringImpl.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 305C021B1B43CC4900F6753B /* StringImpl.hpp */; };
 		305EC3B7189E14F00025E664 /* RSKVBucket.c in Sources */ = {isa = PBXBuildFile; fileRef = 305EC3B5189E14F00025E664 /* RSKVBucket.c */; };
 		305EC3B8189E14F00025E664 /* RSKVBucket.h in Headers */ = {isa = PBXBuildFile; fileRef = 305EC3B6189E14F00025E664 /* RSKVBucket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3062F7561B21A0BA006B0553 /* config.h.in in Resources */ = {isa = PBXBuildFile; fileRef = 3062F72D1B21A0BA006B0553 /* config.h.in */; };
 		3062F7691B21A0BA006B0553 /* include.am in Resources */ = {isa = PBXBuildFile; fileRef = 3062F7411B21A0BA006B0553 /* include.am */; };
 		3062F77A1B21A0BA006B0553 /* stamp-h1 in Resources */ = {isa = PBXBuildFile; fileRef = 3062F7531B21A0BA006B0553 /* stamp-h1 */; };
-		30734F141B2A8BFF0055A31A /* Dictionary.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 30734F121B2A8BFF0055A31A /* Dictionary.hpp */; };
 		3098391E1868818400398AC3 /* RSRawHashTable.c in Sources */ = {isa = PBXBuildFile; fileRef = 3098391C1868818400398AC3 /* RSRawHashTable.c */; };
 		3098391F1868818400398AC3 /* RSRawHashTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 3098391D1868818400398AC3 /* RSRawHashTable.h */; };
 		309903281B1452110081278B /* RSFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = 309903271B1452110081278B /* RSFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -75,7 +75,6 @@
 		309903371B1452120081278B /* RSFoundationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 309903361B1452120081278B /* RSFoundationTests.mm */; };
 		3099033A1B1452120081278B /* RSFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 309903231B1452110081278B /* RSFoundation.framework */; };
 		3099033B1B1452120081278B /* RSFoundation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 309903231B1452110081278B /* RSFoundation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		309D6DC01B2D785000A82BFC /* Dictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 309D6DBF1B2D785000A82BFC /* Dictionary.cpp */; };
 		30A15D3918A9C5170055B9A1 /* RSCoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4158D55A1625C4C60070E69F /* RSCoreFoundation.framework */; };
 		30A4B615189E029800DF6FA4 /* RSMultidimensionalDictionary.c in Sources */ = {isa = PBXBuildFile; fileRef = 30A4B613189E029800DF6FA4 /* RSMultidimensionalDictionary.c */; };
 		30A4B616189E029800DF6FA4 /* RSMultidimensionalDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 30A4B614189E029800DF6FA4 /* RSMultidimensionalDictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -92,7 +91,6 @@
 		30F849581B301340009463A5 /* Date.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300DF91A1B21661D00E60428 /* Date.cpp */; };
 		30F849591B301340009463A5 /* StackTrace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 303BE25B1B258D0A00626DE4 /* StackTrace.cpp */; };
 		30F8495A1B301340009463A5 /* UnicodePrecomposition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300DF9431B21665100E60428 /* UnicodePrecomposition.cpp */; };
-		30F8495B1B301340009463A5 /* Dictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 309D6DBF1B2D785000A82BFC /* Dictionary.cpp */; };
 		30F8495C1B301340009463A5 /* StringFormatSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30178BA51B28259900C402A2 /* StringFormatSupport.cpp */; };
 		30F8495D1B301340009463A5 /* DataBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300DF93E1B21665100E60428 /* DataBase.cpp */; };
 		30F8495E1B301340009463A5 /* BasicHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30F8494D1B2FD449009463A5 /* BasicHash.cpp */; };
@@ -112,7 +110,6 @@
 		30F8496E1B301340009463A5 /* cord.h in Headers */ = {isa = PBXBuildFile; fileRef = 3062F72E1B21A0BA006B0553 /* cord.h */; };
 		30F8496F1B301340009463A5 /* thread_local_alloc.h in Headers */ = {isa = PBXBuildFile; fileRef = 3062F7521B21A0BA006B0553 /* thread_local_alloc.h */; };
 		30F849701B301340009463A5 /* msvc_dbg.h in Headers */ = {isa = PBXBuildFile; fileRef = 3062F74E1B21A0BA006B0553 /* msvc_dbg.h */; };
-		30F849711B301340009463A5 /* Dictionary.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 30734F121B2A8BFF0055A31A /* Dictionary.hpp */; };
 		30F849721B301340009463A5 /* gc_config_macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 3062F7371B21A0BA006B0553 /* gc_config_macros.h */; };
 		30F849731B301340009463A5 /* Allocator.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF8FC1B21661600E60428 /* Allocator.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		30F849741B301340009463A5 /* BasicAlgorithm.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300DF8FD1B21661600E60428 /* BasicAlgorithm.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -970,6 +967,7 @@
 		304B384E186C36F300806E4B /* RSRegularExpression.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRegularExpression.c; sourceTree = "<group>"; };
 		304B384F186C36F300806E4B /* RSRegularExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRegularExpression.h; sourceTree = "<group>"; };
 		3056A93D1AD4E75E00AE909D /* RSCoder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RSCoder.framework; path = ../../../../Users/closure/Library/Frameworks/RSCoder.framework; sourceTree = "<group>"; };
+		305C021B1B43CC4900F6753B /* StringImpl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StringImpl.hpp; sourceTree = "<group>"; };
 		305EC3B5189E14F00025E664 /* RSKVBucket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSKVBucket.c; sourceTree = "<group>"; };
 		305EC3B6189E14F00025E664 /* RSKVBucket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSKVBucket.h; sourceTree = "<group>"; };
 		3062F72C1B21A0BA006B0553 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
@@ -1011,7 +1009,6 @@
 		3062F7541B21A0BA006B0553 /* weakpointer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = weakpointer.h; sourceTree = "<group>"; };
 		3062F7801B21A752006B0553 /* libgc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgc.a; path = RSFoundation/deps/gc/libgc.a; sourceTree = "<group>"; };
 		3062F7811B21A752006B0553 /* libgccpp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgccpp.a; path = RSFoundation/deps/gc/libgccpp.a; sourceTree = "<group>"; };
-		30734F121B2A8BFF0055A31A /* Dictionary.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Dictionary.hpp; sourceTree = "<group>"; };
 		3098391C1868818400398AC3 /* RSRawHashTable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSRawHashTable.c; sourceTree = "<group>"; };
 		3098391D1868818400398AC3 /* RSRawHashTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRawHashTable.h; sourceTree = "<group>"; };
 		309903231B1452110081278B /* RSFoundation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RSFoundation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1021,7 +1018,6 @@
 		309903351B1452120081278B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		309903361B1452120081278B /* RSFoundationTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RSFoundationTests.mm; sourceTree = "<group>"; };
 		309D6DBD1B2D767500A82BFC /* BasicHashFindBucket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BasicHashFindBucket.cpp; sourceTree = "<group>"; };
-		309D6DBF1B2D785000A82BFC /* Dictionary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Dictionary.cpp; sourceTree = "<group>"; };
 		30A4B613189E029800DF6FA4 /* RSMultidimensionalDictionary.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSMultidimensionalDictionary.c; sourceTree = "<group>"; };
 		30A4B614189E029800DF6FA4 /* RSMultidimensionalDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSMultidimensionalDictionary.h; sourceTree = "<group>"; };
 		30D8458F1875164C004DEBE0 /* regex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = regex.h; sourceTree = "<group>"; };
@@ -1835,7 +1831,6 @@
 				300DF9081B21661600E60428 /* TypeTraits.hpp */,
 				300DF92D1B21663A00E60428 /* UniChar.hpp */,
 				300DF9541B21668E00E60428 /* String.hpp */,
-				30734F121B2A8BFF0055A31A /* Dictionary.hpp */,
 			);
 			path = include;
 			sourceTree = "<group>";
@@ -1853,7 +1848,6 @@
 				300DF9211B21661D00E60428 /* TypeTraits.cpp */,
 				300DF92F1B21664000E60428 /* UniChar.cpp */,
 				300DF9561B21669900E60428 /* String.cpp */,
-				309D6DBF1B2D785000A82BFC /* Dictionary.cpp */,
 				30F8494D1B2FD449009463A5 /* BasicHash.cpp */,
 				30F8494E1B2FD449009463A5 /* BasicHash.hpp */,
 				309D6DBD1B2D767500A82BFC /* BasicHashFindBucket.cpp */,
@@ -1873,6 +1867,7 @@
 		300DF9321B21665100E60428 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				305C021B1B43CC4900F6753B /* StringImpl.hpp */,
 				303BE25F1B258F1800626DE4 /* StackTrace.hpp */,
 				300DF9331B21665100E60428 /* BultinConverters.hpp */,
 				300DF9341B21665100E60428 /* DataBase.hpp */,
@@ -3101,7 +3096,6 @@
 				30F849CF1B30145C009463A5 /* c++11.h in Headers */,
 				30F849D61B30145C009463A5 /* fixed_mem_pool.h in Headers */,
 				30F849DF1B30145D009463A5 /* type_traits.h in Headers */,
-				30734F141B2A8BFF0055A31A /* Dictionary.hpp in Headers */,
 				300DF90A1B21661600E60428 /* Allocator.hpp in Headers */,
 				300DF90B1B21661600E60428 /* BasicAlgorithm.hpp in Headers */,
 				30F849D51B30145C009463A5 /* fc_queue.h in Headers */,
@@ -3126,6 +3120,7 @@
 				300DF9551B21668E00E60428 /* String.hpp in Headers */,
 				300DF9491B21665100E60428 /* StringConverterExt.hpp in Headers */,
 				30F849CE1B30145C009463A5 /* bool_array.h in Headers */,
+				305C021C1B43CC4900F6753B /* StringImpl.hpp in Headers */,
 				300DF94C1B21665100E60428 /* UnicodePrecomposition.hpp in Headers */,
 				30F849D11B30145C009463A5 /* cont_ptr_utils.h in Headers */,
 				309903281B1452110081278B /* RSFoundation.h in Headers */,
@@ -3151,7 +3146,6 @@
 				30F8496E1B301340009463A5 /* cord.h in Headers */,
 				30F8496F1B301340009463A5 /* thread_local_alloc.h in Headers */,
 				30F849701B301340009463A5 /* msvc_dbg.h in Headers */,
-				30F849711B301340009463A5 /* Dictionary.hpp in Headers */,
 				30F849721B301340009463A5 /* gc_config_macros.h in Headers */,
 				30F849731B301340009463A5 /* Allocator.hpp in Headers */,
 				30F849741B301340009463A5 /* BasicAlgorithm.hpp in Headers */,
@@ -4068,6 +4062,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30F849CD1B30145C009463A5 /* bool_array.cpp in Sources */,
+				30F849D21B30145C009463A5 /* debug_new.cpp in Sources */,
+				30F849D71B30145C009463A5 /* mem_pool_base.cpp in Sources */,
+				30F849DD1B30145D009463A5 /* static_mem_pool.cpp in Sources */,
 				300DF9281B21661D00E60428 /* ObjectBox.cpp in Sources */,
 				300DF9291B21661D00E60428 /* Protocol.cpp in Sources */,
 				300DF94D1B21665100E60428 /* BultinConverters.cpp in Sources */,
@@ -4075,19 +4073,14 @@
 				300DF9231B21661D00E60428 /* Allocator.cpp in Sources */,
 				300DF9241B21661D00E60428 /* Date.cpp in Sources */,
 				303BE25D1B258D0A00626DE4 /* StackTrace.cpp in Sources */,
-				30F849CD1B30145C009463A5 /* bool_array.cpp in Sources */,
 				300DF9531B21665100E60428 /* UnicodePrecomposition.cpp in Sources */,
-				309D6DC01B2D785000A82BFC /* Dictionary.cpp in Sources */,
-				30F849D21B30145C009463A5 /* debug_new.cpp in Sources */,
 				30178BA71B28259900C402A2 /* StringFormatSupport.cpp in Sources */,
-				30F849D71B30145C009463A5 /* mem_pool_base.cpp in Sources */,
 				300DF94E1B21665100E60428 /* DataBase.cpp in Sources */,
 				30F8494F1B2FD449009463A5 /* BasicHash.cpp in Sources */,
 				300DF9521B21665100E60428 /* UnicodeDecomposition.cpp in Sources */,
 				300DF9301B21664000E60428 /* UniChar.cpp in Sources */,
 				300DF9261B21661D00E60428 /* Nullable.cpp in Sources */,
 				300DF9501B21665100E60428 /* StringConverter.cpp in Sources */,
-				30F849DD1B30145D009463A5 /* static_mem_pool.cpp in Sources */,
 				300DF9571B21669900E60428 /* String.cpp in Sources */,
 				300DF9251B21661D00E60428 /* Lock.cpp in Sources */,
 				300DF92B1B21661D00E60428 /* TypeTraits.cpp in Sources */,
@@ -4116,7 +4109,6 @@
 				30F849581B301340009463A5 /* Date.cpp in Sources */,
 				30F849591B301340009463A5 /* StackTrace.cpp in Sources */,
 				30F8495A1B301340009463A5 /* UnicodePrecomposition.cpp in Sources */,
-				30F8495B1B301340009463A5 /* Dictionary.cpp in Sources */,
 				30F8495C1B301340009463A5 /* StringFormatSupport.cpp in Sources */,
 				30F8495D1B301340009463A5 /* DataBase.cpp in Sources */,
 				30F8495E1B301340009463A5 /* BasicHash.cpp in Sources */,

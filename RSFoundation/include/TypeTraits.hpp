@@ -118,6 +118,22 @@ namespace RSFoundation {
         struct YesType {};
         struct NoType {};
         
+        template <class _Tp, _Tp __v>
+        struct integral_constant {
+            static constexpr const _Tp      value = __v;
+            typedef _Tp               value_type;
+            typedef integral_constant type;
+            
+            inline constexpr operator value_type() const noexcept {return value;}
+            inline constexpr value_type operator ()() const noexcept {return value;}
+        };
+        
+        template <class _Tp, _Tp __v>
+        constexpr const _Tp integral_constant<_Tp, __v>::value;
+        
+        typedef integral_constant<bool, true>  true_type;
+        typedef integral_constant<bool, false> false_type;
+        
         template<typename T, typename YesOrNo>
         struct AcceptType{};
         

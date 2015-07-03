@@ -51,7 +51,7 @@ namespace RSFoundation {
                     
                     __CombiningPriorityTableNumPlane = UniCharGetNumberOfPlanesForUnicodePropertyData(UniCharCombiningProperty);
                     
-                    __CombiningPriorityTable = (const uint8_t **)Allocator<uint8_t*>::SystemDefault.Allocate<uint8_t*>(__CombiningPriorityTableNumPlane);
+                    __CombiningPriorityTable = Allocator<const uint8_t*>::SystemDefault.Allocate<const uint8_t*>(__CombiningPriorityTableNumPlane);
                     for (idx = 0;idx < __CombiningPriorityTableNumPlane;idx++) __CombiningPriorityTable[idx] = (const uint8_t *)UniCharGetUnicodePropertyDataForPlane(UniCharCombiningProperty, (uint32_t)idx);
                 }
                 
@@ -251,7 +251,7 @@ namespace RSFoundation {
                                 UTF32Char *newBuffer;
                                 
                                 decompBufferSize += MAX_BUFFER_LENGTH;
-                                newBuffer = Allocator<UTF32Char>::SystemDefault.Allocate<UTF32Char>(decompBufferSize);
+                                newBuffer = Allocator<UTF32Char>::SystemDefault.Allocate(decompBufferSize);
                                 //                        newBuffer = (UTF32Char *)AllocatorAllocate(SystemDefault, sizeof(UTF32Char) * decompBufferSize);
                                 memmove(newBuffer, decompBuffer, (decompBufferSize - MAX_BUFFER_LENGTH) * sizeof(UTF32Char));
                                 if (decompBuffer != buffer) {

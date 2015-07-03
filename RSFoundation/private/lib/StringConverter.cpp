@@ -7,6 +7,8 @@
 //
 
 #include "StringConverter.hpp"
+#include <RSFoundation/Allocator.hpp>
+#include <RSFoundation/StringImpl.hpp>
 #include <RSFoundation/ICUConverters.hpp>
 #include <RSFoundation/UniChar.hpp>
 #include <RSFoundation/UnicodeDecomposition.hpp>

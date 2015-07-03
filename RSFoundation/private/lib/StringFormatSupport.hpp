@@ -9,7 +9,7 @@
 #ifndef StringFormatSupport_cpp
 #define StringFormatSupport_cpp
 
-#include <RSFoundation/String.hpp>
+#include <RSFoundation/StringImpl.hpp>
 #include <vector>
 
 namespace RSFoundation {
@@ -95,9 +95,9 @@ namespace RSFoundation {
             
             const static Index BUFFER_LEN = 512;
             
-            void ParseFormatSpec(const UniChar *uformat, const uint8_t *cformat, Index *fmtIdx, Index fmtLen, FormatSpec *spec, String **configKeyPointer);
+            void ParseFormatSpec(const UniChar *uformat, const uint8_t *cformat, Index *fmtIdx, Index fmtLen, FormatSpec *spec, StringImpl **configKeyPointer);
             
-            void AppendFormatCore(String *outputString, void* options, String *formatString, Index initialArgPosition, const void*origValues, Index orginalValuesSize, va_list args);
+            void AppendFormatCore(StringImpl *outputString, void* options, StringImpl *formatString, Index initialArgPosition, const void*origValues, Index orginalValuesSize, va_list args);
             
 //            void AppendFormatCore(String *outputString, void* options, String *formatString, Index initialArgPosition, const std::vector<void*> &origValues, va_list args);
             

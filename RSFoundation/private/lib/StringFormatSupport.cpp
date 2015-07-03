@@ -7,11 +7,12 @@
 //
 
 #include "StringFormatSupport.hpp"
+#include <RSFoundation/Allocator.hpp>
 
 // format supporting
 namespace RSFoundation {
     namespace Collection {
-        void StringFormat::ParseFormatSpec(const UniChar *uformat, const uint8_t *cformat, Index *fmtIdx, Index fmtLen, RSFoundation::Collection::StringFormat::FormatSpec *spec, RSFoundation::Collection::String **configKeyPointer) {
+        void StringFormat::ParseFormatSpec(const UniChar *uformat, const uint8_t *cformat, Index *fmtIdx, Index fmtLen, RSFoundation::Collection::StringFormat::FormatSpec *spec, RSFoundation::Collection::StringImpl **configKeyPointer) {
             BOOL seenDot = NO;
             BOOL seenSharp = NO;
             Index keyIndex = NotFound;
@@ -269,7 +270,7 @@ sprintf(buffer, formatBuffer, value);	\
 }}
 #endif
         
-        void StringFormat::AppendFormatCore(RSFoundation::Collection::String *outputString, void *options, RSFoundation::Collection::String *formatString, Index initialArgPosition, const void *origValues, Index orignalValuesSize, va_list args) {
+        void StringFormat::AppendFormatCore(RSFoundation::Collection::StringImpl *outputString, void *options, RSFoundation::Collection::StringImpl *formatString, Index initialArgPosition, const void *origValues, Index orignalValuesSize, va_list args) {
             Index numSpecs, sizeSpecs, sizeArgNum, formatIdx, curSpec, argNum;
             Index formatLen;
 #define FORMAT_BUFFER_LEN 400
@@ -300,7 +301,7 @@ sprintf(buffer, formatBuffer, value);	\
 //            configs = nil;
             
             formatLen = formatString->GetLength();
-            if (!dynamic_cast<String*>(formatString)) {
+            if (!dynamic_cast<StringImpl*>(formatString)) {
                 if (!formatString->_IsUnicode()) {
                     cformat = (const UInt8 *)formatString->_Contents();
                     if (cformat) {
@@ -352,7 +353,7 @@ sprintf(buffer, formatBuffer, value);	\
                     specs[curSpec].type = FormatType::Literal;
                     specs[curSpec].len = newFmtIdx - formatIdx;
                 } else {
-                    String* configKey = nullptr;
+                    StringImpl* configKey = nullptr;
                     newFmtIdx++;	/* Skip % */
                     ParseFormatSpec(uformat, cformat, &newFmtIdx, (UInt32)formatLen, &(specs[curSpec]), &configKey);
                     if (FormatType::Literal == specs[curSpec].type) {

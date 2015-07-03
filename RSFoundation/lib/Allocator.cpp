@@ -61,7 +61,8 @@ namespace RSFoundation {
         }
         
         void *OSXAllocator::Allocate(size_t size) {
-            return malloc_zone_malloc(malloc_default_zone(), size);
+            return new char[size]();
+//            return malloc_zone_malloc(malloc_default_zone(), size);
         }
         
         void *OSXAllocator::Reallocate(void *ptr, size_t size) {
@@ -69,7 +70,8 @@ namespace RSFoundation {
         }
         
         void OSXAllocator::Free(void *ptr) {
-            return malloc_zone_free(malloc_default_zone(), ptr);
+            delete []ptr;
+//            return malloc_zone_free(malloc_default_zone(), ptr);
         }
         
         size_t OSXAllocator::Size(void *ptr) {

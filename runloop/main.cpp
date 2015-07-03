@@ -23,12 +23,8 @@ int main(int argc, char **argv) {
 //    std::auto_ptr<String> ptr(new String());
     
     
-    auto allocator = &Allocator<String>::SystemDefault;
-    const String* str = String::Create("str", String::Encoding::UTF8);
-    allocator->Deallocate(str);
-//    Index length = str->GetLength();
-    const String* copy = str->Copy();
-    allocator->Deallocate(copy);
+    const String str = "str";
+//    allocator->Deallocate(copy);
 //    assert(length == copy->GetLength());
 //    const String* copy2 = copy->Copy();
 //    assert(length == copy2->GetLength());

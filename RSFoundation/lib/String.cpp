@@ -6,6 +6,8 @@
 //  Copyright (c) 2015 RetVal. All rights reserved.
 //
 
+#include <RSFoundation/Allocator.hpp>
+#include <RSFoundation/StringImpl.hpp>
 #include <RSFoundation/String.hpp>
 #include <RSFoundation/Order.hpp>
 #include <RSFoundation/UniChar.hpp>
@@ -323,7 +325,7 @@ namespace RSFoundation {
             __VarWidthLocalBufferSize = 1008
         };
         
-        typedef struct {      /* A simple struct to maintain ASCII/Unicode versions of the same buffer. */
+        typedef struct VarWidthCharBuffer {      /* A simple struct to maintain ASCII/Unicode versions of the same buffer. */
             union {
                 UInt8 *ascii;
                 UniChar *unicode;
@@ -332,7 +334,7 @@ namespace RSFoundation {
             bool shouldFreeChars;	/* If the number of bytes exceeds __VarWidthLocalBufferSize, bytes are allocated */
             bool _unused1;
             bool _unused2;
-            Allocator<String> *allocator;	/* Use this allocator to allocate, reallocate, and deallocate the bytes */
+            Allocator<StringImpl> *allocator;	/* Use this allocator to allocate, reallocate, and deallocate the bytes */
             Index numChars;	/* This is in terms of ascii or unicode; that is, if isASCII, it is number of 7-bit chars; otherwise it is number of UniChars; note that the actual allocated space might be larger */
             UInt8 localBuffer[__VarWidthLocalBufferSize];	/* private; 168 ISO2022JP chars, 504 Unicode chars, 1008 ASCII chars */
         } VarWidthCharBuffer;
@@ -381,7 +383,7 @@ namespace RSFoundation {
                 
                 if (0 == len) return YES;
                 
-                buffer->allocator = (buffer->allocator ? buffer->allocator : &Allocator<String>::SystemDefault);
+//                buffer->allocator = (buffer->allocator ? buffer->allocator : &Allocator<StringImpl>::SystemDefault);
                 
                 if ((encoding == String::Encoding::UTF16) || (encoding == String::Encoding::UTF16BE) || (encoding == String::Encoding::UTF16LE)) {
                     // UTF-16
@@ -432,7 +434,7 @@ namespace RSFoundation {
                             if (nil == buffer->chars.ascii) {
                                 // we never reallocate when buffer is supplied
                                 if (buffer->numChars > MAX_LOCAL_CHA) {
-                                    buffer->chars.ascii = buffer->allocator->Allocate<UInt8>((buffer->numChars));
+                                    buffer->chars.ascii = Allocator<UInt8>::SystemDefault.Allocate((buffer->numChars));
                                     if (!buffer->chars.ascii) goto memoryErrorExit;
                                     buffer->shouldFreeChars = YES;
                                 } else {
@@ -452,7 +454,7 @@ namespace RSFoundation {
                             if (nil == buffer->chars.unicode) {
                                 // we never reallocate when buffer is supplied
                                 if (buffer->numChars > MAX_LOCAL_UNICHA) {
-                                    buffer->chars.unicode = buffer->allocator->Allocate<UniChar>(buffer->numChars);
+                                    buffer->chars.unicode = Allocator<UInt16>::SystemDefault.Allocate(buffer->numChars);
                                     if (!buffer->chars.unicode) goto memoryErrorExit;
                                     buffer->shouldFreeChars = YES;
                                 } else {
@@ -517,7 +519,7 @@ namespace RSFoundation {
                         if (nil == buffer->chars.ascii) {
                             // we never reallocate when buffer is supplied
                             if (buffer->numChars > MAX_LOCAL_CHA) {
-                                buffer->chars.ascii = buffer->allocator->Allocate<UInt8>(buffer->numChars);
+                                buffer->chars.ascii = Allocator<UInt8>::SystemDefault.Allocate(buffer->numChars);
                                 if (!buffer->chars.ascii) goto memoryErrorExit;
                                 buffer->shouldFreeChars = YES;
                             } else {
@@ -535,7 +537,7 @@ namespace RSFoundation {
                         if (nil == buffer->chars.unicode) {
                             // we never reallocate when buffer is supplied
                             if (buffer->numChars > MAX_LOCAL_UNICHA) {
-                                buffer->chars.unicode = buffer->allocator->Allocate<UTF16Char>(buffer->numChars);
+                                buffer->chars.unicode = Allocator<UTF16Char>::SystemDefault.Allocate(buffer->numChars);
                                 if (!buffer->chars.unicode) goto memoryErrorExit;
                                 buffer->shouldFreeChars = YES;
                             } else {
@@ -561,7 +563,7 @@ namespace RSFoundation {
                     if (buffer->isASCII) {
                         buffer->numChars = len;
                         buffer->shouldFreeChars = !buffer->chars.ascii && (len <= MAX_LOCAL_CHA) ? NO : YES;
-                        buffer->chars.ascii = (buffer->chars.ascii ? buffer->chars.ascii : (len <= MAX_LOCAL_CHA) ? (uint8_t *)buffer->localBuffer : buffer->allocator->Allocate<UInt8>(len));
+                        buffer->chars.ascii = (buffer->chars.ascii ? buffer->chars.ascii : (len <= MAX_LOCAL_CHA) ? (uint8_t *)buffer->localBuffer : Allocator<UInt8>::SystemDefault.Allocate(len));
                         if (!buffer->chars.ascii) goto memoryErrorExit;
                         memmove(buffer->chars.ascii, chars, len * sizeof(uint8_t));
                     } else {
@@ -574,7 +576,7 @@ namespace RSFoundation {
                         }
                         
                         buffer->shouldFreeChars = !buffer->chars.unicode && (len <= MAX_LOCAL_UNICHA) ? NO : YES;
-                        buffer->chars.unicode = (buffer->chars.unicode ? buffer->chars.unicode : (len <= MAX_LOCAL_UNICHA) ? (UniChar *)buffer->localBuffer : buffer->allocator->Allocate<UniChar>(len));
+                        buffer->chars.unicode = (buffer->chars.unicode ? buffer->chars.unicode : (len <= MAX_LOCAL_UNICHA) ? (UniChar *)buffer->localBuffer : Allocator<UniChar>::SystemDefault.Allocate(len));
                         if (!buffer->chars.unicode) goto memoryErrorExit;
                         buffer->numChars = 0;
                         while (chars < end) {
@@ -596,7 +598,7 @@ namespace RSFoundation {
                     
                     buffer->isASCII = NO;
                     buffer->shouldFreeChars = !buffer->chars.unicode && (len <= MAX_LOCAL_UNICHA) ? NO : YES;
-                    buffer->chars.unicode = (buffer->chars.unicode ? buffer->chars.unicode : (len <= MAX_LOCAL_UNICHA) ? (UniChar *)buffer->localBuffer : (UniChar *)buffer->allocator->Allocate<UniChar>(len));
+                    buffer->chars.unicode = (buffer->chars.unicode ? buffer->chars.unicode : (len <= MAX_LOCAL_UNICHA) ? (UniChar *)buffer->localBuffer : (UniChar *)Allocator<UniChar>::SystemDefault.Allocate(len));
                     if (!buffer->chars.unicode) goto memoryErrorExit;
                     buffer->numChars = 0;
                     
@@ -689,12 +691,12 @@ namespace RSFoundation {
                         if (buffer->isASCII) {
                             buffer->numChars = len;
                             buffer->shouldFreeChars = !buffer->chars.ascii && (len <= MAX_LOCAL_CHA) ? NO : YES;
-                            buffer->chars.ascii = (buffer->chars.ascii ? buffer->chars.ascii : (len <= MAX_LOCAL_CHA) ? (uint8_t *)buffer->localBuffer : buffer->allocator->Allocate<uint8_t>(len));
+                            buffer->chars.ascii = (buffer->chars.ascii ? buffer->chars.ascii : (len <= MAX_LOCAL_CHA) ? (uint8_t *)buffer->localBuffer : Allocator<uint8_t>::SystemDefault.Allocate(len));
                             if (!buffer->chars.ascii) goto memoryErrorExit;
                             memmove(buffer->chars.ascii, chars, len * sizeof(uint8_t));
                         } else {
                             buffer->shouldFreeChars = !buffer->chars.unicode && (len <= MAX_LOCAL_UNICHA) ? NO : YES;
-                            buffer->chars.unicode = (buffer->chars.unicode ? buffer->chars.unicode : (len <= MAX_LOCAL_UNICHA) ? (UniChar *)buffer->localBuffer : buffer->allocator->Allocate<UniChar>(len));
+                            buffer->chars.unicode = (buffer->chars.unicode ? buffer->chars.unicode : (len <= MAX_LOCAL_UNICHA) ? (UniChar *)buffer->localBuffer : Allocator<UniChar>::SystemDefault.Allocate(len));
                             if (!buffer->chars.unicode) goto memoryErrorExit;
                             buffer->numChars = len;
                             if (String::Encoding::ASCII == encoding || String::Encoding::ISOLatin1 == encoding) {
@@ -715,7 +717,7 @@ namespace RSFoundation {
                         if (buffer->isASCII) {
                             buffer->numChars = len;
                             buffer->shouldFreeChars = !buffer->chars.ascii && (len <= MAX_LOCAL_CHA) ? NO : YES;
-                            buffer->chars.ascii = (buffer->chars.ascii ? buffer->chars.ascii : (len <= MAX_LOCAL_CHA) ? (uint8_t *)buffer->localBuffer : buffer->allocator->Allocate<uint8_t>(len));
+                            buffer->chars.ascii = (buffer->chars.ascii ? buffer->chars.ascii : (len <= MAX_LOCAL_CHA) ? (uint8_t *)buffer->localBuffer : Allocator<uint8_t>::SystemDefault.Allocate(len));
                             if (!buffer->chars.ascii) goto memoryErrorExit;
                             memmove(buffer->chars.ascii, chars, len * sizeof(uint8_t));
                         } else {
@@ -723,7 +725,7 @@ namespace RSFoundation {
                             static UInt32 lossyFlag = (UInt32)-1;
                             
                             buffer->shouldFreeChars = !buffer->chars.unicode && (guessedLength <= MAX_LOCAL_UNICHA) ? NO : YES;
-                            buffer->chars.unicode = (buffer->chars.unicode ? buffer->chars.unicode : (guessedLength <= MAX_LOCAL_UNICHA) ? (UniChar *)buffer->localBuffer : buffer->allocator->Allocate<UniChar>(guessedLength));
+                            buffer->chars.unicode = (buffer->chars.unicode ? buffer->chars.unicode : (guessedLength <= MAX_LOCAL_UNICHA) ? (UniChar *)buffer->localBuffer : Allocator<UniChar>::SystemDefault.Allocate(guessedLength));
                             if (!buffer->chars.unicode) goto memoryErrorExit;
                             
                             if (lossyFlag == (UInt32)-1) lossyFlag = 0;
@@ -736,7 +738,7 @@ namespace RSFoundation {
                 if (NO == result) {
                 memoryErrorExit:	// Added for <rdar://problem/6581621>, but it's not clear whether an exception would be a better option
                     result = NO;	// In case we come here from a goto
-                    if (buffer->shouldFreeChars && buffer->chars.unicode) buffer->allocator->Deallocate(buffer->chars.unicode);
+                    if (buffer->shouldFreeChars && buffer->chars.unicode) Allocator<UniChar>::SystemDefault.Deallocate(buffer->chars.unicode);
                     buffer->isASCII = !alwaysUnicode;
                     buffer->shouldFreeChars = NO;
                     buffer->chars.ascii = nil;
@@ -746,7 +748,7 @@ namespace RSFoundation {
             }
         }
         
-        String *_CreateInstanceImmutable( Allocator<String> *allocator,
+        StringImpl *_CreateInstanceImmutable( Allocator<StringImpl> *allocator,
                                          const void *bytes,
                                          Index numBytes,
                                          String::Encoding encoding,
@@ -755,13 +757,13 @@ namespace RSFoundation {
                                          bool hasLengthByte,
                                          bool hasNullByte,
                                          bool noCopy,
-                                         Allocator<String> *contentsDeallocator,
+                                         Allocator<StringImpl> *contentsDeallocator,
                                          UInt32 reservedFlags) {
             if (!bytes) {
-                return &String::Empty;
+                return &StringImpl::Empty;
             }
             
-            String *str;
+            StringImpl *str;
             VarWidthCharBuffer vBuf = {0};
             
             Index size = 0;
@@ -769,24 +771,24 @@ namespace RSFoundation {
             bool useNullByte = NO;
             bool useInlineData = NO;
             if (allocator == nullptr) {
-                allocator = &Allocator<String>::Default;
+                allocator = &Allocator<StringImpl>::Default;
             }
             
-#define ALLOCATOFREEFUNC ((Allocator<String>*)-1)
+#define ALLOCATOFREEFUNC ((Allocator<StringImpl>*)-1)
             
             if (contentsDeallocator == ALLOCATOFREEFUNC) {
-                contentsDeallocator = &Allocator<String>::Default;
+                contentsDeallocator = &Allocator<StringImpl>::Default;
             } else if (contentsDeallocator == nullptr) {
-                contentsDeallocator = &Allocator<String>::Default;
+                contentsDeallocator = &Allocator<StringImpl>::Default;
             }
             
-            if ((numBytes == 0) && (allocator == &Allocator<String>::SystemDefault)) {
+            if ((numBytes == 0) && (allocator == &Allocator<StringImpl>::SystemDefault)) {
                 // If we are using the system default allocator, and the string is empty, then use the empty string!
                 if (noCopy) {
                     // See 2365208... This change was done after Sonata; before we didn't free the bytes at all (leak).
-                    contentsDeallocator->Deallocate((void *)bytes);
+                    allocator->Deallocate((void *)bytes);
                 }
-                return &String::Empty;
+                return &StringImpl::Empty;
                 //                    return (StringRef)Retain(_EmptyString);	// Quick exit; won't catch all empty strings, but most
             }
             vBuf.shouldFreeChars = false;
@@ -797,7 +799,7 @@ namespace RSFoundation {
                 const void *realBytes = (uint8_t *)bytes + (hasLengthByte ? 1 : 0);
                 Index realNumBytes = numBytes - (hasLengthByte ? 1 : 0);
                 bool usingPassedInMemory = false;
-                vBuf.allocator = &Allocator<String>::SystemDefault;
+                vBuf.allocator = &Allocator<StringImpl>::SystemDefault;
                 vBuf.chars.unicode = nullptr;
                 if (!StringEncodeDecode::__StringDecodeByteStream3((const uint8_t *)realBytes, realNumBytes, encoding, NO, &vBuf, &usingPassedInMemory, reservedFlags)) {
                     return nullptr;
@@ -816,7 +818,7 @@ namespace RSFoundation {
                     
                     if (vBuf.shouldFreeChars && (allocator == vBuf.allocator) && encoding == String::Encoding::Unicode) {
                         vBuf.shouldFreeChars = false;
-                        bytes = vBuf.allocator->Reallocate<UInt8>((void*)vBuf.chars.unicode, numBytes);
+                        bytes = vBuf.allocator->Reallocate<UniChar>(vBuf.chars.unicode, numBytes);
                         noCopy = true;
                     } else {
                         bytes = vBuf.chars.unicode;
@@ -839,7 +841,7 @@ namespace RSFoundation {
                     numBytes = (len + 1 + (newHasLengthByte ? 1 : 0) * sizeof(uint8_t));
                     
                     if (numBytes >= __VarWidthLocalBufferSize) {
-                        mem = ptr = allocator->Allocate<UInt8>(numBytes);
+                        mem = ptr = Allocator<UInt8>::SystemDefault.Allocate(numBytes);
                     } else {
                         mem = ptr = (uint8_t *)(vBuf.localBuffer);
                     }
@@ -875,7 +877,7 @@ namespace RSFoundation {
                 }
             }
             
-            String *romResult = nullptr;
+            StringImpl *romResult = nullptr;
             
             if (romResult == nullptr) {
                 if (noCopy) {
@@ -907,13 +909,13 @@ namespace RSFoundation {
                     }
                 }
                 
-                str = allocator->Allocate<String>(size + sizeof(UInt32));
+                str = allocator->Allocate<StringImpl>(size + sizeof(UInt32));
                 if (nullptr != str) {
-                    OptionFlags allocBits = (contentsDeallocator == allocator ? String::NotInlineContentsDefaultFree : (contentsDeallocator == nullptr ? String::NotInlineContentsNoFree : String::NotInlineContentsCustomFree));
-                    UInt32 info = (UInt32)(useInlineData ? String::HasInlineContents : allocBits) |
-                     ((encoding == String::Encoding::Unicode) ? String::IsUnicode : 0) |
-                     (useNullByte ? String::HasNullByte : 0) |
-                     (useLengthByte ? String::HasLengthByte : 0);
+                    OptionFlags allocBits = (contentsDeallocator == allocator ? StringImpl::NotInlineContentsDefaultFree : (contentsDeallocator == nullptr ? StringImpl::NotInlineContentsNoFree : StringImpl::NotInlineContentsCustomFree));
+                    UInt32 info = (UInt32)(useInlineData ? StringImpl::HasInlineContents : allocBits) |
+                     ((encoding == String::Encoding::Unicode) ? StringImpl::IsUnicode : 0) |
+                     (useNullByte ? StringImpl::HasNullByte : 0) |
+                     (useLengthByte ? StringImpl::HasLengthByte : 0);
                     str->_SetInfo(info);
                     if (!useLengthByte) {
                         Index length = numBytes - (hasLengthByte ? 1 : 0);
@@ -941,12 +943,13 @@ namespace RSFoundation {
                 }
             }
             if (vBuf.shouldFreeChars) {
+                
                 vBuf.allocator->Deallocate((void *)bytes);
             }
             return str;
         }
         
-        String::String(const char *cStr) {
+        StringImpl::StringImpl(const char *cStr) {
 //            bool isASCII = true;
 //            // Given this code path is rarer these days, OK to do this extra work to verify the strings
 //            const char *tmp = cStr;
@@ -964,8 +967,8 @@ namespace RSFoundation {
 //            }
         }
         
-        void String::_DeallocateMutableContents(void *buffer) {
-            auto alloc = _HasContentsAllocator() ? _ContentsAllocator() : &Allocator<String>::SystemDefault;
+        void StringImpl::_DeallocateMutableContents(void *buffer) {
+            auto alloc = _HasContentsAllocator() ? _ContentsAllocator() : &Allocator<StringImpl>::SystemDefault;
             
             if (_IsMutable() && _HasContentsAllocator() && alloc->IsGC()) {
                 // do nothing
@@ -977,7 +980,7 @@ namespace RSFoundation {
             }
         }
         
-        String::~String() {
+        StringImpl::~StringImpl() {
             
             // If in DEBUG mode, check to see if the string a RSSTR, and complain.
             //    RSAssert1(__RSConstantStringTableBeingFreed || !__RSStrIsConstantString((RSStringRef)RS), __RSLogAssertion, "Tried to deallocate RSSTR(\"%R\")", str);
@@ -994,12 +997,12 @@ namespace RSFoundation {
 //                        _DeallocateMutableContents(contents);
                     } else {
                         if (_HasContentsDeallocator()) {
-                            Allocator<String> *allocator = _ContentsDeallocator();
+                            Allocator<StringImpl> *allocator = _ContentsDeallocator();
                             allocator->Deallocate(contents);
 //                            RSAllocatorDeallocate(allocator, contents);
 //                            RSRelease(allocator);
                         } else {
-                            Allocator<String> *allocator = &Allocator<String>::SystemDefault;
+                            Allocator<StringImpl> *allocator = &Allocator<StringImpl>::SystemDefault;
 //                            RSAllocatorRef alloc = __RSGetAllocator();
 //                            RSAllocatorDeallocate(alloc, contents);
                             allocator->Deallocate(contents);
@@ -1015,22 +1018,18 @@ namespace RSFoundation {
             }
         }
         
-        const String *String::Create() {
-            return Allocator<String>::SystemDefault.Allocate();
+        const StringImpl *StringImpl::Create() {
+            return Allocator<StringImpl>::SystemDefault.Allocate();
         }
         
-        const String *String::Create(const char * cStr, String::Encoding encoding) {
+        const StringImpl *StringImpl::Create(const char * cStr, String::Encoding encoding) {
             if (!cStr) return Create();
             Index len = strlen(cStr);
-            Allocator<String> &allocator = Allocator<String>::SystemDefault;
+            Allocator<StringImpl> &allocator = Allocator<StringImpl>::SystemDefault;
             return _CreateInstanceImmutable(&allocator, cStr, len, encoding, false, false, false, true, false, nullptr, 0);
         }
         
-        String::Encoding String::GetSystemEncoding() {
-            return String::UTF8;
-        }
-        
-        const String *String::Copy() const {
+        const StringImpl *StringImpl::Copy() const {
             if (GetLength() == 0) {
                 return Create();
             }
@@ -1043,12 +1042,12 @@ namespace RSFoundation {
                 return _CreateInstanceImmutable(nullptr, contents + _SkipAnyLengthByte(), _Length2(contents), StringPrivate::_GetEightBitStringEncoding(), false, false, false, false, false, nullptr, 0);
             } else {
                 const UniChar *contents = (const UniChar *)_Contents();
-                return _CreateInstanceImmutable(nullptr, contents, _Length2(contents) * sizeof(UniChar), UTF8, false, true, _HasLengthByte(), false, false, nullptr, 0);
+                return _CreateInstanceImmutable(nullptr, contents, _Length2(contents) * sizeof(UniChar), String::Encoding::UTF8, false, true, _HasLengthByte(), false, false, nullptr, 0);
             }
             return this;
         }
         
-        Index String::GetLength() const {
+        Index StringImpl::GetLength() const {
             return _Length();
         }
         
@@ -1123,7 +1122,7 @@ namespace RSFoundation {
             return result + (result << (len & 31));
         }
         
-        HashCode String::Hash() const {
+        HashCode StringImpl::Hash() const {
             const UInt8 *contents = (const UInt8 *)_Contents();
             Index len = _Length2(contents);
             if (_IsEightBit()) {
@@ -1133,7 +1132,45 @@ namespace RSFoundation {
             return _HashCharacters((const UniChar *)contents, len, len);
         }
         
-        String String::Empty;
+        StringImpl StringImpl::Empty;
         
+        // String Implementation
+        
+        String String::Empty;
+     
+        String::String() {
+            implementation = StringImpl::Create();
+        }
+        
+        String::String(const String &str) {
+            implementation = str.implementation->Copy();
+        }
+        
+        String::String(const char *utf8String) {
+            implementation = StringImpl::Create(utf8String, UTF8);
+        }
+        
+        String::String(const char *cStr, String::Encoding encoding) {
+            implementation = StringImpl::Create(cStr, encoding);
+        }
+        
+        String::~String() {
+            if (implementation) {
+                Allocator<StringImpl>::SystemDefault.Deallocate(implementation);
+                implementation = nullptr;
+            }
+        }
+        
+        String::Encoding String::GetSystemEncoding() {
+            return String::UTF8;
+        }
+        
+        Index String::GetLength() const {
+            return implementation->GetLength();
+        }
+        
+        HashCode String::Hash() const {
+            return implementation->Hash();
+        }
     }
 }
