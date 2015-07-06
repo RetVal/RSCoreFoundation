@@ -64,38 +64,31 @@ namespace RSFoundation {
         };
     }
     
-    
-    class Equal {
-    public:
-        bool IsEqualTo(int a, int b) {
-            return a == b;
-        }
-    };
-    
     class TestBasicHash {
     public:
         TestBasicHash() {
-            OptionFlags flags = Hash::LinearHashing;
-            flags |= Hash::HasKeys;
-            basicHash = Hash::Create(flags);
+            OptionFlags flags = BasicHash::LinearHashing;
+            flags |= BasicHash::HasKeys;
+            basicHash = BasicHash::Create(flags);
             basicHash->SuppressRC();
         }
         
         ~TestBasicHash() {
-            Allocator<Hash>::SystemDefault.Deallocate(basicHash);
+            Allocator<BasicHash>::SystemDefault.Deallocate(basicHash);
+            basicHash = nullptr;
         }
-        Hash *basicHash;
+        BasicHash *basicHash;
     };
     
     __RS_FOUNDATION_INIT_ROUTINE(1000) void TestBasicHashFunc() {
         TestBasicHash tbh;
-        Hash *ht = tbh.basicHash;
+        BasicHash *ht = tbh.basicHash;
         for (int i = 1; i < 10; ++i) {
             ht->AddValue(i, i);
         }
         
         for (int i = 1; i < 10; ++i) {
-            const Hash::Bucket &bucket = ht->FindBucket(i);
+            const BasicHash::Bucket &bucket = ht->FindBucket(i);
             if (bucket.count) {
                 assert(bucket.weak_value == i);
             }

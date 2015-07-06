@@ -251,7 +251,7 @@ namespace RSFoundation {
                                 UTF32Char *newBuffer;
                                 
                                 decompBufferSize += MAX_BUFFER_LENGTH;
-                                newBuffer = Allocator<UTF32Char>::SystemDefault.Allocate(decompBufferSize);
+                                newBuffer = Allocator<UTF32Char>::SystemDefault.Allocate((unsigned int)decompBufferSize);
                                 //                        newBuffer = (UTF32Char *)AllocatorAllocate(SystemDefault, sizeof(UTF32Char) * decompBufferSize);
                                 memmove(newBuffer, decompBuffer, (decompBufferSize - MAX_BUFFER_LENGTH) * sizeof(UTF32Char));
                                 if (decompBuffer != buffer) {

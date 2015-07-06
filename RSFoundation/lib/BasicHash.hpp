@@ -24,7 +24,7 @@ namespace RSFoundation {
             static const TableElementType PrimitiveRoots[TableSize];
         };
         
-        class Hash : public Object {
+        class BasicHash : public Object {
         public:
             typedef struct {
                 Index idx;
@@ -66,7 +66,7 @@ namespace RSFoundation {
             };
     
         private:
-            Hash() {
+            BasicHash() {
                 
             }
             
@@ -670,7 +670,7 @@ namespace RSFoundation {
                 }
                 
                 auto allocator = &Allocator<Value *>::SystemDefault;
-                if (allocator->IsGC()) {
+                if (!allocator->IsGC()) {
                     allocator->Deallocate(old_values);
                     allocator->Deallocate(old_keys);
                     allocator->Deallocate(old_counts);
@@ -791,8 +791,8 @@ namespace RSFoundation {
                     }
                 }
                 
-                auto allocator = &Allocator<Hash *>::SystemDefault;
-                if (allocator->IsGC()) {
+                auto allocator = &Allocator<BasicHash *>::SystemDefault;
+                if (!allocator->IsGC()) {
                     allocator->Deallocate(old_values);
                     allocator->Deallocate(old_keys);
                     allocator->Deallocate(old_counts);
@@ -893,13 +893,13 @@ namespace RSFoundation {
         public:
 //            friend Hash *Allocator<Hash>::_AllocateImpl<Hash, false>::_Allocate(size_t size);
             
-            static Hash *Create(OptionFlags flags) {
-                size_t size = sizeof(Hash);
+            static BasicHash *Create(OptionFlags flags) {
+                size_t size = sizeof(BasicHash);
                 if (flags & HasKeys) size += sizeof(Value *); // keys
                 if (flags & HasCounts) size += sizeof(void *); // counts
                 if (flags & HasHashCache) size += sizeof(uintptr_t *); // hashes
-                auto allocator = &Allocator<Hash>::SystemDefault;
-                Hash *ht = (Hash *)allocator->Allocate<char *>(size);
+                auto allocator = &Allocator<BasicHash>::SystemDefault;
+                BasicHash *ht = (BasicHash *)allocator->Allocate<char *>(size);
                 if (nullptr == ht) return nullptr;
                 ht->bits.finalized = 0;
                 ht->bits.hash_style = (flags >> 13) & 0x3;
@@ -1039,7 +1039,7 @@ namespace RSFoundation {
                 return total;
             }
             
-            bool operator==(const Hash &ht) const {
+            bool operator==(const BasicHash &ht) const {
                 Index cnt = GetCount();
                 if (cnt != ht.GetCount()) return false;
                 if (0 == cnt) return true;
@@ -1312,7 +1312,7 @@ namespace RSFoundation {
             }
             
             size_t GetSize(bool total = true) {
-                size_t size = sizeof(class Hash);
+                size_t size = sizeof(class BasicHash);
                 if (bits.keys_offset) size += sizeof(Value *);
                 if (bits.counts_offset) size += sizeof(void *);
                 if (_HasHashCache()) size += sizeof(uintptr_t *);
@@ -1330,7 +1330,11 @@ namespace RSFoundation {
                 return size;
             }
             
-            
+            ~BasicHash() {
+                if (bits.finalized) HALT;
+                bits.finalized = 1;
+                _Drain(true);
+            }
         private:
             static void* __AllocateMemory(Index count, Index elem_size, bool strong = false, bool compactable = false) {
                 void *new_mem = nullptr;

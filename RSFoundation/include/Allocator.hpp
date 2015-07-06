@@ -21,7 +21,7 @@
 namespace RSFoundation {
     class Equal;
     namespace Basic {
-        class Hash;
+        class BasicHash;
     }
     
     namespace Collection {
@@ -70,19 +70,17 @@ namespace RSFoundation {
         OSXAllocator
 #endif
         >
-        class Allocator : public Object, private Counter<UInt32> {
+        class Allocator : public Object {
             static_assert(std::is_base_of<AllocatorProtocol, IMPL>::value, "IMPL should inherit from AllocatorProtocol");
         public:
             static Allocator<T, IMPL> SystemDefault;
             static Allocator<T, IMPL> Default;
             
         public:
-            template<typename ...Args>
-            T *Allocate(Args... args) {
+            template<typename... Args>
+            T *Allocate(Args&&... args) {
                 void *ptr = IMPL::Allocate(sizeof(T));
-                T *t = new (ptr) T(args...);
-                Inc();
-                std::cout << Self << " inc " << name << " " << Val() << "\n";
+                T *t = new (ptr) T(std::forward<Args>(args)...);
                 return t;
             }
             
@@ -98,13 +96,13 @@ namespace RSFoundation {
             
         private:
             friend class RSFoundation::Collection::String;
-            friend class RSFoundation::Basic::Hash;
+            friend class RSFoundation::Basic::BasicHash;
             
             template<typename T2, bool isPod>
             class _AllocateImpl {
                 friend class Allocator;
                 friend class RSFoundation::Collection::String;
-                friend class RSFoundation::Basic::Hash;
+                friend class RSFoundation::Basic::BasicHash;
                 
                 static T2 *_Allocate(size_t size) {
                     return nullptr;
@@ -115,15 +113,12 @@ namespace RSFoundation {
             class _AllocateImpl<T2, false> {
                 friend class Allocator;
                 friend class RSFoundation::Collection::String;
-                friend class RSFoundation::Basic::Hash;
+                friend class RSFoundation::Basic::BasicHash;
                 
                 static T2 *_Allocate(size_t size) {
                     size = 8 + size; // this +
                     void *ptr = IMPL::Allocate(size);
                     T2 *t = new (ptr) T2;
-                    Allocator<T2> *allocator = &Allocator<T2>::SystemDefault;
-                    allocator->Inc();
-                    std::cout << allocator->Self << " inc " << allocator->name << " " << allocator->Val() << "\n";
                     return t;
                 }
             };
@@ -132,7 +127,7 @@ namespace RSFoundation {
             class _AllocateImpl<T2, true> {
                 friend class Allocator;
                 friend class RSFoundation::Collection::String;
-                friend class RSFoundation::Basic::Hash;
+                friend class RSFoundation::Basic::BasicHash;
                 
                 static T2 *_Allocate(size_t size) {
                     return static_cast<T2*>(IMPL::Allocate(size * sizeof(T2)));;
@@ -154,15 +149,11 @@ namespace RSFoundation {
             void Deallocate(T *t) {
                 t->T::~T();
                 IMPL::Free(static_cast<void*>(t));
-                Dec();
-                std::cout << Self << " dec " << name << " " << Val() << "\n";
             }
             
             void Deallocate(const T *t) {
                 t->T::~T();
                 IMPL::Free((void*)(t));
-                Dec();
-                std::cout << Self << " dec " << name << " " << Val() << "\n";
             }
 
             void Deallocate(Nullable<T> &obj) {
