@@ -1,65 +1,185 @@
 //
-//  RSBasicObject.h
+//  Object.hpp
 //  RSCoreFoundation
 //
-//  Created by closure on 5/26/15.
-//  Copyright (c) 2015 RetVal. All rights reserved.
+//  Created by closure on 7/6/15.
+//  Copyright © 2015 RetVal. All rights reserved.
 //
 
-#ifndef __RSCoreFoundation__RSBasicObject__
-#define __RSCoreFoundation__RSBasicObject__
+#ifndef Object_cpp
+#define Object_cpp
 
-#include <RSFoundation/BasicTypeDefine.hpp>
-#include <RSFoundation/TypeTraits.hpp>
-#include <RSFoundation/Protocol.hpp>
-#include <string>
-#include <cxxabi.h>
+#include <cstddef>
+#include <RSCoreFoundation/RSCoreFoundation.h>
 
-namespace RSFoundation {
-    using namespace __cxxabiv1;
-    namespace Basic {
+namespace RSCF {
+    class String;
+    
+    template <class Derived>
+    class RefCountedBase {
+        mutable unsigned ref_cnt;
         
-        template<typename T, size_t _Size = 1>
-        class Counter {
-            static_assert(POD<T>::Result, "T must be POD");
-        private:
-            T __elems_[_Size > 0 ? _Size : 1];
-            
-        public:
-            Counter() = default;
-            
-            void Inc(size_t x = 0) { ++__elems_[x]; }
-            void Dec(size_t x = 0) { --__elems_[x]; }
-            
-            const T& Val(size_t x = 0) const { return __elems_[x]; }
-            const T& Val(size_t x = 0) { return __elems_[x]; }
-        };
+    public:
+        RefCountedBase() : ref_cnt(0) {}
+        RefCountedBase(const RefCountedBase &) : ref_cnt(0) {}
         
-        class Object : public virtual Hashable {
-        public:
-            Object();
-            virtual ~Object();
-            template <typename T>
-            void GetClassName(std::string &className) {
-                char *output_buffer = nullptr;
-                size_t len = 0;
-                int status = 0;
-                const std::type_info& typeinfo = typeid(T);
-                output_buffer = __cxa_demangle(typeinfo.name(), nullptr, &len, &status);
-                if (output_buffer != nullptr) {
-                    assert(status == 0 && "尼玛");
-                    className = std::string(output_buffer);
-                    free(output_buffer);
-                } else {
-                    className = std::string(typeinfo.name());
-                }
-            }
-            
-//            virtual void GetClassName(std::string &className) const;
-//            virtual void Description(std::string &desc, unsigned int indent = 0, bool debug = false) const;
-//            virtual void Dump() const;
-        };
+        void retain() const { ++ref_cnt; }
+        void release() const {
+            assert (ref_cnt > 0 && "Reference count is already zero.");
+            if (--ref_cnt == 0) delete static_cast<const Derived*>(this);
+        }
+        
+        unsigned getRetainCount() const { return ref_cnt; }
+    };
+    
+    template <typename T> struct IntrusiveRefCntPtrInfo {
+        static void retain(T *obj) { obj->retain(); }
+        static void release(T *obj) { obj->release(); }
+        static unsigned getRetainCount(T *obj) { return obj->getRetainCount(); }
+    };
+    
+    template <typename T>
+    class IntrusiveRefCntPtr {
+        T* Obj;
+        
+    public:
+        typedef T element_type;
+        
+        explicit IntrusiveRefCntPtr() : Obj(nullptr) {}
+        
+        IntrusiveRefCntPtr(T* obj) : Obj(obj) {
+            retain();
+        }
+        
+        IntrusiveRefCntPtr(const IntrusiveRefCntPtr& S) : Obj(S.Obj) {
+            retain();
+        }
+        
+        IntrusiveRefCntPtr(IntrusiveRefCntPtr&& S) : Obj(S.Obj) {
+            S.Obj = nullptr;
+        }
+        
+        template <class X>
+        IntrusiveRefCntPtr(IntrusiveRefCntPtr<X>&& S) : Obj(S.get()) {
+            S.Obj = 0;
+        }
+        
+        template <class X>
+        IntrusiveRefCntPtr(const IntrusiveRefCntPtr<X>& S)
+        : Obj(S.get()) {
+            retain();
+        }
+        
+        IntrusiveRefCntPtr& operator=(IntrusiveRefCntPtr S) {
+            swap(S);
+            return *this;
+        }
+        
+        ~IntrusiveRefCntPtr() { release(); }
+        
+        T& operator*() const { return *Obj; }
+        
+        T* operator->() const { return Obj; }
+        
+        T* get() const { return Obj; }
+        
+        explicit operator bool() const { return Obj; }
+        
+        void swap(IntrusiveRefCntPtr& other) {
+            T* tmp = other.Obj;
+            other.Obj = Obj;
+            Obj = tmp;
+        }
+        
+        void reset() {
+            release();
+            Obj = nullptr;
+        }
+        
+        void resetWithoutRelease() {
+            Obj = 0;
+        }
+        
+    private:
+        void retain() { if (Obj) IntrusiveRefCntPtrInfo<T>::retain(Obj); }
+        void release() { if (Obj) IntrusiveRefCntPtrInfo<T>::release(Obj); }
+        
+        template <typename X>
+        friend class IntrusiveRefCntPtr;
+    };
+    
+    template<class T, class U>
+    inline bool operator==(const IntrusiveRefCntPtr<T>& A,
+                           const IntrusiveRefCntPtr<U>& B)
+    {
+        return A.get() == B.get();
     }
+    
+    template<class T, class U>
+    inline bool operator!=(const IntrusiveRefCntPtr<T>& A,
+                           const IntrusiveRefCntPtr<U>& B)
+    {
+        return A.get() != B.get();
+    }
+    
+    template<class T, class U>
+    inline bool operator==(const IntrusiveRefCntPtr<T>& A,
+                           U* B)
+    {
+        return A.get() == B;
+    }
+    
+    template<class T, class U>
+    inline bool operator!=(const IntrusiveRefCntPtr<T>& A,
+                           U* B)
+    {
+        return A.get() != B;
+    }
+    
+    template<class T, class U>
+    inline bool operator==(T* A,
+                           const IntrusiveRefCntPtr<U>& B)
+    {
+        return A == B.get();
+    }
+    
+    template<class T, class U>
+    inline bool operator!=(T* A,
+                           const IntrusiveRefCntPtr<U>& B)
+    {
+        return A != B.get();
+    }
+    
+    template <class T>
+    bool operator==(std::nullptr_t A, const IntrusiveRefCntPtr<T> &B) {
+        return !B;
+    }
+    
+    template <class T>
+    bool operator==(const IntrusiveRefCntPtr<T> &A, std::nullptr_t B) {
+        return B == A;
+    }
+    
+    template <class T>
+    bool operator!=(std::nullptr_t A, const IntrusiveRefCntPtr<T> &B) {
+        return !(A == B);
+    }
+    
+    template <class T>
+    bool operator!=(const IntrusiveRefCntPtr<T> &A, std::nullptr_t B) {
+        return !(A == B);
+    }
+    
+    class Object {
+    public:
+        Object() {}
+        virtual ~Object() {}
+    };
+    
+    class RefObject : public Object, public RefCountedBase<RefObject> {
+    public:
+        
+    };
 }
 
-#endif /* defined(__RSCoreFoundation__RSBasicObject__) */
+#endif /* Object_cpp */

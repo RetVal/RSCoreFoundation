@@ -349,7 +349,9 @@ static void __RSURLConnectionFinishPerform(RSURLConnectionRef connection) {
 
 #include <RSCoreFoundation/RSHTTPCookie.h>
 #include "RSPrivate/libcurl/lib/cookie.h"
-#include "RSPrivate/libcurl/lib/share.h"
+#include "RSPrivate/libcurl/lib/urldata.h"
+extern CURLSHcode Curl_share_lock (struct SessionHandle *, curl_lock_data, curl_lock_access);
+extern CURLSHcode Curl_share_unlock (struct SessionHandle *, curl_lock_data);
 
 static RSArrayRef __RSURLConnectionWalkThroughCoreCookies(struct SessionHandle *data, RSDictionaryRef (^block)(struct Cookie *cookie)){
     RSMutableArrayRef cookies = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);

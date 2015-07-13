@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -22,7 +22,7 @@
  *
  ***************************************************************************/
 
-#include "setup.h"
+#include "curl_setup.h"
 #include "hash.h"
 #include "curl_addrinfo.h"
 #include "asyn.h"
@@ -58,7 +58,7 @@ struct connectdata;
  * Global DNS cache is general badness. Do not use. This will be removed in
  * a future version. Use the share interface instead!
  *
- * Returns a struct curl_hash pointer on success, nil on failure.
+ * Returns a struct curl_hash pointer on success, NULL on failure.
  */
 struct curl_hash *Curl_global_host_cache_init(void);
 void Curl_global_host_cache_dtor(void);
@@ -174,7 +174,7 @@ const char *Curl_printable_address(const Curl_addrinfo *ip,
 /*
  * Curl_cache_addr() stores a 'Curl_addrinfo' struct in the DNS cache.
  *
- * Returns the Curl_dns_entry entry pointer or nil if the storage failed.
+ * Returns the Curl_dns_entry entry pointer or NULL if the storage failed.
  */
 struct Curl_dns_entry *
 Curl_cache_addr(struct SessionHandle *data, Curl_addrinfo *addr,
@@ -201,10 +201,39 @@ extern sigjmp_buf curl_jmpenv;
 CURLcode Curl_set_dns_servers(struct SessionHandle *data, char *servers);
 
 /*
+ * Function provided by the resolver backend to set
+ * outgoing interface to use for DNS requests
+ */
+CURLcode Curl_set_dns_interface(struct SessionHandle *data,
+                                const char *interf);
+
+/*
+ * Function provided by the resolver backend to set
+ * local IPv4 address to use as source address for DNS requests
+ */
+CURLcode Curl_set_dns_local_ip4(struct SessionHandle *data,
+                                const char *local_ip4);
+
+/*
+ * Function provided by the resolver backend to set
+ * local IPv6 address to use as source address for DNS requests
+ */
+CURLcode Curl_set_dns_local_ip6(struct SessionHandle *data,
+                                const char *local_ip6);
+
+/*
+ * Clean off entries from the cache
+ */
+void Curl_hostcache_clean(struct SessionHandle *data, struct curl_hash *hash);
+
+/*
  * Destroy the hostcache of this handle.
  */
 void Curl_hostcache_destroy(struct SessionHandle *data);
 
+/*
+ * Populate the cache with specified entries from CURLOPT_RESOLVE.
+ */
 CURLcode Curl_loadhostpairs(struct SessionHandle *data);
 
 #endif /* HEADER_CURL_HOSTIP_H */

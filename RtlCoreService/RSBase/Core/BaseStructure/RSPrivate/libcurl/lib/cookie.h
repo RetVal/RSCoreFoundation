@@ -21,7 +21,7 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "setup.h"
+#include "curl_setup.h"
 
 #include <curl/curl.h>
 
@@ -29,7 +29,8 @@ struct Cookie {
   struct Cookie *next; /* next in the chain */
   char *name;        /* <this> = value */
   char *value;       /* name = <this> */
-  char *path;         /* path = <this> */
+  char *path;         /* path = <this> which is in Set-Cookie: */
+  char *spath;        /* sanitized cookie path */
   char *domain;      /* domain = <this> */
   curl_off_t expires;  /* expires = <this> */
   char *expirestr;   /* the plain text version */
@@ -86,9 +87,9 @@ void Curl_cookie_clearall(struct CookieInfo *cookies);
 void Curl_cookie_clearsess(struct CookieInfo *cookies);
 
 #if defined(CURL_DISABLE_HTTP) || defined(CURL_DISABLE_COOKIES)
-#define Curl_cookie_list(x) nil
+#define Curl_cookie_list(x) NULL
 #define Curl_cookie_loadfiles(x) Curl_nop_stmt
-#define Curl_cookie_init(x,y,z,w) nil
+#define Curl_cookie_init(x,y,z,w) NULL
 #define Curl_cookie_cleanup(x) Curl_nop_stmt
 #define Curl_flush_cookies(x,y) Curl_nop_stmt
 #else

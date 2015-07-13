@@ -9097,6 +9097,7 @@ RSExport void RSPerformBlockAfterDelay(RSTimeInterval timeInterval, void (^perfo
 {
     RSRunLoopTimerRef timer = RSRunLoopTimerCreateWithHandler(RSAllocatorSystemDefault, RSAbsoluteTimeGetCurrent() + timeInterval, 0, 0, 0, ^(RSRunLoopTimerRef timer) {
         perform();
+        RSRunLoopRemoveTimer(RSRunLoopGetCurrent(), timer, RSRunLoopDefaultMode);
     });
     RSRunLoopAddTimer(RSRunLoopGetCurrent(), timer, RSRunLoopDefaultMode);
     RSRelease(timer);

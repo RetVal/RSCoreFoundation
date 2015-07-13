@@ -21,7 +21,7 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "setup.h"
+#include "curl_setup.h"
 
 #ifdef CURL_DOES_CONVERSIONS
 
@@ -31,7 +31,7 @@
  * Curl_convert_clone() returns a malloced copy of the source string (if
  * returning CURLE_OK), with the data converted to network format.
  *
- * If no conversion was needed *outbuf may be nil.
+ * If no conversion was needed *outbuf may be NULL.
  */
 CURLcode Curl_convert_clone(struct SessionHandle *data,
                             const char *indata,
