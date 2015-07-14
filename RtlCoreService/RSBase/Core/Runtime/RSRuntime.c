@@ -1041,6 +1041,9 @@ extern void __RSURLResponseInitialize();
 extern void __RSURLConnectionInitialize();
 extern void __RSHTTPCookieInitialize();
 
+extern void __RSMachPortInitialize();
+extern void __RSMessagePortInitialize();
+
 #include <RSCoreFoundation/RSNotificationCenter.h>
 RS_PUBLIC_CONST_STRING_DECL(RSCoreFoundationWillDeallocateNotification, "RSCoreFoundationWillDeallocateNotification")
 RS_PUBLIC_CONST_STRING_DECL(RSCoreFoundationDidFinishLoadingNotification, "RSCoreFoundationDidFinishLoadingNotification")
@@ -1133,6 +1136,9 @@ RSExport __RS_INIT_ROUTINE(RSRuntimePriority) void RSCoreFoundationInitialize()
     
     __RSBundleInitialize();
     __RSXMLParserInitialize();
+    
+    __RSMachPortInitialize();
+    __RSMessagePortInitialize();
     
     //__RSDistributedNotificationCenterInitialize();
     if (__RSRuntimeClassTableCount < __RSRuntimeClassReservedRangeEnd) __RSRuntimeClassTableCount = __RSRuntimeClassReservedRangeEnd;

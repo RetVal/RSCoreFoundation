@@ -37,8 +37,8 @@ RSExport RSArchiverRef RSArchiverCreate(RSAllocatorRef allocator);
 
 RSExport RSDataRef RSArchiverContextMakeDataPacket(RSArchiverRef archiver, RSIndex count, RSDataRef data1, ...);
 RSExport RSArrayRef RSArchiverContextUnarchivePacket(const RSUnarchiverRef unarchiver, RSDataRef data, RSTypeID ID);
-RSExport RSDataRef RSArchiverEncodeObject(RSArchiverRef archiver, RSTypeRef object);
-RSExport RSTypeRef RSUnarchiverDecodeObject(RSUnarchiverRef unarchiver, RSDataRef data);
+RSExport RSDataRef RSArchiverEncodeObject(RSArchiverRef archiver, RSTypeRef object); // return strong
+RSExport RSTypeRef RSUnarchiverDecodeObject(RSUnarchiverRef unarchiver, RSDataRef data); // return strong
 
 RSExport BOOL RSArchiverEncodeObjectForKey(RSArchiverRef archiver, RSStringRef key, RSTypeRef object);
 RSExport RSTypeRef RSUnarchiverDecodeObjectForKey(RSUnarchiverRef unarchiver, RSStringRef key);

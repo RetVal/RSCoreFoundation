@@ -290,7 +290,7 @@ static void __RSMessagePortDeallocate(RSTypeRef cf) {
 static RSTypeID __RSMessagePortTypeID = _RSRuntimeNotATypeID;
 
 static const RSRuntimeClass __RSMessagePortClass = {
-    0,
+    _RSRuntimeScannedObject,
     0,
     "RSMessagePort",
     NULL,      // init
@@ -504,7 +504,7 @@ static RSMessagePortRef __RSMessagePortCreateRemote(RSAllocatorRef allocator, RS
     RSSpinLockLock(&__RSAllMessagePortsLock);
     if (!perPID && NULL != name) {
         RSMessagePortRef existing;
-        if (NULL != __RSAllRemoteMessagePorts && (existing == RSDictionaryGetValue(__RSAllRemoteMessagePorts, name))) {
+        if (NULL != __RSAllRemoteMessagePorts && (RSDictionaryGetValueIfPresent(__RSAllRemoteMessagePorts, name, (const void **)&existing))) {
             RSRetain(existing);
             RSSpinLockUnlock(&__RSAllMessagePortsLock);
             RSRelease(name);
@@ -561,7 +561,7 @@ static RSMessagePortRef __RSMessagePortCreateRemote(RSAllocatorRef allocator, RS
     RSSpinLockLock(&__RSAllMessagePortsLock);
     if (!perPID && NULL != name) {
         RSMessagePortRef existing;
-        if (NULL != __RSAllRemoteMessagePorts && (existing = RSDictionaryGetValue(__RSAllRemoteMessagePorts, name))) {
+        if (NULL != __RSAllRemoteMessagePorts && (RSDictionaryGetValueIfPresent(__RSAllRemoteMessagePorts, name, (const void **)&existing))) {
             RSRetain(existing);
             RSSpinLockUnlock(&__RSAllMessagePortsLock);
             RSRelease(memory);
@@ -570,7 +570,7 @@ static RSMessagePortRef __RSMessagePortCreateRemote(RSAllocatorRef allocator, RS
         if (NULL == __RSAllRemoteMessagePorts) {
             __RSAllRemoteMessagePorts = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryNilValueContext);
         }
-        RSDictionaryAddValue(__RSAllRemoteMessagePorts, name, memory);
+        RSDictionarySetValue(__RSAllLocalMessagePorts, name, memory);
     }
     RSRetain(native);
     RSSpinLockUnlock(&__RSAllMessagePortsLock);

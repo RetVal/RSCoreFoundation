@@ -292,7 +292,7 @@ static void __RSMachPortChecker(BOOL fromTimer) {
     static RSTypeID __RSMachPortTypeID = _RSRuntimeNotATypeID;
     
     static const RSRuntimeClass __RSMachPortClass = {
-        0,
+        _RSRuntimeScannedObject,
         0,
         "RSMachPort",
         NULL,      // init

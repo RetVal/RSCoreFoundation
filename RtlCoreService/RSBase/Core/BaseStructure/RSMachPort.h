@@ -25,8 +25,8 @@
 	Copyright (c) 1998-2013, Apple Inc. All rights reserved.
 */
 
-#if !defined(__COREFOUNDATION_RSMACHPORT__)
-#define __COREFOUNDATION_RSMACHPORT__ 1
+#if !defined(__RSCOREFOUNDATION_RSMACHPORT__)
+#define __RSCOREFOUNDATION_RSMACHPORT__ 1
 
 #include <RSCoreFoundation/RSRunLoop.h>
 #include <mach/port.h>

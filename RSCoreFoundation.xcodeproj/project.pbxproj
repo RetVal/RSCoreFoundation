@@ -8,9 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		30047C331B54B1C90006C063 /* RSMachPort.c in Sources */ = {isa = PBXBuildFile; fileRef = 30047C2F1B54B1C90006C063 /* RSMachPort.c */; };
-		30047C341B54B1C90006C063 /* RSMachPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 30047C301B54B1C90006C063 /* RSMachPort.h */; };
+		30047C341B54B1C90006C063 /* RSMachPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 30047C301B54B1C90006C063 /* RSMachPort.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30047C351B54B1C90006C063 /* RSMessagePort.c in Sources */ = {isa = PBXBuildFile; fileRef = 30047C311B54B1C90006C063 /* RSMessagePort.c */; };
-		30047C361B54B1C90006C063 /* RSMessagePort.h in Headers */ = {isa = PBXBuildFile; fileRef = 30047C321B54B1C90006C063 /* RSMessagePort.h */; };
+		30047C361B54B1C90006C063 /* RSMessagePort.h in Headers */ = {isa = PBXBuildFile; fileRef = 30047C321B54B1C90006C063 /* RSMessagePort.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30047C381B54B8010006C063 /* RSPriv.h in Headers */ = {isa = PBXBuildFile; fileRef = 30047C371B54B8010006C063 /* RSPriv.h */; };
 		300869C11B4CE6AD00A6EDC7 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 300869BA1B4CDE4C00A6EDC7 /* libcurl.a */; };
 		300869C31B4CF25800A6EDC7 /* GSS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 300869C21B4CF25800A6EDC7 /* GSS.framework */; };
@@ -2698,9 +2698,11 @@
 				41BEF0AF17B7E93500B09C05 /* RSUnicodePrecomposition.h in Headers */,
 				41FED9B11825170E0079639B /* RSURLConnection.h in Headers */,
 				30E23BF21B4BEBBB0035ED51 /* curl_gssapi.h in Headers */,
+				30047C341B54B1C90006C063 /* RSMachPort.h in Headers */,
 				416B382216514C8A005848CC /* RSDate.h in Headers */,
 				30E23C191B4BEBBB0035ED51 /* http_proxy.h in Headers */,
 				30E23BFC1B4BEBBB0035ED51 /* curl_ntlm_msgs.h in Headers */,
+				30047C361B54B1C90006C063 /* RSMessagePort.h in Headers */,
 				4101F35118447BBA0090C212 /* string_piece.h in Headers */,
 				30E23C0C1B4BEBBB0035ED51 /* formdata.h in Headers */,
 				41ABD4B7175F6D7C00A4B4F6 /* RSNumber+Extension.h in Headers */,
@@ -2756,7 +2758,6 @@
 				30E23C4C1B4BEBBB0035ED51 /* polarssl.h in Headers */,
 				30E23BFF1B4BEBBB0035ED51 /* curl_sasl.h in Headers */,
 				41BEC69717170DBB006B946B /* RSJSONSerialization.h in Headers */,
-				30047C361B54B1C90006C063 /* RSMessagePort.h in Headers */,
 				41587496167390E000EFC5CA /* RSSet.h in Headers */,
 				413064401769A25C00EFACC0 /* RSSocket.h in Headers */,
 				30E23C381B4BEBBB0035ED51 /* ssh.h in Headers */,
@@ -2820,7 +2821,6 @@
 				30E23BD01B4BEBBB0035ED51 /* curlrules.h in Headers */,
 				41F90C8416DFBB59005CDC45 /* RSFileManagerPathSupport.h in Headers */,
 				30E23C371B4BEBBB0035ED51 /* splay.h in Headers */,
-				30047C341B54B1C90006C063 /* RSMachPort.h in Headers */,
 				30E23BF41B4BEBBB0035ED51 /* curl_ldap.h in Headers */,
 				41A7A852171408C800D18936 /* RSThread.h in Headers */,
 				30E23BDD1B4BEBBB0035ED51 /* arpa_telnet.h in Headers */,

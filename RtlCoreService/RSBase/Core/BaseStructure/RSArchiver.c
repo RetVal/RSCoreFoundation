@@ -265,11 +265,7 @@ RSInline RSDataRef __RSArchiverContextSerializeEx(const RSArchiverRef archiver, 
     RSTypeID ID = RSGetTypeID(object);
     if (push) __RSArchiverContextPushTypeID(__RSArchiverGetContext(archiver), ID);
     RSDataRef data = __RSArchiverGetSerializeCallBack(__RSArchiverGetCallBacks((archiver), ID))(archiver, object);
-    if (data)
-    {
-        return data;
-    }
-    return nil;
+    return data;
 }
 
 RSInline RSDataRef __RSArchiverContextSerialize(const RSArchiverRef archiver, RSTypeRef object)

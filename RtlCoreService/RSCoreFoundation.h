@@ -42,6 +42,8 @@
 #include <RSCoreFoundation/RSPathUtilities.h>
 #include <RSCoreFoundation/RSProtocol.h>
 #include <RSCoreFoundation/RSPropertyList.h>
+#include <RSCoreFoundation/RSMachPort.h>
+#include <RSCoreFoundation/RSMessagePort.h>
 #include <RSCoreFoundation/RSQueue.h>
 #include <RSCoreFoundation/RSRunLoop.h>
 #include <RSCoreFoundation/RSRegularExpression.h>
