@@ -219,18 +219,18 @@ static RSStringRef __RSMessagePortCopyDescription(RSTypeRef cf) {
     RSStringRef contextDesc = NULL;
     locked = ms->_lock ? "Yes" : "No";
     if (__RSMessagePortIsRemote(ms)) {
-        result = RSStringCreateWithFormat(RSAllocatorSystemDefault, NULL, RSSTR("<RSMessagePort %p [%p]>{locked = %s, valid = %s, remote = %s, name = %@}"), cf, RSGetAllocator(ms), locked, (__RSMessagePortIsValid(ms) ? "Yes" : "No"), (__RSMessagePortIsRemote(ms) ? "Yes" : "No"), ms->_name);
+        result = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<RSMessagePort %p [%p]>{locked = %s, valid = %s, remote = %s, name = %@}"), cf, RSGetAllocator(ms), locked, (__RSMessagePortIsValid(ms) ? "Yes" : "No"), (__RSMessagePortIsRemote(ms) ? "Yes" : "No"), ms->_name);
     } else {
         if (NULL != ms->_context.info && NULL != ms->_context.copyDescription) {
             contextDesc = ms->_context.copyDescription(ms->_context.info);
         }
         if (NULL == contextDesc) {
-            contextDesc = RSStringCreateWithFormat(RSAllocatorSystemDefault, NULL, RSSTR("<RSMessagePort context %p>"), ms->_context.info);
+            contextDesc = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<RSMessagePort context %p>"), ms->_context.info);
         }
         void *addr = ms->_callout ? (void *)ms->_callout : (void *)ms->_calloutEx;
         Dl_info info;
         const char *name = (dladdr(addr, &info) && info.dli_saddr == addr && info.dli_sname) ? info.dli_sname : "???";
-        result = RSStringCreateWithFormat(RSAllocatorSystemDefault, NULL, RSSTR("<RSMessagePort %p [%p]>{locked = %s, valid = %s, remote = %s, name = %@, source = %p, callout = %s (%p), context = %@}"), cf, RSGetAllocator(ms), locked, (__RSMessagePortIsValid(ms) ? "Yes" : "No"), (__RSMessagePortIsRemote(ms) ? "Yes" : "No"), ms->_name, ms->_source, name, addr, (NULL != contextDesc ? contextDesc : RSSTR("<no description>")));
+        result = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<RSMessagePort %p [%p]>{locked = %s, valid = %s, remote = %s, name = %@, source = %p, callout = %s (%p), context = %@}"), cf, RSGetAllocator(ms), locked, (__RSMessagePortIsValid(ms) ? "Yes" : "No"), (__RSMessagePortIsRemote(ms) ? "Yes" : "No"), ms->_name, ms->_source, name, addr, (NULL != contextDesc ? contextDesc : RSSTR("<no description>")));
     }
     if (NULL != contextDesc) {
         RSRelease(contextDesc);
@@ -360,7 +360,7 @@ static RSMessagePortRef __RSMessagePortCreateLocal(RSAllocatorRef allocator, RSS
     RSSpinLockLock(&__RSAllMessagePortsLock);
     if (!perPID && NULL != name) {
         RSMessagePortRef existing;
-        if (NULL != __RSAllLocalMessagePorts && (existing = RSDictionaryGetValue(__RSAllLocalMessagePorts, name))) {
+        if (NULL != __RSAllLocalMessagePorts && (RSDictionaryGetValueIfPresent(__RSAllRemoteMessagePorts, name, (const void **)&existing))) {
             RSRetain(existing);
             RSSpinLockUnlock(&__RSAllMessagePortsLock);
             RSRelease(name);
@@ -460,7 +460,7 @@ static RSMessagePortRef __RSMessagePortCreateLocal(RSAllocatorRef allocator, RSS
     RSSpinLockLock(&__RSAllMessagePortsLock);
     if (!perPID && NULL != name) {
         RSMessagePortRef existing;
-        if (NULL != __RSAllLocalMessagePorts && (existing = RSDictionaryGetValue(__RSAllLocalMessagePorts, name))) {
+        if (NULL != __RSAllLocalMessagePorts && (RSDictionaryGetValueIfPresent(__RSAllRemoteMessagePorts, name, (const void **)&existing))) {
             RSRetain(existing);
             RSSpinLockUnlock(&__RSAllMessagePortsLock);
             RSRelease(memory);
@@ -693,7 +693,7 @@ BOOL RSMessagePortSetName(RSMessagePortRef ms, RSStringRef name) {
             RSRelease(ms->_name);
         }
         ms->_name = name;
-        RSDictionaryAddValue(__RSAllLocalMessagePorts, name, ms);
+        RSDictionarySetValue(__RSAllLocalMessagePorts, name, ms);
         RSSpinLockUnlock(&__RSAllMessagePortsLock);
     }
     
@@ -952,6 +952,7 @@ SInt32 RSMessagePortSendRequest(RSMessagePortRef remote, SInt32 msgid, RSDataRef
         return RSMessagePortSuccess;
     }
     _RSMachPortInstallNotifyPort(currentRL, replyMode);
+    
     termTSR = mach_absolute_time() + __RSTimeIntervalToTSR(rcvTimeout);
     for (;;) {
         RSRunLoopRunInMode(replyMode, __RSTimeIntervalUntilTSR(termTSR), true);

@@ -258,23 +258,23 @@ enum {
 	__RSTSDKeyExceptionData = 63,
 };
 
-extern int       pthread_key_init_np(int, void (*)(void *));
-extern pthread_t _RSMainPThread;
-extern void *_RSGetTSD(uint32_t slot);
+RSExtern int       pthread_key_init_np(int, void (*)(void *));
+RSExtern pthread_t _RSMainPThread;
+RSExtern void *_RSGetTSD(uint32_t slot);
 typedef void (*tsdDestructor)(void *);
-extern void *_RSSetTSD(uint32_t slot, void *newVal, tsdDestructor destructor);
+RSExtern void *_RSSetTSD(uint32_t slot, void *newVal, tsdDestructor destructor);
 
 
-extern RSAllocatorRef RSAllocatorSystemDefault;
+RSExtern RSAllocatorRef RSAllocatorSystemDefault;
 #define RSAllocatorNull ((RSAllocatorRef)nil)
 
-extern const void *__RSStringCollectionCopy(RSAllocatorRef allocator, const void *ptr);
-extern const void *__RSTypeCollectionRetain(RSAllocatorRef allocator, const void *ptr);
-extern void __RSTypeCollectionRelease(RSAllocatorRef allocator, const void *ptr);
+RSExtern const void *__RSStringCollectionCopy(RSAllocatorRef allocator, const void *ptr);
+RSExtern const void *__RSTypeCollectionRetain(RSAllocatorRef allocator, const void *ptr);
+RSExtern void __RSTypeCollectionRelease(RSAllocatorRef allocator, const void *ptr);
 
-extern RSTypeRef __RSAllocatorSetHeader(RSAllocatorRef allocator, RSHandle* zone, RSIndex size);
+RSExtern RSTypeRef __RSAllocatorSetHeader(RSAllocatorRef allocator, RSHandle* zone, RSIndex size);
 
-extern BOOL __RSStringEncodingAvailable(RSStringEncoding encoding);
+RSExtern BOOL __RSStringEncodingAvailable(RSStringEncoding encoding);
 //RSPrivate void RSStringSetEncoding(RSStringRef string, RSStringEncoding encoding);
 RSPrivate void __RSSetCharToUniCharFunc(BOOL (*func)(UInt32 flags, UInt8 ch, UniChar *unicodeChar));
 RSPrivate void __RSStrConvertBytesToUnicode(const uint8_t *bytes, UniChar *buffer, RSIndex numChars);
@@ -305,26 +305,26 @@ RSExport BOOL __RSStringDecodeByteStream2(const UInt8 *bytes, UInt32 len, RSStri
 RSExport BOOL __RSStringDecodeByteStream3(const UInt8 *bytes, RSIndex len, RSStringEncoding encoding, BOOL alwaysUnicode, RSVarWidthCharBuffer *buffer, BOOL *useClientsMemoryPtr, UInt32 converterFlags);
 
 #include <RSCoreFoundation/RSDictionary.h>
-extern void __RSDictionaryCleanAllKeysAndObjects(RSMutableDictionaryRef dictionary);
+RSExtern void __RSDictionaryCleanAllKeysAndObjects(RSMutableDictionaryRef dictionary);
 #include <RSCoreFoundation/RSAutoreleasePool.h>
 
 #define RSExceptionKey          205
 #define RSAutoreleasePageKey    204
 #define RSRunLoopKey            203
-extern void __RSAutoreleasePoolReleaseUntil(RSAutoreleasePoolRef pool, RSTypeRef *stop);
+RSExtern void __RSAutoreleasePoolReleaseUntil(RSAutoreleasePoolRef pool, RSTypeRef *stop);
 
-extern RSStringRef __RSRunLoopThreadToString(pthread_t t);
+RSExtern RSStringRef __RSRunLoopThreadToString(pthread_t t);
 
-extern const RSDictionaryKeyContext ___RSDictionaryNilKeyContext;
-extern const RSDictionaryValueContext ___RSDictionaryNilValueContext;
-extern const RSDictionaryKeyContext ___RSDictionaryRSKeyContext;
-extern const RSDictionaryValueContext ___RSDictionaryRSValueContext;
-extern const RSDictionaryKeyContext ___RSConstantCStringKeyContext;
+RSExtern const RSDictionaryKeyContext ___RSDictionaryNilKeyContext;
+RSExtern const RSDictionaryValueContext ___RSDictionaryNilValueContext;
+RSExtern const RSDictionaryKeyContext ___RSDictionaryRSKeyContext;
+RSExtern const RSDictionaryValueContext ___RSDictionaryRSValueContext;
+RSExtern const RSDictionaryKeyContext ___RSConstantCStringKeyContext;
 
-extern void __RSRuntimeMemoryBarrier();
-extern void RSAllocatorLogUnitCount();
-extern void *__RSStartSimpleThread(void (*func)(void *), void *arg);
-extern void _RSRunLoopRunBackGround();
+RSExtern void __RSRuntimeMemoryBarrier();
+RSExtern void RSAllocatorLogUnitCount();
+RSExtern void *__RSStartSimpleThread(void (*func)(void *), void *arg);
+RSExtern void _RSRunLoopRunBackGround();
 
 struct _RSRuntimeLogPreference {
     RSUInteger _RSRuntimeInstanceBZeroBeforeDie             : 1;
@@ -344,17 +344,17 @@ struct _RSRuntimeLogPreference {
     RSUInteger _RSReserved : 32 - 11;
 #endif
 };
-extern struct _RSRuntimeLogPreference ___RSDebugLogPreference;
+RSExtern struct _RSRuntimeLogPreference ___RSDebugLogPreference;
 
 #include <RSCoreFoundation/RSRunLoop.h>
-extern void *__RSRunLoopGetQueue(RSRunLoopRef rl);
+RSExtern void *__RSRunLoopGetQueue(RSRunLoopRef rl);
 
-extern BOOL _RSStringGetFileSystemRepresentation(RSStringRef string, uint8_t *buffer, RSIndex maxBufLen);
-//extern BOOL __RSStringScanInteger(RSStringInlineBuffer *buf, RSTypeRef locale, SInt32 *indexPtr, BOOL doLonglong, void *result);
+RSExtern BOOL _RSStringGetFileSystemRepresentation(RSStringRef string, uint8_t *buffer, RSIndex maxBufLen);
+//RSExtern BOOL __RSStringScanInteger(RSStringInlineBuffer *buf, RSTypeRef locale, SInt32 *indexPtr, BOOL doLonglong, void *result);
 
-extern BOOL _RSExecutableLinkedOnOrAfter(RSUInteger v);
+RSExtern BOOL _RSExecutableLinkedOnOrAfter(RSUInteger v);
 
-extern RSUInteger RSRunLoopRunSpecific(RSRunLoopRef rl, RSStringRef modeName, RSTimeInterval seconds, BOOL returnAfterSourceHandled);
+RSExtern RSUInteger RSRunLoopRunSpecific(RSRunLoopRef rl, RSStringRef modeName, RSTimeInterval seconds, BOOL returnAfterSourceHandled);
 #ifndef __RSNotificationIPCName
 #define __RSNotificationIPCName "com.retval.RSCoreFoundation.RSNotificationCenter"
 #endif
@@ -447,9 +447,9 @@ RSInline bool RSCharacterSetInlineBufferIsLongCharacterMember(RSCharacterSetInli
 #endif /* RS_INLINE */
 
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
-extern uint8_t __RS120293;
-extern uint8_t __RS120290;
-extern void __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__(void);
+RSExtern uint8_t __RS120293;
+RSExtern uint8_t __RS120290;
+RSExtern void __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__(void);
 #define CHECK_FOR_FORK() do { __RS120290 = true; if (__RS120293) __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__(); } while (0)
 #define CHECK_FOR_FORK_RET(...) do { CHECK_FOR_FORK(); if (__RS120293) return __VA_ARGS__; } while (0)
 #define HAS_FORKED() (__RS120293)
