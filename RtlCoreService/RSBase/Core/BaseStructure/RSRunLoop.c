@@ -5396,7 +5396,7 @@ static void __RSPortSetFree(__RSPortSet portSet) {
 
 // Returns portBuf if ports fit in that space, else returns another ptr that must be freed
 static __RSPort *__RSPortSetGetPorts(__RSPortSet portSet, __RSPort *portBuf, uint32_t bufSize, uint32_t *portsUsed) {
-    __RSSpinLock(&(portSet->lock));
+    RSSpinLockLock(&(portSet->lock));
     __RSPort *result = portBuf;
     if (bufSize < portSet->used)
         result = (__RSPort *)RSAllocatorAllocate(RSAllocatorSystemDefault, portSet->used * sizeof(HANDLE), 0);
@@ -5409,7 +5409,7 @@ static __RSPort *__RSPortSetGetPorts(__RSPortSet portSet, __RSPort *portBuf, uin
     }
     memmove(result, portSet->handles, portSet->used * sizeof(HANDLE));
     *portsUsed = portSet->used;
-    __RSSpinUnlock(&(portSet->lock));
+    RSSpinLockUnlock(&(portSet->lock));
     return result;
 }
 
@@ -5417,7 +5417,7 @@ static kern_return_t __RSPortSetInsert(__RSPort port, __RSPortSet portSet) {
     if (nil == port) {
         return -1;
     }
-    __RSSpinLock(&(portSet->lock));
+    RSSpinLockLock(&(portSet->lock));
     if (portSet->used >= portSet->size) {
         portSet->size += 4;
         portSet->handles = (HANDLE *)RSAllocatorReallocate(RSAllocatorSystemDefault, portSet->handles, portSet->size * sizeof(HANDLE), 0);
@@ -5426,7 +5426,7 @@ static kern_return_t __RSPortSetInsert(__RSPort port, __RSPortSet portSet) {
         RSLog(RSLogLevelWarning, RSSTR("*** More than MAXIMUM_WAIT_OBJECTS (%d) ports add to a port set.  The last ones will be ignored."), MAXIMUM_WAIT_OBJECTS);
     }
     portSet->handles[portSet->used++] = port;
-    __RSSpinUnlock(&(portSet->lock));
+    RSSpinLockUnlock(&(portSet->lock));
     return KERN_SUCCESS;
 }
 
@@ -5435,18 +5435,18 @@ static kern_return_t __RSPortSetRemove(__RSPort port, __RSPortSet portSet) {
     if (nil == port) {
         return -1;
     }
-    __RSSpinLock(&(portSet->lock));
+    RSSpinLockLock(&(portSet->lock));
     for (i = 0; i < portSet->used; i++) {
         if (portSet->handles[i] == port) {
             for (j = i+1; j < portSet->used; j++) {
                 portSet->handles[j-1] = portSet->handles[j];
             }
             portSet->used--;
-            __RSSpinUnlock(&(portSet->lock));
+            RSSpinLockUnlock(&(portSet->lock));
             return YES;
         }
     }
-    __RSSpinUnlock(&(portSet->lock));
+    RSSpinLockUnlock(&(portSet->lock));
     return KERN_SUCCESS;
 }
 

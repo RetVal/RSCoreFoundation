@@ -1137,7 +1137,7 @@ RSExport RSStringRef RSURLCreateStringByAddingPercentEscapes(RSAllocatorRef allo
     
     for (idx = 0; idx < length; idx ++) {
         UniChar ch = __RSStringGetCharacterFromInlineBufferQuick(&buf, idx);
-        Boolean shouldReplace = (isURLLegalCharacter(ch) == false);
+        BOOL shouldReplace = (isURLLegalCharacter(ch) == false);
         if (shouldReplace) {
             if (charactersToLeaveUnescaped && _stringContainsCharacter(charactersToLeaveUnescaped, ch)) {
                 shouldReplace = false;

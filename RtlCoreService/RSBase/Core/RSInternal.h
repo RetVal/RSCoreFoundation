@@ -20,6 +20,8 @@ RS_EXTERN_C_BEGIN
 #include "RSFoundationEncoding.h"
 
 #include <dispatch/dispatch.h>
+
+#include <RSCoreFoundation/RSPriv.h>
 #define RSDictionaryBasicHash   1
 #define RSDictionaryRBTree      2
 #define RSDictionaryCoreSelector RSDictionaryBasicHash

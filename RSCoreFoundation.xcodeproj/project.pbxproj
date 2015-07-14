@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		30047C331B54B1C90006C063 /* RSMachPort.c in Sources */ = {isa = PBXBuildFile; fileRef = 30047C2F1B54B1C90006C063 /* RSMachPort.c */; };
+		30047C341B54B1C90006C063 /* RSMachPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 30047C301B54B1C90006C063 /* RSMachPort.h */; };
+		30047C351B54B1C90006C063 /* RSMessagePort.c in Sources */ = {isa = PBXBuildFile; fileRef = 30047C311B54B1C90006C063 /* RSMessagePort.c */; };
+		30047C361B54B1C90006C063 /* RSMessagePort.h in Headers */ = {isa = PBXBuildFile; fileRef = 30047C321B54B1C90006C063 /* RSMessagePort.h */; };
+		30047C381B54B8010006C063 /* RSPriv.h in Headers */ = {isa = PBXBuildFile; fileRef = 30047C371B54B8010006C063 /* RSPriv.h */; };
 		300869C11B4CE6AD00A6EDC7 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 300869BA1B4CDE4C00A6EDC7 /* libcurl.a */; };
 		300869C31B4CF25800A6EDC7 /* GSS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 300869C21B4CF25800A6EDC7 /* GSS.framework */; };
 		300869C51B4CF62A00A6EDC7 /* Kerberos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 300869C41B4CF62A00A6EDC7 /* Kerberos.framework */; };
@@ -691,6 +696,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		30047C2F1B54B1C90006C063 /* RSMachPort.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSMachPort.c; sourceTree = "<group>"; };
+		30047C301B54B1C90006C063 /* RSMachPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSMachPort.h; sourceTree = "<group>"; };
+		30047C311B54B1C90006C063 /* RSMessagePort.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSMessagePort.c; sourceTree = "<group>"; };
+		30047C321B54B1C90006C063 /* RSMessagePort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSMessagePort.h; sourceTree = "<group>"; };
+		30047C371B54B8010006C063 /* RSPriv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSPriv.h; sourceTree = "<group>"; };
 		300869B71B4CD85100A6EDC7 /* libcurl.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.4.dylib; path = deps/libcurl.4.dylib; sourceTree = "<group>"; };
 		300869BA1B4CDE4C00A6EDC7 /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl.a; path = deps/libcurl.a; sourceTree = "<group>"; };
 		300869C21B4CF25800A6EDC7 /* GSS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GSS.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/System/Library/Frameworks/GSS.framework; sourceTree = DEVELOPER_DIR; };
@@ -2161,6 +2171,7 @@
 				41704FF01647C713005E7FB5 /* BaseStructure */,
 				410C4BA91756DDBC00A0434B /* Extension */,
 				41D919221652758E007568E9 /* RSInternal.h */,
+				30047C371B54B8010006C063 /* RSPriv.h */,
 				41B6A5D4162924470006956C /* RSBase.h */,
 				41A9DACD16578914005E188D /* RSBaseType.h */,
 				4145F78D168C25B6008AC7F8 /* RSAvailability.h */,
@@ -2280,6 +2291,10 @@
 				41BEC69617170DBB006B946B /* RSJSONSerialization.h */,
 				412C1B3217AE76EB00F36F25 /* RSLocale.c */,
 				412C1B3317AE76EB00F36F25 /* RSLocale.h */,
+				30047C2F1B54B1C90006C063 /* RSMachPort.c */,
+				30047C301B54B1C90006C063 /* RSMachPort.h */,
+				30047C311B54B1C90006C063 /* RSMessagePort.c */,
+				30047C321B54B1C90006C063 /* RSMessagePort.h */,
 				41704FF91647C713005E7FB5 /* RSNil.c */,
 				41704FFA1647C713005E7FB5 /* RSNil.h */,
 				419FE549168C8CCD00F05709 /* RSNotificationCenter.c */,
@@ -2741,6 +2756,7 @@
 				30E23C4C1B4BEBBB0035ED51 /* polarssl.h in Headers */,
 				30E23BFF1B4BEBBB0035ED51 /* curl_sasl.h in Headers */,
 				41BEC69717170DBB006B946B /* RSJSONSerialization.h in Headers */,
+				30047C361B54B1C90006C063 /* RSMessagePort.h in Headers */,
 				41587496167390E000EFC5CA /* RSSet.h in Headers */,
 				413064401769A25C00EFACC0 /* RSSocket.h in Headers */,
 				30E23C381B4BEBBB0035ED51 /* ssh.h in Headers */,
@@ -2804,6 +2820,7 @@
 				30E23BD01B4BEBBB0035ED51 /* curlrules.h in Headers */,
 				41F90C8416DFBB59005CDC45 /* RSFileManagerPathSupport.h in Headers */,
 				30E23C371B4BEBBB0035ED51 /* splay.h in Headers */,
+				30047C341B54B1C90006C063 /* RSMachPort.h in Headers */,
 				30E23BF41B4BEBBB0035ED51 /* curl_ldap.h in Headers */,
 				41A7A852171408C800D18936 /* RSThread.h in Headers */,
 				30E23BDD1B4BEBBB0035ED51 /* arpa_telnet.h in Headers */,
@@ -2817,6 +2834,7 @@
 				41A345411747603600E49821 /* RSPrivateExceptionHandler.h in Headers */,
 				41B30B56174A5F8B00433B7F /* RSPrivateTimer.h in Headers */,
 				4151C1AA17600E6500C9AC40 /* alphaindex.h in Headers */,
+				30047C381B54B8010006C063 /* RSPriv.h in Headers */,
 				4151C1AB17600E6500C9AC40 /* appendable.h in Headers */,
 				4151C1AC17600E6500C9AC40 /* basictz.h in Headers */,
 				4151C1AD17600E6500C9AC40 /* bms.h in Headers */,
@@ -3514,6 +3532,7 @@
 				4101F35B18447BBA0090C212 /* vector.c in Sources */,
 				41A9CD6417B887BD007A0E43 /* RSFileSystem.c in Sources */,
 				417050501647C713005E7FB5 /* RSString.c in Sources */,
+				30047C351B54B1C90006C063 /* RSMessagePort.c in Sources */,
 				417050521647C713005E7FB5 /* RSTimeZone.c in Sources */,
 				41259DD417E18DEC00FECA33 /* RSArchiver.c in Sources */,
 				417050541647C713005E7FB5 /* RSVersion.c in Sources */,
@@ -3566,6 +3585,7 @@
 				41FE70C016CF7C5B00BDB467 /* RSPrivateShell.c in Sources */,
 				41B2088A16D484FA0063AB3A /* RSBundlePrivateC0Context.c in Sources */,
 				41EC213116D5F79800AED1DC /* RSBinaryPropertyList.c in Sources */,
+				30047C331B54B1C90006C063 /* RSMachPort.c in Sources */,
 				41AE32E216DE3ED500C3A15E /* RSStringNumberSupport.c in Sources */,
 				41AE61AC17801356001B309B /* RSBitVector.c in Sources */,
 				4118341816E8F68E00C4322A /* RSQueue.c in Sources */,
@@ -4073,6 +4093,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"\"$(SRCROOT)/RtlCoreService/RSBase/Core/BaseStructure/RSPrivate/Priv\"",
 				);
 				INFOPLIST_FILE = "RtlCoreService/RSCoreFoundation-Info.plist";
 				INSTALL_PATH = "@rpath";
@@ -4149,6 +4170,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"\"$(SRCROOT)/RtlCoreService/RSBase/Core/BaseStructure/RSPrivate/Priv\"",
 				);
 				INFOPLIST_FILE = "RtlCoreService/RSCoreFoundation-Info.plist";
 				INSTALL_PATH = "@rpath";

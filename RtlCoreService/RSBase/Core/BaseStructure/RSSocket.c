@@ -2929,7 +2929,7 @@ RS_EXPORT void __RSSocketInitializeWinSock(void) {
     RSSpinLockUnlock(&__RSActiveSocketsLock);
 }
 
-RS_PRIVATE void __RSSocketCleanup(void) {
+RSPrivate void __RSSocketCleanup(void) {
     if (INVALID_SOCKET != __RSWakeupSocketPair[0]) {
         closesocket(__RSWakeupSocketPair[0]);
         __RSWakeupSocketPair[0] = INVALID_SOCKET;

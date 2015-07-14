@@ -64,7 +64,7 @@ static RSArrayRef __RSUnarchiverCopyClassTypeIDsFromClassNames(RSArrayRef classN
 
 RS_PUBLIC_CONST_STRING_DECL(__RSArchiverContextData, "context");    // RSDictionary / RSData
 RS_PUBLIC_CONST_STRING_DECL(__RSArchiverContextOrder, "order");     // RSArray
-RS_PUBLIC_CONST_STRING_DECL(__RSArchiverContextEncoded, "encoded"); // RSNumber (Boolean)
+RS_PUBLIC_CONST_STRING_DECL(__RSArchiverContextEncoded, "encoded"); // RSNumber (BOOL)
 RS_PUBLIC_CONST_STRING_DECL(RSKeyedArchiveRootObjectKey, "root");
 
 #pragma mark -

@@ -72,6 +72,7 @@ RSExport RSMutableDictionaryRef RSDictionaryCreateMutable(RSAllocatorRef allocat
 
 RSExport void RSDictionarySetValue(RSMutableDictionaryRef dictionary, const void* key, const void* value) RS_AVAILABLE(0_0);
 RSExport const void* RSDictionaryGetValue(RSDictionaryRef dictionary, const void* key) RS_AVAILABLE(0_0);
+RSExport BOOL RSDictionaryGetValueIfPresent(RSDictionaryRef hc, const void *key, const void **value) RS_AVAILABLE(0_0);
 RSExport void RSDictionaryRemoveValue(RSMutableDictionaryRef dictionary, const void* key) RS_AVAILABLE(0_0);
 
 RSExport void RSDictionaryRemoveAllObjects(RSMutableDictionaryRef dictionary) RS_AVAILABLE(0_0);

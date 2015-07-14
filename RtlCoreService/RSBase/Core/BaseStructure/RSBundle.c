@@ -2433,7 +2433,7 @@ RSPrivate void __RSBundleGUnlock()
 }
 
 
-RSPrivate RSBundleRef _RSBundleCopyBundleForPath(RSStringRef path, Boolean alreadyLocked)
+RSPrivate RSBundleRef _RSBundleCopyBundleForPath(RSStringRef path, BOOL alreadyLocked)
 {
     RSBundleRef result = nil;
     if (!alreadyLocked) __RSBundleGLock();
@@ -3501,7 +3501,7 @@ RSPrivate void _RSBundleDlfcnUnload(RSBundleRef bundle)
     }
 }
 
-static void *_RSBundleDlfcnGetSymbolByNameWithSearch(RSBundleRef bundle, RSStringRef symbolName, Boolean globalSearch) {
+static void *_RSBundleDlfcnGetSymbolByNameWithSearch(RSBundleRef bundle, RSStringRef symbolName, BOOL globalSearch) {
     void *result = NULL;
     char buff[1026];
     
