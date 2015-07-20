@@ -21,7 +21,7 @@ RSExtern RSDataRef ServerMessagePortCallBack(RSMessagePortRef local, SInt32 msgi
     
     if (data) {
         RSUnarchiverRef unarchiver = RSUnarchiverCreate(RSAllocatorDefault, data);
-        RSDictionaryRef getDict = (RSDictionaryRef)RSUnarchiverDecodeObject(unarchiver, data);
+        RSDictionaryRef getDict = (RSDictionaryRef)RSUnarchiverDecodeObjectForKey(unarchiver, RSKeyedArchiveRootObjectKey);
         RSLog(RSSTR("message content = %R"), getDict);
         RSRelease(getDict);
         RSRelease(unarchiver);
@@ -31,6 +31,7 @@ RSExtern RSDataRef ServerMessagePortCallBack(RSMessagePortRef local, SInt32 msgi
     RSDictionarySetValue(dict, RSSTR("n1"), RSSTR("v1"));
     RSDictionarySetValue(dict, RSSTR("n2"), RSSTR("v2"));
     RSDictionarySetValue(dict, RSSTR("n3"), RSSTR("v3"));
+    RSLog(RSSTR("%R"), dict);
     RSArchiverRef archiver = RSArchiverCreate(RSAllocatorDefault);
     RSArchiverEncodeObjectForKey(archiver, RSKeyedArchiveRootObjectKey, dict);
     RSDataRef archivedData = RSArchiverCopyData(archiver);
@@ -42,12 +43,10 @@ RSExtern RSDataRef ServerMessagePortCallBack(RSMessagePortRef local, SInt32 msgi
 
 int main(int argc, char **argv) {
     using namespace RSCF;
-    String s = "RSFoundation";
+    String *s = new String("RSFoundation");
+    s->release();
 
-    BOOL flag = NO;
-
-    RSMessagePortContext ctx;
-    RSMessagePortRef messagePort = RSMessagePortCreateLocal(RSAllocatorDefault, RSSTR("com.retval.rl.server"), ServerMessagePortCallBack, &ctx, &flag);
+    RSMessagePortRef messagePort = RSMessagePortCreateLocal(RSAllocatorDefault, RSSTR("com.retval.rl.server"), ServerMessagePortCallBack, nil, nil);
     
     RSRunLoopSourceRef source = RSMessagePortCreateRunLoopSource(RSAllocatorDefault, messagePort, 0);
     RSRunLoopRef rl = RSRunLoopGetCurrent();

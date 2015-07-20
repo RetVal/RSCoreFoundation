@@ -178,7 +178,7 @@ namespace RSCF {
     
     class RefObject : public Object, public RefCountedBase<RefObject> {
     public:
-        
+        RefObject() { retain(); }
     };
 }
 

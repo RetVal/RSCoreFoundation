@@ -8,6 +8,8 @@
 
 #import <Cocoa/Cocoa.h>
 #import <XCTest/XCTest.h>
+#include <RSFoundation/RSFoundation.h>
+
 
 @interface RSFoundationTests : XCTestCase
 
