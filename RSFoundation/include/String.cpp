@@ -11,7 +11,7 @@
 
 namespace RSCF {
     String::String() {
-        __impI = RSRetain(RSStringGetEmptyString());
+        __impI = RSStringGetEmptyString();
     }
     
     String::String(const String &str) {
