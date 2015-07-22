@@ -123,6 +123,10 @@ namespace RSCF {
         return RSStringGetRange(__getI());
     }
     
+    RSHashCode String::hashValue() const {
+        return RSHash(__getI());
+    }
+    
     bool String::find(const String &toFind, RSRange searchRange, RSRange &result) const {
         return find(toFind, searchRange, CaseInsensitive, result);
     }

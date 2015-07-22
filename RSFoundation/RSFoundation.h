@@ -9,8 +9,11 @@
 extern "C" {
 #include <RSCoreFoundation/RSCoreFoundation.h>
 }
+#include <RSFoundation/type_traits.hpp>
 #include <RSFoundation/Object.hpp>
 #include <RSFoundation/String.hpp>
+#include <RSFoundation/DictionaryInfo.hpp>
+#include <RSFoundation/Dictionary.hpp>
 
 //! Project version number for RSFoundation.
 RS_EXPORT double RSFoundationVersionNumber;

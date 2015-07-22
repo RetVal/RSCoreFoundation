@@ -75,6 +75,12 @@ using namespace RSCF;
     XCTAssertTrue(rangeResult.location == cs7.getRange().location);
     XCTAssertTrue(rangeResult.length == cs7.getRange().length);
     
+    StringI i2;
+    if (1) {
+        StringI i1 = "123";
+        i2 = i1;
+    }
+    
     XCTAssert(YES, @"Pass");
 }
 

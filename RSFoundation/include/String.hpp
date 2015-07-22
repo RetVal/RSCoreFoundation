@@ -27,6 +27,7 @@ namespace RSCF {
         ~String();
         
         String(const char *utf8String);
+        
         String(const void *data, const RSStringEncoding encoding);
         String(RSStringRef stringRef);
         String(RSMutableStringRef mutableStringRef);
@@ -39,6 +40,7 @@ namespace RSCF {
     public:
         RSIndex getLength() const;
         RSRange getRange() const;
+        RSHashCode hashValue() const;
         
     public:
         enum CompareFlags : RSInteger {
@@ -57,6 +59,7 @@ namespace RSCF {
         bool find(const String &toFind, RSRange searchRange, CompareFlags compareFlags, RSRange &result) const;
         
     public:
+        bool isMutable() const { return false; }
         
     public:
         bool operator==(const String& str) const;
@@ -65,6 +68,7 @@ namespace RSCF {
         bool operator==(RSStringRef stringRef) const;
         bool operator==(RSMutableStringRef mutableStringRef) const;
         explicit operator bool() const;
+        
         
     private:
         friend class StringM;
@@ -82,8 +86,29 @@ namespace RSCF {
         };
     };
     
-    class StringI : public String {
+    class StringI : public RefObject {
+    public:
+        StringI() {
+            ptr = "";
+        }
         
+        template <int N>
+        StringI(char const (&s)[N]) {
+            ptr = s;
+        }
+        
+    public:
+        StringI(const StringI& str) {
+            ptr = str.ptr;
+        }
+        
+        StringI& operator=(const StringI& str) {
+            ptr = str.ptr;
+            return *this;
+        }
+        
+    private:
+        const char *ptr;
     };
     
     class StringM : public String {
@@ -114,7 +139,23 @@ namespace RSCF {
         
         StringM& operator=(StringM&& str);
     public:
+        bool isMutable() const { return true; }
+    public:
         void trim(const String &trimString);
+    };
+}
+
+#include <RSFoundation/DictionaryInfo.hpp>
+
+namespace RSCF {
+    // Provide DictionaryInfo for ints.
+    template<> struct DictionaryInfo<String> {
+        static inline String getEmptyKey() { return String(); }
+        static inline String getTombstoneKey() { return String(); }
+        static RSHashCode getHashValue(const String& Val) { return Val.hashValue(); }
+        static bool isEqual(const String& LHS, const String& RHS) {
+            return LHS == RHS;
+        }
     };
 }
 
