@@ -14,6 +14,7 @@ extern "C" {
 #include <RSFoundation/String.hpp>
 #include <RSFoundation/DictionaryInfo.hpp>
 #include <RSFoundation/Dictionary.hpp>
+#include <RSFoundation/Array.hpp>
 
 //! Project version number for RSFoundation.
 RS_EXPORT double RSFoundationVersionNumber;

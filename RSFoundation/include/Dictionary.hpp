@@ -827,7 +827,7 @@ namespace RSCF {
         
         /// A "union" of an inline bucket array and the struct representing
         /// a large bucket. This union will be discriminated by the 'Small' bit.
-        AlignedCharArrayUnion<BucketT[InlineBuckets], LargeRep> storage;
+        RSCF::AlignedCharArrayUnionX<BucketT[InlineBuckets], LargeRep> storage;
         
     public:
         explicit SmallDictionary(size_t NumInitBuckets = 0) {
@@ -969,7 +969,7 @@ namespace RSCF {
                     return; // Nothing to do.
                 
                 // First move the inline buckets into a temporary storage.
-                AlignedCharArrayUnion<BucketT[InlineBuckets]> TmpStorage;
+                RSCF::AlignedCharArrayUnionX<BucketT[InlineBuckets]> TmpStorage;
                 BucketT *TmpBegin = reinterpret_cast<BucketT *>(TmpStorage.buffer);
                 BucketT *TmpEnd = TmpBegin;
                 

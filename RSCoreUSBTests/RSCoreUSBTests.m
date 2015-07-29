@@ -1,21 +1,19 @@
 //
-//  RSFoundationTests.m
-//  RSFoundationTests
+//  RSCoreUSBTests.m
+//  RSCoreUSBTests
 //
-//  Created by closure on 5/26/15.
+//  Created by closure on 7/23/15.
 //  Copyright (c) 2015 RetVal. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
 #import <XCTest/XCTest.h>
-#include <RSFoundation/RSFoundation.h>
 
-
-@interface RSFoundationTests : XCTestCase
+@interface RSCoreUSBTests : XCTestCase
 
 @end
 
-@implementation RSFoundationTests
+@implementation RSCoreUSBTests
 
 - (void)setUp {
     [super setUp];

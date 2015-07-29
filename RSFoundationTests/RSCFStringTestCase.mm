@@ -39,7 +39,7 @@ using namespace RSCF;
     String s5(s1);
     String s6 = s4;
     String s7 = String("s7");
-    String s8 = String(s7, RSMakeRange(0, 1));
+    String s8 = s7.subString(RSMakeRange(0, 1));
     
     XCTAssertTrue(s2.getLength() == 0);
     XCTAssertTrue(s3.getLength() == 2);
@@ -61,7 +61,7 @@ using namespace RSCF;
     const String cs5(cs1);
     const String cs6 = cs4;
     const String cs7 = String("cs7");
-    const String cs8 = String(cs7, RSMakeRange(0, 1));
+    const String cs8 = cs7.subString(RSMakeRange(0, 1));
     
     XCTAssertTrue(cs2.getLength() == 0);
     XCTAssertTrue(cs3.getLength() == 3);

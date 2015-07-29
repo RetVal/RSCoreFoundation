@@ -11,15 +11,36 @@
 		30047C341B54B1C90006C063 /* RSMachPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 30047C301B54B1C90006C063 /* RSMachPort.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30047C351B54B1C90006C063 /* RSMessagePort.c in Sources */ = {isa = PBXBuildFile; fileRef = 30047C311B54B1C90006C063 /* RSMessagePort.c */; };
 		30047C361B54B1C90006C063 /* RSMessagePort.h in Headers */ = {isa = PBXBuildFile; fileRef = 30047C321B54B1C90006C063 /* RSMessagePort.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		30047C381B54B8010006C063 /* RSPriv.h in Headers */ = {isa = PBXBuildFile; fileRef = 30047C371B54B8010006C063 /* RSPriv.h */; };
+		30047C381B54B8010006C063 /* RSPriv.h in Headers */ = {isa = PBXBuildFile; fileRef = 30047C371B54B8010006C063 /* RSPriv.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		300869C11B4CE6AD00A6EDC7 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 300869BA1B4CDE4C00A6EDC7 /* libcurl.a */; };
 		300869C31B4CF25800A6EDC7 /* GSS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 300869C21B4CF25800A6EDC7 /* GSS.framework */; };
 		300869C51B4CF62A00A6EDC7 /* Kerberos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 300869C41B4CF62A00A6EDC7 /* Kerberos.framework */; };
+		300BD7011B60B2CE00487D18 /* RSCoreUSB.h in Headers */ = {isa = PBXBuildFile; fileRef = 300BD7001B60B2CE00487D18 /* RSCoreUSB.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		300BD7071B60B2CE00487D18 /* RSCoreUSB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 300BD6FC1B60B2CE00487D18 /* RSCoreUSB.framework */; };
+		300BD70E1B60B2CE00487D18 /* RSCoreUSBTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 300BD70D1B60B2CE00487D18 /* RSCoreUSBTests.m */; };
+		300BD7171B60B33B00487D18 /* RSCoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4158D55A1625C4C60070E69F /* RSCoreFoundation.framework */; };
+		300BD71A1B60B35800487D18 /* RSCoreUSBDevice.c in Sources */ = {isa = PBXBuildFile; fileRef = 300BD7181B60B35800487D18 /* RSCoreUSBDevice.c */; };
+		300BD71B1B60B35800487D18 /* RSCoreUSBDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 300BD7191B60B35800487D18 /* RSCoreUSBDevice.h */; };
+		300BD7281B60B9D300487D18 /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 300BD71C1B60B9D300487D18 /* core.c */; };
+		300BD7291B60B9D300487D18 /* descriptor.c in Sources */ = {isa = PBXBuildFile; fileRef = 300BD71D1B60B9D300487D18 /* descriptor.c */; };
+		300BD72A1B60B9D300487D18 /* io.c in Sources */ = {isa = PBXBuildFile; fileRef = 300BD71E1B60B9D300487D18 /* io.c */; };
+		300BD72B1B60B9D300487D18 /* libusb.h in Headers */ = {isa = PBXBuildFile; fileRef = 300BD71F1B60B9D300487D18 /* libusb.h */; };
+		300BD72C1B60B9D300487D18 /* libusbi.h in Headers */ = {isa = PBXBuildFile; fileRef = 300BD7201B60B9D300487D18 /* libusbi.h */; };
+		300BD72D1B60B9D300487D18 /* darwin_usb.c in Sources */ = {isa = PBXBuildFile; fileRef = 300BD7211B60B9D300487D18 /* darwin_usb.c */; };
+		300BD72E1B60B9D300487D18 /* darwin_usb.h in Headers */ = {isa = PBXBuildFile; fileRef = 300BD7221B60B9D300487D18 /* darwin_usb.h */; };
+		300BD72F1B60B9D300487D18 /* poll_posix.h in Headers */ = {isa = PBXBuildFile; fileRef = 300BD7231B60B9D300487D18 /* poll_posix.h */; };
+		300BD7301B60B9D300487D18 /* threads_posix.c in Sources */ = {isa = PBXBuildFile; fileRef = 300BD7241B60B9D300487D18 /* threads_posix.c */; };
+		300BD7311B60B9D300487D18 /* threads_posix.h in Headers */ = {isa = PBXBuildFile; fileRef = 300BD7251B60B9D300487D18 /* threads_posix.h */; };
+		300BD7321B60B9D300487D18 /* sync.c in Sources */ = {isa = PBXBuildFile; fileRef = 300BD7261B60B9D300487D18 /* sync.c */; };
+		300BD7331B60B9D300487D18 /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = 300BD7271B60B9D300487D18 /* version.h */; };
+		300BD7351B60B9FD00487D18 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 300BD7341B60B9FD00487D18 /* config.h */; };
 		300CB71218992D16004298E2 /* RSFunctional.c in Sources */ = {isa = PBXBuildFile; fileRef = 300CB71118992D16004298E2 /* RSFunctional.c */; };
 		300CB714189932A6004298E2 /* RSFunctional.h in Headers */ = {isa = PBXBuildFile; fileRef = 300CB713189932A6004298E2 /* RSFunctional.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		300CB717189A3349004298E2 /* RSList.c in Sources */ = {isa = PBXBuildFile; fileRef = 300CB715189A3349004298E2 /* RSList.c */; };
 		300CB718189A3349004298E2 /* RSList.h in Headers */ = {isa = PBXBuildFile; fileRef = 300CB716189A3349004298E2 /* RSList.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		300D4CE61B5FDBB100A02F0A /* AlignOf.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300D4CE51B5FDBB100A02F0A /* AlignOf.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		300D4CE91B5FF99300A02F0A /* Array.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300D4CE71B5FF99300A02F0A /* Array.cpp */; };
+		300D4CEA1B5FF99300A02F0A /* Array.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 300D4CE81B5FF99300A02F0A /* Array.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		300DF8FA1B21653F00E60428 /* RSFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 309903231B1452110081278B /* RSFoundation.framework */; };
 		300F80EC1B1EB22B009B062B /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 41813436168B394500B08722 /* libicucore.dylib */; };
 		300F80ED1B1EB2B1009B062B /* libldap.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 412925091822BADE00F2D71B /* libldap.dylib */; };
@@ -49,9 +70,9 @@
 		3092D4FE1B56C502000DE4F4 /* Fix.m in Sources */ = {isa = PBXBuildFile; fileRef = 3092D4FD1B56C502000DE4F4 /* Fix.m */; };
 		3098391E1868818400398AC3 /* RSRawHashTable.c in Sources */ = {isa = PBXBuildFile; fileRef = 3098391C1868818400398AC3 /* RSRawHashTable.c */; };
 		3098391F1868818400398AC3 /* RSRawHashTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 3098391D1868818400398AC3 /* RSRawHashTable.h */; };
-		309903281B1452110081278B /* RSFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = 309903271B1452110081278B /* RSFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		309903281B1452110081278B /* RSFoundation.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 309903271B1452110081278B /* RSFoundation.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		3099032E1B1452110081278B /* RSFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 309903231B1452110081278B /* RSFoundation.framework */; };
-		309903371B1452120081278B /* RSFoundationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 309903361B1452120081278B /* RSFoundationTests.mm */; };
+		309903371B1452120081278B /* RSCFArrayTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 309903361B1452120081278B /* RSCFArrayTests.mm */; };
 		3099033A1B1452120081278B /* RSFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 309903231B1452110081278B /* RSFoundation.framework */; };
 		3099033B1B1452120081278B /* RSFoundation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 309903231B1452110081278B /* RSFoundation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		30A15D3918A9C5170055B9A1 /* RSCoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4158D55A1625C4C60070E69F /* RSCoreFoundation.framework */; };
@@ -600,6 +621,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		300BD7081B60B2CE00487D18 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4158D5501625C4C60070E69F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 300BD6FB1B60B2CE00487D18;
+			remoteInfo = RSCoreUSB;
+		};
 		3099032F1B1452110081278B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 4158D5501625C4C60070E69F /* Project object */;
@@ -695,11 +723,34 @@
 		300869BA1B4CDE4C00A6EDC7 /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl.a; path = deps/libcurl.a; sourceTree = "<group>"; };
 		300869C21B4CF25800A6EDC7 /* GSS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GSS.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/System/Library/Frameworks/GSS.framework; sourceTree = DEVELOPER_DIR; };
 		300869C41B4CF62A00A6EDC7 /* Kerberos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kerberos.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/System/Library/Frameworks/Kerberos.framework; sourceTree = DEVELOPER_DIR; };
+		300BD6FC1B60B2CE00487D18 /* RSCoreUSB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RSCoreUSB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		300BD6FF1B60B2CE00487D18 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		300BD7001B60B2CE00487D18 /* RSCoreUSB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RSCoreUSB.h; sourceTree = "<group>"; };
+		300BD7061B60B2CE00487D18 /* RSCoreUSBTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RSCoreUSBTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		300BD70C1B60B2CE00487D18 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		300BD70D1B60B2CE00487D18 /* RSCoreUSBTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RSCoreUSBTests.m; sourceTree = "<group>"; };
+		300BD7181B60B35800487D18 /* RSCoreUSBDevice.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSCoreUSBDevice.c; sourceTree = "<group>"; };
+		300BD7191B60B35800487D18 /* RSCoreUSBDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSCoreUSBDevice.h; sourceTree = "<group>"; };
+		300BD71C1B60B9D300487D18 /* core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = core.c; sourceTree = "<group>"; };
+		300BD71D1B60B9D300487D18 /* descriptor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = descriptor.c; sourceTree = "<group>"; };
+		300BD71E1B60B9D300487D18 /* io.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = io.c; sourceTree = "<group>"; };
+		300BD71F1B60B9D300487D18 /* libusb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libusb.h; sourceTree = "<group>"; };
+		300BD7201B60B9D300487D18 /* libusbi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libusbi.h; sourceTree = "<group>"; };
+		300BD7211B60B9D300487D18 /* darwin_usb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = darwin_usb.c; sourceTree = "<group>"; };
+		300BD7221B60B9D300487D18 /* darwin_usb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = darwin_usb.h; sourceTree = "<group>"; };
+		300BD7231B60B9D300487D18 /* poll_posix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = poll_posix.h; sourceTree = "<group>"; };
+		300BD7241B60B9D300487D18 /* threads_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = threads_posix.c; sourceTree = "<group>"; };
+		300BD7251B60B9D300487D18 /* threads_posix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = threads_posix.h; sourceTree = "<group>"; };
+		300BD7261B60B9D300487D18 /* sync.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sync.c; sourceTree = "<group>"; };
+		300BD7271B60B9D300487D18 /* version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
+		300BD7341B60B9FD00487D18 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		300CB71118992D16004298E2 /* RSFunctional.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSFunctional.c; sourceTree = "<group>"; };
 		300CB713189932A6004298E2 /* RSFunctional.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSFunctional.h; sourceTree = "<group>"; };
 		300CB715189A3349004298E2 /* RSList.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSList.c; sourceTree = "<group>"; };
 		300CB716189A3349004298E2 /* RSList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSList.h; sourceTree = "<group>"; };
 		300D4CE51B5FDBB100A02F0A /* AlignOf.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AlignOf.hpp; sourceTree = "<group>"; };
+		300D4CE71B5FF99300A02F0A /* Array.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Array.cpp; sourceTree = "<group>"; };
+		300D4CE81B5FF99300A02F0A /* Array.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Array.hpp; sourceTree = "<group>"; };
 		301814641B5EB4B2002DF29B /* DictionaryInfo.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DictionaryInfo.hpp; sourceTree = "<group>"; };
 		301814661B5EB6A7002DF29B /* RSCFDictionaryTestCase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RSCFDictionaryTestCase.mm; sourceTree = "<group>"; };
 		301814681B5EBBBD002DF29B /* MathExtras.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MathExtras.cpp; sourceTree = "<group>"; };
@@ -764,10 +815,10 @@
 		3098391D1868818400398AC3 /* RSRawHashTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRawHashTable.h; sourceTree = "<group>"; };
 		309903231B1452110081278B /* RSFoundation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RSFoundation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		309903261B1452110081278B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		309903271B1452110081278B /* RSFoundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RSFoundation.h; sourceTree = "<group>"; };
+		309903271B1452110081278B /* RSFoundation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RSFoundation.hpp; sourceTree = "<group>"; };
 		3099032D1B1452110081278B /* RSFoundationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RSFoundationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		309903351B1452120081278B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		309903361B1452120081278B /* RSFoundationTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RSFoundationTests.mm; sourceTree = "<group>"; };
+		309903361B1452120081278B /* RSCFArrayTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RSCFArrayTests.mm; sourceTree = "<group>"; };
 		30A4B613189E029800DF6FA4 /* RSMultidimensionalDictionary.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSMultidimensionalDictionary.c; sourceTree = "<group>"; };
 		30A4B614189E029800DF6FA4 /* RSMultidimensionalDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSMultidimensionalDictionary.h; sourceTree = "<group>"; };
 		30D8458F1875164C004DEBE0 /* regex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = regex.h; sourceTree = "<group>"; };
@@ -909,7 +960,6 @@
 		30E23C531B4BEDAE0035ED51 /* curl_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = curl_config.h; sourceTree = "<group>"; };
 		30F32B381860318300A45125 /* RSHTTPCookieStorage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSHTTPCookieStorage.c; sourceTree = "<group>"; };
 		30F32B391860318300A45125 /* RSHTTPCookieStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSHTTPCookieStorage.h; sourceTree = "<group>"; };
-		30F849B51B301341009463A5 /* RSFoundation copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "RSFoundation copy-Info.plist"; path = "/SourceCache/Library/Frameworks/RSCoreFoundation-1400/RSFoundation copy-Info.plist"; sourceTree = "<absolute>"; };
 		30F9A85718752F27006EC81B /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/usr/lib/libicucore.dylib; sourceTree = DEVELOPER_DIR; };
 		4101F32B18447BBA0090C212 /* attribute.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = attribute.c; sourceTree = "<group>"; };
 		4101F32C18447BBA0090C212 /* attribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = attribute.h; sourceTree = "<group>"; };
@@ -1338,6 +1388,22 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		300BD6F81B60B2CE00487D18 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				300BD7171B60B33B00487D18 /* RSCoreFoundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		300BD7031B60B2CE00487D18 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				300BD7071B60B2CE00487D18 /* RSCoreUSB.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3099031F1B1452110081278B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1426,6 +1492,55 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		300BD6FD1B60B2CE00487D18 /* RSCoreUSB */ = {
+			isa = PBXGroup;
+			children = (
+				300BD7341B60B9FD00487D18 /* config.h */,
+				300BD71C1B60B9D300487D18 /* core.c */,
+				300BD71D1B60B9D300487D18 /* descriptor.c */,
+				300BD71E1B60B9D300487D18 /* io.c */,
+				300BD71F1B60B9D300487D18 /* libusb.h */,
+				300BD7201B60B9D300487D18 /* libusbi.h */,
+				300BD7211B60B9D300487D18 /* darwin_usb.c */,
+				300BD7221B60B9D300487D18 /* darwin_usb.h */,
+				300BD7231B60B9D300487D18 /* poll_posix.h */,
+				300BD7241B60B9D300487D18 /* threads_posix.c */,
+				300BD7251B60B9D300487D18 /* threads_posix.h */,
+				300BD7261B60B9D300487D18 /* sync.c */,
+				300BD7271B60B9D300487D18 /* version.h */,
+				300BD7001B60B2CE00487D18 /* RSCoreUSB.h */,
+				300BD7181B60B35800487D18 /* RSCoreUSBDevice.c */,
+				300BD7191B60B35800487D18 /* RSCoreUSBDevice.h */,
+				300BD6FE1B60B2CE00487D18 /* Supporting Files */,
+			);
+			path = RSCoreUSB;
+			sourceTree = "<group>";
+		};
+		300BD6FE1B60B2CE00487D18 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				300BD6FF1B60B2CE00487D18 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		300BD70A1B60B2CE00487D18 /* RSCoreUSBTests */ = {
+			isa = PBXGroup;
+			children = (
+				300BD70D1B60B2CE00487D18 /* RSCoreUSBTests.m */,
+				300BD70B1B60B2CE00487D18 /* Supporting Files */,
+			);
+			path = RSCoreUSBTests;
+			sourceTree = "<group>";
+		};
+		300BD70B1B60B2CE00487D18 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				300BD70C1B60B2CE00487D18 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		300CB71018992CF4004298E2 /* FP */ = {
 			isa = PBXGroup;
 			children = (
@@ -1524,6 +1639,8 @@
 				301814641B5EB4B2002DF29B /* DictionaryInfo.hpp */,
 				3091C9C11B5D6E1300796020 /* Dictionary.hpp */,
 				3091C9C01B5D6E1300796020 /* Dictionary.cpp */,
+				300D4CE81B5FF99300A02F0A /* Array.hpp */,
+				300D4CE71B5FF99300A02F0A /* Array.cpp */,
 			);
 			path = include;
 			sourceTree = "<group>";
@@ -1564,7 +1681,7 @@
 				3072D5B41B4A6CD80032065C /* include */,
 				3072D5B81B4A6CD80032065C /* src */,
 				3072D5B51B4A6CD80032065C /* private */,
-				309903271B1452110081278B /* RSFoundation.h */,
+				309903271B1452110081278B /* RSFoundation.hpp */,
 				300DF85D1B21613C00E60428 /* deps */,
 				309903251B1452110081278B /* Supporting Files */,
 			);
@@ -1585,7 +1702,7 @@
 			children = (
 				307B9C291B5ABB9000B818C9 /* RSCFStringTestCase.mm */,
 				301814661B5EB6A7002DF29B /* RSCFDictionaryTestCase.mm */,
-				309903361B1452120081278B /* RSFoundationTests.mm */,
+				309903361B1452120081278B /* RSCFArrayTests.mm */,
 				309903341B1452120081278B /* Supporting Files */,
 			);
 			path = RSFoundationTests;
@@ -2053,9 +2170,10 @@
 				309903241B1452110081278B /* RSFoundation */,
 				309903331B1452120081278B /* RSFoundationTests */,
 				41B0E3B7182F338200A5E00D /* runloop */,
+				300BD6FD1B60B2CE00487D18 /* RSCoreUSB */,
+				300BD70A1B60B2CE00487D18 /* RSCoreUSBTests */,
 				4158D55C1625C4C60070E69F /* Frameworks */,
 				4158D55B1625C4C60070E69F /* Products */,
-				30F849B51B301341009463A5 /* RSFoundation copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -2071,6 +2189,8 @@
 				418C497B1833930300D88CB3 /* RSFileMonitor.framework */,
 				309903231B1452110081278B /* RSFoundation.framework */,
 				3099032D1B1452110081278B /* RSFoundationTests.xctest */,
+				300BD6FC1B60B2CE00487D18 /* RSCoreUSB.framework */,
+				300BD7061B60B2CE00487D18 /* RSCoreUSBTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2587,6 +2707,22 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		300BD6F91B60B2CE00487D18 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				300BD7011B60B2CE00487D18 /* RSCoreUSB.h in Headers */,
+				300BD72E1B60B9D300487D18 /* darwin_usb.h in Headers */,
+				300BD7351B60B9FD00487D18 /* config.h in Headers */,
+				300BD72C1B60B9D300487D18 /* libusbi.h in Headers */,
+				300BD71B1B60B35800487D18 /* RSCoreUSBDevice.h in Headers */,
+				300BD72B1B60B9D300487D18 /* libusb.h in Headers */,
+				300BD7331B60B9D300487D18 /* version.h in Headers */,
+				300BD7311B60B9D300487D18 /* threads_posix.h in Headers */,
+				300BD72F1B60B9D300487D18 /* poll_posix.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		309903201B1452110081278B /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -2597,9 +2733,10 @@
 				3018146B1B5EBBBD002DF29B /* MathExtras.hpp in Headers */,
 				301814651B5EB4B2002DF29B /* DictionaryInfo.hpp in Headers */,
 				3091C9C31B5D6E1300796020 /* Dictionary.hpp in Headers */,
+				300D4CEA1B5FF99300A02F0A /* Array.hpp in Headers */,
 				300D4CE61B5FDBB100A02F0A /* AlignOf.hpp in Headers */,
 				302E6BA61B4BBD7D009BC6C3 /* RSFoundation-Prefix.pch in Headers */,
-				309903281B1452110081278B /* RSFoundation.h in Headers */,
+				309903281B1452110081278B /* RSFoundation.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2691,6 +2828,7 @@
 				41D9376717A5409D004E5E0F /* RSFoundationEncoding.h in Headers */,
 				41D919231652758E007568E9 /* RSInternal.h in Headers */,
 				41D9376F17A57A77004E5E0F /* RSStringEncodingConverter.h in Headers */,
+				30047C381B54B8010006C063 /* RSPriv.h in Headers */,
 				4102DD331742198400A09614 /* RSStringInlineBuffer.h in Headers */,
 				41AD12A116ECE9570032577A /* RSObserver.h in Headers */,
 				41A9FC50165F179C00EB7175 /* RSRunLoop.h in Headers */,
@@ -2776,7 +2914,6 @@
 				41A345411747603600E49821 /* RSPrivateExceptionHandler.h in Headers */,
 				41B30B56174A5F8B00433B7F /* RSPrivateTimer.h in Headers */,
 				4151C1AA17600E6500C9AC40 /* alphaindex.h in Headers */,
-				30047C381B54B8010006C063 /* RSPriv.h in Headers */,
 				4151C1AB17600E6500C9AC40 /* appendable.h in Headers */,
 				4151C1AC17600E6500C9AC40 /* basictz.h in Headers */,
 				4151C1AD17600E6500C9AC40 /* bms.h in Headers */,
@@ -3060,6 +3197,43 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		300BD6FB1B60B2CE00487D18 /* RSCoreUSB */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 300BD7131B60B2CE00487D18 /* Build configuration list for PBXNativeTarget "RSCoreUSB" */;
+			buildPhases = (
+				300BD6F71B60B2CE00487D18 /* Sources */,
+				300BD6F81B60B2CE00487D18 /* Frameworks */,
+				300BD6F91B60B2CE00487D18 /* Headers */,
+				300BD6FA1B60B2CE00487D18 /* Resources */,
+				300BD7161B60B31200487D18 /* Install */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RSCoreUSB;
+			productName = RSCoreUSB;
+			productReference = 300BD6FC1B60B2CE00487D18 /* RSCoreUSB.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		300BD7051B60B2CE00487D18 /* RSCoreUSBTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 300BD7141B60B2CE00487D18 /* Build configuration list for PBXNativeTarget "RSCoreUSBTests" */;
+			buildPhases = (
+				300BD7021B60B2CE00487D18 /* Sources */,
+				300BD7031B60B2CE00487D18 /* Frameworks */,
+				300BD7041B60B2CE00487D18 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				300BD7091B60B2CE00487D18 /* PBXTargetDependency */,
+			);
+			name = RSCoreUSBTests;
+			productName = RSCoreUSBTests;
+			productReference = 300BD7061B60B2CE00487D18 /* RSCoreUSBTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		309903221B1452110081278B /* RSFoundation */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 309903401B1452120081278B /* Build configuration list for PBXNativeTarget "RSFoundation" */;
@@ -3241,6 +3415,12 @@
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = RetVal;
 				TargetAttributes = {
+					300BD6FB1B60B2CE00487D18 = {
+						CreatedOnToolsVersion = 6.4;
+					};
+					300BD7051B60B2CE00487D18 = {
+						CreatedOnToolsVersion = 6.4;
+					};
 					309903221B1452110081278B = {
 						CreatedOnToolsVersion = 6.3.1;
 					};
@@ -3274,11 +3454,27 @@
 				41B0E3B5182F338200A5E00D /* runloop */,
 				418C497A1833930300D88CB3 /* RSFileMonitor */,
 				3099032C1B1452110081278B /* RSFoundationTests */,
+				300BD6FB1B60B2CE00487D18 /* RSCoreUSB */,
+				300BD7051B60B2CE00487D18 /* RSCoreUSBTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		300BD6FA1B60B2CE00487D18 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		300BD7041B60B2CE00487D18 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		309903211B1452110081278B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3328,6 +3524,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		300BD7161B60B31200487D18 /* Install */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = Install;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ${TARGET_BUILD_DIR}/\nrm -rf ~/Library/Frameworks/RSCoreUSB.framework\ncp -a RSCoreUSB.framework ~/Library/Frameworks/RSCoreUSB.framework";
+		};
 		3099034A1B1452B40081278B /* Install */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -3430,11 +3640,34 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		300BD6F71B60B2CE00487D18 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				300BD7281B60B9D300487D18 /* core.c in Sources */,
+				300BD72D1B60B9D300487D18 /* darwin_usb.c in Sources */,
+				300BD72A1B60B9D300487D18 /* io.c in Sources */,
+				300BD71A1B60B35800487D18 /* RSCoreUSBDevice.c in Sources */,
+				300BD7291B60B9D300487D18 /* descriptor.c in Sources */,
+				300BD7321B60B9D300487D18 /* sync.c in Sources */,
+				300BD7301B60B9D300487D18 /* threads_posix.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		300BD7021B60B2CE00487D18 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				300BD70E1B60B2CE00487D18 /* RSCoreUSBTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3099031E1B1452110081278B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				302E6BA11B4BB553009BC6C3 /* String.cpp in Sources */,
+				300D4CE91B5FF99300A02F0A /* Array.cpp in Sources */,
 				3091C9C21B5D6E1300796020 /* Dictionary.cpp in Sources */,
 				3018146A1B5EBBBD002DF29B /* MathExtras.cpp in Sources */,
 			);
@@ -3446,7 +3679,7 @@
 			files = (
 				301814671B5EB6A7002DF29B /* RSCFDictionaryTestCase.mm in Sources */,
 				307B9C2A1B5ABB9000B818C9 /* RSCFStringTestCase.mm in Sources */,
-				309903371B1452120081278B /* RSFoundationTests.mm in Sources */,
+				309903371B1452120081278B /* RSCFArrayTests.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3622,6 +3855,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		300BD7091B60B2CE00487D18 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 300BD6FB1B60B2CE00487D18 /* RSCoreUSB */;
+			targetProxy = 300BD7081B60B2CE00487D18 /* PBXContainerItemProxy */;
+		};
 		309903301B1452110081278B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 309903221B1452110081278B /* RSFoundation */;
@@ -3703,6 +3941,152 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		300BD70F1B60B2CE00487D18 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_VERSION = A;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = RSCoreUSB/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		300BD7101B60B2CE00487D18 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_VERSION = A;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = RSCoreUSB/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		300BD7111B60B2CE00487D18 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = RSCoreUSBTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		300BD7121B60B2CE00487D18 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = RSCoreUSBTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		3099033C1B1452120081278B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4385,6 +4769,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		300BD7131B60B2CE00487D18 /* Build configuration list for PBXNativeTarget "RSCoreUSB" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				300BD70F1B60B2CE00487D18 /* Debug */,
+				300BD7101B60B2CE00487D18 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		300BD7141B60B2CE00487D18 /* Build configuration list for PBXNativeTarget "RSCoreUSBTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				300BD7111B60B2CE00487D18 /* Debug */,
+				300BD7121B60B2CE00487D18 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		309903401B1452120081278B /* Build configuration list for PBXNativeTarget "RSFoundation" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

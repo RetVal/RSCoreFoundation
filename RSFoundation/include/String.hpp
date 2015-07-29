@@ -28,10 +28,13 @@ namespace RSCF {
         
         String(const char *utf8String);
         
-        String(const void *data, const RSStringEncoding encoding);
+        String(const RSStringEncoding encoding, const void *data);
         String(RSStringRef stringRef);
         String(RSMutableStringRef mutableStringRef);
-        String(const String &str, RSRange range);
+        
+    public:
+        static const String &format(const char *format, ...); // format can not be nil
+        static const String &format(const char *format, va_list ap);
         
     public:
         void retain() const;
@@ -42,6 +45,7 @@ namespace RSCF {
         RSRange getRange() const;
         RSHashCode hashValue() const;
         
+        const String& subString(RSRange range) const;
     public:
         enum CompareFlags : RSInteger {
             CaseInsensitive = 1,
@@ -126,7 +130,7 @@ namespace RSCF {
         ~StringM();
         
         StringM(const char *utf8String);
-        StringM(const void *data, const RSStringEncoding encoding);
+        StringM(const RSStringEncoding encoding, const void *data);
         StringM(RSStringRef stringRef);
         StringM(RSMutableStringRef mutableStringRef);
         StringM(const String &str, RSRange range);

@@ -93,7 +93,7 @@ namespace RSCF {
 //        __impl = RSStringCreateWithCString(RSAllocatorDefault, utf8String, RSStringEncodingUTF8);
     }
     
-    String::String(const void *data, const RSStringEncoding encoding) {
+    String::String(const RSStringEncoding encoding, const void *data) {
         __impI = RSStringCreateWithCString(RSAllocatorDefault, (const char*)data, encoding);
     }
     
@@ -110,8 +110,21 @@ namespace RSCF {
         }
     }
     
-    String::String(const String &str, RSRange range) {
-        __impI = RSStringCreateWithSubstring(RSAllocatorDefault, str.__getI(), range);
+    const String &String::format(const char *format, ...) {
+        assert(format && "format can not be nil");
+        va_list ap;
+        va_start(ap, format);
+        RSStringRef f = __RSStringMakeConstantString(format);
+        RSStringRef str = RSStringCreateWithFormatAndArguments(RSAllocatorDefault, 0, f, ap);
+        va_end(ap);
+        return std::move(String(str));
+    }
+    
+    const String &String::format(const char *format, va_list ap) {
+        assert(format && "format can not be nil");
+        RSStringRef f = __RSStringMakeConstantString(format);
+        RSStringRef str = RSStringCreateWithFormatAndArguments(RSAllocatorDefault, 0, f, ap);
+        return std::move(String(str));
     }
     
     RSIndex String::getLength() const {
@@ -125,6 +138,11 @@ namespace RSCF {
     
     RSHashCode String::hashValue() const {
         return RSHash(__getI());
+    }
+    
+    const String& String::subString(RSRange range) const {
+        String subStr(RSStringCreateWithSubstring(RSAllocatorDefault, __getI(), range));
+        return std::move(subStr);
     }
     
     bool String::find(const String &toFind, RSRange searchRange, RSRange &result) const {
@@ -249,9 +267,9 @@ namespace RSCF {
         RSStringAppendString(__getM(), String(utf8String).__getI());
     }
     
-    StringM::StringM(const void *data, const RSStringEncoding encoding) {
+    StringM::StringM(const RSStringEncoding encoding, const void *data) {
         __impM = RSStringCreateMutable(RSAllocatorDefault, 0);
-        RSStringAppendString(__getM(), String(data, encoding).__getI());
+        RSStringAppendString(__getM(), String(encoding, data).__getI());
     }
     
     StringM::StringM(RSStringRef stringRef) {
