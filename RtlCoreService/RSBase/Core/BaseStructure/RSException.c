@@ -349,7 +349,7 @@ RSExport void RSCoreFoundationCrash(const char *crash)
     if (crash)
         __RSCLog(RSLogLevelWarning, "%s\n", crash);
     __RSReportBacktrace();
-    *(int *)(uintptr_t)0xbbadbeef = 0;
+//    *(int *)(uintptr_t)0xbbadbeef = 0;
     // More reliable, but doesn't say BBADBEEF.
 #if defined(__clang__)
     __builtin_trap();

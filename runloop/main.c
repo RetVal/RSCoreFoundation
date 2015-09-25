@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 RetVal. All rights reserved.
 //
 
-#include <RSFoundation/RSFoundation.h>
+#include <RSCoreFoundation/RSCoreFoundation.h>
 
 RSExtern RSDataRef ServerMessagePortCallBack(RSMessagePortRef local, SInt32 msgid, RSDataRef data, void *info) {
     if (msgid == 0xbeaf) {
@@ -42,18 +42,14 @@ RSExtern RSDataRef ServerMessagePortCallBack(RSMessagePortRef local, SInt32 msgi
 }
 
 int main(int argc, char **argv) {
-    using namespace RSCF;
-    String *s = new String("RSFoundation");
-    s->release();
-
-    RSMessagePortRef messagePort = RSMessagePortCreateLocal(RSAllocatorDefault, RSSTR("com.retval.rl.server"), ServerMessagePortCallBack, nil, nil);
-    
-    RSRunLoopSourceRef source = RSMessagePortCreateRunLoopSource(RSAllocatorDefault, messagePort, 0);
-    RSRunLoopRef rl = RSRunLoopGetCurrent();
-    RSRunLoopAddSource(rl, source, RSRunLoopDefaultMode);
-    RSRelease(source);
+    RSURLConnectionSendAsynchronousRequest(RSURLRequestWithURL(RSURLWithString(RSSTR("http://www.baidu.com/"))), RSRunLoopGetCurrent(), ^(RSURLResponseRef response, RSDataRef data, RSErrorRef error) {
+        RSAutoreleasePoolPush();
+        RSLog(RSSTR("%R"), response);
+        RSXMLDocumentRef document = RSAutorelease(RSXMLDocumentCreateWithXMLData(RSAllocatorDefault, data, RSXMLDocumentTidyHTML));
+        RSLog(RSSTR("%R"), document);
+        RSLog(RSSTR("%R"), RSStringWithData(data, RSStringEncodingUTF8));
+        RSAutoreleasePoolPop();
+    });
     RSRunLoopRun();
-    
-    sleep(1);
     return 0;
 }

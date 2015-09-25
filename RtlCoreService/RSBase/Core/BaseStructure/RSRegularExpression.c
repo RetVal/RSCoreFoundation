@@ -20,7 +20,7 @@ struct __RSRegularExpression
 };
 
 static void __RSRegularExpressionClassDeallocate(RSTypeRef rs)
-{
+{   RSCoreFoundationCrash("");
     struct __RSRegularExpression *expression = (struct __RSRegularExpression *)rs;
     if (expression->_pattern) RSRelease(expression->_pattern);
     if (expression->_regex) uregex_close(expression->_regex);

@@ -18,7 +18,7 @@ typedef RS_OPTIONS(RSBitU8, RSQueueAtomType) {
 };
 RSExport RSTypeID RSQueueGetTypeID() RS_AVAILABLE(0_2);
 RSExport RSQueueRef RSQueueCreate(RSAllocatorRef allocator, RSIndex capacity, RSQueueAtomType type) RS_AVAILABLE(0_2);
-RSExport RSTypeRef RSQueueDequeue(RSQueueRef queue) RS_AVAILABLE(0_2);
+RSExport RSTypeRef RSQueueDequeue(RSQueueRef queue) RS_AVAILABLE(0_2); // get owner!
 RSExport void RSQueueEnqueue(RSQueueRef queue, RSTypeRef object) RS_AVAILABLE(0_2);
 RSExport RSTypeRef RSQueuePeekObject(RSQueueRef queue) RS_AVAILABLE(0_2);
 RSExport RSIndex RSQueueGetCapacity(RSQueueRef queue) RS_AVAILABLE(0_2);

@@ -119,13 +119,11 @@ static RSTypeRef __RSFileMonitorDefault = nil;
 
 static void __RSFileMonitorCore();
 
-static void __RSFileMonitorDeallocate()
-{
+static void __RSFileMonitorDeallocate() {
     
 }
 
-static void __RSFileMonitorInitialize()
-{
+static void __RSFileMonitorInitialize() {
     RSSyncUpdateBlock(&__RSFileMonitorDefaultLock, ^{ RSPerformBlockInBackGround(^{ RSRunLoopPerformBlock(RSRunLoopGetCurrent(), RSRunLoopDefaultMode, ^{ __RSFileMonitorCore();}); RSRunLoopRun();});});
 }
 
@@ -139,8 +137,7 @@ RSExport RSTypeID RSFileMonitorGetTypeID()
     return _RSFileMonitorTypeID;
 }
 
-static RSFileMonitorRef __RSFileMonitorCreateInstance(RSAllocatorRef allocator)
-{
+static RSFileMonitorRef __RSFileMonitorCreateInstance(RSAllocatorRef allocator) {
     RSFileMonitorRef instance = (RSFileMonitorRef)__RSRuntimeCreateInstance(allocator, _RSFileMonitorTypeID, sizeof(struct __RSFileMonitor) - sizeof(RSRuntimeBase));
     
 //    <#do your other setting for the instance#>
@@ -148,8 +145,7 @@ static RSFileMonitorRef __RSFileMonitorCreateInstance(RSAllocatorRef allocator)
     return instance;
 }
 
-static void __RSFileMonitorCore_(RSStringRef path)
-{
+static void __RSFileMonitorCore_(RSStringRef path) {
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 	int fildes = open(RSStringGetUTF8String(path), O_EVTONLY);
     if (-1 == fildes) return;
@@ -176,21 +172,18 @@ static void __RSFileMonitorCore_(RSStringRef path)
         } else if (data & DISPATCH_VNODE_REVOKE) {
         	__RSCLog(RSLogLevelNotice, "REVOKE\n");
         }
-        if(data & DISPATCH_VNODE_DELETE)
-        {
+        if(data & DISPATCH_VNODE_DELETE) {
         	dispatch_source_cancel(source);
             __RSFileMonitorCore_(path);
         }
     });
-	dispatch_source_set_cancel_handler(source, ^(void) 
-                                       {
-                                           close(fildes);
-                                       });
+	dispatch_source_set_cancel_handler(source, ^(void) {
+        close(fildes);
+    });
 	dispatch_resume(source);
 }
 
-static void __RSFileMonitorPraperInfo(void *info)
-{
+static void __RSFileMonitorPraperInfo(void *info) {
     RSFileMonitorRef monitor = (RSFileMonitorRef)info;
     RSStringRef file = monitor->_filePath;
     RSRetain(file);
@@ -201,8 +194,7 @@ static void __RSFileMonitorPraperInfo(void *info)
     RSRelease(file);
 }
 
-static void __RSFileMonitorSchedule(void *info, RSRunLoopRef rl, RSStringRef mode)
-{
+static void __RSFileMonitorSchedule(void *info, RSRunLoopRef rl, RSStringRef mode) {
     if (!info) return;
     __RSFileMonitorPraperInfo(info);
     RSFileMonitorRef monitor = (RSFileMonitorRef)info;
@@ -219,8 +211,7 @@ static void __RSFileMonitorSchedule(void *info, RSRunLoopRef rl, RSStringRef mod
     RSRunLoopSourceSignal(monitor->_runloopSource);
 }
 
-static void __RSFileMonitorPerformV0(void *info)
-{
+static void __RSFileMonitorPerformV0(void *info) {
     RSFileMonitorRef monitor = (RSFileMonitorRef)info;
     dispatch_source_set_event_handler(monitor->_source, ^{
         unsigned long data = dispatch_source_get_data(monitor->_source);
@@ -250,8 +241,7 @@ static void __RSFileMonitorPerformV0(void *info)
     dispatch_resume(monitor->_source);
 }
 
-static void __RSFileMonitorCancel(void *info, RSRunLoopRef rl, RSStringRef mode)
-{
+static void __RSFileMonitorCancel(void *info, RSRunLoopRef rl, RSStringRef mode) {
     RSFileMonitorRef monitor = (RSFileMonitorRef)info;
 //    dispatch_source_cancel(monitor->_source);
     dispatch_source_cancel(monitor->_source);
@@ -261,15 +251,12 @@ static void __RSFileMonitorCancel(void *info, RSRunLoopRef rl, RSStringRef mode)
     monitor->_source = nil;
 }
 
-RSExport RSRunLoopSourceRef RSFileMonitorCreateRunLoopSource(RSAllocatorRef allocator, RSFileMonitorRef monitor, RSIndex order)
-{
-    if (monitor->_runloopSource && !RSRunLoopSourceIsValid(monitor->_runloopSource))
-    {
+RSExport RSRunLoopSourceRef RSFileMonitorCreateRunLoopSource(RSAllocatorRef allocator, RSFileMonitorRef monitor, RSIndex order) {
+    if (monitor->_runloopSource && !RSRunLoopSourceIsValid(monitor->_runloopSource)) {
         RSRelease(monitor->_runloopSource);
         monitor->_runloopSource = nil;
     }
-    if (!monitor->_runloopSource)
-    {
+    if (!monitor->_runloopSource) {
         RSRunLoopSourceContext context = {0};
         context.version = 0;
         context.info = monitor;
@@ -287,8 +274,7 @@ RSExport RSRunLoopSourceRef RSFileMonitorCreateRunLoopSource(RSAllocatorRef allo
     return (RSRunLoopSourceRef)RSRetain(monitor->_runloopSource);
 }
 
-RSExport RSFileMonitorRef RSFileMonitorCreate(RSAllocatorRef allocator, RSStringRef filePath)
-{
+RSExport RSFileMonitorRef RSFileMonitorCreate(RSAllocatorRef allocator, RSStringRef filePath) {
     RSFileMonitorRef monitor = (RSFileMonitorRef)__RSRuntimeCreateInstance(allocator, RSFileMonitorGetTypeID(), sizeof(struct __RSFileMonitor) - sizeof(struct __RSRuntimeBase));
     monitor->_filePath = RSRetain(filePath);
     return monitor;

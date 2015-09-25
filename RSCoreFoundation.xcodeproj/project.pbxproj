@@ -557,7 +557,7 @@
 		41AE61AD17801356001B309B /* RSBitVector.h in Headers */ = {isa = PBXBuildFile; fileRef = 41AE61AB17801356001B309B /* RSBitVector.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		41B080C6167448FE00DA68DF /* RSBasicHash.c in Sources */ = {isa = PBXBuildFile; fileRef = 41B080C5167448FE00DA68DF /* RSBasicHash.c */; };
 		41B080C91674491B00DA68DF /* RSBasicHash.h in Headers */ = {isa = PBXBuildFile; fileRef = 41B080C81674491B00DA68DF /* RSBasicHash.h */; };
-		41B0E3B9182F338300A5E00D /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41B0E3B8182F338300A5E00D /* main.cpp */; };
+		41B0E3B9182F338300A5E00D /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 41B0E3B8182F338300A5E00D /* main.c */; };
 		41B0E3BB182F338300A5E00D /* runloop.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 41B0E3BA182F338300A5E00D /* runloop.1 */; };
 		41B2088A16D484FA0063AB3A /* RSBundlePrivateC0Context.c in Sources */ = {isa = PBXBuildFile; fileRef = 41B2088916D484FA0063AB3A /* RSBundlePrivateC0Context.c */; };
 		41B2088C16D4850B0063AB3A /* RSBundlePrivateC0Context.h in Headers */ = {isa = PBXBuildFile; fileRef = 41B2088B16D4850B0063AB3A /* RSBundlePrivateC0Context.h */; };
@@ -1322,7 +1322,7 @@
 		41B080C81674491B00DA68DF /* RSBasicHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSBasicHash.h; sourceTree = "<group>"; };
 		41B080CA16746BAD00DA68DF /* RSBasicHashFindBucket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSBasicHashFindBucket.m; sourceTree = "<group>"; };
 		41B0E3B6182F338200A5E00D /* runloop */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = runloop; sourceTree = BUILT_PRODUCTS_DIR; };
-		41B0E3B8182F338300A5E00D /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		41B0E3B8182F338300A5E00D /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		41B0E3BA182F338300A5E00D /* runloop.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = runloop.1; sourceTree = "<group>"; };
 		41B0E3C6182F434000A5E00D /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/CoreFoundation.framework; sourceTree = DEVELOPER_DIR; };
 		41B2088916D484FA0063AB3A /* RSBundlePrivateC0Context.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RSBundlePrivateC0Context.c; sourceTree = "<group>"; };
@@ -2603,7 +2603,7 @@
 		41B0E3B7182F338200A5E00D /* runloop */ = {
 			isa = PBXGroup;
 			children = (
-				41B0E3B8182F338300A5E00D /* main.cpp */,
+				41B0E3B8182F338300A5E00D /* main.c */,
 				3092D4FD1B56C502000DE4F4 /* Fix.m */,
 				41B0E3BA182F338300A5E00D /* runloop.1 */,
 			);
@@ -3839,7 +3839,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				41B0E3B9182F338300A5E00D /* main.cpp in Sources */,
+				41B0E3B9182F338300A5E00D /* main.c in Sources */,
 				3092D4FE1B56C502000DE4F4 /* Fix.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4438,7 +4438,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.RetVal.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = RSCoreFoundation;
 				PROVISIONING_PROFILE = "";
-				SDKROOT = macosx10.10;
+				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				USER_HEADER_SEARCH_PATHS = "icu/** \"$(SRCROOT)/icu/common/\"/**";
 				WRAPPER_EXTENSION = framework;
@@ -4517,7 +4517,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.RetVal.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = RSCoreFoundation;
 				PROVISIONING_PROFILE = "";
-				SDKROOT = macosx10.10;
+				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "icu/** \"$(SRCROOT)/icu/common/\"/**";
 				WRAPPER_EXTENSION = framework;
 			};
