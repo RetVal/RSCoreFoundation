@@ -688,18 +688,18 @@ RSExport void RSDataAppendBytes(RSMutableDataRef data, const void* appendBytes, 
 
 RSExport void RSDataReplaceBytes(RSMutableDataRef data, RSRange rangeToReplace, const void* replaceBytes, RSIndex length)
 {
-    if (data && __RSDataAvailable(data) && replaceBytes && length && isMutable(data) && __RSDataAvailableRange(data, rangeToReplace))
+    if (data && __RSDataAvailable(data) && replaceBytes && isMutable(data) && __RSDataAvailableRange(data, rangeToReplace))
     {
         __RSDataReplaceBytes(data, rangeToReplace, replaceBytes, length);
     }
     return;
 }
 
-RSExport void RSDataDeleteBytes(RSMutableDataRef data, RSRange rangeToDelete,  RSIndex length)
+RSExport void RSDataDeleteBytes(RSMutableDataRef data, RSRange rangeToDelete)
 {
-    if (data && __RSDataAvailable(data) && isMutable(data) && length && __RSDataAvailableRange(data, rangeToDelete))
+    if (data && __RSDataAvailable(data) && isMutable(data) && __RSDataAvailableRange(data, rangeToDelete))
     {
-        __RSDataReplaceBytes(data, rangeToDelete, nil, length);
+        __RSDataReplaceBytes(data, rangeToDelete, nil, 0);
     }
 }
 

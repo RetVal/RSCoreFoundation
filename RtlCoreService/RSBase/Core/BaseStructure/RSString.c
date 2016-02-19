@@ -5895,7 +5895,7 @@ static bool __RSStringFillCharacterSetInlineBuffer(RSCharacterSetInlineBuffer *b
     return NO;
 }
 
-RSExport RSComparisonResult RSStringCompare(RSStringRef string, RSStringRef string2, void *context)
+RSExport RSComparisonResult RSStringCompare(RSStringRef string, RSStringRef string2, RSStringCompareFlags compareOptions)
 {
     __RSGenericValidInstance(string, __RSStringTypeID);
     __RSGenericValidInstance(string2, __RSStringTypeID);

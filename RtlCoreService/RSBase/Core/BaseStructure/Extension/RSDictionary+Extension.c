@@ -11,7 +11,7 @@
 #include <RSCoreFoundation/RSPropertyList.h>
 RSExport RSDictionaryRef RSDictionaryWithKeysAndValues(const void** keys, const void** values, const RSDictionaryContext* context, RSIndex count)
 {
-    return RSAutorelease(RSDictionaryCreate(RSAllocatorSystemDefault, keys, values, context, count));
+    return RSAutorelease(RSDictionaryCreate(RSAllocatorSystemDefault, keys, values, count, context));
 }
 
 RSExport RSDictionaryRef RSDictionaryWithArray(RSArrayRef keys, RSArrayRef values, const RSDictionaryContext* context)

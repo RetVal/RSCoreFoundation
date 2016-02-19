@@ -677,7 +677,6 @@ uint32_t RSStringEncodingUnicodeToBytes(uint32_t encoding, uint32_t flags, const
         RSIndex convertedCharLen;
         RSIndex usedLen;
         
-        
         if ((flags & RSStringEncodingUseCanonical) || (flags & RSStringEncodingUseHFSPlusCanonical)) {
             (void)RSUniCharDecompose(characters, numChars, &convertedCharLen, (void *)bytes, maxByteLen, &usedLen, YES, RSUniCharUTF8Format, (flags & RSStringEncodingUseHFSPlusCanonical ? YES : NO));
         } else {

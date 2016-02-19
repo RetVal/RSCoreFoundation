@@ -175,7 +175,7 @@ BOOL __RSFileManagerContentsDirectory(RSFileManagerRef fmg, RSStringRef path, __
     {
         if (error)
         {
-            RSDictionaryRef userInfo = RSDictionaryCreate(RSAllocatorSystemDefault, (const void**)RSErrorTargetKey, (const void**)&path, RSDictionaryRSTypeContext, 1);
+            RSDictionaryRef userInfo = RSDictionaryCreate(RSAllocatorSystemDefault, (const void**)RSErrorTargetKey, (const void**)&path, 1, RSDictionaryRSTypeContext);
             *error = RSErrorCreate(RSAllocatorSystemDefault, RSErrorDomainRSCoreFoundation, kErrExisting, userInfo);
             RSRelease(userInfo);
             RSAutorelease(*error);

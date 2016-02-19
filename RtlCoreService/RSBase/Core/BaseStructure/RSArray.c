@@ -2373,9 +2373,13 @@ RSExport RSMutableArrayRef __RSArrayCreateMutableCopy0(RSAllocatorRef allocator,
 
 #if DEFINE_CREATION_METHODS
 
+RSExport RSArrayRef RSArrayCreateWithCallBacks(RSAllocatorRef allocator, const void **values, RSIndex numObjects, const RSArrayCallBacks *cb) {
+    return __RSArrayCreate0(allocator, values, numObjects, cb);
+}
+
 RSExport RSArrayRef RSArrayCreateWithObjects(RSAllocatorRef allocator, const void **values, RSIndex numObjects)
 {
-    return __RSArrayCreate0(allocator, values, numObjects, RSArrayRSTypeCallBacks);
+    return RSArrayCreateWithCallBacks(allocator, values, numObjects, RSArrayRSTypeCallBacks);
 }
 
 RSExport RSArrayRef RSArrayCreateWithObject(RSAllocatorRef allocator, RSTypeRef object)

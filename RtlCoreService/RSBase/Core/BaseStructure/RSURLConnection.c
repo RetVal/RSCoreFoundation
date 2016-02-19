@@ -120,19 +120,8 @@ RSInline void __RSURLConnectionCoreAlloc(RSURLConnectionRef connection, BOOL asy
 
 RSInline void __RSURLConnectionCoreRelease(void *core, BOOL async)
 {
-    if (core)
-    {
-//        curl_easy_reset(core);
+    if (core) {
         curl_easy_cleanup(core);
-//        if (!async)
-//        {
-//        	curl_easy_reset(core);
-//            curl_easy_cleanup(core);
-//        }
-//        else
-//        {
-//            curl_multi_cleanup(core);
-//        }
     }
 }
 
@@ -408,7 +397,6 @@ static RSURLConnectionRef __RSURLConnectionCorePerform(RSURLConnectionRef connec
 //    _core->_core = nil;
     
     if (retCode) {
-        __RSCLog(RSLogLevelNotice, "RSURLConnection Notice ");
         __RSURLConnectionDidFailWithError(connection, RSErrorWithDomainCodeAndUserInfo(__RSURLConnectionErrorDomain, retCode, nil));
     }
     else {
@@ -497,6 +485,8 @@ RSExport RSTypeID RSURLConnectionGetTypeID()
 
 static RSRunLoopRef __RSURLConnectionRunLoop = nil;
 static RSSpinLock __RSURLConnectionRunLoopSpinLock = RSSpinLockInit;
+static dispatch_queue_t __RSURLConnectionWorkQueue = nil;
+
 static void __RSURLConnectionLoaderMain(void *context);
 static void __RSURLConnectionDeallocate(RSNotificationRef notification);
 
@@ -519,6 +509,7 @@ static void _emptyPerform(void *info) {
 
 static void __RSURLConnectionLoaderMain(void *context) {
     pthread_setname_np("com.retval.RSURLConnectionLoaderMain");
+    __RSURLConnectionWorkQueue = dispatch_queue_create("com.retval.RSURLConnection.WorkQueue", nil);
     __RSURLConnectionRunLoop = RSRunLoopGetCurrent();
     RSRunLoopPerformBlock(RSRunLoopGetCurrent(), RSRunLoopDefaultMode, ^{
         if (NO == RSSpinLockTry(&__RSURLConnectionRunLoopSpinLock))
@@ -552,6 +543,10 @@ static void __RSURLConnectionDeallocate(RSNotificationRef notification)
     RSSyncUpdateBlock(&__RSURLConnectionRunLoopSpinLock, ^{
         if (__RSURLConnectionRunLoop)
             RSRunLoopStop(__RSURLConnectionRunLoop);
+        if (__RSURLConnectionWorkQueue) {
+            dispatch_release(__RSURLConnectionWorkQueue);
+            __RSURLConnectionWorkQueue = nil;
+        }
     });
 }
 
@@ -750,19 +745,27 @@ RSExport void RSURLConnectionSendAsynchronousRequest(RSURLRequestRef request, RS
     if (rl == nil) rl = RSRunLoopGetMain();
     __RSURLConnectionRunLoopInitialize();
     RSRunLoopPerformBlock(__RSURLConnectionRunLoop, RSRunLoopDefault, ^{
-        RSURLResponseRef response = nil;
-        RSErrorRef error = nil;
-        RSDataRef data = RSURLConnectionSendSynchronousRequest(request, &response, &error);
-        RSRelease(request);
-        if (data) RSRetain(data);
-        if (response) RSRetain(response);
-        if (error) RSRetain(error);
-        struct __RSURLConnectionQueueCalloutContext *ctx = RSAllocatorAllocate(RSAllocatorSystemDefault, sizeof(struct __RSURLConnectionQueueCalloutContext));
-        ctx->response = response;
-        ctx->data = data;
-        ctx->error = error;
-        ctx->completeHandler = Block_copy(completeHandler);
-        dispatch_async_f(__RSRunLoopGetQueue(rl), ctx, __RSURLConnectionQueueCallout);
+        dispatch_async(__RSURLConnectionWorkQueue, ^{
+            RSURLResponseRef response = nil;
+            RSErrorRef error = nil;
+            RSDataRef data = RSURLConnectionSendSynchronousRequest(request, &response, &error);
+            RSRelease(request);
+            if (data) RSRetain(data);
+            if (response) RSRetain(response);
+            if (error) RSRetain(error);
+            struct __RSURLConnectionQueueCalloutContext *ctx = RSAllocatorAllocate(RSAllocatorSystemDefault, sizeof(struct __RSURLConnectionQueueCalloutContext));
+            ctx->response = response;
+            ctx->data = data;
+            ctx->error = error;
+            ctx->completeHandler = Block_copy(completeHandler);
+            RSRunLoopPerformBlock(rl, RSRunLoopDefaultMode, ^{
+                __RSURLConnectionQueueCallout(ctx);
+            });
+            if (RSRunLoopIsWaiting(rl)) {
+                RSRunLoopWakeUp(rl);
+            }
+        });
+//        dispatch_async_f(__RSRunLoopGetQueue(rl), ctx, __RSURLConnectionQueueCallout);
     });
 
     if (RSRunLoopIsWaiting(__RSURLConnectionRunLoop))

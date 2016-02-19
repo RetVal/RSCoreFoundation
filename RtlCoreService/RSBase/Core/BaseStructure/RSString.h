@@ -6,8 +6,8 @@
 //  Copyright (c) 2012 RetVal. All rights reserved.
 //
 
-#ifndef RSCoreFoundation_RSString_h
-#define RSCoreFoundation_RSString_h
+#ifndef __RSSTRING__
+#define __RSSTRING__
 #include <RSCoreFoundation/RSArray.h>
 #include <RSCoreFoundation/RSAllocator.h>
 #include <RSCoreFoundation/RSStringEncoding.h>
@@ -66,7 +66,7 @@ RSExport RSMutableStringRef RSStringReplaceAll(RSMutableStringRef mutableString,
 
 RSExport RSRange RSStringGetRange(RSStringRef aString) RS_AVAILABLE(0_0);
 
-RSExport RSComparisonResult RSStringCompare(RSStringRef aString, RSStringRef other, void *context) RS_AVAILABLE(0_0);
+RSExport RSComparisonResult RSStringCompare(RSStringRef aString, RSStringRef other, RSStringCompareFlags compareFlags) RS_AVAILABLE(0_0);
 RSExport RSComparisonResult RSStringCompareCaseInsensitive(RSStringRef aString, RSStringRef other) RS_AVAILABLE(0_0);
 
 RSExport RSComparisonResult RSStringCompareWithOptionsAndLocale(RSStringRef string, RSStringRef string2, RSRange rangeToCompare, RSStringCompareFlags compareOptions, const void* locale) RS_AVAILABLE(0_0);

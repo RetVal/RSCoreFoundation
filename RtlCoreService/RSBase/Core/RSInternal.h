@@ -122,6 +122,8 @@ RSInline BOOL RS_IS_OBJC(RSTypeID typeID, RSTypeRef obj)
     return RS_IS_TAGGED_OBJ(obj);
 }
 #define RS_OBJC_FUNCDISPATCHV(typeID, obj, ...) do { } while (0)
+#define RS_OBJC_CALLV(obj, ...) (0)
+
 RSInline uintptr_t __RSISAForTypeID(RSTypeID typeID)
 {
     return 0;
@@ -327,21 +329,12 @@ RSExtern void *__RSStartSimpleThread(void (*func)(void *), void *arg);
 RSExtern void _RSRunLoopRunBackGround();
 
 struct _RSRuntimeLogPreference {
-    RSUInteger _RSRuntimeInstanceBZeroBeforeDie             : 1;
-    RSUInteger _RSRuntimeISABaseOnEmptyField                : 1;
-    RSUInteger _RSRuntimeInstanceManageWatcher              : 1;
-    RSUInteger _RSRuntimeInstanceRefWatcher                 : 1;
-    RSUInteger _RSRuntimeInstanceAllocFreeWatcher           : 1;
-    RSUInteger _RSRuntimeInstanceARC                        : 1;
-    RSUInteger _RSRuntimeCheckAutoreleaseFlag               : 1;
-    RSUInteger _RSStringNoticeWhenConstantStringAddToTable  : 1;
-    RSUInteger _RSPropertyListWarningWhenParseNullKey       : 1;
-    RSUInteger _RSPropertyListWarningWhenParseNullValue     : 1;
-    RSUInteger _RSRuntimeLogSave                            : 1;
+#define DEBUG_PERFERENCE(Prefix, Name, BitWidth, Default, Comment) RSUInteger Prefix##Name : BitWidth ;
+#include <RSCoreFoundation/RSRuntimeDebugSupport.h>
 #if __LP64__
-    RSUInteger _RSReserved : 64 - 11;
+    RSUInteger _RSReserved : 64 - 12;
 #else
-    RSUInteger _RSReserved : 32 - 11;
+    RSUInteger _RSReserved : 32 - 12;
 #endif
 };
 RSExtern struct _RSRuntimeLogPreference ___RSDebugLogPreference;
@@ -442,9 +435,9 @@ RSInline bool RSCharacterSetInlineBufferIsLongCharacterMember(RSCharacterSetInli
     }
     return isInverted;
 }
-#else /* RS_INLINE */
+#else /* RSInline */
 #define RSCharacterSetInlineBufferIsLongCharacterMember(buffer, character) (RSCharacterSetIsLongCharacterMember(buffer->cset, character))
-#endif /* RS_INLINE */
+#endif /* RSInline */
 
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
 RSExtern uint8_t __RS120293;
@@ -467,18 +460,6 @@ RSExtern void __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FU
 #define HAS_FORKED() 0
 #endif
 
-
-typedef const void *	(*RSArrayRetainCallBack)(RSAllocatorRef allocator, const void *value);
-typedef void		(*RSArrayReleaseCallBack)(RSAllocatorRef allocator, const void * RS_RELEASES_ARGUMENT value);
-typedef RSStringRef	(*RSArrayCopyDescriptionCallBack)(const void *value);
-typedef BOOL		(*RSArrayEqualCallBack)(const void *value1, const void *value2);
-typedef struct {
-    RSIndex				version;
-    RSArrayRetainCallBack		retain;
-    RSArrayReleaseCallBack		release;
-    RSArrayCopyDescriptionCallBack	copyDescription;
-    RSArrayEqualCallBack		equal;
-} RSArrayCallBacks;
 RSExport RSMutableArrayRef __RSArrayCreateMutable0(RSAllocatorRef allocator, RSIndex capacity, const RSArrayCallBacks *callBacks);
 RSPrivate RSArrayRef __RSArrayCreateWithArguments(va_list arguments, RSInteger maxCount);
 enum {
@@ -492,6 +473,6 @@ typedef RS_ENUM(RSIndex, RSStringCharacterClusterType) {
     RSStringBackwardDeletionCluster = 4 /* Cluster suitable for backward deletion */
 };
 
-    
+RSExport void __RSDumpAllPointerLocations(uintptr_t ptr) RS_AVAILABLE(0_5);
 RS_EXTERN_C_END
 #endif

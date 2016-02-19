@@ -30,10 +30,12 @@
 #define __RSRuntimeInstanceAllocFreeWatcher     0
 #define __RSRuntimeInstanceARC                  0
 #define __RSRuntimeCheckAutoreleaseFlag         0
+#define __RSRuntimeLogSave                      0
 
 #define __RSStringNoticeWhenConstantStringAddToTable    0
 #define __RSPropertyListWarningWhenParseNullKey         0
 #define __RSPropertyListWarningWhenParseNullValue       0
+#define __RSLogDebugLevelShouldFallThrough              0
 
 RS_EXTERN_C_BEGIN
 enum {
@@ -347,6 +349,18 @@ RSExport ISA       __RSRuntimeRetainAutorelease(RSTypeRef obj) RS_AVAILABLE(0_2)
 
 #ifndef __RSBitfieldSetValue
 #define __RSBitfieldSetValue(V, N1, N2, X)	((V) = ((V) & ~__RSBitfieldMask(N1, N2)) | (((X) << (N2)) & __RSBitfieldMask(N1, N2)))
+#endif
+
+#ifndef __RSBitIsSet
+#define __RSBitIsSet(V, N)  (((V) & (1UL << (N))) != 0)
+#endif
+
+#ifndef __RSBitSet
+#define __RSBitSet(V, N)  ((V) |= (1UL << (N)))
+#endif
+
+#ifndef __RSBitClear
+#define __RSBitClear(V, N)  ((V) &= ~(1UL << (N)))
 #endif
 
 /* end runtime system*/

@@ -1837,7 +1837,7 @@ static BOOL parseRealTag(__RSPlistParserInfo *pInfo, RSTypeRef *out)
         {
 //            RSIndex len = RSStringGetLength(str);
 //            RSStringInlineBuffer buf;
-//            RSStringInitInlineBuffer(str, &buf, RSRangeMake(0, len));
+//            RSStringInitInlineBuffer(str, &buf, RSMakeRange(0, len));
 //            SInt32 idx = 0;
 //            double val;
 //            if (!__RSStringScanDouble(&buf, nil, &idx, &val) || idx != len)
@@ -2107,7 +2107,7 @@ static void parseEntityReference_pl(__RSPlistParserInfo *pInfo, RSMutableDataRef
                     UniChar tmpBuf[6]; // max of 6 bytes for UTF8
                     RSIndex tmpBufLength = 0;
                     RSStringGetCharacters(oneChar, RSMakeRange(1, 6), (UniChar*)tmpBuf);
-//                    RSStringGetBytes(oneChar, RSRangeMake(0, 1), RSStringEncodingUTF8, 0, NO, tmpBuf, 6, &tmpBufLength);
+//                    RSStringGetBytes(oneChar, RSMakeRange(0, 1), RSStringEncodingUTF8, 0, NO, tmpBuf, 6, &tmpBufLength);
                     RSDataAppendBytes(stringData, tmpBuf, tmpBufLength);
                     __RSPListRelease(oneChar, pInfo->allocator);
                     return;
@@ -2157,7 +2157,7 @@ static RSStringRef _uniqueStringForUTF8Bytes(__RSPlistParserInfo *pInfo, const c
 //    BOOL uniqued = RSBurstTrieContainsUTF8String(pInfo->stringTrie, (UInt8 *)base, length, &payload);
 //    if (uniqued)
 //    {
-//        result = (RSStringRef)RSArrayGetValueAtIndex(pInfo->stringCache, (RSIndex)payload);
+//        result = (RSStringRef)RSArrayObjectAtIndex(pInfo->stringCache, (RSIndex)payload);
 //        if (!_RSAllocatorIsGCRefZero(pInfo->allocator)) RSRetain(result);
 //    }
 //    else
@@ -2165,7 +2165,7 @@ static RSStringRef _uniqueStringForUTF8Bytes(__RSPlistParserInfo *pInfo, const c
 //        result = RSStringCreateWithBytes(pInfo->allocator, (const UInt8 *)base, length, RSStringEncodingUTF8, NO);
 //        if (!result) return nil;
 //        payload = RSArrayGetCount(pInfo->stringCache);
-//        RSArrayAppendValue(pInfo->stringCache, result);
+//        RSArrayAddObject(pInfo->stringCache, result);
 //        //RSBurstTrieAddUTF8String(pInfo->stringTrie, (UInt8 *)base, length, payload);
 //    }
     result = RSStringCreateWithBytes(pInfo->allocator, (const RSBitU8 *)base, length, __RSDefaultEightBitStringEncoding, NO);

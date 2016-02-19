@@ -129,6 +129,18 @@
     #endif
 #endif
 
+#if !defined(RS_INLINE)
+    #if defined(__GNUC__)
+        #define RS_INLINE __inline__ __attribute__((always_inline))
+    #elif defined(__MWERKS__) || defined(__cplusplus)
+        #define RS_INLINE inline
+    #elif defined(_MSC_VER)
+        #define RS_INLINE  __inline
+    #elif TARGET_OS_WIN32
+        #define RS_INLINE __inline__
+    #endif
+#endif
+
 #ifndef __autorelease
     #define __autorelease
 #endif

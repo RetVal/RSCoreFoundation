@@ -1346,7 +1346,7 @@ static const RSRuntimeClass __RSURLClass = {
 
 // When __CONSTANT_RSSTRINGS__ is not defined, we have separate macros for static and exported constant strings, but
 // when it is defined, we must prefix with static to prevent the string from being exported
-#ifdef __CONSTANT_RSSTRINGS__
+#ifndef __CONSTANT_RSSTRINGS__
 RS_CONST_STRING_DECL(RSURLHTTPScheme, "http")
 RS_CONST_STRING_DECL(RSURLHTTPSScheme, "https")
 RS_CONST_STRING_DECL(RSURLFileScheme, "file")
@@ -2923,7 +2923,7 @@ RSExport RSStringRef  RSURLCopyHostName(RSURLRef  anURL) {
 
 extern BOOL __RSStringScanInteger(RSStringInlineBuffer *buf, RSTypeRef locale, SInt32 *indexPtr, BOOL doLonglong, void *result);
 // Return -1 to indicate no port is specified
-SInt32 RSURLGetPortNumber(RSURLRef  anURL) {
+RSExport SInt32 RSURLGetPortNumber(RSURLRef  anURL) {
     RSStringRef port;
     if (RS_IS_OBJC(__RSURLTypeID, anURL)) {
         //        RSNumberRef rsPort = (RSNumberRef) RS_OBJC_CALLV((NSURL *)anURL, port);

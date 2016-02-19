@@ -535,7 +535,7 @@ static RSStringRef _uniqueStringForUTF8Bytes(__RSJSONParserContext *pInfo, const
     //    BOOL uniqued = RSBurstTrieContainsUTF8String(pInfo->stringTrie, (UInt8 *)base, length, &payload);
     //    if (uniqued)
     //    {
-    //        result = (RSStringRef)RSArrayGetValueAtIndex(pInfo->stringCache, (RSIndex)payload);
+    //        result = (RSStringRef)RSArrayObjectAtIndex(pInfo->stringCache, (RSIndex)payload);
     //        if (!_RSAllocatorIsGCRefZero(pInfo->allocator)) RSRetain(result);
     //    }
     //    else
@@ -543,7 +543,7 @@ static RSStringRef _uniqueStringForUTF8Bytes(__RSJSONParserContext *pInfo, const
     //        result = RSStringCreateWithBytes(pInfo->allocator, (const UInt8 *)base, length, RSStringEncodingUTF8, NO);
     //        if (!result) return nil;
     //        payload = RSArrayGetCount(pInfo->stringCache);
-    //        RSArrayAppendValue(pInfo->stringCache, result);
+    //        RSArrayAddObject(pInfo->stringCache, result);
     //        //RSBurstTrieAddUTF8String(pInfo->stringTrie, (UInt8 *)base, length, payload);
     //    }
     result = RSStringCreateWithBytes(pInfo->_allocator, (const RSBitU8*)base, length, RSStringEncodingUTF8, NO);

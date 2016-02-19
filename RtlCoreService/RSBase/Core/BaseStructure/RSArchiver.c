@@ -1066,7 +1066,7 @@ static RSDataRef __RSDictionarySerializeCallBack(RSArchiverRef archiver, RSTypeR
         keyValuePairs[count * 2 + idx] = __RSArchiverContextSerialize(archiver, keyValuePairs[count * 1 + idx]);
     }
     
-    RSDictionaryRef dict = RSDictionaryCreate(RSAllocatorSystemDefault, &keyValuePairs[count * 0], &keyValuePairs[count * 2], RSDictionaryRSTypeContext, count);
+    RSDictionaryRef dict = RSDictionaryCreate(RSAllocatorSystemDefault, &keyValuePairs[count * 0], &keyValuePairs[count * 2], count, RSDictionaryRSTypeContext);
     
     for (RSUInteger idx = 0; idx < count; idx++) {
         RSRelease(keyValuePairs[count * 2 + idx]);

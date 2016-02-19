@@ -55,6 +55,7 @@ RSExport const RSDictionaryValueContext* RSDictionaryDoNilValueContext RS_AVAILA
 RSExport const RSDictionaryKeyContext* RSDictionaryRSKeyContext RS_AVAILABLE(0_0);     
 RSExport const RSDictionaryValueContext* RSDictionaryRSValueContext RS_AVAILABLE(0_0); 
 RSExport const RSDictionaryContext* RSDictionaryRSTypeContext RS_AVAILABLE(0_0);     // key and value are RSTypeRef.
+RSExport const RSDictionaryContext* RSDictionaryRSStringCopyContext RS_AVAILABLE(0_4);
 RSExport const RSDictionaryContext* RSDictionaryNilContext RS_AVAILABLE(0_0);        // do nothing with key and value.
 RSExport const RSDictionaryContext* RSDictionaryNilKeyContext RS_AVAILABLE(0_0);     // do nothing with key.
 RSExport const RSDictionaryContext* RSDictionaryNilValueContext RS_AVAILABLE(0_0);   // do nothing with value.
@@ -63,7 +64,7 @@ RSExport RSTypeID RSDictionaryGetTypeID() RS_AVAILABLE(0_0);
 
 RSExport RSIndex RSDictionaryGetCount(RSDictionaryRef dictionary) RS_AVAILABLE(0_0);
 
-RSExport RSDictionaryRef RSDictionaryCreate(RSAllocatorRef allocator, const void** keys, const void** values, const RSDictionaryContext* context, RSIndex count) RS_AVAILABLE(0_0);
+RSExport RSDictionaryRef RSDictionaryCreate(RSAllocatorRef allocator, const void** keys, const void** values, RSIndex count, const RSDictionaryContext* context) RS_AVAILABLE(0_0);
 RSExport RSDictionaryRef RSDictionaryCreateCopy(RSAllocatorRef allocator, RSDictionaryRef other) RS_AVAILABLE(0_0);
 RSExport RSMutableDictionaryRef RSDictionaryCreateMutableCopy(RSAllocatorRef allocator, RSDictionaryRef dictionary) RS_AVAILABLE(0_0);
 RSExport RSDictionaryRef RSDictionaryCreateWithArray(RSAllocatorRef allocator, RSArrayRef keys, RSArrayRef values, const RSDictionaryContext* context) RS_AVAILABLE(0_0);

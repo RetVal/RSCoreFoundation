@@ -50,6 +50,30 @@ const RSDictionaryContext* RSDictionaryRSTypeContext = &__RSDictionaryRSTypeCont
 const RSDictionaryKeyContext* RSDictionaryRSTypeKeyContext = &__RSDictionaryRSTypeKeyContext;
 const RSDictionaryValueContext* RSDictionaryRSTypeValueContext = &__RSDictionaryRSTypeValueContext;
 
+const static RSDictionaryKeyContext __RSDictionaryRSTypeCopyKeyContext = {
+#if RSDictionaryCoreSelector == RSDictionaryBasicHash
+    __RSStringCollectionCopy, __RSTypeCollectionRelease,
+#elif RSDictionaryCoreSelector == RSDictionaryRBTree
+    RSRetain, RSRelease,
+#endif
+    RSDescription,
+    RSCopy,
+    RSHash,
+#if RSDictionaryCoreSelector  == RSDictionaryBasicHash
+    RSEqual,
+#elif RSDictionaryCoreSelector == RSDictionaryRBTree
+    (RSDictionaryEqualCallBack)RSStringCompare,
+#endif
+};
+
+const static RSDictionaryContext __RSDictionaryRSStringCopyContext = {
+    0,
+    &__RSDictionaryRSTypeCopyKeyContext,
+    &__RSDictionaryRSTypeValueContext
+};
+
+const RSDictionaryContext* RSDictionaryRSStringCopyContext = &__RSDictionaryRSStringCopyContext;
+
 static const void* __RSRetainNothing(const void* value)
 {
     return value;
@@ -1342,7 +1366,7 @@ RSPrivate RSHashRef __RSDictionaryCreateTransfer(RSAllocatorRef allocator, const
     return (RSHashRef)ht;
 }
 #endif
-RSExport RSHashRef RSDictionaryCreate(RSAllocatorRef allocator, const_any_pointer_t *klist, const_any_pointer_t *vlist, const RSDictionaryContext *context, RSIndex numValues) {
+RSExport RSHashRef RSDictionaryCreate(RSAllocatorRef allocator, const_any_pointer_t *klist, const_any_pointer_t *vlist, RSIndex numValues, const RSDictionaryContext *context) {
     RSTypeID typeID = RSDictionaryGetTypeID();
     RSAssert2(0 <= numValues, __RSLogAssertion, "%s(): numValues (%ld) cannot be less than zero", __PRETTY_FUNCTION__, numValues);
     RSBasicHashRef ht = __RSDictionaryCreateGeneric(allocator, context->keyContext, context->valueContext, RSDictionary);
@@ -1718,7 +1742,7 @@ RSExport RSArrayRef RSDictionaryCopyAllValues(RSHashRef hc)
 
 RSExport RSHashRef RSDictionaryCreateWithArray(RSAllocatorRef allocator, RSArrayRef keys, RSArrayRef values, const RSDictionaryContext* context)
 {
-    if (!(keys && values)) return RSDictionaryCreate(allocator, nil, nil, context, 0);
+    if (!(keys && values)) return RSDictionaryCreate(allocator, nil, nil, 0, context);
     RSIndex cnt = RSArrayGetCount(keys);
     if (cnt != RSArrayGetCount(values)) HALTWithError(RSInvalidArgumentException, "the number of keys and values is not equal.");
     RSMutableDictionaryRef dictionary = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, context);

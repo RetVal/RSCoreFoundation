@@ -25,8 +25,8 @@
 	Copyright (c) 1998-2013, Apple Inc. All rights reserved.
 */
 
-#if !defined(__COREFOUNDATION_RSMESSAGEPORT__)
-#define __COREFOUNDATION_RSMESSAGEPORT__ 1
+#if !defined(__RSCOREFOUNDATION_RSMESSAGEPORT__)
+#define __RSCOREFOUNDATION_RSMESSAGEPORT__ 1
 
 #include <RSCoreFoundation/RSString.h>
 #include <RSCoreFoundation/RSRunLoop.h>
@@ -81,5 +81,5 @@ RSExport void RSMessagePortSetDispatchQueue(RSMessagePortRef ms, dispatch_queue_
 
 RS_EXTERN_C_END
 
-#endif /* ! __COREFOUNDATION_RSMESSAGEPORT__ */
+#endif /* ! __RSCOREFOUNDATION_RSMESSAGEPORT__ */
 

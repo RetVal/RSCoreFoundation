@@ -89,6 +89,6 @@ do {(buf)->theString = str; (buf)->rangeToBuffer = range; (buf)->directBuffer = 
 #define RSStringGetCharacterFromInlineBuffer(buf, idx) \
 (((idx) < 0 || (idx) >= (buf)->rangeToBuffer.length) ? 0 : ((buf)->directBuffer ? (buf)->directBuffer[(idx) + (buf)->rangeToBuffer.location] : RSStringGetCharacterAtIndex((buf)->theString, (idx) + (buf)->rangeToBuffer.location)))
 
-#endif /* RS_INLINE */
+#endif /* RSInline */
 
 #endif

@@ -50,7 +50,7 @@
 #define RSCoreFoundationVersionNumber0_5        2000
 
 #ifndef RSCoreFoundationVersionNumberCurrent
-#define RSCoreFoundationVersionNumberCurrent   RSCoreFoundationVersionNumber0_4
+#define RSCoreFoundationVersionNumberCurrent   RSCoreFoundationVersionNumber0_5
 #endif
 
 /*

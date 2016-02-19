@@ -755,7 +755,7 @@ static void __RSBPLParserObject(__RSBinaryPropertyListWrittenBuffer* buffer, RST
                 __RSBPLParserObject(buffer, &objectPtr[idx]);           // keyRef
                 __RSBPLParserObject(buffer, &objectPtr[length + idx]);  // valueRef
             }
-            dictionary = RSDictionaryCreate(RSAllocatorSystemDefault, &objectPtr[0], &objectPtr[length], RSDictionaryRSTypeContext, length);
+            dictionary = RSDictionaryCreate(RSAllocatorSystemDefault, &objectPtr[0], &objectPtr[length], length, RSDictionaryRSTypeContext);
             for (RSUInteger idx = 0; idx < length * 2; idx++)
             {
                 RSRelease(objectPtr[idx]);

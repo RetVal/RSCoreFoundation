@@ -42,14 +42,24 @@ RSExtern RSDataRef ServerMessagePortCallBack(RSMessagePortRef local, SInt32 msgi
 }
 
 int main(int argc, char **argv) {
-    RSURLConnectionSendAsynchronousRequest(RSURLRequestWithURL(RSURLWithString(RSSTR("http://www.baidu.com/"))), RSRunLoopGetCurrent(), ^(RSURLResponseRef response, RSDataRef data, RSErrorRef error) {
-        RSAutoreleasePoolPush();
-        RSLog(RSSTR("%R"), response);
-        RSXMLDocumentRef document = RSAutorelease(RSXMLDocumentCreateWithXMLData(RSAllocatorDefault, data, RSXMLDocumentTidyHTML));
-        RSLog(RSSTR("%R"), document);
-        RSLog(RSSTR("%R"), RSStringWithData(data, RSStringEncodingUTF8));
-        RSAutoreleasePoolPop();
+    RSMessagePortRef MessagePort = RSMessagePortCreateLocal(RSAllocatorDefault, RSSTR("com.retval.runloop.server"), ServerMessagePortCallBack, NULL, NULL);
+    RSRunLoopRef RL = RSRunLoopGetCurrent();
+    RSRunLoopSourceRef Source = RSMessagePortCreateRunLoopSource(RSAllocatorDefault, MessagePort, 0);
+    RSRunLoopAddSource(RL, Source, RSRunLoopDefaultMode);
+    RSRelease(Source);
+    RSPerformBlockAfterDelay(2.0, ^{
+        RSRunLoopStop(RL);
+        RSShow(RSSTR("stop rl"));
     });
     RSRunLoopRun();
+    RSRelease(MessagePort);
+//    RSURLConnectionSendAsynchronousRequest(RSURLRequestWithURL(RSURLWithString(RSSTR("http://www.baidu.com/"))), RSRunLoopGetCurrent(), ^(RSURLResponseRef response, RSDataRef data, RSErrorRef error) {
+//        RSAutoreleasePoolPush();
+//        RSLog(RSSTR("%R"), response);
+//        RSXMLDocumentRef document = RSAutorelease(RSXMLDocumentCreateWithXMLData(RSAllocatorDefault, data, RSXMLDocumentTidyHTML));
+//        RSLog(RSSTR("%R"), document);
+//        RSLog(RSSTR("%R"), RSStringWithData(data, RSStringEncodingUTF8));
+//        RSAutoreleasePoolPop();
+//    });
     return 0;
 }

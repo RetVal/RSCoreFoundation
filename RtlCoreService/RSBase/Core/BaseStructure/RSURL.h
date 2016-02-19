@@ -6,8 +6,8 @@
 //  Copyright (c) 2012 RetVal. All rights reserved.
 //
 
-#ifndef RSCoreFoundation_RSURL_h
-#define RSCoreFoundation_RSURL_h
+#ifndef __RSURL__
+#define __RSURL__
 #include <RSCoreFoundation/RSArray.h>
 #include <RSCoreFoundation/RSError.h>
 #include <RSCoreFoundation/RSDictionary.h>
@@ -80,6 +80,8 @@ RSExport BOOL RSURLHasDirectoryPath(RSURLRef  anURL) RS_AVAILABLE(0_3);
 RSExport RSStringRef  RSURLCopyResourceSpecifier(RSURLRef  anURL) RS_AVAILABLE(0_3);
 
 RSExport RSStringRef  RSURLCopyHostName(RSURLRef  anURL) RS_AVAILABLE(0_3);
+
+RSExport SInt32 RSURLGetPortNumber(RSURLRef  anURL) RS_AVAILABLE(0_3);
 
 RSExport RSStringRef  RSURLCopyUserName(RSURLRef  anURL) RS_AVAILABLE(0_3);
 

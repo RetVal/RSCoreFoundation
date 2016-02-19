@@ -1870,7 +1870,7 @@
  __block RSSocketRef sock = nil;
  dispatch_sync(__sockQueue(), ^{
  for (RSIndex idx = 0, cnt = RSArrayGetCount(__RSAllSockets); idx < cnt; idx++) {
- RSSocketRef s = (RSSocketRef)RSArrayGetValueAtIndex(__RSAllSockets, idx);
+ RSSocketRef s = (RSSocketRef)RSArrayObjectAtIndex(__RSAllSockets, idx);
  if (s->_shared->_socket == ufd) {
  RSRetain(s);
  sock = s;
@@ -2219,7 +2219,7 @@
  sock->_state = RSSocketStateInvalidating;
  OSMemoryBarrier();
  for (RSIndex idx = 0, cnt = RSArrayGetCount(__RSAllSockets); idx < cnt; idx++) {
- RSSocketRef s = (RSSocketRef)RSArrayGetValueAtIndex(__RSAllSockets, idx);
+ RSSocketRef s = (RSSocketRef)RSArrayObjectAtIndex(__RSAllSockets, idx);
  if (s == sock) {
  RSArrayRemoveObjectAtIndex(__RSAllSockets, idx);
  break;
@@ -3502,7 +3502,7 @@ static void __RSSocketWriteSocketList(RSArrayRef sockets, RSDataRef fdSet, BOOL 
     fd_set *tempfds = (fd_set *)RSDataGetBytesPtr(fdSet);
     SInt32 idx, cnt;
     for (idx = 0, cnt = RSArrayGetCount(sockets); idx < cnt; idx++) {
-        RSSocketRef s = (RSSocketRef)RSArrayGetValueAtIndex(sockets, idx);
+        RSSocketRef s = (RSSocketRef)RSArrayObjectAtIndex(sockets, idx);
         if (FD_ISSET(s->_socket, tempfds)) {
             fprintf(stdout, "%d ", s->_socket);
         } else if (!onlyIfSet) {

@@ -162,17 +162,8 @@ RSPrivate BOOL __RSRuntimeSetEnvironment(RSCBuffer name, RSCBuffer value)
 }
 
 struct _RSRuntimeLogPreference ___RSDebugLogPreference = {
-    ._RSRuntimeInstanceBZeroBeforeDie                       = __RSRuntimeInstanceBZeroBeforeDie,
-    ._RSRuntimeISABaseOnEmptyField                          = __RSRuntimeISABaseOnEmptyField,
-    ._RSRuntimeInstanceManageWatcher                        = __RSRuntimeInstanceManageWatcher,
-    ._RSRuntimeInstanceRefWatcher                           = __RSRuntimeInstanceRefWatcher,
-    ._RSRuntimeInstanceAllocFreeWatcher                     = __RSRuntimeInstanceAllocFreeWatcher,
-    ._RSRuntimeInstanceARC                                  = __RSRuntimeInstanceARC,
-    ._RSRuntimeCheckAutoreleaseFlag                         = __RSRuntimeCheckAutoreleaseFlag,
-    ._RSStringNoticeWhenConstantStringAddToTable            = __RSStringNoticeWhenConstantStringAddToTable,
-    ._RSPropertyListWarningWhenParseNullKey                 = __RSPropertyListWarningWhenParseNullKey,
-    ._RSPropertyListWarningWhenParseNullValue               = __RSPropertyListWarningWhenParseNullValue,
-    ._RSRuntimeLogSave                                      = __RSRuntimeInstanceManageWatcher | __RSRuntimeInstanceRefWatcher | __RSRuntimeInstanceAllocFreeWatcher | __RSStringNoticeWhenConstantStringAddToTable | __RSRuntimeCheckAutoreleaseFlag,
+#define DEBUG_PERFERENCE(Prefix, Name, BitWidth, Default, Comment) .Prefix##Name = _##Prefix##Name,
+#include <RSCoreFoundation/RSRuntimeDebugSupport.h>
 };
 
 struct ____RSDebugLogContext {
@@ -227,6 +218,25 @@ static void __RSDebugLevelPreferencesInitialize() {
 #elif DEPLOYMENT_TARGET_WINDOWS
 
 #endif
+    
+    const char * Value = nil;
+#define DEBUG_PERFERENCE(Prefix, Name, BitWidth, Default, Comment) \
+    Value = __RSGetEnvironment(""#Prefix#Name); \
+    if (Value) { \
+        if (atoi(Value) == 1) {\
+            __RSCLog(RSLogLevelNotice, "----- " #Prefix#Name " is enabled -----\n");\
+            ___RSDebugLogPreference.Prefix##Name = 1;\
+        }\
+        Value = nil;\
+    }\
+
+#include <RSCoreFoundation/RSRuntimeDebugSupport.h>
+    
+    if (___RSDebugLogPreference._RSRuntimeInstanceManageWatcher | ___RSDebugLogPreference._RSRuntimeInstanceRefWatcher | ___RSDebugLogPreference._RSRuntimeInstanceAllocFreeWatcher | ___RSDebugLogPreference._RSStringNoticeWhenConstantStringAddToTable | ___RSDebugLogPreference._RSRuntimeCheckAutoreleaseFlag) {
+        ___RSDebugLogPreference._RSRuntimeLogSave = 1;
+    } else {
+        ___RSDebugLogPreference._RSRuntimeLogSave = 0;
+    }
 }
 
 static void __RSDebugLevelInitialize()
@@ -234,6 +244,7 @@ static void __RSDebugLevelInitialize()
     RSBlock _debuglogPrefixPath[RSMaxPathSize] = {0};
     ____RSRuntimeDebugLevelLogContext._debugLogLock = RSSpinLockInit;
 	strcpy(_debuglogPrefixPath, __RSRuntimeGetEnvironment("HOME") ? : "");
+    __RSDebugLevelPreferencesInitialize();
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_LINUX
     strcat(_debuglogPrefixPath, "/Library/Logs/RSCoreFoundation");
 	mkdir(_debuglogPrefixPath, 0777);
@@ -821,6 +832,10 @@ retry:
             {
                 case RSLogLevelDebug:
                     __RSDebugLevelLog(pptr, max(result, size));
+                    // do not fall through
+                    if (!___RSDebugLogPreference._RSLogDebugLevelShouldFallThrough) {
+                        break;
+                    }
                 case RSLogLevelNotice:
                     __RSCPrint(STDOUT_FILENO, fitCache?:traceBuf);
                     break;
@@ -1036,9 +1051,9 @@ extern void __RSXMLParserInitialize();
 extern void __RSArchiverInitialize();
 
 extern void __RSURLInitialize();
-extern void __RSURLRequestInitialize();
-extern void __RSURLResponseInitialize();
-extern void __RSURLConnectionInitialize();
+//extern void __RSURLRequestInitialize();
+//extern void __RSURLResponseInitialize();
+//extern void __RSURLConnectionInitialize();
 extern void __RSHTTPCookieInitialize();
 
 extern void __RSMachPortInitialize();
@@ -1126,9 +1141,9 @@ RSExport __RS_INIT_ROUTINE(RSRuntimePriority) void RSCoreFoundationInitialize()
 //    __RSSocketInitialize();
     
     __RSURLInitialize();
-    __RSURLRequestInitialize();
-    __RSURLResponseInitialize();
-    __RSURLConnectionInitialize();
+//    __RSURLRequestInitialize();
+//    __RSURLResponseInitialize();
+//    __RSURLConnectionInitialize();
     __RSHTTPCookieInitialize();
     
     __RSQueueInitialize();

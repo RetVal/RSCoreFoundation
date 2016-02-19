@@ -8,6 +8,32 @@
 
 #include <sys/sysctl.h>
 
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
+#include <unistd.h>
+#include <sys/uio.h>
+#include <mach/mach.h>
+#include <pthread.h>
+#include <mach-o/loader.h>
+#include <mach-o/dyld.h>
+#include <crt_externs.h>
+#include <dlfcn.h>
+#include <vproc.h>
+#include <sys/sysctl.h>
+#include <sys/stat.h>
+#include <mach/mach.h>
+#include <mach/mach_vm.h>
+#include <sys/mman.h>
+#include <stdio.h>
+#include <sys/errno.h>
+#include <mach/mach_time.h>
+#include <Block.h>
+#endif
+#if DEPLOYMENT_TARGET_LINUX || DEPLOYMENT_TARGET_FREEBSD
+#include <string.h>
+#include <pthread.h>
+#include <sys/mman.h>
+#endif
+
 RSPrivate RSUInteger __RSActiveProcessorCount()
 {
     int32_t pcnt;
@@ -78,3 +104,90 @@ BOOL _RSExecutableLinkedOnOrAfter(RSUInteger v)
 {
     return YES;
 }
+
+#if DEPLOYMENT_TARGET_MACOSX
+RSPrivate void *__RSLookupCarbonCoreFunction(const char *name) {
+    static void *image = NULL;
+    if (NULL == image) {
+        image = dlopen("/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/CarbonCore.framework/Versions/A/CarbonCore", RTLD_LAZY | RTLD_LOCAL);
+    }
+    void *dyfunc = NULL;
+    if (image) {
+        dyfunc = dlsym(image, name);
+    }
+    return dyfunc;
+}
+#endif
+
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
+RSPrivate uintptr_t __RSFindPointer(uintptr_t ptr, uintptr_t start) {
+    vm_map_t task = mach_task_self();
+    mach_vm_address_t address = start;
+    for (;;) {
+        mach_vm_size_t size = 0;
+        vm_region_basic_info_data_64_t info;
+        mach_msg_type_number_t count = VM_REGION_BASIC_INFO_COUNT_64;
+        mach_port_t object_name;
+        kern_return_t ret = mach_vm_region(task, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&info, &count, &object_name);
+        if (KERN_SUCCESS != ret) break;
+        boolean_t scan = (info.protection & VM_PROT_WRITE) ? 1 : 0;
+        if (scan) {
+            uintptr_t *addr = (uintptr_t *)((uintptr_t)address);
+            uintptr_t *end = (uintptr_t *)((uintptr_t)address + (uintptr_t)size);
+            while (addr < end) {
+                if ((uintptr_t *)start <= addr && *addr == ptr) {
+                    return (uintptr_t)addr;
+                }
+                addr++;
+            }
+        }
+        address += size;
+    }
+    return 0;
+}
+
+RSExport void __RSDumpAllPointerLocations(uintptr_t ptr) {
+    uintptr_t addr = 0;
+    do {
+        addr = __RSFindPointer(ptr, sizeof(void *) + addr);
+        printf("%p\n", (void *)addr);
+    } while (addr != 0);
+}
+#endif
+
+RSPrivate BOOL __RSProcessIsRestricted() {
+    return issetugid();
+}
+
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED
+RSPrivate void *__RSLookupCoreServicesInternalFunction(const char *name) {
+    static void *image = NULL;
+    if (NULL == image) {
+        image = dlopen("/System/Library/PrivateFrameworks/CoreServicesInternal.framework/CoreServicesInternal", RTLD_LAZY | RTLD_LOCAL);
+    }
+    void *dyfunc = NULL;
+    if (image) {
+        dyfunc = dlsym(image, name);
+    }
+    return dyfunc;
+}
+
+RSPrivate void *__RSLookupRSNetworkFunction(const char *name) {
+    static void *image = NULL;
+    if (NULL == image) {
+        const char *path = NULL;
+        if (!__RSProcessIsRestricted()) {
+            path = __RSGetEnvironment("RSNETWORK_LIBRARY_PATH");
+        }
+        if (!path) {
+            path = "/System/Library/Frameworks/RSNetwork.framework/RSNetwork";
+        }
+        image = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
+    }
+    void *dyfunc = NULL;
+    if (image) {
+        dyfunc = dlsym(image, name);
+    }
+    return dyfunc;
+}
+#endif

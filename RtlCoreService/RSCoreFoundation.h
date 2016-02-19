@@ -49,15 +49,16 @@
 #include <RSCoreFoundation/RSRegularExpression.h>
 #include <RSCoreFoundation/RSSet.h>
 #include <RSCoreFoundation/RSSocket.h>
+#include <RSCoreFoundation/RSStream.h>
 #include <RSCoreFoundation/RSString.h>
 #include <RSCoreFoundation/RSStringEncoding.h>
 #include <RSCoreFoundation/RSStringNumberSupport.h>
 #include <RSCoreFoundation/RSTimer.h>
 #include <RSCoreFoundation/RSTimeZone.h>
 #include <RSCoreFoundation/RSURL.h>
-#include <RSCoreFoundation/RSURLRequest.h>
-#include <RSCoreFoundation/RSURLResponse.h>
-#include <RSCoreFoundation/RSURLConnection.h>
+//#include <RSCoreFoundation/RSURLRequest.h>
+//#include <RSCoreFoundation/RSURLResponse.h>
+//#include <RSCoreFoundation/RSURLConnection.h>
 #include <RSCoreFoundation/RSHTTPCookie.h>
 #include <RSCoreFoundation/RSHTTPCookieStorage.h>
 #include <RSCoreFoundation/RSUUID.h>
@@ -69,7 +70,7 @@
 #include <RSCoreFoundation/RSError+Extension.h>
 #include <RSCoreFoundation/RSNumber+Extension.h>
 #include <RSCoreFoundation/RSString+Extension.h>
-#include <RSCoreFoundation/RSURL+Extension.h>
+//#include <RSCoreFoundation/RSURL+Extension.h>
 
 #include <RSCoreFoundation/RSProcessInfo.h>
 

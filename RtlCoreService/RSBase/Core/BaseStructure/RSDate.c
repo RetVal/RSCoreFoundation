@@ -694,3 +694,14 @@ RSExport RSDateRef RSDateCreateWithString(RSAllocatorRef allocator, RSStringRef 
     }
     return _v;
 }
+
+BOOL RSGregorianDateIsValid(RSGregorianDate gdate, RSOptionFlags unitFlags) {
+    if ((unitFlags & RSGregorianUnitsYears) && (gdate.year <= 0)) return false;
+    if ((unitFlags & RSGregorianUnitsMonths) && (gdate.month < 1 || 12 < gdate.month)) return false;
+    if ((unitFlags & RSGregorianUnitsDays) && (gdate.day < 1 || 31 < gdate.day)) return false;
+    if ((unitFlags & RSGregorianUnitsHours) && (gdate.hour < 0 || 23 < gdate.hour)) return false;
+    if ((unitFlags & RSGregorianUnitsMinutes) && (gdate.minute < 0 || 59 < gdate.minute)) return false;
+    if ((unitFlags & RSGregorianUnitsSeconds) && (gdate.second < 0.0 || 60.0 <= gdate.second)) return false;
+    if ((unitFlags & RSGregorianUnitsDays) && (unitFlags & RSGregorianUnitsMonths) && (unitFlags & RSGregorianUnitsYears) && (__RSDaysInMonth(gdate.month, gdate.year - 2001, isleap(gdate.year - 2001)) < gdate.day)) return false;
+    return true;
+}

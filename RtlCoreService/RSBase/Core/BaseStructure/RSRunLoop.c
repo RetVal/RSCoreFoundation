@@ -2355,7 +2355,7 @@ static void __RSRunLoopCollectTimers(const void *value, void *ctx) {
     if (rlt->_fireTSR <= context->cutoffTSR) {
         if (nil == context->results)
             context->results = RSArrayCreateMutable(RSAllocatorSystemDefault, 0, &RSTypeArrayCallBacks);
-        RSArrayAppendValue(context->results, rlt);
+        RSArrayAddObject(context->results, rlt);
     }
 }
 

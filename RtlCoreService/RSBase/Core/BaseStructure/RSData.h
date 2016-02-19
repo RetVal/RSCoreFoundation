@@ -36,7 +36,7 @@ RSExport RSMutableDataRef RSDataCreateMutableWithNoCopy(RSAllocatorRef allocator
 
 RSExport void RSDataAppendBytes(RSMutableDataRef data, const void* appendBytes, RSIndex length) RS_AVAILABLE(0_0);
 RSExport void RSDataReplaceBytes(RSMutableDataRef data, RSRange rangeToReplace, const void* replaceBytes, RSIndex length) RS_AVAILABLE(0_0);
-RSExport void RSDataDeleteBytes(RSMutableDataRef data, RSRange rangeToDelete, RSIndex length) RS_AVAILABLE(0_0);
+RSExport void RSDataDeleteBytes(RSMutableDataRef data, RSRange rangeToDelete) RS_AVAILABLE(0_0);
 
 RSExport void RSDataAppend(RSMutableDataRef data, RSDataRef appendData) RS_AVAILABLE(0_0);
 RSExport void RSDataReplace(RSMutableDataRef data, RSRange rangeToReplace, RSDataRef replaceData) RS_AVAILABLE(0_0);

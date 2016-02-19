@@ -896,7 +896,7 @@ struct __RSXMLNode
     
     RSStringRef _name;
     RSTypeRef _objectValue;
-    
+    RSMutableArrayRef _children;
     struct __RSXMLNode *_parent;
 };
 
@@ -945,6 +945,14 @@ RSInline RSXMLNodeRef __RSXMLNodeGetParent(RSXMLNodeRef node) {
 RSInline void __RSXMLNodeSetParent(RSXMLNodeRef node, RSXMLNodeRef parent) {
     // FIXME: weak or strong?
     ((struct __RSXMLNode *)node)->_parent = (struct __RSXMLNode *)parent;
+}
+
+RSInline RSMutableArrayRef __RSXMLNodeGetChildren(RSXMLNodeRef node) {
+    return node->_children;
+}
+
+RSInline void __RSXMLNodeSetChildren(RSXMLNodeRef node, RSMutableArrayRef children) {
+    ((struct __RSXMLNode *)node)->_children = children;
 }
 
 static void __RSXMLNodeClassInit(RSTypeRef rs)
@@ -1110,7 +1118,11 @@ RSExport RSStringRef RSXMLNodeGetStringValue(RSXMLNodeRef node)
     return RSAutorelease(RSDescription(__RSXMLNodeGetValue(node)));
 }
 
-
+RSExport RSArrayRef RSXMLNodeGetChildren(RSXMLNodeRef node) {
+    if (!node) return nil;
+    __RSXMLNodeGenericValidInstance(node);
+    return __RSXMLNodeGetChildren(node);
+}
 
 #pragma mark -
 #pragma mark RSXMLElement
@@ -1118,9 +1130,16 @@ RSExport RSStringRef RSXMLNodeGetStringValue(RSXMLNodeRef node)
 struct __RSXMLElement
 {
     struct __RSXMLNode _node;
-    RSMutableArrayRef _children;
     RSMutableDictionaryRef _attributes;
 };
+
+RSInline RSMutableArrayRef __RSXMLElementGetChildren(RSXMLElementRef element) {
+    return __RSXMLNodeGetChildren(&element->_node);
+}
+
+RSInline void __RSXMLElementSetChildren(RSXMLElementRef element, RSMutableArrayRef children) {
+    __RSXMLNodeSetChildren(&element->_node, children);
+}
 
 static void __RSXMLElementRemoveAllAttribtues(RSXMLElementRef element)
 {
@@ -1159,7 +1178,7 @@ static void __RSXMLElementClassDeallocate(RSTypeRef rs)
 {
     RSXMLElementRef element = (RSXMLElementRef)rs;
     if (element->_attributes) __RSXMLElementRemoveAllAttribtues(element);
-    if (element->_children) RSRelease(element->_children);
+    if (__RSXMLElementGetChildren(element)) RSRelease(__RSXMLElementGetChildren(element));
     __RSXMLNodeClassDeallocate(rs); // call super
 }
 
@@ -1213,9 +1232,9 @@ static RSStringRef __RSXMLElementClassDescription(RSTypeRef rs)
         });
     }
     RSMutableStringRef children = nil;
-    if (element->_children && RSArrayGetCount(element->_children)) {
+    if (__RSXMLElementGetChildren(element) && RSArrayGetCount(__RSXMLElementGetChildren(element))) {
         children = RSStringCreateMutable(RSAllocatorSystemDefault, 0);
-        RSArrayApplyBlock(element->_children, RSMakeRange(0, RSArrayGetCount(element->_children)), ^(RSTypeRef value, RSUInteger idx, BOOL *isStop) {
+        RSArrayApplyBlock(__RSXMLElementGetChildren(element), RSMakeRange(0, RSArrayGetCount(__RSXMLElementGetChildren(element))), ^(RSTypeRef value, RSUInteger idx, BOOL *isStop) {
             RSXMLElementRef element = (RSXMLElementRef)value;
             RSStringRef description = RSDescription(element);
             if (description) {
@@ -1226,13 +1245,13 @@ static RSStringRef __RSXMLElementClassDescription(RSTypeRef rs)
         });
     }
     RSStringRef description = nil;
-    if (element->_attributes && (element->_children && RSArrayGetCount(element->_children))) {
+    if (element->_attributes && (__RSXMLElementGetChildren(element) && RSArrayGetCount(__RSXMLElementGetChildren(element)))) {
         description = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<%r %r>%r</%r>"), __RSXMLNodeGetName((RSXMLNodeRef)element), attributes, children, __RSXMLNodeGetName((RSXMLNodeRef)element));
     } else if (element->_attributes && element->_node._objectValue) {
         description = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<%r %r>%r</%r>"), __RSXMLNodeGetName((RSXMLNodeRef)element), attributes, element->_node._objectValue, __RSXMLNodeGetName((RSXMLNodeRef)element));
     } else if (element->_attributes) {
         description = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<%r %r></%r>"), __RSXMLNodeGetName((RSXMLNodeRef)element), attributes, __RSXMLNodeGetName((RSXMLNodeRef)element));
-    } else if ((element->_children && RSArrayGetCount(element->_children))) {
+    } else if ((__RSXMLElementGetChildren(element) && RSArrayGetCount(__RSXMLElementGetChildren(element)))) {
         description = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<%r>%r</%r>"), __RSXMLNodeGetName((RSXMLNodeRef)element), children, __RSXMLNodeGetName((RSXMLNodeRef)element));
     } else if (element->_node._objectValue) {
         description = RSStringCreateWithFormat(RSAllocatorSystemDefault, RSSTR("<%r>%r</%r>"), __RSXMLNodeGetName((RSXMLNodeRef)element), element->_node._objectValue, __RSXMLNodeGetName((RSXMLNodeRef)element));
@@ -1339,10 +1358,10 @@ RSExport void RSXMLElementSetAttributes(RSXMLElementRef element, RSArrayRef attr
 
 static RSMutableArrayRef __RSXMLElementGetElementsForName(RSXMLElementRef element, RSMutableArrayRef stores, RSStringRef name)
 {
-    if (!element->_children) return stores;
-    RSUInteger cnt = RSArrayGetCount(element->_children);
+    if (!__RSXMLElementGetChildren(element)) return stores;
+    RSUInteger cnt = RSArrayGetCount(__RSXMLElementGetChildren(element));
     
-    RSArrayApplyBlock(element->_children, RSMakeRange(0, cnt), ^(const void *value, RSUInteger idx, BOOL *isStop) {
+    RSArrayApplyBlock(__RSXMLElementGetChildren(element), RSMakeRange(0, cnt), ^(const void *value, RSUInteger idx, BOOL *isStop) {
         if (RSEqual(__RSXMLNodeGetName((RSXMLNodeRef)value), name)) {
             RSArrayAddObject(stores, value);
         }
@@ -1365,9 +1384,9 @@ RSExport void RSXMLElementInsertChild(RSXMLElementRef element, RSXMLNodeRef chil
 {
     __RSGenericValidInstance(element, _RSXMLElementTypeID);
     if (!child) return;
-    if (!element->_children) ((struct __RSXMLElement *)element)->_children = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
-    if (element->_children) {
-        RSArrayInsertObjectAtIndex(element->_children, atIndex, child);
+    if (!__RSXMLElementGetChildren(element)) __RSXMLElementSetChildren(element, RSArrayCreateMutable(RSAllocatorSystemDefault, 0));
+    if (__RSXMLElementGetChildren(element)) {
+        RSArrayInsertObjectAtIndex(__RSXMLElementGetChildren(element), atIndex, child);
     }
 }
 
@@ -1375,11 +1394,11 @@ RSExport void RSXMLElementInsertChildren(RSXMLElementRef element, RSArrayRef chi
 {
     __RSGenericValidInstance(element, _RSXMLElementTypeID);
     if (!children || !RSArrayGetCount(children)) return;
-    if (!element->_children) ((struct __RSXMLElement *)element)->_children = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
-    if (element->_children) {
+    if (!__RSXMLElementGetChildren(element)) __RSXMLElementSetChildren(element, RSArrayCreateMutable(RSAllocatorSystemDefault, 0));
+    if (__RSXMLElementGetChildren(element)) {
         RSUInteger cnt = RSArrayGetCount(children);
         for (RSUInteger idx = 0; idx < cnt; idx++) {
-            RSArrayInsertObjectAtIndex(element->_children, atIndex + idx, RSArrayObjectAtIndex(children, idx));
+            RSArrayInsertObjectAtIndex(__RSXMLElementGetChildren(element), atIndex + idx, RSArrayObjectAtIndex(children, idx));
         }
     }
 }
@@ -1388,34 +1407,34 @@ RSExport void RSXMLElementRemoveChild(RSXMLElementRef element, RSXMLNodeRef chil
 {
     __RSGenericValidInstance(element, _RSXMLElementTypeID);
     if (!child) return;
-    if (!element->_children) ((struct __RSXMLElement *)element)->_children = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
-    if (element->_children) {
-        RSArrayRemoveObjectAtIndex(element->_children, atIndex);
+    if (!__RSXMLElementGetChildren(element)) __RSXMLElementSetChildren(element, RSArrayCreateMutable(RSAllocatorSystemDefault, 0));
+    if (__RSXMLElementGetChildren(element)) {
+        RSArrayRemoveObjectAtIndex(__RSXMLElementGetChildren(element), atIndex);
     }
 }
 
 RSExport void RSXMLElementSetChildren(RSXMLElementRef element, RSArrayRef children)
 {
     __RSGenericValidInstance(element, _RSXMLElementTypeID);
-    if (element->_children) RSRelease(element->_children);
-    ((struct __RSXMLElement *)element)->_children = nil;
-    if (children) ((struct __RSXMLElement *)element)->_children = RSMutableCopy(RSAllocatorSystemDefault, children);
+    if (__RSXMLElementGetChildren(element)) RSRelease(__RSXMLElementGetChildren(element));
+    __RSXMLElementSetChildren(element, nil);
+    if (children) __RSXMLElementSetChildren(element, RSMutableCopy(RSAllocatorSystemDefault, children));
 }
 
 RSExport void RSXMLElementAddChild(RSXMLElementRef element, RSXMLNodeRef child)
 {
     __RSGenericValidInstance(element, _RSXMLElementTypeID);
     if (!child) return;
-    if (!element->_children) ((struct __RSXMLElement *)element)->_children = RSArrayCreateMutable(RSAllocatorSystemDefault, 1);
-    RSArrayAddObject(element->_children, child);
+    if (!__RSXMLElementGetChildren(element)) __RSXMLElementSetChildren(element, RSArrayCreateMutable(RSAllocatorSystemDefault, 0));
+    RSArrayAddObject(__RSXMLElementGetChildren(element), child);
 }
 
 RSExport void RSXMLElementReplaceChild(RSXMLElementRef element, RSXMLNodeRef child, RSIndex atIndex)
 {
     __RSGenericValidInstance(element, _RSXMLElementTypeID);
     if (!child) return;
-    if (!element->_children || !RSArrayGetCount(element->_children)) return;
-    RSArrayReplaceObject(element->_children, RSMakeRange(atIndex, 1), (RSTypeRef *)&child, 1);
+    if (!__RSXMLElementGetChildren(element) || !RSArrayGetCount(__RSXMLElementGetChildren(element))) return;
+    RSArrayReplaceObject(__RSXMLElementGetChildren(element), RSMakeRange(atIndex, 1), (RSTypeRef *)&child, 1);
 }
 
 #pragma mark -
@@ -1424,9 +1443,16 @@ RSExport void RSXMLElementReplaceChild(RSXMLElementRef element, RSXMLNodeRef chi
 struct __RSXMLDocument
 {
     struct __RSXMLNode _node;
-    RSMutableArrayRef _children;
     RSXMLElementRef _rootElement;
 };
+
+RSInline RSMutableArrayRef __RSXMLDocumentGetChildren(RSXMLDocumentRef document) {
+    return document->_node._children;
+}
+
+RSInline void ___RSXMLDocumentSetChildren(RSXMLDocumentRef document, RSMutableArrayRef children) {
+    ((struct __RSXMLDocument *)document)->_node._children = children;
+}
 
 RSInline RSXMLElementRef __RSXMLDocumentGetRootElement(RSXMLDocumentRef document)
 {
@@ -1442,7 +1468,7 @@ RSInline void __RSXMLDocumentSetRootElement(RSXMLDocumentRef document, RSXMLElem
 
 static void __RSXMLDocumentInsertChild(RSXMLDocumentRef document, RSXMLNodeRef child, RSIndex atIndex)
 {
-    RSArrayInsertObjectAtIndex(document->_children, atIndex, child);
+    RSArrayInsertObjectAtIndex(__RSXMLDocumentGetChildren(document), atIndex, child);
 }
 
 static void __RSXMLDocumentInsertChildren(RSXMLDocumentRef document, RSArrayRef children, RSIndex atIndex)
@@ -1456,25 +1482,25 @@ static void __RSXMLDocumentInsertChildren(RSXMLDocumentRef document, RSArrayRef 
 
 static void __RSXMLDocumentRemoveChild(RSXMLDocumentRef document, RSIndex atIndex)
 {
-    RSArrayRemoveObjectAtIndex(document->_children, atIndex);
+    RSArrayRemoveObjectAtIndex(__RSXMLDocumentGetChildren(document), atIndex);
 }
 
 static void __RSXMLDocumentSetChildren(RSXMLDocumentRef document, RSArrayRef children)
 {
-    if (document->_children) RSRelease(document->_children);
-    ((struct __RSXMLDocument *)document)->_children = nil;
-    if (children) ((struct __RSXMLDocument *)document)->_children = RSMutableCopy(RSAllocatorSystemDefault, children);
-    else ((struct __RSXMLDocument *)document)->_children = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
+    if (__RSXMLDocumentGetChildren(document)) RSRelease(__RSXMLDocumentGetChildren(document));
+    ___RSXMLDocumentSetChildren(document, nil);
+    if (children) ___RSXMLDocumentSetChildren(document, RSMutableCopy(RSAllocatorSystemDefault, children));
+    else ___RSXMLDocumentSetChildren(document, RSArrayCreateMutable(RSAllocatorSystemDefault, 0));
 }
 
 static void __RSXMLDocumentAddChild(RSXMLDocumentRef document, RSXMLNodeRef child)
 {
-    RSArrayAddObject(document->_children, child);
+    RSArrayAddObject(__RSXMLDocumentGetChildren(document), child);
 }
 
 static void __RSXMLDocumentReplaceChild(RSXMLDocumentRef document, RSXMLNodeRef child, RSIndex atIndex)
 {
-    RSArrayReplaceObject(document->_children, RSMakeRange(atIndex, 1), (RSTypeRef *)&child, 1);
+    RSArrayReplaceObject(__RSXMLDocumentGetChildren(document), RSMakeRange(atIndex, 1), (RSTypeRef *)&child, 1);
 }
 
 static void __RSXMLDocumentClassInit(RSTypeRef rs)
@@ -1482,7 +1508,7 @@ static void __RSXMLDocumentClassInit(RSTypeRef rs)
     // call super
     __RSXMLNodeClassInit(rs);
     RSXMLDocumentRef document = (RSXMLDocumentRef)rs;
-    ((struct __RSXMLDocument *)document)->_children = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
+    __RSXMLDocumentSetChildren(document, nil); // init children = empty mutable array
 }
 
 static RSTypeRef __RSXMLDocumentClassCopy(RSAllocatorRef allocator, RSTypeRef rs, BOOL mutableCopy)
@@ -1493,9 +1519,9 @@ static RSTypeRef __RSXMLDocumentClassCopy(RSAllocatorRef allocator, RSTypeRef rs
 static void __RSXMLDocumentClassDeallocate(RSTypeRef rs)
 {
     RSXMLDocumentRef document = (RSXMLDocumentRef)rs;
-    if (document->_children) RSRelease(document->_children);
+    if (__RSXMLDocumentGetChildren(document)) RSRelease(__RSXMLDocumentGetChildren(document));
+    ___RSXMLDocumentSetChildren(document, nil);
     if (document->_rootElement) RSRelease(document->_rootElement);
-    ((struct __RSXMLDocument *)document)->_children = nil;
     ((struct __RSXMLDocument *)document)->_rootElement = nil;
 }
 
@@ -1506,7 +1532,7 @@ static BOOL __RSXMLDocumentClassEqual(RSTypeRef rs1, RSTypeRef rs2)
     BOOL result = NO;
     
     result =  RSEqual(RSXMLDocument1->_rootElement, RSXMLDocument2->_rootElement);
-    if (result == YES) result = RSEqual(RSXMLDocument1->_children, RSXMLDocument2->_children);
+    if (result == YES) result = RSEqual(__RSXMLDocumentGetChildren(RSXMLDocument1), __RSXMLDocumentGetChildren(RSXMLDocument2));
     return result;
 }
 
@@ -2478,7 +2504,7 @@ static RSXMLNodeRef __RSHTMLCreateNodeFromGumboNode(GumboNode *gumboNode) {
             RSRelease(node);
         }
         GumboVector * cChildren = &gumboNode->v.element.children;
-        ((struct __RSXMLElement*)element)->_children = (RSMutableArrayRef)__RSHTMLCreateArrayOfNodesFromGumboVector(cChildren, (RSXMLNodeRef)element);
+        __RSXMLElementSetChildren(element, (RSMutableArrayRef)__RSHTMLCreateArrayOfNodesFromGumboVector(cChildren, (RSXMLNodeRef)element));
         node  = (RSXMLNodeRef)element;
     } else {
         if (gumboNode->type != GUMBO_NODE_WHITESPACE) {

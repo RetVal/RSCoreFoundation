@@ -22,6 +22,7 @@ RSExport void RSXMLNodeSetObjectValue(RSXMLNodeRef node, RSTypeRef value);
 RSExport RSXMLNodeRef RSXMLNodeGetParent(RSXMLNodeRef node);
 RSExport RSUInteger RSXMLNodeGetNodeTypeId(RSXMLNodeRef node);
 RSExport RSStringRef RSXMLNodeGetStringValue(RSXMLNodeRef node);
+RSExport RSArrayRef RSXMLNodeGetChildren(RSXMLNodeRef node);
 
 typedef const struct __RSXMLElement *RSXMLElementRef;
 

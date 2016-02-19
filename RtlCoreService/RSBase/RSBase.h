@@ -6,8 +6,8 @@
 //  Copyright (c) 2012 RetVal. All rights reserved.
 //
 
-#ifndef RSCoreFoundation_RSBase_h
-#define RSCoreFoundation_RSBase_h
+#ifndef __RSBASE__
+#define __RSBASE__
 #include <RSCoreFoundation/RSBaseType.h>
 #include <RSCoreFoundation/RSAllocator.h>
 #include <RSCoreFoundation/RSArray.h>

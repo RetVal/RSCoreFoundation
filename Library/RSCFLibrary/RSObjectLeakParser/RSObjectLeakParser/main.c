@@ -59,6 +59,9 @@ static void parser(RSMutableDictionaryRef map, RSDataRef data) {
 
 int main(int argc, const char * argv[]) {
     RSStringRef resultPath = RSSTR("~/Desktop/leak.plist");
+    if (argc == 3) {
+        resultPath = RSStringWithUTF8String(argv[2]);
+    }
     RSMutableDictionaryRef map = RSDictionaryCreateMutable(RSAllocatorDefault, 0, RSDictionaryRSTypeContext);
     RSDataRef data = RSDataCreateWithContentOfPath(RSAllocatorDefault, RSStringWithUTF8String(argv[1]));
     parser(map, data);

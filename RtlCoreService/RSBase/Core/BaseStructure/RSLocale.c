@@ -3227,7 +3227,7 @@ static bool __RSLocaleCopyUsesMetric(RSLocaleRef locale, bool user, RSTypeRef *c
     *cf = us ? RSRetain(RSBooleanFalse) : RSRetain(RSBooleanTrue);
     return YES;
 #else
-    *cf = RSRetain(RSBOOLFalse);
+    *cf = RSRetain(RSBooleanFalse);
     return YES;
 #endif
 }

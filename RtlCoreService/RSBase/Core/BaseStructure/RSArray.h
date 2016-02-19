@@ -10,9 +10,24 @@
 #define RSCoreFoundation_RSArray_h
 
 #include <RSCoreFoundation/RSBase.h>
+
 RS_EXTERN_C_BEGIN
 typedef const struct __RSArray* RSArrayRef;
 typedef struct __RSArray * RSMutableArrayRef;
+
+#include <RSCoreFoundation/RSString.h>
+
+typedef const void *	(*RSArrayRetainCallBack)(RSAllocatorRef allocator, const void *value);
+typedef void		(*RSArrayReleaseCallBack)(RSAllocatorRef allocator, const void * RS_RELEASES_ARGUMENT value);
+typedef RSStringRef	(*RSArrayCopyDescriptionCallBack)(const void *value);
+typedef BOOL		(*RSArrayEqualCallBack)(const void *value1, const void *value2);
+typedef struct {
+    RSIndex				version;
+    RSArrayRetainCallBack		retain;
+    RSArrayReleaseCallBack		release;
+    RSArrayCopyDescriptionCallBack	copyDescription;
+    RSArrayEqualCallBack		equal;
+} RSArrayCallBacks;
 
 /*! @function RSArrayGetTypeID
  @abstract Return the RSTypeID type id.
@@ -39,6 +54,8 @@ RSExport RSArrayRef RSArrayCreateWithObject(RSAllocatorRef allocator, RSTypeRef 
  @result A RSArrayRef a new array object.
  */
 RSExport RSArrayRef RSArrayCreateWithObjects(RSAllocatorRef allocator, RSTypeRef* objects, RSIndex count) RS_AVAILABLE(0_0);
+
+RSExport RSArrayRef RSArrayCreateWithCallBacks(RSAllocatorRef allocator, const void **values, RSIndex numObjects, const RSArrayCallBacks *cb) RS_AVAILABLE(0_5);
 
 RSExport RSArrayRef RSArrayCreateWithObjectsNoCopy(RSAllocatorRef allocator, RSTypeRef* objects, RSIndex count, BOOL freeWhenDone) RS_AVAILABLE(0_0);
 
@@ -147,7 +164,7 @@ RSExport void       RSArrayReplaceObject(RSMutableArrayRef array, RSRange range,
  @result RSIndex.
  */
 RSExport RSIndex    RSArrayIndexOfObject(RSArrayRef array, RSTypeRef obj) RS_AVAILABLE(0_0);
-
+RSExport RSIndex RSArrayGetFirstIndexOfObject(RSArrayRef array, RSRange range, const void *value) RS_AVAILABLE(0_0);
 /*! @function RSArrayExchangeObjectsAtIndices
  @abstract Return nothing.
  @discussion This function exchange objects at two given indexes

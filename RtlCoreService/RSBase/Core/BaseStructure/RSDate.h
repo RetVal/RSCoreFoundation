@@ -39,5 +39,19 @@ RSExport RSBitU32 RSAbsoluteTimeGetDayOfWeek(RSAbsoluteTime at, RSTimeZoneRef tz
 RSExport RSBitU32 RSAbsoluteTimeGetDayOfYear(RSAbsoluteTime at, RSTimeZoneRef tz) RS_AVAILABLE(0_0);
 RSExport RSBitU32 RSAbsoluteTimeGetWeekOfYear(RSAbsoluteTime at, RSTimeZoneRef tz) RS_AVAILABLE(0_0);
 RSExport RSUInteger RSDateGetDayOfWeek(RSDateRef date) RS_AVAILABLE(0_0);
+
+
+enum {
+    RSGregorianUnitsYears = (1UL << 0),
+    RSGregorianUnitsMonths = (1UL << 1),
+    RSGregorianUnitsDays = (1UL << 2),
+    RSGregorianUnitsHours = (1UL << 3),
+    RSGregorianUnitsMinutes = (1UL << 4),
+    RSGregorianUnitsSeconds = (1UL << 5),
+    RSGregorianAllUnits = 0x00FFFFFF
+};
+typedef RSOptionFlags RSGregorianUnitFlags;
+
+RSExport BOOL RSGregorianDateIsValid(RSGregorianDate gdate, RSGregorianUnitFlags unitFlags) RS_AVAILABLE(0_5);
 RS_EXTERN_C_END
 #endif
