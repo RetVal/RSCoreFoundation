@@ -50,7 +50,7 @@ RSExport RSCharacterSetRef RSCharacterSetGetPredefined(RSCharacterSetPredefinedS
 /*!
  @function RSCharacterSetCreateWithCharactersInRange
  Creates a new immutable character set with the values from the given range.
- @param alloc The RSAllocator which should be used to allocate
+ @param allocator The RSAllocator which should be used to allocate
  memory for the array and its storage for values. This
  parameter may be nil in which case the current default
  RSAllocator is used. If this reference is not a valid
@@ -63,12 +63,12 @@ RSExport RSCharacterSetRef RSCharacterSetGetPredefined(RSCharacterSetPredefinedS
  point, the behavior is undefined.
  @result A reference to the new immutable RSCharacterSet.
  */
-RSExport RSCharacterSetRef RSCharacterSetCreateWithCharactersInRange(RSAllocatorRef alloc, RSRange theRange);
+RSExport RSCharacterSetRef RSCharacterSetCreateWithCharactersInRange(RSAllocatorRef allocator, RSRange theRange);
 
 /*!
  @function RSCharacterSetCreateWithCharactersInString
  Creates a new immutable character set with the values in the given string.
- @param alloc The RSAllocator which should be used to allocate
+ @param allocator The RSAllocator which should be used to allocate
  memory for the array and its storage for values. This
  parameter may be nil in which case the current default
  RSAllocator is used. If this reference is not a valid
@@ -79,12 +79,12 @@ RSExport RSCharacterSetRef RSCharacterSetCreateWithCharactersInRange(RSAllocator
  is undefined.
  @result A reference to the new immutable RSCharacterSet.
  */
-RSExport RSCharacterSetRef RSCharacterSetCreateWithCharactersInString(RSAllocatorRef alloc, RSStringRef theString);
+RSExport RSCharacterSetRef RSCharacterSetCreateWithCharactersInString(RSAllocatorRef allocator, RSStringRef theString);
 
 /*!
  @function RSCharacterSetCreateWithBitmapRepresentation
  Creates a new immutable character set with the bitmap representtion in the given data.
- @param alloc The RSAllocator which should be used to allocate
+ @param allocator The RSAllocator which should be used to allocate
  memory for the array and its storage for values. This
  parameter may be nil in which case the current default
  RSAllocator is used. If this reference is not a valid
@@ -106,12 +106,12 @@ RSExport RSCharacterSetRef RSCharacterSetCreateWithCharactersInString(RSAllocato
  (1 to 16), the behavior is undefined.
  @result A reference to the new immutable RSCharacterSet.
  */
-RSExport RSCharacterSetRef RSCharacterSetCreateWithBitmapRepresentation(RSAllocatorRef alloc, RSDataRef theData);
+RSExport RSCharacterSetRef RSCharacterSetCreateWithBitmapRepresentation(RSAllocatorRef allocator, RSDataRef theData);
 
 /*!
  @function RSCharacterSetCreateInvertedSet
  Creates a new immutable character set that is the invert of the specified character set.
- @param alloc The RSAllocator which should be used to allocate
+ @param allocator The RSAllocator which should be used to allocate
  memory for the array and its storage for values. This
  parameter may be nil in which case the current default
  RSAllocator is used. If this reference is not a valid
@@ -121,7 +121,7 @@ RSExport RSCharacterSetRef RSCharacterSetCreateWithBitmapRepresentation(RSAlloca
  undefined.
  @result A reference to the new immutable RSCharacterSet.
  */
-RSExport RSCharacterSetRef RSCharacterSetCreateInvertedSet(RSAllocatorRef alloc, RSCharacterSetRef theSet);
+RSExport RSCharacterSetRef RSCharacterSetCreateInvertedSet(RSAllocatorRef allocator, RSCharacterSetRef theSet);
 
 /*!
  @function RSCharacterSetIsSupersetOfSet
@@ -154,7 +154,7 @@ RSExport BOOL RSCharacterSetHasMemberInPlane(RSCharacterSetRef theSet, RSIndex t
  RSAllocator, the behavior is undefined.
  @result A reference to the new mutable RSCharacterSet.
  */
-RSExport RSMutableCharacterSetRef RSCharacterSetCreateMutable(RSAllocatorRef alloc);
+RSExport RSMutableCharacterSetRef RSCharacterSetCreateMutable(RSAllocatorRef allocator);
 
 /*!
  @function RSCharacterSetCreateCopy
@@ -169,7 +169,7 @@ RSExport RSMutableCharacterSetRef RSCharacterSetCreateMutable(RSAllocatorRef all
  undefined.
  @result A reference to the new RSCharacterSet.
  */
-RSExport RSCharacterSetRef RSCharacterSetCreateCopy(RSAllocatorRef alloc, RSCharacterSetRef theSet);
+RSExport RSCharacterSetRef RSCharacterSetCreateCopy(RSAllocatorRef allocator, RSCharacterSetRef theSet);
 
 /*!
  @function RSCharacterSetCreateMutableCopy
@@ -184,7 +184,7 @@ RSExport RSCharacterSetRef RSCharacterSetCreateCopy(RSAllocatorRef alloc, RSChar
  undefined.
  @result A reference to the new mutable RSCharacterSet.
  */
-RSExport RSMutableCharacterSetRef RSCharacterSetCreateMutableCopy(RSAllocatorRef alloc, RSCharacterSetRef theSet);
+RSExport RSMutableCharacterSetRef RSCharacterSetCreateMutableCopy(RSAllocatorRef allocator, RSCharacterSetRef theSet);
 
 /*!
  @function RSCharacterSetIsCharacterMember
@@ -226,7 +226,7 @@ RSExport BOOL RSCharacterSetIsLongCharacterMember(RSCharacterSetRef theSet, UTF3
  behavior is undefined.
  @result A reference to the new immutable RSData.
  */
-RSExport RSDataRef RSCharacterSetCreateBitmapRepresentation(RSAllocatorRef alloc, RSCharacterSetRef theSet);
+RSExport RSDataRef RSCharacterSetCreateBitmapRepresentation(RSAllocatorRef allocator, RSCharacterSetRef theSet);
 
 /*!
  @function RSCharacterSetAddCharactersInRange

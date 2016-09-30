@@ -2780,7 +2780,7 @@ RSInline void __RSSocketEstablishAddress(RSSocketRef s) {
     /* socket should already be locked */
     uint8_t name[MAX_SOCKADDR_LEN];
     int namelen = sizeof(name);
-    if (__RSSocketIsValid(s) && nil == s->_address && INVALID_SOCKET != s->_socket && 0 == getsockname(s->_socket, (struct sockaddr *)name, (socklen_t *)&namelen) && nil != name && 0 < namelen) {
+    if (__RSSocketIsValid(s) && nil == s->_address && INVALID_SOCKET != s->_socket && 0 == getsockname(s->_socket, (struct sockaddr *)name, (socklen_t *)&namelen) && 0 < namelen) {
         s->_address = RSDataCreate(RSGetAllocator(s), name, namelen);
     }
 }
@@ -2789,7 +2789,7 @@ RSInline void __RSSocketEstablishPeerAddress(RSSocketRef s) {
     /* socket should already be locked */
     uint8_t name[MAX_SOCKADDR_LEN];
     int namelen = sizeof(name);
-    if (__RSSocketIsValid(s) && nil == s->_peerAddress && INVALID_SOCKET != s->_socket && 0 == getpeername(s->_socket, (struct sockaddr *)name, (socklen_t *)&namelen) && nil != name && 0 < namelen) {
+    if (__RSSocketIsValid(s) && nil == s->_peerAddress && INVALID_SOCKET != s->_socket && 0 == getpeername(s->_socket, (struct sockaddr *)name, (socklen_t *)&namelen) && 0 < namelen) {
         s->_peerAddress = RSDataCreate(RSGetAllocator(s), name, namelen);
     }
 }
@@ -2957,7 +2957,7 @@ static void __RSSocketInitializeSockets(void) {
     __RSSocketInitializeWinSock_Guts();
 #endif
     if (0 > __RSSocketCreateWakeupSocketPair()) {
-        RSLog(RSLogLevelWarning, RSSTR("*** Could not create wakeup socket pair for RSSocket!!!"));
+        RSLog(RSSTR("*** Could not create wakeup socket pair for RSSocket!!!"));
     } else {
         UInt32 yes = 1;
         /* wakeup sockets must be non-blocking */
@@ -3104,7 +3104,7 @@ static void __RSSocketHandleRead(RSSocketRef s, BOOL causedByTimeout)
             return;
         }
         __RSSocketSetReadSignalled(s);
-        if (nil != name && 0 < namelen) {
+        if (0 < namelen) {
             //??? possible optimizations:  uniquing; storing last value
             address = RSDataCreate(RSGetAllocator(s), name, namelen);
         } else if (__RSSocketIsConnectionOriented(s)) {
@@ -3120,9 +3120,9 @@ static void __RSSocketHandleRead(RSSocketRef s, BOOL causedByTimeout)
         if (nil == s->_addressQueue) {
             s->_addressQueue = RSArrayCreateMutable(RSGetAllocator(s), 0);
         }
-        RSArrayRemoveObjectAtIndex(s->_dataQueue, data);
+        RSArrayAddObject(s->_dataQueue, data);
         RSRelease(data);
-        RSArrayRemoveObjectAtIndex(s->_addressQueue, address);
+        RSArrayAddObject(s->_addressQueue, address);
         RSRelease(address);
         if (0 < recvlen
             && (s->_f.client & RSSocketDataCallBack) != 0 && (s->_f.disabled & RSSocketDataCallBack) == 0
@@ -3141,7 +3141,7 @@ static void __RSSocketHandleRead(RSSocketRef s, BOOL causedByTimeout)
             //??? should return error
             return;
         }
-        if (nil != name && 0 < namelen) {
+        if (0 < namelen) {
             address = RSDataCreate(RSGetAllocator(s), name, namelen);
         } else {
             address = (RSDataRef)RSRetain(zeroLengthData);
@@ -3160,8 +3160,8 @@ static void __RSSocketHandleRead(RSSocketRef s, BOOL causedByTimeout)
         if (nil == s->_addressQueue) {
             s->_addressQueue = RSArrayCreateMutable(RSGetAllocator(s), 0);
         }
-        RSArrayRemoveObjectAtIndex(s->_dataQueue, (void *)(uintptr_t)sock);
-        RSArrayRemoveObjectAtIndex(s->_addressQueue, address);
+        RSArrayAddObject(s->_dataQueue, (void *)(uintptr_t)sock);
+        RSArrayAddObject(s->_addressQueue, address);
         RSRelease(address);
         if ((s->_f.client & RSSocketAcceptCallBack) != 0 && (s->_f.disabled & RSSocketAcceptCallBack) == 0
             && __RSSocketIsScheduled(s)
@@ -3546,7 +3546,7 @@ manageSelectError()
 #if defined(LOG_RSSOCKET)
                 fprintf(stdout, "socket manager found write socket %d invalid\n", s->_socket);
 #endif
-                RSArrayRemoveObjectAtIndex(invalidSockets, s);
+                RSArrayAddObject(invalidSockets, s);
             }
         }
         cnt = RSArrayGetCount(__RSReadSockets);
@@ -3556,7 +3556,7 @@ manageSelectError()
 #if defined(LOG_RSSOCKET)
                 fprintf(stdout, "socket manager found read socket %d invalid\n", s->_socket);
 #endif
-                RSArrayRemoveObjectAtIndex(invalidSockets, s);
+                RSArrayAddObject(invalidSockets, s);
             }
         }
         
@@ -4214,7 +4214,7 @@ void __RSSocketEnableCallBacks(RSSocketRef s, RSOptionFlags callBackTypes, BOOL 
             if (turnOnWrite || turnOnConnect) {
                 if (force) {
                     RSIndex idx = RSArrayIndexOfObject(__RSWriteSockets, s);
-                    if (RSNotFound == idx) RSArrayRemoveObjectAtIndex(__RSWriteSockets, s);
+                    if (RSNotFound == idx) RSArrayAddObject(__RSWriteSockets, s);
                     //                     if (RSNotFound == idx) RSLog(5, RSSTR("__RSSocketEnableCallBacks: put %p in __RSWriteSockets list due to force and non-presence"), s);
                 }
                 if (__RSSocketSetFDForWrite(s)) wakeup = YES;
@@ -4222,7 +4222,7 @@ void __RSSocketEnableCallBacks(RSSocketRef s, RSOptionFlags callBackTypes, BOOL 
             if (turnOnRead) {
                 if (force) {
                     RSIndex idx = RSArrayIndexOfObject(__RSReadSockets, s);
-                    if (RSNotFound == idx) RSArrayRemoveObjectAtIndex(__RSReadSockets, s);
+                    if (RSNotFound == idx) RSArrayAddObject(__RSReadSockets, s);
                 }
                 if (__RSSocketSetFDForRead(s)) wakeup = YES;
             }
@@ -4247,7 +4247,7 @@ static void __RSSocketSchedule(void *info, RSRunLoopRef rl, RSStringRef mode) {
     if (__RSSocketIsValid(s)) {
         RSMutableArrayRef runLoopsOrig = s->_runLoops;
         RSMutableArrayRef runLoopsCopy = RSMutableCopy(RSAllocatorSystemDefault, s->_runLoops);
-        RSArrayRemoveObjectAtIndex(runLoopsCopy, rl);
+        RSArrayAddObject(runLoopsCopy, rl);
         s->_runLoops = runLoopsCopy;
         RSRelease(runLoopsOrig);
         s->_socketSetCount++;
@@ -4610,7 +4610,7 @@ RSSocketError RSSocketSetAddress(RSSocketRef s, RSDataRef address) {
         
         if (realLength != namelen) {
             // We got a different answer for length than was supplied by the caller. Fix it up so we don't end up truncating the path.
-            RSLog(RSLogLevelWarning, RSSTR("WARNING: The sun_len field of a sockaddr_un structure passed to RSSocketSetAddress was not set correctly using the SUN_LEN macro."));
+            RSLog(RSSTR("WARNING: The sun_len field of a sockaddr_un structure passed to RSSocketSetAddress was not set correctly using the SUN_LEN macro."));
             memcpy(newName, name, realLength);
             namelen = realLength;
             ((struct sockaddr_un *)newName)->sun_len = realLength;

@@ -110,8 +110,13 @@ typedef float RSFloat;
 #endif
 
 typedef double RSTimeInterval;
+
+#if __STDC_VERSION__ < 11
+
 typedef float  Float32;
 typedef double Float64;
+
+#endif
 
 typedef RSBit16 RSCode;
 
@@ -218,6 +223,8 @@ typedef void* RSMutableTypeRef;
 
 typedef RSTypeRef RSClassRef;
 
+#if __STDC_VERSION__ < 11
+
 typedef unsigned char                   UInt8;
 typedef signed char                     SInt8;
 typedef unsigned short                  UInt16;
@@ -239,6 +246,8 @@ typedef UInt8                           UTF8Char;
 typedef UniChar *                       UniCharPtr;
 typedef unsigned long                   UniCharCount;
 typedef UniCharCount *                  UniCharCountPtr;
+
+#endif 
 
 typedef RSTimeInterval RSAbsoluteTime;
 

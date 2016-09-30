@@ -51,7 +51,6 @@ RSExport RSCalendarRef RSCalendarCreateWithIndentifier(RSAllocatorRef allocator,
  @abstract Return a RSTimeZoneRef object.
  @discussion This function return a RSTimeZoneRef from a calendar.
  @param calendar a RSCalendarRef calendar.
- @param indentifier a RSStringRef indentifier of the calendar.
  @result A RSTimeZoneRef from calendar with retain.
  */
     
@@ -63,7 +62,6 @@ RSExport RSTimeZoneRef RSCalendarCopyTimeZone(RSCalendarRef calendar) RS_AVAILAB
  @discussion This function set the tz to the calendar.
  @param calendar a RSCalendarRef calendar.
  @param tz a RSTimeZone tz.
- @result void.
  */
 RSExport void RSCalendarSetTimeZone(RSCalendarRef calendar, RSTimeZoneRef tz) RS_AVAILABLE(0_0);
 

@@ -669,7 +669,7 @@ static void _wakeUpRunLoop(struct _RSStream *stream) {
                 for (idx = 0; idx < cnt; idx += 2) {
                     RSRunLoopRef value = (RSRunLoopRef)RSArrayObjectAtIndex(rlArray, idx);
                     RSStringRef currentMode = RSRunLoopCopyCurrentMode(value);
-                    if (nil != currentMode && RSEqual(currentMode, RSArrayObjectAtIndex(rlArray, idx + 1) && RSRunLoopIsWaiting(value))) {
+                    if (nil != currentMode && RSEqual(currentMode, RSArrayObjectAtIndex(rlArray, idx + 1)) && RSRunLoopIsWaiting(value)) {
                         RSRelease(currentMode);
                         rl = value;
                         break;
@@ -775,7 +775,7 @@ RSPrivate RSStreamStatus _RSStreamGetStatus(struct _RSStream *stream) {
                     }
                     _RSStreamSetStatusCode(stream, status);
                     if (status == RSStreamStatusOpen) {
-                        _RSStreamScheduleEvent(status, RSStreamEventOpenCompleted);
+                        _RSStreamScheduleEvent(stream, RSStreamEventOpenCompleted);
                     } else {
                         _RSStreamScheduleEvent(stream, RSStreamEventErrorOccurred);
                     }

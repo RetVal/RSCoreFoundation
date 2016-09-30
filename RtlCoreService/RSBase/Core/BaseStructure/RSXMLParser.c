@@ -2510,7 +2510,7 @@ static RSXMLNodeRef __RSHTMLCreateNodeFromGumboNode(GumboNode *gumboNode) {
         if (gumboNode->type != GUMBO_NODE_WHITESPACE) {
             const char *cText = gumboNode->v.text.text;
             RSStringRef text = RSStringCreateWithCString(RSAllocatorSystemDefault, cText, RSStringEncodingUTF8);
-            node = __RSXMLNodeCreateInstance(RSAllocatorSystemDefault, gumboNode->type, text, RSStringGetEmptyString());
+            node = __RSXMLNodeCreateInstance(RSAllocatorSystemDefault, (RSXMLNodeTypeId)gumboNode->type, text, RSStringGetEmptyString());
             RSRelease(text);
         }
     }

@@ -2938,7 +2938,7 @@ RSExport SInt32 RSURLGetPortNumber(RSURLRef  anURL) {
         RSStringInlineBuffer buf;
         RSStringInitInlineBuffer(port, &buf, RSMakeRange(0, length));
         idx = 0;
-        if (!__RSStringScanInteger(&buf, nil, (SInt32)&idx, NO, &portNum) || (idx != length)) {
+        if (!__RSStringScanInteger(&buf, nil, (SInt32 *)&idx, NO, &portNum) || (idx != length)) {
             portNum = -1;
         }
         RSRelease(port);
@@ -5137,8 +5137,8 @@ RSExport RSURLRef RSURLCreateFilePathURL(RSAllocatorRef alloc, RSURLRef url, RSE
         }
         if ( fsPath ) {
             RSStringRef urlPath = _replacePathIllegalCharacters( fsPath, alloc, YES );
-            newURLString = RSStringCreateWithFormat( alloc, RSSTR("file://%R%R%R%R"), (netLoc ? netLoc : RSSTR("")), urlPath, ((RSStringCompare(urlPath, RSSTR("/"), nil) != RSCompareEqualTo) ? (RSURLHasDirectoryPath( url ) ? RSSTR("/") : RSSTR("")) : RSSTR("")), (rSpec ? rSpec : RSSTR("")));
-            result = RSURLCreateWithString( alloc, newURLString, nil );
+            newURLString = RSStringCreateWithFormat( alloc, RSSTR("file://%R%R%R%R"), (netLoc ? netLoc : RSSTR("")), urlPath, ((RSStringCompare(urlPath, RSSTR("/"), 0) != RSCompareEqualTo) ? (RSURLHasDirectoryPath( url ) ? RSSTR("/") : RSSTR("")) : RSSTR("")), (rSpec ? rSpec : RSSTR("")));
+            result = RSURLCreateWithString(alloc, newURLString, nil);
             RSRelease( newURLString );
             RSRelease( urlPath );
             RSRelease( fsPath );

@@ -2551,8 +2551,8 @@ RSInline RSBasicHashBucket __RSBasicHashFindBucket(RSConstBasicHashRef ht, uintp
         }
     }
     HALT;
-    RSBasicHashBucket result = {RSNotFound, 0UL, 0UL, 0};
-    return result;
+//    RSBasicHashBucket result = {RSNotFound, 0UL, 0UL, 0};
+//    return result;
 }
 
 RSInline RSIndex __RSBasicHashFindBucket_NoCollision(RSConstBasicHashRef ht, uintptr_t stack_key, uintptr_t key_hash) {

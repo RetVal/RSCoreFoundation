@@ -498,7 +498,7 @@ static RSAutoreleasePoolRef __RSAutoreleasePoolCreateInstance(RSAllocatorRef all
     }
 //    int r __unused = pthread_key_init_np(__RSAutoreleasePoolThreadKey,
 //                                         tls_dealloc);
-    int r __unused = _RSSetTSD(__RSTSDKeyAutoreleaseData1, pool, tls_dealloc);
+    int32_t r __unused = (int32_t)_RSSetTSD(__RSTSDKeyAutoreleaseData1, pool, tls_dealloc);
     
 //    assert(r == 0);
     void* endptr __unused = __poolEnd(pool);

@@ -559,11 +559,6 @@ static BOOL __checkIfNumberString(const UniChar* numStr, RSUInteger length) {
     }
     return YES;
 }
-//<?xml version="1.0" encoding="UTF-8"?>
-//<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-//<plist version="1.0">
-//<date>2013-11-19T10:57:41Z</date>
-//</plist>
 
 static BOOL __unichar2i(UniChar *ptr, RSUInteger len, RSIndex *n) {
     if (!ptr || !n || 0 == len) return NO;

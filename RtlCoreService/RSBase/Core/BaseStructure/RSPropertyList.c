@@ -2739,7 +2739,7 @@ static RSTypeRef __RSPropertyListCore1(RSDataRef plistData, RSIndex* offset,__RS
                             case KEY_IX:
                                 __RSPlistHaltHandler("the key should not be in an array.", nil);
                                 goto PLIST_PARSE_RELEASE;
-                                if (previousTagIsKEYIX) return __RSPlistHaltHandler("the previous tag is not key.", nil);
+//                                if (previousTagIsKEYIX) return __RSPlistHaltHandler("the previous tag is not key.", nil);
                                 //if (key) RSStringReplace(key, RSMakeRange(0, RSStringGetLength(key)), RSSTR(""));
                                 previousTagIsKEYIX = YES;
                                 break;
@@ -2986,8 +2986,10 @@ static RSTypeRef __RSPropertyListCore0 (RSDataRef plistData, RSIndex* offset,__R
                                         goto PLIST_PARSE_RELEASE;
                                     }
                                 }
-                                else if (previousTagID != -1)
-                                    return __RSPlistHaltHandler("plist tag is not available.", nil);
+                                else if (previousTagID != -1) {
+                                    __RSPlistHaltHandler("plist tag is not available.", nil);
+                                    return nil;
+                                }
                                 previousTagIsKEYIX = NO;
                                 break;
                             case ARRAY_IX:
@@ -3043,7 +3045,10 @@ static RSTypeRef __RSPropertyListCore0 (RSDataRef plistData, RSIndex* offset,__R
                                 }
                                 break;
                             case KEY_IX:
-                                if (previousTagIsKEYIX) return __RSPlistHaltHandler("previous tag is not key tag.", nil);
+                                if (previousTagIsKEYIX) {
+                                    __RSPlistHaltHandler("previous tag is not key tag.", nil);
+                                    return nil;
+                                }
                                 if (key) RSRelease(key);
                                 key = RSStringCreateMutable(RSAllocatorSystemDefault, 32);
                                 previousTagIsKEYIX = YES;

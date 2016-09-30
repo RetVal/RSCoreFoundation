@@ -255,7 +255,7 @@ static void __RSDebugLevelInitialize()
 #endif
 }
 
-static void __RSDebugLevelDeallocate()
+RSPrivate void __RSDebugLevelDeallocate()
 {
 	unsigned long long org = lseek(____RSRuntimeDebugLevelLogContext._handle, 0, SEEK_CUR);
     lseek(____RSRuntimeDebugLevelLogContext._handle, 0, SEEK_END);

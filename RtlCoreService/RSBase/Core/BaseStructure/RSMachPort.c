@@ -324,7 +324,7 @@ static void __RSMachPortChecker(BOOL fromTimer) {
         kern_return_t ret = mach_port_type(mach_task_self(), port, &type);
         if (KERN_SUCCESS != ret || (0 == (type & MACH_PORT_TYPE_PORT_RIGHTS))) {
             if (type & ~MACH_PORT_TYPE_DEAD_NAME) {
-                RSLog(RSLogLevelError, RSSTR("*** RSMachPortCreateWithPort(): bad Mach port parameter (0x%lx) or unsupported mysterious kind of Mach port (%d, %ld)"), (unsigned long)port, ret, (unsigned long)type);
+                RSLog(RSSTR("*** RSMachPortCreateWithPort(): bad Mach port parameter (0x%lx) or unsupported mysterious kind of Mach port (%d, %ld)"), (unsigned long)port, ret, (unsigned long)type);
             }
             return NULL;
         }
@@ -539,7 +539,7 @@ static void __RSMachPortChecker(BOOL fromTimer) {
             mach_port_type_t type = 0;
             kern_return_t ret = mach_port_type(mach_task_self(), mp->_port, &type);
             if (KERN_SUCCESS != ret || 0 == (type & MACH_PORT_TYPE_SEND_RIGHTS)) {
-                RSLog(RSLogLevelError, RSSTR("*** WARNING: RSMachPortSetInvalidationCallBack() called on a RSMachPort with a Mach port (0x%x) which does not have any send rights.  This is not going to work.  Callback function: %p"), mp->_port, callout);
+                RSLog(RSSTR("*** WARNING: RSMachPortSetInvalidationCallBack() called on a RSMachPort with a Mach port (0x%x) which does not have any send rights.  This is not going to work.  Callback function: %p"), mp->_port, callout);
             }
         }
         RSSpinLockLock(&mp->_lock);
@@ -550,7 +550,7 @@ static void __RSMachPortChecker(BOOL fromTimer) {
             callout(mp, mp->_context.info);
             RSSpinLockLock(&mp->_lock);
         } else {
-            RSLog(RSLogLevelWarning, RSSTR("RSMachPortSetInvalidationCallBack(): attempt to set invalidation callback (%p) on invalid RSMachPort (%p) thwarted"), callout, mp);
+            RSLog(RSSTR("RSMachPortSetInvalidationCallBack(): attempt to set invalidation callback (%p) on invalid RSMachPort (%p) thwarted"), callout, mp);
         }
         RSSpinLockUnlock(&mp->_lock);
     }

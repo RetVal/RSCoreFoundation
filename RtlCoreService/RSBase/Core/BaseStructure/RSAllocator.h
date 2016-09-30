@@ -37,7 +37,6 @@ RSAllocatorRef RSAllocatorGetDefault() RS_AVAILABLE(0_0);
  @abstract Return nothing.
  @discussion This function set a new allocator as the default allocator, if push nil, the RSAllocatorDefault will be set.
  @param allocator The RSAllocatorRef object.
- @result void.
  */
 void RSAllocatorSetDefault(RSAllocatorRef allocator) RS_AVAILABLE(0_0);
 void *RSAllocatorAllocate(RSAllocatorRef allocator, RSIndex size) __attribute__ ((__malloc__));

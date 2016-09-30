@@ -67,8 +67,8 @@ static RSStringRef __RSDistributedModuleClassDescription(RSTypeRef rs)
 static RSRuntimeClass __RSDistributedModuleClass =
 {
     _RSRuntimeScannedObject,
-    "__RSDistributedModule",
     0,
+    "__RSDistributedModule",
     __RSDistributedModuleClassInit,
     __RSDistributedModuleClassCopy,
     __RSDistributedModuleClassDeallocate,

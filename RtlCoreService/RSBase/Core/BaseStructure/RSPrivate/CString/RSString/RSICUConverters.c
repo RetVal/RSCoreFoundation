@@ -169,7 +169,7 @@ static RSIndex __RSStringEncodingConverterReleaseICUConverter(UConverter *conver
                     RSIndex newSize = data->_numSlots + ICU_CONVERTER_SLOT_INCREMENT;
                     
                     if (newSize > ICU_CONVERTER_MAX_SLOT) { // something is terribly wrong
-                        RSLog(RSLogLevelError, RSSTR("Per-thread streaming ID for ICU converters exhausted. Ignoring..."));
+                        RSLog(RSSTR("Per-thread streaming ID for ICU converters exhausted. Ignoring..."));
                         ucnv_close(converter);
                         return 0;
                     }

@@ -429,7 +429,7 @@ RSPrivate RSStringEncoding __RSStringEncodingGetFromWindowsCodePage(uint16_t cod
         
 //        if (RSDictionaryGetValueIfPresent(mappingTable, (const void *)(uintptr_t)codepage, (const void **)&value))
 //            return (RSStringEncoding)value;
-        value = (uint32_t)RSDictionaryGetValue(mappingTable, codepage);
+        value = (uint32_t)RSDictionaryGetValue(mappingTable, (const void *)(uintptr_t)codepage);
         
         return (RSStringEncoding)value;
     }

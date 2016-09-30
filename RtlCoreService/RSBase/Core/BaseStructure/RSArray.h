@@ -76,7 +76,7 @@ RSExport RSMutableArrayRef RSArrayCreateMutable(RSAllocatorRef allocator, RSInde
  @abstract Return a RSMutableArrayRef object.
  @discussion This function return a RSMutableArrayRef object which is deep copy of array.
  @param allocator push RSAllocatorSystemDefault.
- @param capacity a initialize capacity for the mutable array.
+ @param array a initialize capacity for the mutable array.
  @result A RSMutableArrayRef a new mutable array object.
  */
 RSExport RSMutableArrayRef RSArrayCreateMutableCopy(RSAllocatorRef allocator, RSArrayRef array) RS_AVAILABLE(0_0);
@@ -115,7 +115,6 @@ RSExport RSTypeRef  RSArrayLastObject(RSArrayRef array) RS_AVAILABLE(0_0);
  @discussion This function add the object to the array.
  @param array a RSMutableArrayRef array.
  @param obj a RSTypeRef that add to the array, array will retain it.
- @result void.
  */
 RSExport void       RSArrayAddObject(RSMutableArrayRef array, RSTypeRef obj) RS_AVAILABLE(0_0);
 RSExport void       RSArrayAddObjects(RSMutableArrayRef array, RSArrayRef objects) RS_AVAILABLE(0_0);
@@ -125,7 +124,6 @@ RSExport void       RSArrayAddObjects(RSMutableArrayRef array, RSArrayRef object
  @discussion This function remove the object from the array.
  @param array a RSMutableArrayRef array.
  @param obj a RSTypeRef that want to remove from the array, array will release it.
- @result void.
  */
 RSExport void       RSArrayRemoveObject(RSMutableArrayRef array, RSTypeRef obj) RS_AVAILABLE(0_0);
 
@@ -133,7 +131,6 @@ RSExport void       RSArrayRemoveObject(RSMutableArrayRef array, RSTypeRef obj) 
  @abstract Return nothing.
  @discussion This function remove the last object from the array. if the array is empty, do nothing.
  @param array a RSMutableArrayRef array.
- @result void.
  */
 RSExport void       RSArrayRemoveLastObject(RSMutableArrayRef array) RS_AVAILABLE(0_0);
 
@@ -141,7 +138,6 @@ RSExport void       RSArrayRemoveLastObject(RSMutableArrayRef array) RS_AVAILABL
  @abstract Return nothing.
  @discussion This function remove all objects from the array. if the array is empty, do nothing.
  @param array a RSMutableArrayRef array.
- @result void.
  */
 RSExport void       RSArrayRemoveAllObjects(RSMutableArrayRef array) RS_AVAILABLE(0_0);
 
@@ -149,8 +145,7 @@ RSExport void       RSArrayRemoveAllObjects(RSMutableArrayRef array) RS_AVAILABL
  @abstract Return nothing.
  @discussion This function remove the object from the array.
  @param array a RSMutableArrayRef array.
- @param obj a RSTypeRef that want to remove from the array, array will release it.
- @result void.
+ @param idx a RSTypeRef that want to remove from the array, array will release it.
  */
 RSExport void       RSArrayRemoveObjectAtIndex(RSMutableArrayRef array, RSIndex idx) RS_AVAILABLE(0_0);
 
@@ -169,8 +164,7 @@ RSExport RSIndex RSArrayGetFirstIndexOfObject(RSArrayRef array, RSRange range, c
  @abstract Return nothing.
  @discussion This function exchange objects at two given indexes
  @param array a RSArrayRef array.
- @param idx1, idx2 two indexes
- @result void.
+ @param idx1 idx2 two indexes
  */
 RSExport void RSArrayExchangeObjectsAtIndices(RSMutableArrayRef array, RSIndex idx1, RSIndex idx2) RS_AVAILABLE(0_0);
 
@@ -178,9 +172,9 @@ RSExport void RSArrayExchangeObjectsAtIndices(RSMutableArrayRef array, RSIndex i
  @abstract Return nothing.
  @discussion This function use the comparator to sort the array.
  @param array a RSArrayRef array.
+ @param order a BOOL sort the array ascending or descending.
  @param comparator a RSComparatorFunction comparator.
- @param ascending a BOOL sort the array ascending or descending.
- @result void.
+ @param context user context
  */
 RSExport void RSArraySort(RSArrayRef array, RSComparisonOrder order, RSComparatorFunction comparator, void *context) RS_AVAILABLE(0_0);
 RSExport void RSArraySortUsingComparaotr(RSArrayRef array, RSComparisonResult (^comparator)(const void *val1, const void *val2)) RS_AVAILABLE(0_4);
@@ -190,7 +184,6 @@ RSExport void RSArraySortUsingComparaotr(RSArrayRef array, RSComparisonResult (^
  @param array a RSArrayRef array.
  @param range a RSRange range.
  @param obj a RSTypeRef* obj.
- @result void.
  */
 RSExport void RSArrayGetObjects(RSArrayRef array, RSRange range, RSTypeRef* obj) RS_AVAILABLE(0_0);
 typedef void (*RSArrayApplierFunction)(const void *value, void *context);
@@ -202,7 +195,6 @@ typedef void (*RSArrayApplierFunction)(const void *value, void *context);
  @param range a RSRange range.
  @param function RSArrayApplierFunction function.
  @param context void* context.
- @result void.
  */
 RSExport void RSArrayApplyFunction(RSArrayRef array, RSRange range, RSArrayApplierFunction function, void* context) RS_AVAILABLE(0_1);
 

@@ -417,7 +417,7 @@ static RSMessagePortRef __RSMessagePortCreateLocal(RSAllocatorRef allocator, RSS
                     native = RSMachPortCreateWithPort(allocator, mp, __RSMessagePortDummyCallback, &ctx, NULL);
                     __RSMessagePortSetExtraMachRef(memory);
                 } else {
-                    RSLog(RSLogLevelDebug, RSSTR("*** RSMessagePort: mach_port_insert_member() after bootstrap_check_in(): failed %d (0x%x) '%s', port = 0x%x, name = '%s'"), ret, ret, bootstrap_strerror(ret), mp, utfname);
+                    RSLog(RSSTR("*** RSMessagePort: mach_port_insert_member() after bootstrap_check_in(): failed %d (0x%x) '%s', port = 0x%x, name = '%s'"), ret, ret, bootstrap_strerror(ret), mp, utfname);
                     mach_port_destroy(mach_task_self(), mp);
                     RSAllocatorDeallocate(RSAllocatorSystemDefault, utfname);
                     // name is released by deallocation
@@ -438,7 +438,7 @@ static RSMessagePortRef __RSMessagePortCreateLocal(RSAllocatorRef allocator, RSS
             mp = RSMachPortGetPort(native);
             ret = bootstrap_register2(bs, (char *)utfname, mp, perPID ? BOOTSTRAP_PER_PID_SERVICE : 0);
             if (ret != KERN_SUCCESS) {
-                RSLog(RSLogLevelDebug, RSSTR("*** RSMessagePort: bootstrap_register(): failed %d (0x%x) '%s', port = 0x%x, name = '%s'\nSee /usr/include/servers/bootstrap_defs.h for the error codes."), ret, ret, bootstrap_strerror(ret), mp, utfname);
+                RSLog(RSSTR("*** RSMessagePort: bootstrap_register(): failed %d (0x%x) '%s', port = 0x%x, name = '%s'\nSee /usr/include/servers/bootstrap_defs.h for the error codes."), ret, ret, bootstrap_strerror(ret), mp, utfname);
                 RSMachPortInvalidate(native);
                 RSRelease(native);
                 RSAllocatorDeallocate(RSAllocatorSystemDefault, utfname);
@@ -534,7 +534,7 @@ static RSMessagePortRef __RSMessagePortCreateRemote(RSAllocatorRef allocator, RS
     memory->_port = NULL;
     memory->_replies = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryNilContext);
     memory->_convCounter = 0;
-    memory->_perPID = perPID ? pid : 0;
+    memory->_perPID = perPID ? (int32_t)pid : 0;
     memory->_replyPort = NULL;
     memory->_source = NULL;
     memory->_dispatchSource = NULL;
@@ -659,7 +659,7 @@ BOOL RSMessagePortSetName(RSMessagePortRef ms, RSStringRef name) {
             mp = RSMachPortGetPort(native);
             ret = bootstrap_register2(bs, (char *)utfname, mp, 0);
             if (ret != KERN_SUCCESS) {
-                RSLog(RSLogLevelDebug, RSSTR("*** RSMessagePort: bootstrap_register(): failed %d (0x%x) '%s', port = 0x%x, name = '%s'\nSee /usr/include/servers/bootstrap_defs.h for the error codes."), ret, ret, bootstrap_strerror(ret), mp, utfname);
+                RSLog(RSSTR("*** RSMessagePort: bootstrap_register(): failed %d (0x%x) '%s', port = 0x%x, name = '%s'\nSee /usr/include/servers/bootstrap_defs.h for the error codes."), ret, ret, bootstrap_strerror(ret), mp, utfname);
                 RSMachPortInvalidate(native);
                 RSRelease(native);
                 RSAllocatorDeallocate(RSAllocatorSystemDefault, utfname);
@@ -909,7 +909,7 @@ SInt32 RSMessagePortSendRequest(RSMessagePortRef remote, SInt32 msgid, RSDataRef
     }
     remote->_convCounter++;
     desiredReply = -remote->_convCounter;
-    sendmsg = __RSMessagePortCreateMessage(false, RSMachPortGetPort(remote->_port), (replyMode != NULL ? RSMachPortGetPort(remote->_replyPort) : MACH_PORT_NULL), -desiredReply, msgid, (data ? RSDataGetBytesPtr(data) : NULL), (data ? RSDataGetLength(data) : 0));
+    sendmsg = __RSMessagePortCreateMessage(false, RSMachPortGetPort(remote->_port), (replyMode != NULL ? RSMachPortGetPort(remote->_replyPort) : MACH_PORT_NULL), -desiredReply, msgid, (data ? RSDataGetBytesPtr(data) : NULL), (data ? (int32_t)RSDataGetLength(data) : 0));
     if (!sendmsg) {
         __RSMessagePortUnlock(remote);
         RSRelease(remote);
@@ -1090,7 +1090,7 @@ static void *__RSMessagePortPerform(void *msg, RSIndex size, RSAllocatorRef allo
             memmove(return_bytes, RSDataGetBytesPtr(returnData), return_len);
         }
     }
-    replymsg = __RSMessagePortCreateMessage(true, msgp->header.msgh_remote_port, MACH_PORT_NULL, -1 * (int32_t)msgp->header.msgh_id, msgid, return_bytes, return_len);
+    replymsg = __RSMessagePortCreateMessage(true, msgp->header.msgh_remote_port, MACH_PORT_NULL, -1 * (int32_t)msgp->header.msgh_id, msgid, return_bytes, (int32_t)return_len);
     if (1 == replymsg->body.msgh_descriptor_count) {
         MSGP1_FIELD(replymsg, ool).deallocate = true;
     }

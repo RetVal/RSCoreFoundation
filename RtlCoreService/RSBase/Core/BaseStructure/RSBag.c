@@ -910,7 +910,7 @@ void RSBagAddValue(RSMutableHashRef hc, const_any_pointer_t key)
     __RSGenericValidInstance(hc, __RSBagTypeID);
     RSAssert2(RSBasicHashIsMutable((RSBasicHashRef)hc), __RSLogAssertion, "%s(): immutable collection %p passed to mutating operation", __PRETTY_FUNCTION__, hc);
     if (!RSBasicHashIsMutable((RSBasicHashRef)hc)) {
-        RSLog(3, RSSTR("%s(): immutable collection %p given to mutating function"), __PRETTY_FUNCTION__, hc);
+        RSLog(RSSTR("%s(): immutable collection %p given to mutating function"), __PRETTY_FUNCTION__, hc);
     }
     RS_OBJC_KVO_WILLCHANGE(hc, key);
     RSBasicHashAddValue((RSBasicHashRef)hc, (uintptr_t)key, (uintptr_t)value);
@@ -932,7 +932,7 @@ void RSBagReplaceValue(RSMutableHashRef hc, const_any_pointer_t key)
     __RSGenericValidInstance(hc, __RSBagTypeID);
     RSAssert2(RSBasicHashIsMutable((RSBasicHashRef)hc), __RSLogAssertion, "%s(): immutable collection %p passed to mutating operation", __PRETTY_FUNCTION__, hc);
     if (!RSBasicHashIsMutable((RSBasicHashRef)hc)) {
-        RSLog(3, RSSTR("%s(): immutable collection %p given to mutating function"), __PRETTY_FUNCTION__, hc);
+        RSLog(RSSTR("%s(): immutable collection %p given to mutating function"), __PRETTY_FUNCTION__, hc);
     }
     RS_OBJC_KVO_WILLCHANGE(hc, key);
     RSBasicHashReplaceValue((RSBasicHashRef)hc, (uintptr_t)key, (uintptr_t)value);
@@ -954,7 +954,7 @@ void RSBagSetValue(RSMutableHashRef hc, const_any_pointer_t key)
     __RSGenericValidInstance(hc, __RSBagTypeID);
     RSAssert2(RSBasicHashIsMutable((RSBasicHashRef)hc), __RSLogAssertion, "%s(): immutable collection %p passed to mutating operation", __PRETTY_FUNCTION__, hc);
     if (!RSBasicHashIsMutable((RSBasicHashRef)hc)) {
-        RSLog(3, RSSTR("%s(): immutable collection %p given to mutating function"), __PRETTY_FUNCTION__, hc);
+        RSLog(RSSTR("%s(): immutable collection %p given to mutating function"), __PRETTY_FUNCTION__, hc);
     }
     RS_OBJC_KVO_WILLCHANGE(hc, key);
     //#warning this for a dictionary used to not replace the key
@@ -968,7 +968,7 @@ void RSBagRemoveValue(RSMutableHashRef hc, const_any_pointer_t key) {
     __RSGenericValidInstance(hc, __RSBagTypeID);
     RSAssert2(RSBasicHashIsMutable((RSBasicHashRef)hc), __RSLogAssertion, "%s(): immutable collection %p passed to mutating operation", __PRETTY_FUNCTION__, hc);
     if (!RSBasicHashIsMutable((RSBasicHashRef)hc)) {
-        RSLog(3, RSSTR("%s(): immutable collection %p given to mutating function"), __PRETTY_FUNCTION__, hc);
+        RSLog(RSSTR("%s(): immutable collection %p given to mutating function"), __PRETTY_FUNCTION__, hc);
     }
     RS_OBJC_KVO_WILLCHANGE(hc, key);
     RSBasicHashRemoveValue((RSBasicHashRef)hc, (uintptr_t)key);
@@ -981,7 +981,7 @@ void RSBagRemoveAllValues(RSMutableHashRef hc) {
     __RSGenericValidInstance(hc, __RSBagTypeID);
     RSAssert2(RSBasicHashIsMutable((RSBasicHashRef)hc), __RSLogAssertion, "%s(): immutable collection %p passed to mutating operation", __PRETTY_FUNCTION__, hc);
     if (!RSBasicHashIsMutable((RSBasicHashRef)hc)) {
-        RSLog(3, RSSTR("%s(): immutable collection %p given to mutating function"), __PRETTY_FUNCTION__, hc);
+        RSLog(RSSTR("%s(): immutable collection %p given to mutating function"), __PRETTY_FUNCTION__, hc);
     }
     RS_OBJC_KVO_WILLCHANGEALL(hc);
     RSBasicHashRemoveAllValues((RSBasicHashRef)hc);

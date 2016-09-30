@@ -96,7 +96,7 @@ struct ___RSExceptionHandlerPool *___exception_create_pool(RSAllocatorRef alloca
     struct ___RSExceptionHandlerPool* p = (struct ___RSExceptionHandlerPool*)RSAllocatorVallocate(allocator, __kPageSize);
     if (parent) p->_parent = parent;
     p->_thread = pthread_self();
-    int r __unused = _RSSetTSD(__RSTSDKeyExceptionData, p, tls_dealloc);
+    int32_t r __unused = (int32_t)_RSSetTSD(__RSTSDKeyExceptionData, p, tls_dealloc);
 //    pthread_key_init_np(__RSExceptionHandlerKey, tls_dealloc);
     p->_next = __poolBegin(p);
     return p;

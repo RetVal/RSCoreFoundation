@@ -688,7 +688,7 @@ RSExport RSTypeRef RSUnarchiverDecodeObject(RSUnarchiverRef unarchiver, RSDataRe
 
 RSExport BOOL RSArchiverEncodeObjectForKey(RSArchiverRef archiver, RSStringRef key, RSTypeRef object)
 {
-    if (!archiver || !key) return nil;
+    if (!archiver || !key) return NO;
     __RSGenericValidInstance(archiver, _RSArchiverTypeID);
     return __RSArchiverContextSerializeObjectForKey(archiver, key, object);
 }
@@ -834,13 +834,13 @@ static RSDataRef __RSAllocatorSerializeCallBack(RSArchiverRef archiver, RSTypeRe
         
         if (object == RSAllocatorDefault)
         {
-            bytes = 0x03ab;
+            bytes = (RSBitU8 *)0x03ab;
         }
         else if (object == RSAllocatorSystemDefault)
         {
-            bytes = 0x03ad;
+            bytes = (RSBitU8 *)0x03ad;
         }
-        else bytes = 0x03af;
+        else bytes = (RSBitU8 *)0x03af;
         
         RSDataRef data = RSDataCreate(object, bytes, size);
         return data;
@@ -1292,15 +1292,15 @@ static void __RSArchiverInitialize_Set()
 static RSDataRef __RSStringSerializeCallBack(RSArchiverRef archiver, RSTypeRef object)
 {
     return __RSBPLCreateDataForObject(object);
-    RSDataRef data = RSStringCreateExternalRepresentation(RSAllocatorSystemDefault, object, RSStringEncodingUTF8, 0);
-    return data;
+//    RSDataRef data = RSStringCreateExternalRepresentation(RSAllocatorSystemDefault, object, RSStringEncodingUTF8, 0);
+//    return data;
 }
 
 static RSTypeRef __RSStringDeserializeCallBack(RSUnarchiverRef archiver, RSDataRef data)
 {
     return __RSBPLCreateObjectWithData(data);
-    RSStringRef string = RSStringCreateWithData(RSAllocatorSystemDefault, data, RSStringEncodingUTF8);
-    return string;
+//    RSStringRef string = RSStringCreateWithData(RSAllocatorSystemDefault, data, RSStringEncodingUTF8);
+//    return string;
 }
 
 static void __RSArchiverInitialize_String()
@@ -1357,72 +1357,72 @@ static void __RSArchiverInitialize_UUID()
 RSExport void __RSArchiverTestMain()
 {
     return;
-    RSArchiverRef archiverEX = RSArchiverCreate(RSAllocatorSystemDefault);
-    RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
-    RSArrayAddObject(array, RSTimeZoneCopySystem());
-    RSMutableDictionaryRef dict = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
-    
-    RSDictionarySetValue(dict, RSSTR("k1"), RSNumberWithInt(1));
-    RSDictionarySetValue(dict, RSSTR("k3"), RSSTR("v3"));
-    RSDictionarySetValue(dict, RSSTR("k2"), RSSTR("v2"));
-    RSDictionarySetValue(dict, RSSTR("k4"), RSSTR("v4"));
-    RSDictionarySetValue(dict, RSSTR("k5"), RSTimeZoneCopySystem());
-    RSDictionarySetValue(dict, RSSTR("k6"), array);
-    RSDictionarySetValue(dict, RSSTR("k7"), RSDateGetCurrent(RSAllocatorSystemDefault));
-    RSDictionarySetValue(dict, RSSTR("k8"), RSErrorWithDomainCodeAndUserInfo(RSErrorDomainRSCoreFoundation, kErrVerify, nil));
-    RSRelease(array);
-    
-    RSArchiverEncodeObjectForKey(archiverEX, RSSTR("dict"), dict);
-    RSDataWriteToFile(RSAutorelease(RSArchiverCopyData(archiverEX)), RSFileManagerStandardizingPath(RSSTR("~/Desktop/dict.plist")), RSWriteFileAutomatically);
-    RSRelease(archiverEX);
-    
-    RSUnarchiverRef unarchiver = RSUnarchiverCreate(RSAllocatorSystemDefault, RSDataWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/dict.plist"))));
-    dict = (RSMutableDictionaryRef)RSUnarchiverDecodeObjectForKey(unarchiver, RSSTR("dict"));
-    RSShow(dict);
-    RSRelease(dict);
-    RSRelease(unarchiver);
-    return;
-    RSArchiverRef archiver = RSArchiverCreate(RSAllocatorSystemDefault);
-    RSArchiverEncodeObjectForKey(archiver, RSSTR("date"), RSDateGetCurrent(RSAllocatorSystemDefault));
-    RSArchiverEncodeObjectForKey(archiver, RSSTR("test"), RSSTR("value"));
-    
-    RSTimeZoneRef tz = RSTimeZoneCopySystem();
-    RSArchiverEncodeObjectForKey(archiver, RSSTR("tz"), tz);
-    RSRelease(tz);
-    
-    RSDataRef data = RSDataCreateWithString(RSAllocatorSystemDefault, RSSTR("test-data"), RSStringEncodingUTF8);
-    RSArchiverEncodeObjectForKey(archiver, RSSTR("data"), data);
-    RSRelease(data);
-    
-    RSCalendarRef calendar = RSCalendarCreateWithIndentifier(RSAllocatorSystemDefault, RSGregorianCalendar);
-    RSArchiverEncodeObjectForKey(archiver, RSSTR("cal"), calendar);
-    RSRelease(calendar);
-    
-    RSShow((archiver));
-    RSDataWriteToFile(RSAutorelease(RSArchiverCopyData(archiver)), RSFileManagerStandardizingPath(RSSTR("~/Desktop/archiver.plist")), RSWriteFileAutomatically);
-    RSRelease(archiver);
-    
-    unarchiver = RSUnarchiverCreate(RSAllocatorSystemDefault, RSDataWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/archiver.plist"))));
-    RSDateRef date = RSUnarchiverDecodeObjectForKey(unarchiver, RSSTR("date"));
-    RSShow(date);
-    RSRelease(date);
-    
-    RSStringRef value = RSUnarchiverDecodeObjectForKey(unarchiver, RSSTR("test"));
-    RSShow(value);
-    RSRelease(value);
-    
-    tz = RSUnarchiverDecodeObjectForKey(unarchiver, RSSTR("tz"));
-    RSShow(tz);
-    RSRelease(tz);
-    
-    data = RSUnarchiverDecodeObjectForKey(unarchiver, RSSTR("data"));
-    RSShow(data);
-    RSRelease(data);
-    
-    calendar = (RSCalendarRef)RSUnarchiverDecodeObjectForKey(unarchiver, RSSTR("cal"));
-    RSShow(calendar);
-    RSRelease(calendar);
-
-    RSRelease(archiver);
+//    RSArchiverRef archiverEX = RSArchiverCreate(RSAllocatorSystemDefault);
+//    RSMutableArrayRef array = RSArrayCreateMutable(RSAllocatorSystemDefault, 0);
+//    RSArrayAddObject(array, RSTimeZoneCopySystem());
+//    RSMutableDictionaryRef dict = RSDictionaryCreateMutable(RSAllocatorSystemDefault, 0, RSDictionaryRSTypeContext);
+//    
+//    RSDictionarySetValue(dict, RSSTR("k1"), RSNumberWithInt(1));
+//    RSDictionarySetValue(dict, RSSTR("k3"), RSSTR("v3"));
+//    RSDictionarySetValue(dict, RSSTR("k2"), RSSTR("v2"));
+//    RSDictionarySetValue(dict, RSSTR("k4"), RSSTR("v4"));
+//    RSDictionarySetValue(dict, RSSTR("k5"), RSTimeZoneCopySystem());
+//    RSDictionarySetValue(dict, RSSTR("k6"), array);
+//    RSDictionarySetValue(dict, RSSTR("k7"), RSDateGetCurrent(RSAllocatorSystemDefault));
+//    RSDictionarySetValue(dict, RSSTR("k8"), RSErrorWithDomainCodeAndUserInfo(RSErrorDomainRSCoreFoundation, kErrVerify, nil));
+//    RSRelease(array);
+//    
+//    RSArchiverEncodeObjectForKey(archiverEX, RSSTR("dict"), dict);
+//    RSDataWriteToFile(RSAutorelease(RSArchiverCopyData(archiverEX)), RSFileManagerStandardizingPath(RSSTR("~/Desktop/dict.plist")), RSWriteFileAutomatically);
+//    RSRelease(archiverEX);
+//    
+//    RSUnarchiverRef unarchiver = RSUnarchiverCreate(RSAllocatorSystemDefault, RSDataWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/dict.plist"))));
+//    dict = (RSMutableDictionaryRef)RSUnarchiverDecodeObjectForKey(unarchiver, RSSTR("dict"));
+//    RSShow(dict);
+//    RSRelease(dict);
+//    RSRelease(unarchiver);
+//    return;
+//    RSArchiverRef archiver = RSArchiverCreate(RSAllocatorSystemDefault);
+//    RSArchiverEncodeObjectForKey(archiver, RSSTR("date"), RSDateGetCurrent(RSAllocatorSystemDefault));
+//    RSArchiverEncodeObjectForKey(archiver, RSSTR("test"), RSSTR("value"));
+//    
+//    RSTimeZoneRef tz = RSTimeZoneCopySystem();
+//    RSArchiverEncodeObjectForKey(archiver, RSSTR("tz"), tz);
+//    RSRelease(tz);
+//    
+//    RSDataRef data = RSDataCreateWithString(RSAllocatorSystemDefault, RSSTR("test-data"), RSStringEncodingUTF8);
+//    RSArchiverEncodeObjectForKey(archiver, RSSTR("data"), data);
+//    RSRelease(data);
+//    
+//    RSCalendarRef calendar = RSCalendarCreateWithIndentifier(RSAllocatorSystemDefault, RSGregorianCalendar);
+//    RSArchiverEncodeObjectForKey(archiver, RSSTR("cal"), calendar);
+//    RSRelease(calendar);
+//    
+//    RSShow((archiver));
+//    RSDataWriteToFile(RSAutorelease(RSArchiverCopyData(archiver)), RSFileManagerStandardizingPath(RSSTR("~/Desktop/archiver.plist")), RSWriteFileAutomatically);
+//    RSRelease(archiver);
+//    
+//    unarchiver = RSUnarchiverCreate(RSAllocatorSystemDefault, RSDataWithContentOfPath(RSFileManagerStandardizingPath(RSSTR("~/Desktop/archiver.plist"))));
+//    RSDateRef date = RSUnarchiverDecodeObjectForKey(unarchiver, RSSTR("date"));
+//    RSShow(date);
+//    RSRelease(date);
+//    
+//    RSStringRef value = RSUnarchiverDecodeObjectForKey(unarchiver, RSSTR("test"));
+//    RSShow(value);
+//    RSRelease(value);
+//    
+//    tz = RSUnarchiverDecodeObjectForKey(unarchiver, RSSTR("tz"));
+//    RSShow(tz);
+//    RSRelease(tz);
+//    
+//    data = RSUnarchiverDecodeObjectForKey(unarchiver, RSSTR("data"));
+//    RSShow(data);
+//    RSRelease(data);
+//    
+//    calendar = (RSCalendarRef)RSUnarchiverDecodeObjectForKey(unarchiver, RSSTR("cal"));
+//    RSShow(calendar);
+//    RSRelease(calendar);
+//
+//    RSRelease(archiver);
 }
 #endif

@@ -2951,7 +2951,7 @@ RSInline void __RSParseFormatSpec(const UniChar *uformat, const uint8_t *cformat
                 if (spec->size != RSFormatSize16) spec->size = RSFormatSize8;
                 return;
             case 'n':		/* %n is not handled correctly; for Leopard or newer apps, we disable it further */
-                spec->type = 1 ? RSFormatDummyPointerType : RSFormatPointerType;
+                spec->type = /* DISABLES CODE */ (1) ? RSFormatDummyPointerType : RSFormatPointerType;
                 spec->size = RSFormatSizePointer;  // 4 or 8 depending on LP64
                 return;
             case 'p':
@@ -3147,13 +3147,20 @@ RSExport RSMutableStringRef RSStringReplaceAll(RSMutableStringRef str, RSStringR
 }
 
 static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
-                                       RSStringRef (*copyDescfunc)(void *, const void *),
+                                       RSStringRef (*copyDescfunc)(void *, RSDictionaryRef),
                                        RSDictionaryRef formatOptions,
                                        RSStringRef formatString,
                                        RSIndex initialArgPosition,
                                        const void *origValues,
                                        RSIndex originalValuesSize,
                                        va_list args);
+
+RSExport void RxStringAppendFormatAndArguments(RSMutableStringRef str,
+                                               RSStringRef format,
+                                               va_list args,
+                                               RSStringRef (*copyDescfunc)(void *, RSDictionaryRef)) {
+    __RSStringAppendFormatCore(str, copyDescfunc, nil, format, 0, nil, 0, args);
+}
 
 RSExport void RSStringAppendFormatAndArguments(RSMutableStringRef str, RSStringRef format, va_list args)
 {
@@ -3234,7 +3241,7 @@ sprintf(buffer, formatBuffer, value);	\
 #endif
 
 static void __RSStringAppendFormatCore(RSMutableStringRef outputString,
-                                       RSStringRef (*copyDescfunc)(void *, const void *),
+                                       RSStringRef (*copyDescfunc)(void *, RSDictionaryRef),
                                        RSDictionaryRef formatOptions,
                                        RSStringRef formatString,
                                        RSIndex initialArgPosition,

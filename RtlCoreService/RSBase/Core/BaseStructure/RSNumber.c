@@ -280,21 +280,12 @@ RSInline void   __RSNumberUnMarkInt(RSNumberRef number) {
 }
 RSInline BOOL   __RSNumberISUnsignedInt(RSNumberRef number) {
     return __RSNumberISInt(number);
-    return  (!__RSNumberISFloatType(number)) &&
-//            (__RSNumberISUnsignedType(number)) &&
-            ((number->_number._type & _RSNumberInt)    == _RSNumberIntMask);
 }
 RSInline void   __RSNumberMarkUnsignedInt(RSNumberRef number) {
     return __RSNumberMarkInt(number);
-    ((((struct __RSNumber*)number)->_number._type &= ~_RSNumberIsFloatMask));
-//    ((((struct __RSNumber*)number)->_number._type |= _RSNumberIsUnsignedMask));
-    ((((struct __RSNumber*)number)->_number._type |= _RSNumberIntMask));
 }
 RSInline void   __RSNumberUnMarkUnsignedInt(RSNumberRef number) {
     return __RSNumberUnMarkInt(number);
-    ((((struct __RSNumber*)number)->_number._type &= ~_RSNumberIsFloatMask));
-//    ((((struct __RSNumber*)number)->_number._type &= ~_RSNumberIsUnsignedMask));
-    ((((struct __RSNumber*)number)->_number._type &= ~_RSNumberIntMask));
 }
 
 RSInline BOOL   __RSNumberISShort(RSNumberRef number) {
@@ -323,26 +314,16 @@ RSInline void   __RSNumberUnMarkShort(RSNumberRef number) {
 }
 RSInline BOOL   __RSNumberISUnsignedShort(RSNumberRef number) {
     return __RSNumberISShort(number);
-    return  (!__RSNumberISFloatType(number)) &&
-//    (__RSNumberISUnsignedType(number)) &&
-    ((number->_number._type & _RSNumberShort)    == _RSNumberShortMask);
 }
 RSInline void   __RSNumberMarkUnsignedShort(RSNumberRef number) {
     return __RSNumberMarkShort(number);
-    ((((struct __RSNumber*)number)->_number._type &= ~_RSNumberIsFloatMask));
-//    ((((struct __RSNumber*)number)->_number._type |= _RSNumberIsUnsignedMask));
-    ((((struct __RSNumber*)number)->_number._type |= _RSNumberShortMask));
 }
 RSInline void   __RSNumberUnMarkUnsignedShort(RSNumberRef number) {
     return __RSNumberUnMarkShort(number);
-    ((((struct __RSNumber*)number)->_number._type &= ~_RSNumberIsFloatMask));
-//    ((((struct __RSNumber*)number)->_number._type &= ~_RSNumberIsUnsignedMask));
-    ((((struct __RSNumber*)number)->_number._type &= ~_RSNumberShortMask));
 }
 
 RSInline BOOL   __RSNumberISLong(RSNumberRef number) {
-    if (RS_IS_TAGGED_INT(number))
-    {
+    if (RS_IS_TAGGED_INT(number)) {
 #if __LP64__
         return RSNumberGetType(number) == RSNumberSInt64;
 #else
@@ -377,15 +358,9 @@ RSInline void   __RSNumberUnMarkLong(RSNumberRef number) {
 
 RSInline BOOL   __RSNumberISUnsignedlong(RSNumberRef number) {
     return __RSNumberISLong(number);
-    return  (!__RSNumberISFloatType(number)) &&
-//            (__RSNumberISUnsignedType(number)) &&
-            ((number->_number._type & _RSNumberLong) == _RSNumberLongMask);
 }
 RSInline void   __RSNumberMarkUnsignedlong(RSNumberRef number) {
     return __RSNumberMarkLong(number);
-    ((((struct __RSNumber*)number)->_number._type &= ~_RSNumberIsFloatMask));
-//    ((((struct __RSNumber*)number)->_number._type |= _RSNumberIsUnsignedMask));
-    ((((struct __RSNumber*)number)->_number._type |= _RSNumberLongMask));
 }
 RSInline void   __RSNumberUnMarkUnsignedlong(RSNumberRef number) {
     ((((struct __RSNumber*)number)->_number._type &= ~_RSNumberIsFloatMask));
@@ -455,15 +430,9 @@ RSInline void   __RSNumberUnMarkLonglong(RSNumberRef number) {
 
 RSInline BOOL   __RSNumberISUnsignedlonglong(RSNumberRef number) {
     return __RSNumberISLonglong(number);
-    return  (!__RSNumberISFloatType(number)) &&
-//            (__RSNumberISUnsignedType(number)) &&
-            ((number->_number._type & _RSNumberLonglong) == _RSNumberLonglongMask);
 }
 RSInline void   __RSNumberMarkUnsignedlonglong(RSNumberRef number) {
     return __RSNumberMarkLonglong(number);
-    ((((struct __RSNumber*)number)->_number._type &= ~_RSNumberIsFloatMask));
-//    ((((struct __RSNumber*)number)->_number._type |= _RSNumberIsUnsignedMask));
-    ((((struct __RSNumber*)number)->_number._type |= _RSNumberLonglongMask));
 }
 RSInline void   __RSNumberUnMarkUnsignedlonglong(RSNumberRef number) {
     ((((struct __RSNumber*)number)->_number._type &= ~_RSNumberIsFloatMask));
@@ -832,50 +801,6 @@ static BOOL    __RSNumberClassEqual(RSTypeRef obj1, RSTypeRef obj2)
     if (obj1 == nil) HALTWithError(RSInvalidArgumentException, "the obj1 is nil");
     if (obj2 == nil) HALTWithError(RSInvalidArgumentException, "the obj2 is nil");
     return RSCompareEqualTo == RSNumberCompare(obj1, obj2, nil);
-    // the object is RSNumber
-    RSNumberRef num1 = (RSNumberRef)obj1;
-    RSNumberRef num2 = (RSNumberRef)obj2;
-    RSNumberType type1 = RSNumberGetType(obj1);
-    RSNumberType type2 = RSNumberGetType(obj2);
-    if (type1 != type2) return NO;
-    BOOL tagged1 = RS_IS_TAGGED_INT(obj1);
-    BOOL tagged2 = RS_IS_TAGGED_INT(obj2);
-    if (tagged1 && tagged2) {
-        return num1 == num2;
-    } else if (tagged1 == YES)
-    switch (type1)
-    {
-        case RSNumberBoolean:
-            return (num1->_number._pay._bool == num2->_number._pay._bool)             ? (YES):(NO);
-            break;
-        case RSNumberInt:
-            return (num1->_number._pay._int == num2->_number._pay._int)               ? (YES):(NO);
-        case RSNumberLong:
-            return (num1->_number._pay._long == num2->_number._pay._long)             ? (YES):(NO);
-            break;
-        case RSNumberLonglong:
-            return (num1->_number._pay._longlong == num2->_number._pay._longlong)     ? (YES):(NO);
-            break;
-        case RSNumberFloat:
-            return (num1->_number._pay._float == num2->_number._pay._float)           ? (YES):(NO);
-            break;
-        case RSNumberDouble:
-            return (num1->_number._pay._double == num2->_number._pay._double)         ? (YES):(NO);
-            break;
-        case RSNumberRSRange:
-            return (num1->_number._pay._range.location == num2->_number._pay._range.location) && (num1->_number._pay._range.length == num2->_number._pay._range.length)            ? (YES):(NO);
-            break;
-        case RSNumberPointer:
-            return (num1->_number._pay._pointer == num2->_number._pay._pointer)   ? (YES):(NO);
-            break;
-        case RSNumberString:
-            return RSEqual(num1->_number._pay._string , num2->_number._pay._string);
-        default:
-            return NO;
-            break;
-    }
-    
-    return NO;
 }
 
 static RSHashCode __RSNumberClassHash(RSTypeRef rs)
@@ -1017,54 +942,30 @@ static RSNumberRef __RSNumberCreateConstant(RSAllocatorRef allocator)
 RSExport RSNumberRef RSNumberCreateInt(RSAllocatorRef allocator, int value)
 {
     return RSNumberCreate(allocator, RSNumberInt, &value);
-    RSNumberRef aNumber = __RSNumberCreateConstant(allocator);
-    if (aNumber == (RSNumberRef)0) return aNumber;
-    RSNumberSetValue(aNumber, RSNumberInt, &value);
-    return aNumber;
 }
 
 RSExport RSNumberRef RSNumberCreateUnsignedInt(RSAllocatorRef allocator, unsigned int value)
 {
     return RSNumberCreate(allocator, RSNumberUnsignedInt, &value);
-    RSNumberRef aNumber = __RSNumberCreateConstant(allocator);
-    if (aNumber == (RSNumberRef)0) return aNumber;
-    RSNumberSetValue(aNumber, RSNumberUnsignedInt, &value);
-    return aNumber;
 }
 
 RSExport RSNumberRef RSNumberCreateShort(RSAllocatorRef allocator, short value)
 {
     return RSNumberCreate(allocator, RSNumberShort, &value);
-    RSNumberRef aNumber = __RSNumberCreateConstant(allocator);
-    if (aNumber == (RSNumberRef)0) return aNumber;
-    RSNumberSetValue(aNumber, RSNumberShort, &value);
-    return aNumber;
 }
 
 RSExport RSNumberRef RSNumberCreateUnsignedShort(RSAllocatorRef allocator, unsigned short value)
 {
     return RSNumberCreate(allocator, RSNumberUnsignedShort, &value);
-    RSNumberRef aNumber = __RSNumberCreateConstant(allocator);
-    if (aNumber == (RSNumberRef)0) return aNumber;
-    RSNumberSetValue(aNumber, RSNumberUnsignedShort, &value);
-    return aNumber;
 }
 
 RSExport RSNumberRef RSNumberCreateInteger(RSAllocatorRef allocator, RSInteger value)
 {
     return RSNumberCreate(allocator, RSNumberInteger, &value);
-    RSNumberRef aNumber = __RSNumberCreateConstant(allocator);
-    if (aNumber == (RSNumberRef)0) return aNumber;
-    RSNumberSetValue(aNumber, RSNumberInteger, &value);
-    return aNumber;
 }
 RSExport RSNumberRef RSNumberCreateUnsignedInteger(RSAllocatorRef allocator, RSUInteger value)
 {
     return RSNumberCreate(allocator, RSNumberUnsignedInteger, &value);
-    RSNumberRef aNumber = __RSNumberCreateConstant(allocator);
-    if (aNumber == (RSNumberRef)0) return aNumber;
-    RSNumberSetValue(aNumber, RSNumberUnsignedInteger, &value);
-    return aNumber;
 }
 
 RSExport RSNumberRef RSNumberCreateBoolean(RSAllocatorRef allocator, BOOL value)
@@ -1076,60 +977,32 @@ RSExport RSNumberRef RSNumberCreateBoolean(RSAllocatorRef allocator, BOOL value)
 RSExport RSNumberRef RSNumberCreateLong(RSAllocatorRef allocator, long value)
 {
     return RSNumberCreate(allocator, RSNumberLong, &value);
-    RSNumberRef aNumber = __RSNumberCreateConstant(allocator);
-    if (aNumber == (RSNumberRef)0) return aNumber;
-    RSNumberSetValue(aNumber, RSNumberLong, &value);
-    return aNumber;
 }
 RSExport RSNumberRef RSNumberCreateLonglong(RSAllocatorRef allocator, long long value)
 {
     return RSNumberCreate(allocator, RSNumberLonglong, &value);
-    RSNumberRef aNumber = __RSNumberCreateConstant(allocator);
-    if (aNumber == (RSNumberRef)0) return aNumber;
-    RSNumberSetValue(aNumber, RSNumberLonglong, &value);
-    return aNumber;
 }
 
 RSExport RSNumberRef RSNumberCreateUnsignedLong(RSAllocatorRef allocator, unsigned long value)
 {
     return RSNumberCreate(allocator, RSNumberUnsignedLong, &value);
-    RSNumberRef aNumber = __RSNumberCreateConstant(allocator);
-    if (aNumber == (RSNumberRef)0) return aNumber;
-    RSNumberSetValue(aNumber, RSNumberUnsignedLong, &value);
-    return aNumber;
 }
 RSExport RSNumberRef RSNumberCreateUnsignedLonglong(RSAllocatorRef allocator, unsigned long long value)
 {
     return RSNumberCreate(allocator, RSNumberUnsignedLonglong, &value);
-    RSNumberRef aNumber = __RSNumberCreateConstant(allocator);
-    if (aNumber == (RSNumberRef)0) return aNumber;
-    RSNumberSetValue(aNumber, RSNumberUnsignedLonglong, &value);
-    return aNumber;
 }
 RSExport RSNumberRef RSNumberCreateFloat(RSAllocatorRef allocator, float value)
 {
     return RSNumberCreate(allocator, RSNumberFloat, &value);
-    RSNumberRef aNumber = __RSNumberCreateConstant(allocator);
-    if (aNumber == (RSNumberRef)0) return aNumber;
-    RSNumberSetValue(aNumber, RSNumberFloat, &value);
-    return aNumber;
 }
 RSExport RSNumberRef RSNumberCreateDouble(RSAllocatorRef allocator, double value)
 {
     return RSNumberCreate(allocator, RSNumberDouble, &value);
-    RSNumberRef aNumber = __RSNumberCreateConstant(allocator);
-    if (aNumber == (RSNumberRef)0) return aNumber;
-    RSNumberSetValue(aNumber, RSNumberDouble, &value);
-    return aNumber;
 }
 
 RSExport RSNumberRef RSNumberCreateRSFloat(RSAllocatorRef allocator, RSFloat value)
 {
     return RSNumberCreate(allocator, RSNumberRSFloat, &value);
-    RSNumberRef aNumber = __RSNumberCreateConstant(allocator);
-    if (aNumber == (RSNumberRef)0) return aNumber;
-    RSNumberSetValue(aNumber, RSNumberRSFloat, &value);
-    return aNumber;
 }
 
 RSExport RSNumberRef RSNumberCreateRange(RSAllocatorRef allocator, RSRange value) {
@@ -1463,7 +1336,7 @@ RSExport RSComparisonResult RSNumberCompare(RSNumberRef aNumber, RSNumberRef oth
                 else if (pay1._pay._pointer < pay2._pay._pointer) return RSCompareLessThan;
                 return RSCompareEqualTo;
             } else if (otherNumberType == RSNumberString) {
-                return RSStringCompare(pay1._pay._string, pay2._pay._string, nil);
+                return RSStringCompare(pay1._pay._string, pay2._pay._string, 0);
             }
         }
     } else if (!RS_IS_TAGGED_INT(aNumber) && !RS_IS_TAGGED_INT(other)) {

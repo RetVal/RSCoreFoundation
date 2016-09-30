@@ -414,7 +414,7 @@ raw_hash_entry *he_create(int flags, void *key, size_t key_size, void *value,
 
 /// @brief Destroys the hash entry and frees all associated memory.
 /// @param flags The hash table flags.
-/// @param raw_hash_entry A pointer to the hash entry.
+/// @param entry A pointer to the hash entry.
 void he_destroy(int flags, raw_hash_entry *entry);
 
 /// @brief Compare two hash entries.

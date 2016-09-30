@@ -2080,7 +2080,7 @@ static RSMutableDictionaryRef __RSBundleCreateQueryTableAtBundlePathWithVersion(
     if (files)
     {
         RSDictionarySetValue(queryTable, _RSBundleSharedFrameworksPathFromBase0, files);
-        RSRelease(files);
+//        RSRelease(files);
     }
     
     return queryTable;

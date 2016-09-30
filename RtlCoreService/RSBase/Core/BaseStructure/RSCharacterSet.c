@@ -551,7 +551,7 @@ static void __RSCheckForExpandedSet(RSCharacterSetRef cset) {
         while (entries) {
             if ((entries & 1) && (++count >= __RSNumberOfPlanesForLogging)) {
                 if (!warnedOnce) {
-                    RSLog(RSLogLevelWarning, RSSTR("An expanded RSMutableCharacter has been detected.  Recommend to compact with RSCharacterSetCreateCopy"));
+                    RSLog(RSSTR("An expanded RSMutableCharacter has been detected.  Recommend to compact with RSCharacterSetCreateCopy"));
                     warnedOnce = YES;
                 }
                 break;

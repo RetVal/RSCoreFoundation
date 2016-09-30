@@ -623,7 +623,7 @@ static void __RSFileMonitorCore()
 }
 
 #include <vproc.h>
-#include <CoreServices/CoreServices.h>
+//#include <CoreServices/CoreServices.h>
 
 static void _watch_path(int kq, const char *path, char *buf)
 {
@@ -709,41 +709,41 @@ static void _watch_path(int kq, const char *path, char *buf)
 
 //f (a, b, c, d, e, f);
 //a->%rdi, b->%rsi, c->%rdx, d->%rcx, e->%r8, f->%r9
-static void __useCoreServicesFSEventStream()
-{
-//    FSEventStreamRef stream = FSEventStreamCreate(<#CFAllocatorRef allocator#>, <#FSEventStreamCallback callback#>, <#FSEventStreamContext *context#>, <#CFArrayRef pathsToWatch#>, <#FSEventStreamEventId sinceWhen#>, <#CFTimeInterval latency#>, <#FSEventStreamCreateFlags flags#>)
-    
-    FSEventStreamContext *context = nil;
-//    struct FSEventStreamContext {
-//        CFIndex             version;
-//        void *              info;
-//        CFAllocatorRetainCallBack  retain;
-//        CFAllocatorReleaseCallBack  release;
-//        CFAllocatorCopyDescriptionCallBack  copyDescription;
+//static void __useCoreServicesFSEventStream()
+//{
+////    FSEventStreamRef stream = FSEventStreamCreate(<#CFAllocatorRef allocator#>, <#FSEventStreamCallback callback#>, <#FSEventStreamContext *context#>, <#CFArrayRef pathsToWatch#>, <#FSEventStreamEventId sinceWhen#>, <#CFTimeInterval latency#>, <#FSEventStreamCreateFlags flags#>)
+//    
+//    FSEventStreamContext *context = nil;
+////    struct FSEventStreamContext {
+////        CFIndex             version;
+////        void *              info;
+////        CFAllocatorRetainCallBack  retain;
+////        CFAllocatorReleaseCallBack  release;
+////        CFAllocatorCopyDescriptionCallBack  copyDescription;
+////    };
+//    typedef struct FSEventStreamContext     FSEventStreamContext;
+//    void *buf = CFAllocatorAllocate(kCFAllocatorDefault, 0x1a8, 0); // structure
+//    bzero(buf, 0x1a8);
+//    CFRetain(kCFAllocatorDefault);
+//    struct __unknown_structure1 {
+//        CFAllocatorRef deallocator;
+//        
 //    };
-    typedef struct FSEventStreamContext     FSEventStreamContext;
-    void *buf = CFAllocatorAllocate(kCFAllocatorDefault, 0x1a8, 0); // structure
-    bzero(buf, 0x1a8);
-    CFRetain(kCFAllocatorDefault);
-    struct __unknown_structure1 {
-        CFAllocatorRef deallocator;
-        
-    };
-    // rdx + 0x18 = version = r12
-    // rdx + 0x20 = info = r12 + 0x8
-    // rdx + 0x28 = retain = r12 + 0x10
-    // rdx + 0x30 = release = r12 + 0x18
-    // rdx + 0x38 = description = r12 + 0x20
-    // rdx + 0x50 = CFAllocatorAllocate(...)
-    // kqueue
-    // CFAllocatorAllocate(...)
-    // CFAllocatorAllocate(...)
-    // CALL _watch_path
-    // CALL _watch_all_parents
-    //
-/*
- check null of params
- 
- */
-}
-
+//    // rdx + 0x18 = version = r12
+//    // rdx + 0x20 = info = r12 + 0x8
+//    // rdx + 0x28 = retain = r12 + 0x10
+//    // rdx + 0x30 = release = r12 + 0x18
+//    // rdx + 0x38 = description = r12 + 0x20
+//    // rdx + 0x50 = CFAllocatorAllocate(...)
+//    // kqueue
+//    // CFAllocatorAllocate(...)
+//    // CFAllocatorAllocate(...)
+//    // CALL _watch_path
+//    // CALL _watch_all_parents
+//    //
+///*
+// check null of params
+// 
+// */
+//}
+//

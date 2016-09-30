@@ -1464,7 +1464,7 @@ RSExport RSIndex RSDictionaryGetCount(RSHashRef hc) {
 RSExport RSIndex RSDictionaryGetCountOfKey(RSHashRef hc, const_any_pointer_t key) {
     if (RSDictionary) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, RSIndex, (NSDictionary *)hc, countForKey:(id)key);
     if (RSSet) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, RSIndex, (NSSet *)hc, countForObject:(id)key);
-    if (!hc) return nil;
+    if (!hc) return 0;
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
     return RSBasicHashGetCountOfKey((RSBasicHashRef)hc, (uintptr_t)key);
 }
@@ -1474,7 +1474,7 @@ RSExport BOOL RSDictionaryContainsKey(RSHashRef hc, const_any_pointer_t key) {
     
     if (RSDictionary) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, char, (NSDictionary *)hc, containsKey:(id)key);
     if (RSSet) RS_OBJC_FUNCDISPATCHV(__RSDictionaryTypeID, char, (NSSet *)hc, containsObject:(id)key);
-    if (!hc) return nil;
+    if (!hc) return 0;
     __RSGenericValidInstance(hc, _RSDictionaryTypeID);
     return (0 < RSBasicHashGetCountOfKey((RSBasicHashRef)hc, (uintptr_t)key));
 }

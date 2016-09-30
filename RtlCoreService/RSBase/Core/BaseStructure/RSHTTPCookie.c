@@ -68,7 +68,7 @@ static BOOL __RSHTTPCookieClassEqual(RSTypeRef rs1, RSTypeRef rs2)
                  RSEqual(RSHTTPCookieGetPath(RSHTTPCookie1), RSHTTPCookieGetPath(RSHTTPCookie2)) &&
                  RSEqual(RSHTTPCookieGetName(RSHTTPCookie1), RSHTTPCookieGetName(RSHTTPCookie2)) &&
 //                 RSEqual(RSHTTPCookieGetValue(RSHTTPCookie1), RSHTTPCookieGetValue(RSHTTPCookie2)) &&
-                 RSEqual(RSHTTPCookieGetVersion(RSHTTPCookie1), RSHTTPCookieGetVersion(RSHTTPCookie2));
+                 RSHTTPCookieGetVersion(RSHTTPCookie1) == RSHTTPCookieGetVersion(RSHTTPCookie2);
     }
     return result;
 }
@@ -288,8 +288,8 @@ RSExport RSStringRef RSHTTPCookieGetPath(RSHTTPCookieRef cookie) {
 
 RSExport BOOL RSHTTPCookieIsSecure(RSHTTPCookieRef cookie) {
     RSDictionaryRef properties = RSHTTPCookieGetProperties(cookie);
-    if (!properties) return nil;
-    return RSDictionaryGetValue(properties, RSHTTPCookieSecure);
+    if (!properties) return NO;
+    return RSDictionaryGetValue(properties, RSHTTPCookieSecure) != 0;
 }
 
 RSExport BOOL RSHTTPCookieIsHTTPOnly(RSHTTPCookieRef cookie) {

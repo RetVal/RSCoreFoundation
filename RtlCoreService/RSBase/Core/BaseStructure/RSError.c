@@ -159,7 +159,7 @@ static RSDictionaryRef __RSErrorGetUserInfo(RSErrorRef err)
 RSExport RSDictionaryRef RSErrorCopyUserInfo(RSErrorRef err)
 {
     __RSAssertIsError(err);
-    return (err->_userInfo) ? RSRetain(err->_userInfo) : RSDictionaryCreate(RSAllocatorSystemDefault, nil, nil, RSDictionaryRSTypeContext, 0);
+    return (err->_userInfo) ? RSRetain(err->_userInfo) : RSDictionaryCreate(RSAllocatorSystemDefault, nil, nil, 0, RSDictionaryRSTypeContext);
 }
 
 RSExport RSErrorRef RSErrorCreate(RSAllocatorRef allocator, RSStringRef domain, RSIndex code, RSDictionaryRef userInfo)
@@ -175,7 +175,7 @@ RSExport RSErrorRef RSErrorCreate(RSAllocatorRef allocator, RSStringRef domain, 
 
 RSExport RSErrorRef RSErrorCreateWithKeysAndValues(RSAllocatorRef allocator, RSStringRef domain, RSIndex code, const void** keys, const void** values, RSIndex userInfoValuesCount)
 {
-    RSDictionaryRef userInfo = RSDictionaryCreate(allocator, keys, values, RSDictionaryRSTypeContext, userInfoValuesCount);
+    RSDictionaryRef userInfo = RSDictionaryCreate(allocator, keys, values, userInfoValuesCount, RSDictionaryRSTypeContext);
     RSErrorRef err = RSErrorCreate(allocator, domain, code, userInfo);
     RSRelease(userInfo);
     return err;

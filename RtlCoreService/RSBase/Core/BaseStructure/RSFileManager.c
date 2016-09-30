@@ -64,7 +64,7 @@ static int _mkdir(const char *dir) {
     for(; i < len; i++) {
         if(tmp[i] == '/') {
             tmp[i] = 0;
-            if(access(tmp, nil)) {
+            if(access(tmp, 0)) {
                 if(mkdir(tmp, 0755) == -1) {
                     return -1;
                 }  
@@ -240,16 +240,14 @@ static BOOL __RSFileHandleVerifyFd(__RSFileHandleRef fh)
             // custom file descriptor
             int result = 0;
             result = fcntl(fh->_fp, F_GETFL, 0);
-            if (result & O_RDWR)
-            {
+            if (result & O_RDWR) {
                 markFileRead(fh);
+                markFileWrite(fh);
+            } else if (result == O_RDONLY) {
+                markFileRead(fh);
+            } else if (result & O_WRONLY) {
                 markFileWrite(fh);
             }
-            else if (result & O_RDONLY)
-                markFileRead(fh);
-            else if (result & O_WRONLY)
-                markFileWrite(fh);
-            
         }
         return YES;
     }

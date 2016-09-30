@@ -229,11 +229,15 @@ RSExport void **RSExceptionGetFrames(RSExceptionRef e)
     return e->_stackFrames;
 }
 
+RSPrivate void __RSDebugLevelDeallocate();
+
 static RSExceptionHandler __RSExceptionDefaultHandler = ^(RSExceptionRef e) {
     RSShow(e);
     RSStringRef s = RSDescription(e);
     __RSLog(RSLogLevelDebug, RSSTR("%R"), s);
     RSRelease(s);
+    
+    __RSDebugLevelDeallocate();
     __HALT();
 };
 
