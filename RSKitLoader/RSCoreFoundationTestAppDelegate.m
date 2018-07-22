@@ -63,7 +63,7 @@ typedef RSComparisonResult (*COMPARATOR)(RSIndex, RSIndex);
 #endif
 
 RSExport void RSSortIndexes(RSIndex *indexBuffer, RSIndex count, RSOptionFlags opts, COMPARATOR cmp, RSComparisonOrder order);
-extern void caller();
+extern void caller(void);
 extern void __runtime_vm_pressure_handler(void *context __unused);
 extern void __runtime_malloc_vm_pressure_setup(void);
 
@@ -75,8 +75,8 @@ extern void __runtime_malloc_vm_pressure_setup(void);
 //    RSAutoreleasePoolRef pool = RSAutoreleasePoolCreate(RSAllocatorDefault);
 //    RSLog(RSSTR("%r"), RSAutorelease(RSStringWithFormat(RSSTR("%s"), "fuck")));
 //    RSAutoreleasePoolDrain(pool);
-    return;
-    caller();
+//    return;
+//    caller();
     uint32_t pages_reclaimed = 0;
     int pressure = 0;
     int vm_pressure_monitor(int wait_for_pressure, int nsecs_monitored, uint32_t *pages_reclaimed);

@@ -14,8 +14,7 @@
 #define ___RSCoreFoundationLoadPath RSSTR("~/Library/Frameworks/RSCoreFoundation.framework/Resources/Info.plist")
 #endif
 
-typedef RS_ENUM(RSIndex, ___RSCFPVersionIndex)
-{
+typedef RS_ENUM(RSIndex, ___RSCFPVersionIndex) {
     ___RSCFPVersionSelfBuild = 0,
     ___RSCFPVersionSelf = 1,
     ___RSCFPVersionOSBuild = 2,
@@ -30,8 +29,7 @@ typedef RS_ENUM(RSIndex, ___RSCFPVersionIndex)
 
 static RSVersion ___RSCFPVersionListCache[___RSCFPVersionCount] = {0};
 
-static BOOL ___RSCFPreferenceGetCFVersion(RSVersion* productVersion, RSVersion* buildVersion)
-{
+static BOOL ___RSCFPreferenceGetCFVersion(RSVersion* productVersion, RSVersion* buildVersion) {
     if (likely(___RSCFPVersionListCache[___RSCFPVersionSelfBuild])) return ___RSCFPVersionListCache[___RSCFPVersionSelfBuild];
     RSDictionaryRef _contents = RSDictionaryCreateWithContentOfPath(RSAllocatorDefault, RSFileManagerStandardizingPath(___RSCoreFoundationLoadPath));
     RSVersion _version1 = 0, _version2 = 0;
@@ -58,14 +56,12 @@ static BOOL ___RSCFPreferenceGetCFVersion(RSVersion* productVersion, RSVersion* 
 #define ___RSCoreOperatingSystemVersion RSSTR("/System/Library/CoreServices/SystemVersion.plist")
 #endif
 
-static RSVersion ___RSCFPVersionCacheGetVersionWithID(___RSCFPVersionIndex idx)
-{
+static RSVersion ___RSCFPVersionCacheGetVersionWithID(___RSCFPVersionIndex idx) {
     if (idx < 0 || idx >= ___RSCFPVersionCount) return 0;
     if (likely(___RSCFPVersionListCache[idx])) return ___RSCFPVersionListCache[idx];
     RSDictionaryRef _contents = RSDictionaryCreateWithContentOfPath(RSAllocatorDefault, ___RSCoreOperatingSystemVersion);
     RSVersion productVersion = 0, buildVersion = 0;
-    if (___RSCFPreferenceGetCFVersion(&productVersion, &buildVersion))
-    {
+    if (___RSCFPreferenceGetCFVersion(&productVersion, &buildVersion)) {
         ___RSCFPVersionListCache[___RSCFPVersionSelfBuild] = buildVersion;
         ___RSCFPVersionListCache[___RSCFPVersionSelf] = productVersion;
     }
@@ -76,8 +72,8 @@ static RSVersion ___RSCFPVersionCacheGetVersionWithID(___RSCFPVersionIndex idx)
     return ___RSCFPVersionListCache[idx];
 }
 #undef ___RSCoreOperationSystemVersion
-RSExport RSVersion RSGetVersion(int key)
-{
+
+RSExport RSVersion RSGetVersion(int key) {
     if (key < 0 || key > ___RSCFPVersionCount)
         return 0;
     return ___RSCFPVersionCacheGetVersionWithID(key);

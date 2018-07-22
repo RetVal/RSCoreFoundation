@@ -10,15 +10,13 @@
 #include <pthread.h>
 typedef BOOL (*f)(RSErrorRef *error);
 
-struct __UTFunction
-{
+struct __UTFunction {
     f _f;
 };
 
 static RSErrorRef unit_test_create_error(RSStringRef domain, RSErrorCode errorCode, RSStringRef key, RSStringRef descriptionFormat, ...);
 
-static BOOL unit_test_runperform(RSErrorRef *error)
-{
+static BOOL unit_test_runperform(RSErrorRef *error) {
     RSPerformBlockOnMainThread(^{
         if (pthread_main_np())
             RSLog(RSSTR("PERFORM ON MAIN THREAD"));
@@ -33,8 +31,7 @@ static BOOL unit_test_runperform(RSErrorRef *error)
     return YES;
 }
 
-static BOOL unit_test_plist(RSErrorRef *error)
-{
+static BOOL unit_test_plist(RSErrorRef *error) {
     __block RSPropertyListRef plist = nil;
     __block RSStringRef path = nil;
     RSPerformBlockInBackGroundWaitUntilDone(^{
@@ -42,11 +39,9 @@ static BOOL unit_test_plist(RSErrorRef *error)
             RSShow(plist = (RSPropertyListRef)RSRetain(RSAutorelease(RSPropertyListCreateWithPath(RSAllocatorDefault, RSFileManagerStandardizingPath(path = RSSTR("~/Desktop/info.plist"))))));
         });
     });
-    if (plist == nil)
-    {
+    if (plist == nil) {
         RSLog(RSSTR("(%s) plist is nil.<line is %ld>"), __func__, __LINE__);
-        if (error)
-        {
+        if (error) {
             *error = unit_test_create_error(RSErrorDomainRSCoreFoundation,
                                             kErrExisting,
                                             RSErrorDebugDescriptionKey,
@@ -59,14 +54,11 @@ static BOOL unit_test_plist(RSErrorRef *error)
     return YES;
 }
 
-static BOOL unit_test_string(RSErrorRef *error)
-{
+static BOOL unit_test_string(RSErrorRef *error) {
     RSStringRef test = RSSTR("what the hell with the testing...");
     RSMutableStringRef need_replace = RSMutableCopy(RSAllocatorDefault, test);
-    if (NO == RSEqual(RSStringReplaceAll(need_replace, RSSTR("l"), RSSTR("-")), RSSTR("what the he-- with the testing...")))
-    {
-        if (error)
-        {
+    if (NO == RSEqual(RSStringReplaceAll(need_replace, RSSTR("l"), RSSTR("-")), RSSTR("what the he-- with the testing..."))) {
+        if (error) {
             *error = unit_test_create_error(RSErrorDomainRSCoreFoundation,
                                             kErrMmUnknown,
                                             RSErrorDebugDescriptionKey,
@@ -74,14 +66,12 @@ static BOOL unit_test_string(RSErrorRef *error)
         }
         RSRelease(need_replace);
         return NO;
-    }
-    else
+    } else {
         RSRelease(need_replace);
+    }
     RSRange rangeResult = {0};
-    if (NO == RSStringFind(test, RSSTR("the"), RSStringGetRange(test), &rangeResult))
-    {
-        if (error)
-        {
+    if (NO == RSStringFind(test, RSSTR("the"), RSStringGetRange(test), &rangeResult)) {
+        if (error) {
             *error = unit_test_create_error(RSErrorDomainRSCoreFoundation,
                                             kErrMmUnknown,
                                             RSErrorDebugDescriptionKey,
@@ -90,10 +80,8 @@ static BOOL unit_test_string(RSErrorRef *error)
         return NO;
     }
     RSStringRef intest = RSSTR("wHat tHe hell with the testing...");
-    if (RSCompareEqualTo != RSStringCompareCaseInsensitive(intest, test))
-    {
-        if (error)
-        {
+    if (RSCompareEqualTo != RSStringCompareCaseInsensitive(intest, test)) {
+        if (error) {
             *error = unit_test_create_error(RSErrorDomainRSCoreFoundation,
                                             kErrMmUnknown,
                                             RSErrorDebugDescriptionKey,
@@ -101,10 +89,8 @@ static BOOL unit_test_string(RSErrorRef *error)
         }
         return NO;
     }
-    if (NO == RSStringHasPrefix(test, RSSTR("what")))
-    {
-        if (error)
-        {
+    if (NO == RSStringHasPrefix(test, RSSTR("what"))) {
+        if (error) {
             *error = unit_test_create_error(RSErrorDomainRSCoreFoundation,
                                             kErrMmUnknown,
                                             RSErrorDebugDescriptionKey,
@@ -112,10 +98,8 @@ static BOOL unit_test_string(RSErrorRef *error)
         }
         return NO;
     }
-    if (NO == RSStringHasSuffix(test, RSSTR("testing...")))
-    {
-        if (error)
-        {
+    if (NO == RSStringHasSuffix(test, RSSTR("testing..."))) {
+        if (error) {
             *error = unit_test_create_error(RSErrorDomainRSCoreFoundation,
                                             kErrMmUnknown,
                                             RSErrorDebugDescriptionKey,
@@ -129,7 +113,8 @@ static BOOL unit_test_string(RSErrorRef *error)
     RSShow(array);
     
     RSStringRef x = RSStringCreateByCombiningStrings(RSAllocatorDefault, array, RSSTR("/"));
-    RSShow(x);RSRelease(x);
+    RSShow(x);
+    RSRelease(x);
     RSRelease(array);
     RSRelease(string);
     
@@ -138,12 +123,10 @@ static BOOL unit_test_string(RSErrorRef *error)
     RSShow(ms);
     RSRelease(ms);
     
-    
     return YES;
 }
 
-static BOOL unit_test_timer(RSErrorRef *error)
-{
+static BOOL unit_test_timer(RSErrorRef *error) {
     RSLog(RSSTR("---0"));
     RSPerformBlockAfterDelay(2.0f, ^{
         RSLog(RSSTR("---TIMER"));
@@ -157,27 +140,25 @@ static BOOL unit_test_timer(RSErrorRef *error)
     return YES;
 }
 
-static BOOL unit_test_json(RSErrorRef *error)
-{
+static BOOL unit_test_json(RSErrorRef *error) {
     RSStringRef __autorelease pd = RSFileManagerStandardizingPath(RSSTR("~/Desktop/tests"));
     RSArrayRef paths = RSFileManagerSubpathsOfDirectory(RSFileManagerGetDefault(), pd, nil);
     RSShow(paths);
     
     RSStringRef full = nil;
     RSIndex cnt = RSArrayGetCount(paths);
-    for (RSIndex idx = 0; idx < cnt; idx++)
-    {
+    for (RSIndex idx = 0; idx < cnt; idx++) {
         full = RSStringCreateWithFormat(RSAllocatorDefault, RSSTR("%R/%R"), pd, RSArrayObjectAtIndex(paths, idx));
         RSDataRef json = RSDataCreateWithContentOfPath(RSAllocatorDefault, full);
         RSTypeRef d = RSJSONSerializationCreateWithJSONData(RSAllocatorDefault, json);;
         RSRelease(json);
-        if (d)
+        if (d) {
             RSShow(d);
+        }
         RSRelease(d);
         RSRelease(full);
         
-        if (!d)
-        {
+        if (!d) {
             return NO;
         }
     }
@@ -186,7 +167,23 @@ static BOOL unit_test_json(RSErrorRef *error)
     return YES;
 }
 
-struct __UTFunction _func_table[] = {unit_test_plist, unit_test_string, unit_test_runperform, unit_test_timer};
+static BOOL unit_test_array_insert(RSErrorRef *error) {
+    RSMutableArrayRef mutableArray = RSArrayCreateMutable(RSAllocatorDefault, 0);
+    RSArrayAddObject(mutableArray, RSSTR("value0"));
+    RSArrayAddObject(mutableArray, RSSTR("value2"));
+    RSArrayInsertObjectAtIndex(mutableArray, 1, RSSTR("value1"));
+    RSLog(RSSTR("%R"), mutableArray);
+    RSRelease(mutableArray);
+    return YES;
+}
+
+struct __UTFunction _func_table[] = {
+    unit_test_array_insert,
+    unit_test_plist,
+    unit_test_string,
+    unit_test_runperform,
+    unit_test_timer
+};
 
 static unsigned int _kSizeOfF = sizeof(_func_table)/ sizeof(struct __UTFunction);
  
