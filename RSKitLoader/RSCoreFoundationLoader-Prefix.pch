@@ -1,7 +1,0 @@
-//
-// Prefix header for all source files of the 'RSCoreFoundationLoader' target in the 'RSCoreFoundationLoader' project
-//
-
-#ifdef __OBJC__
-    #import <Cocoa/Cocoa.h>
-#endif
